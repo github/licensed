@@ -1,0 +1,9 @@
+{
+  "name": "licensed",
+  "dependencies": {
+    "jquery": "2.1.4"
+  },
+  "devDependencies": {
+    "mocha": "2.3.3"
+  }
+}

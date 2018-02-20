@@ -1,0 +1,5 @@
+{
+  "test/fixtures/manifest/test_1.c": "manifest_test",
+  "test/fixtures/manifest/subfolder/test_2.c": "manifest_test",
+  "script/console": "other"
+}

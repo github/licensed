@@ -1,0 +1,10 @@
+{
+  "name": "fixtures",
+  "version": "1.0.0",
+  "dependencies": {
+    "autoprefixer": "5.2.0"
+  },
+  "devDependencies": {
+    "string.prototype.startswith": "0.2.0"
+  }
+}

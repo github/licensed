@@ -1,0 +1,26 @@
+/.bundle/
+/.yardoc
+/Gemfile.lock
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+# test fixtures
+test/fixtures/bundler/.bundle/
+test/fixtures/bundler/vendor/
+test/fixtures/bundler/Gemfile.lock
+test/fixtures/bower/bower_components
+test/fixtures/npm/node_modules
+test/fixtures/npm/package-lock.json
+test/fixtures/go/src/*
+test/fixtures/go/pkg
+!test/fixtures/go/src/test
+test/fixtures/haskell/dist*
+
+vendor/licenses
+.licenses
+*.gem
+vendor/gems
