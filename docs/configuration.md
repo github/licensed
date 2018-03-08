@@ -25,8 +25,8 @@ source_path: 'relative/path/to/source'
 # Sources of metadata
 # All sources will attempt to run unless explicitly disabled
 sources:
-  - bower: true
-  - rubygem: false
+  bower: true
+  rubygem: false
 
 # Dependencies with these licenses are allowed by default.
 allowed:
@@ -71,8 +71,8 @@ Here are some examples:
 #### Inheriting configuration
 ```yml
 sources:
-  - go: true
-  - rubygem: false
+  go: true
+  rubygem: false
 
 ignored:
   rubygem:
@@ -87,8 +87,8 @@ apps:
   - source_path: 'path/to/app1'
   - source_path: 'path/to/app2'
     sources:
-      - rubygem: true
-      - go: false
+      rubygem: true
+      go: false
 ```
 
 In this example, two apps have been declared.  The first app, with `source_path` `path/to/app1`, inherits all configuration settings from the root configuration.  The second app, with `source_path` `path/to/app2`, overrides the `sources` configuration and inherits all other settings.
