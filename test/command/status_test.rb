@@ -17,6 +17,12 @@ describe Licensed::Command::Status do
     end
   end
 
+  after do
+    config.apps.each do |app|
+      FileUtils.rm_rf app.cache_path
+    end
+  end
+
   it "warns if license is not allowed" do
     out, _ = capture_io { verifier.run }
     assert_match(/license needs reviewed: mit/, out)

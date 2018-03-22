@@ -8,10 +8,15 @@ describe Licensed::Command::Cache do
 
   before do
     config.ui.level = "silent"
-    FileUtils.rm_rf config.cache_path
     config.apps.each do |app|
       app.sources.clear
       app.sources << source
+    end
+  end
+
+  after do
+    config.apps.each do |app|
+      FileUtils.rm_rf app.cache_path
     end
   end
 
