@@ -24,3 +24,5 @@ vendor/licenses
 .licenses
 *.gem
 vendor/gems
+
+bin/
