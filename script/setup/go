@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+if [ -z "$(which go)" ]; then
+  echo "The Go runtime environment is required." >&2
+  exit 1
+fi
+
+# setup test fixtures
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+export GOPATH="$BASE_PATH/test/fixtures/go"
+cd $BASE_PATH/test/fixtures/go/src/test
+go get
