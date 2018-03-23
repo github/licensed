@@ -18,3 +18,30 @@ Minitest::Spec.class_eval do
     Licensed.use_github = false
   end
 end
+
+class TestSource
+  attr_accessor :dependencies_hook
+
+  def initialize
+    @dependencies_hook = nil
+  end
+
+  def type
+    "test"
+  end
+
+  def enabled?
+    true
+  end
+
+  def dependencies
+    @dependencies_hook.call if @dependencies_hook.respond_to?(:call)
+    @dependencies ||= [
+      Licensed::Dependency.new(Dir.pwd, {
+        "type"     => type,
+        "name"     => "dependency",
+        "version"  => "1.0"
+      })
+    ]
+  end
+end
