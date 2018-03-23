@@ -3,8 +3,14 @@ require "test_helper"
 
 describe Licensed::Command::Status do
   let(:config) { Licensed::Configuration.new }
+  let(:source) { TestSource.new }
 
   before do
+    config.apps.each do |app|
+      app.sources.clear
+      app.sources << source
+    end
+
     config.ui.silence do
       Licensed::Command::Cache.new(config.dup).run(force: true)
     end
@@ -24,24 +30,24 @@ describe Licensed::Command::Status do
 
   it "does not warn if dependency is ignored" do
     out, _ = capture_io { @verifier.run }
-    assert_match(/licensee.txt/, out)
+    assert_match(/dependency.txt/, out)
 
-    config.ignore "type" => "rubygem", "name" => "licensee"
+    config.ignore "type" => "test", "name" => "dependency"
     out, _ = capture_io { @verifier.run }
-    refute_match(/licensee.txt/, out)
+    refute_match(/dependency.txt/, out)
   end
 
   it "does not warn if dependency is reviewed" do
     out, _ = capture_io { @verifier.run }
-    assert_match(/licensee/, out)
+    assert_match(/dependency/, out)
 
-    config.review "type" => "rubygem", "name" => "licensee"
+    config.review "type" => "test", "name" => "dependency"
     out, _ = capture_io { @verifier.run }
-    refute_match(/licensee/, out)
+    refute_match(/dependency/, out)
   end
 
   it "warns if license is empty" do
-    filename = config.cache_path.join("rubygem/licensee.txt")
+    filename = config.cache_path.join("test/dependency.txt")
     license = Licensed::License.read(filename)
     license.text = ""
     license.save(filename)
@@ -57,24 +63,24 @@ describe Licensed::Command::Status do
   end
 
   it "warns if cached license data missing" do
-    FileUtils.rm config.cache_path.join("rubygem/licensee.txt")
+    FileUtils.rm config.cache_path.join("test/dependency.txt")
     out, _ = capture_io { @verifier.run }
     assert_match(/cached license data missing/, out)
   end
 
   it "does not warn if cached license data missing for ignored gem" do
-    FileUtils.rm config.cache_path.join("rubygem/licensee.txt")
-    config.ignore "type" => "rubygem", "name" => "licensee"
+    FileUtils.rm config.cache_path.join("test/dependency.txt")
+    config.ignore "type" => "test", "name" => "dependency"
 
     out, _ = capture_io { @verifier.run }
-    refute_match(/licensee/, out)
+    refute_match(/dependency/, out)
   end
 
   it "does not include ignored dependencies in dependency counts" do
     out, _ = capture_io { @verifier.run }
     count = out.match(/(\d+) dependencies checked/)[1].to_i
 
-    config.ignore "type" => "rubygem", "name" => "licensee"
+    config.ignore "type" => "test", "name" => "dependency"
     out, _ = capture_io { @verifier.run }
     ignored_count = out.match(/(\d+) dependencies checked/)[1].to_i
     assert_equal count - 1, ignored_count
@@ -110,8 +116,8 @@ describe Licensed::Command::Status do
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      out, _ = capture_io { @verifier.run }
-      assert_match(/autoprefixer.txt:\s+?- license needs reviewed/, out)
+      source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
+      capture_io { @verifier.run }
     end
   end
 end
