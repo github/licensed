@@ -4,7 +4,7 @@ require "rake/testtask"
 
 desc "Run source setup scripts"
 task :setup do
-  Dir["script/setup/*"].each do |script|
+  Dir["script/source-setup/*"].each do |script|
     # green
     puts "\033[32mRunning #{script}.\e[0m"
 
