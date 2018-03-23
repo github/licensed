@@ -45,3 +45,13 @@ class TestSource
     ]
   end
 end
+
+def each_source(&block)
+  Licensed::Source.constants.each do |source_type|
+    # TODO: enable bundler - needs bundler shims from bundler_test.rb when finding dependencies
+    # TODO: enable go - needs dynamically settable GOPATH
+    next if source_type == :Go || source_type == :Bundler
+
+    block.call(source_type)
+  end
+end
