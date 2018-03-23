@@ -5,6 +5,7 @@ describe Licensed::Command::Cache do
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new }
   let(:generator) { Licensed::Command::Cache.new(config) }
+  let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
     config.ui.level = "silent"
@@ -20,12 +21,24 @@ describe Licensed::Command::Cache do
     end
   end
 
-  it "extracts license info for each ruby dep" do
-    generator.run
-    assert config.cache_path.join("test/dependency.txt").exist?
-    license = Licensed::License.read(config.cache_path.join("test/dependency.txt"))
-    assert_equal "dependency", license["name"]
-    assert_equal "mit", license["license"]
+  each_source do |source_type|
+    describe "with #{source_type}" do
+      let(:yaml) { YAML.load_file(File.join(fixtures, "command/#{source_type.to_s.downcase}.yml")) }
+      let(:expected_dependency) { yaml["expected_dependency"] }
+
+      let(:config) { Licensed::Configuration.new(yaml["config"]) }
+      let(:source) { Licensed::Source.const_get(source_type).new(config) }
+
+      it "extracts license info" do
+        generator.run
+
+        path = config.cache_path.join("#{source.type}/#{expected_dependency}.txt")
+        assert path.exist?
+        license = Licensed::License.read(path)
+        assert_equal expected_dependency, license["name"]
+        assert license["license"]
+      end
+    end
   end
 
   it "cleans up old dependencies" do
@@ -82,7 +95,6 @@ describe Licensed::Command::Cache do
   end
 
   describe "with app.source_path" do
-    let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do

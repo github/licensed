@@ -5,6 +5,7 @@ describe Licensed::Command::List do
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new }
   let(:command) { Licensed::Command::List.new(config) }
+  let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
     config.apps.each do |app|
@@ -13,10 +14,19 @@ describe Licensed::Command::List do
     end
   end
 
-  it "lists dependencies for all source types" do
-    out, = capture_io { command.run }
-    config.sources.each do |s|
-      assert_match(/#{s.type} dependencies:/, out)
+  each_source do |source_type|
+    describe "with #{source_type}" do
+      let(:yaml) { YAML.load_file(File.join(fixtures, "command/#{source_type.to_s.downcase}.yml")) }
+      let(:expected_dependency) { yaml["expected_dependency"] }
+
+      let(:config) { Licensed::Configuration.new(yaml["config"]) }
+      let(:source) { Licensed::Source.const_get(source_type).new(config) }
+
+      it "lists dependencies" do
+        out, = capture_io { command.run }
+        assert_match(/Found #{expected_dependency}/, out)
+        assert_match(/#{source.type} dependencies:/, out)
+      end
     end
   end
 
@@ -58,12 +68,11 @@ describe Licensed::Command::List do
   end
 
   describe "with app.source_path" do
-    let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
       source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
-      capture_io { command.run } 
+      capture_io { command.run }
     end
   end
 end
