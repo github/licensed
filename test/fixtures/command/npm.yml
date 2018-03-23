@@ -1,0 +1,3 @@
+expected_dependency: autoprefixer
+config:
+  source_path: test/fixtures/npm
