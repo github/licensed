@@ -2,8 +2,8 @@
 set -e
 
 if [ -z "$(which bower)" ]; then
-  echo "bower is required." >&2
-  exit 1
+  echo "A local bower installation is required for bower development." >&2
+  exit 127
 fi
 
 # setup test fixtures

@@ -2,8 +2,8 @@
 set -e
 
 if [ -z "$(which npm)" ]; then
-  echo "npm is required." >&2
-  exit 1
+  echo "A local npm installation is required for npm development." >&2
+  exit 127
 fi
 
 # setup test fixtures

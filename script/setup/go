@@ -2,8 +2,8 @@
 set -e
 
 if [ -z "$(which go)" ]; then
-  echo "The Go runtime environment is required." >&2
-  exit 1
+  echo "A local Go installation is required for go development." >&2
+  exit 127
 fi
 
 # setup test fixtures
