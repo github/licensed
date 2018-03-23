@@ -52,6 +52,9 @@ def each_source(&block)
     # TODO: enable go - needs dynamically settable GOPATH
     next if source_type == :Go || source_type == :Bundler
 
+    # if a specific source type is set via ENV, skip other source types
+    next if ENV["SOURCE_TEST"] && source_type.to_s.downcase != ENV["SOURCE_TEST"].downcase
+
     block.call(source_type)
   end
 end
