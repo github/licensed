@@ -2,42 +2,4 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-if [ -n "$(which bundle)" ]; then
-  bundle install --path vendor/gems
-fi
-
-cd test/fixtures
-
-if [ -n "$(which bundle)" ]; then
-  pushd bundler
-  bundle install --path vendor/gems
-  popd
-fi
-
-# Install bower fixtures
-if [ -n "$(which bower)" ]; then
-  pushd bower
-  bower install
-  popd
-fi
-
-# Install npm fixtures
-if [ -n "$(which npm)" ]; then
-  pushd npm
-  npm install
-  popd
-fi
-
-if [ -n "$(which go)" ]; then
-  export GOPATH="`pwd`/go"
-
-  pushd go/src/test
-  go get || true
-  popd
-fi
-
-if [ -n "$(which cabal)" ]; then
-  pushd haskell
-  cabal new-build
-  popd
-fi
+bundle install --path vendor/gems

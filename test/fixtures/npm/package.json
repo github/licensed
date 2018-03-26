@@ -6,5 +6,8 @@
   },
   "devDependencies": {
     "string.prototype.startswith": "0.2.0"
-  }
+  },
+  "description": "npm test fixture",
+  "repository": "https://github.com/github/licensed",
+  "license": "MIT"
 }
