@@ -9,30 +9,30 @@ if Licensed::Shell.tool_available?("go")
 
     before do
       ENV["GOPATH"] = go_path
-      @config = Licensed::Configuration.new
-      @source = Licensed::Source::Go.new(@config)
     end
+    let(:config) { Licensed::Configuration.new }
+    let(:source) { Licensed::Source::Go.new(config) }
 
     describe "enabled?" do
       it "is true if go source is available" do
         Dir.chdir(fixtures) do
-          assert @source.enabled?
+          assert source.enabled?
         end
       end
 
       it "is false if go source is not available" do
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
-            refute @source.enabled?
+            refute source.enabled?
           end
         end
       end
 
       it "is false if disabled" do
         Dir.chdir(fixtures) do
-          assert @source.enabled?
-          @config["sources"][@source.type] = false
-          refute @source.enabled?
+          assert source.enabled?
+          config["sources"][source.type] = false
+          refute source.enabled?
         end
       end
     end
@@ -40,7 +40,7 @@ if Licensed::Shell.tool_available?("go")
     describe "dependencies" do
       it "includes direct dependencies" do
         Dir.chdir fixtures do
-          dep = @source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+          dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
           assert dep
           assert_equal "go", dep["type"]
           assert dep["homepage"]
@@ -50,7 +50,7 @@ if Licensed::Shell.tool_available?("go")
 
       it "includes indirect dependencies" do
         Dir.chdir fixtures do
-          dep = @source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru/simplelru" }
+          dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru/simplelru" }
           assert dep
           assert_equal "go", dep["type"]
           assert dep["homepage"]
@@ -59,7 +59,7 @@ if Licensed::Shell.tool_available?("go")
 
       it "doesn't include depenencies from the go std library" do
         Dir.chdir fixtures do
-          refute @source.dependencies.any? { |d| d["name"] == "runtime" }
+          refute source.dependencies.any? { |d| d["name"] == "runtime" }
         end
       end
 
@@ -85,17 +85,17 @@ if Licensed::Shell.tool_available?("go")
         end
 
         it "do not raise an error if ignored" do
-          @config.ignore("type" => "go", "name" => "github.com/hashicorp/golang-lru")
+          config.ignore("type" => "go", "name" => "github.com/hashicorp/golang-lru")
 
           Dir.chdir @tmpfixtures do
-            @source.dependencies
+            source.dependencies
           end
         end
 
         it "raises an error" do
           Dir.chdir @tmpfixtures do
             assert_raises RuntimeError do
-              @source.dependencies
+              source.dependencies
             end
           end
         end
@@ -104,7 +104,7 @@ if Licensed::Shell.tool_available?("go")
       describe "search root" do
         it "is set to the vendor path for vendored packages" do
           Dir.chdir fixtures do
-            dep = @source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+            dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
             assert dep
             assert_equal File.join(fixtures, "vendor"), dep.search_root
           end
@@ -112,7 +112,7 @@ if Licensed::Shell.tool_available?("go")
 
         it "is set to GOPATH if available" do
           Dir.chdir fixtures do
-            dep = @source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+            dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
             assert dep
             assert_equal go_path, dep.search_root
           end
@@ -123,7 +123,7 @@ if Licensed::Shell.tool_available?("go")
         it "is nil when git is unavailable" do
           Dir.chdir fixtures do
             Licensed::Git.stub(:available?, false) do
-              dep = @source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+              dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
               assert_nil dep["version"]
             end
           end
@@ -131,7 +131,7 @@ if Licensed::Shell.tool_available?("go")
 
         it "is the latest git SHA of the package directory" do
           Dir.chdir fixtures do
-            dep = @source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+            dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
             assert_match(/[a-f0-9]{40}/, dep["version"])
           end
         end
