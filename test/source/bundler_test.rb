@@ -3,27 +3,6 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("bundle")
-  module Bundler
-    class << self
-      # helper to clear all bundler environment around a yielded block
-      def with_local_configuration
-        # with the clean, original environment
-        with_original_env do
-          # reset all bundler configuration
-          reset!
-          # and re-configure with settings for current directory
-          configure
-
-          yield
-        end
-      ensure
-        # restore bundler configuration
-        reset!
-        configure
-      end
-    end
-  end
-
   describe Licensed::Source::Bundler do
     let(:fixtures) { File.expand_path("../../fixtures/bundler", __FILE__) }
     let(:config) { Licensed::Configuration.new }
@@ -74,11 +53,9 @@ if Licensed::Shell.tool_available?("bundle")
     describe "dependencies" do
       it "finds dependencies from Gemfile" do
         Dir.chdir(fixtures) do
-          ::Bundler.with_local_configuration do
-            dep = source.dependencies.find { |d| d["name"] == "semantic" }
-            assert dep
-            assert_equal "1.6.0", dep["version"]
-          end
+          dep = source.dependencies.find { |d| d["name"] == "semantic" }
+          assert dep
+          assert_equal "1.6.0", dep["version"]
         end
       end
     end
