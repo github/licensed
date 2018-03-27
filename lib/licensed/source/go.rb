@@ -124,6 +124,8 @@ module Licensed
         @std_packages ||= Licensed::Shell.execute("go", "list", "std").lines.map(&:strip)
       end
 
+      # Returns a GOPATH value from either a configuration value or ENV["GOPATH"],
+      # with the configuration value preferred over the ENV var
       def gopath
         return @gopath if defined?(@gopath)
 
@@ -137,6 +139,8 @@ module Licensed
 
       private
 
+      # Execute a block with ENV["GOPATH"] set to the value of #gopath.
+      # Any pre-existing ENV["GOPATH"] value is restored after the block ends.
       def with_configured_gopath(&block)
         begin
           original_gopath = ENV["GOPATH"]
