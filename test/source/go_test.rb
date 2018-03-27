@@ -6,11 +6,7 @@ if Licensed::Shell.tool_available?("go")
   describe Licensed::Source::Go do
     let(:go_path) { File.expand_path("../../fixtures/go", __FILE__) }
     let(:fixtures) { File.join(go_path, "src/test") }
-
-    before do
-      ENV["GOPATH"] = go_path
-    end
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::Configuration.new("go" => { "GOPATH" => go_path }) }
     let(:source) { Licensed::Source::Go.new(config) }
 
     describe "enabled?" do
@@ -34,6 +30,20 @@ if Licensed::Shell.tool_available?("go")
           config["sources"][source.type] = false
           refute source.enabled?
         end
+      end
+    end
+
+    it "uses ENV['GOPATH'] if not set in configuration" do
+      begin
+        original_go_path = ENV["GOPATH"]
+        ENV["GOPATH"] = go_path
+        config.delete("go")
+
+        Dir.chdir fixtures do
+          assert source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+        end
+      ensure
+        ENV["GOPATH"] = original_go_path
       end
     end
 
@@ -64,16 +74,18 @@ if Licensed::Shell.tool_available?("go")
       end
 
       describe "with unavailable packages" do
-        before do
-          @tmpdir = Dir.mktmpdir
-          FileUtils.mkdir File.join(@tmpdir, "src")
-          ENV["GOPATH"] = @tmpdir
+        # use a custom go path that doesn't contain go libraries installed from
+        # setup scripts
+        let(:go_path) { Dir.mktmpdir }
 
-          @tmpfixtures = File.join(@tmpdir, "src/test")
-          FileUtils.cp_r File.join(go_path, "src/test"), @tmpfixtures
+        before do
+          # fixtures now points at the tmp location, copy go source to tmp
+          # fixtures location
+          FileUtils.mkdir_p File.join(go_path, "src")
+          FileUtils.cp_r File.expand_path("../../fixtures/go/src/test", __FILE__), fixtures
 
           # the tests are expected to print errors from `go list` which
-          # should not be hidden during normal usage.  hide that output during
+          # should not be hidden during normal usage. hide that output during
           # the test execution
           @previous_stderr = $stderr
           $stderr.reopen(File.new("/dev/null", "w"))
@@ -81,19 +93,19 @@ if Licensed::Shell.tool_available?("go")
 
         after do
           $stderr.reopen(@previous_stderr)
-          FileUtils.rm_rf @tmpdir
+          FileUtils.rm_rf go_path
         end
 
         it "do not raise an error if ignored" do
           config.ignore("type" => "go", "name" => "github.com/hashicorp/golang-lru")
 
-          Dir.chdir @tmpfixtures do
+          Dir.chdir fixtures do
             source.dependencies
           end
         end
 
         it "raises an error" do
-          Dir.chdir @tmpfixtures do
+          Dir.chdir fixtures do
             assert_raises RuntimeError do
               source.dependencies
             end
@@ -110,7 +122,7 @@ if Licensed::Shell.tool_available?("go")
           end
         end
 
-        it "is set to GOPATH if available" do
+        it "is set to #gopath" do
           Dir.chdir fixtures do
             dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
             assert dep
