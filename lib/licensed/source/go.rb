@@ -18,25 +18,27 @@ module Licensed
       end
 
       def dependencies
-        @dependencies ||= packages.map do |package_name|
-          package = package_info(package_name)
-          import_path = non_vendored_import_path(package_name)
+        @dependencies ||= with_configured_gopath do
+          packages.map do |package_name|
+            package = package_info(package_name)
+            import_path = non_vendored_import_path(package_name)
 
-          if package.empty?
-            next if @config.ignored?("type" => type, "name" => package_name)
-            raise "couldn't find package for #{import_path}"
-          end
+            if package.empty?
+              next if @config.ignored?("type" => type, "name" => package_name)
+              raise "couldn't find package for #{import_path}"
+            end
 
-          package_dir = package["Dir"]
-          Dependency.new(package_dir, {
-            "type"        => type,
-            "name"        => import_path,
-            "summary"     => package["Doc"],
-            "homepage"    => homepage(import_path),
-            "search_root" => search_root(package_dir),
-            "version"     => Licensed::Git.version(package_dir)
-          })
-        end.compact
+            package_dir = package["Dir"]
+            Dependency.new(package_dir, {
+              "type"        => type,
+              "name"        => import_path,
+              "summary"     => package["Doc"],
+              "homepage"    => homepage(import_path),
+              "search_root" => search_root(package_dir),
+              "version"     => Licensed::Git.version(package_dir)
+            })
+          end.compact
+        end
       end
 
       # Returns the homepage for a package import_path.  Assumes that the
@@ -70,7 +72,7 @@ module Licensed
         # 2. GOPATH
         # 3. nil (no search up directory hierarchy)
         return package_dir.match("^(.*/vendor)/.*$")[1] if vendored_path?(package_dir)
-        ENV.fetch("GOPATH", nil)
+        gopath
       end
 
       # Returns whether a package is vendored or not based on the package
@@ -120,6 +122,23 @@ module Licensed
       # Returns a list of go standard packages
       def go_std_packages
         @std_packages ||= Licensed::Shell.execute("go", "list", "std").lines.map(&:strip)
+      end
+
+      private
+
+      def with_configured_gopath(&block)
+        begin
+          original_gopath = ENV["GOPATH"]
+          ENV["GOPATH"] = gopath
+
+          block.call
+        ensure
+          ENV["GOPATH"] = original_gopath
+        end
+      end
+
+      def gopath
+        @gopath ||= @config.dig("go", "GOPATH") || ENV["GOPATH"]
       end
     end
   end
