@@ -125,7 +125,14 @@ module Licensed
       end
 
       def gopath
-        @gopath ||= File.expand_path(@config.dig("go", "GOPATH") || ENV["GOPATH"], @config.pwd)
+        return @gopath if defined?(@gopath)
+
+        path = @config.dig("go", "GOPATH")
+        @gopath = if path.nil? || path.empty?
+                    ENV["GOPATH"]
+                  else
+                    File.expand_path(path, @config.pwd)
+                  end
       end
 
       private
