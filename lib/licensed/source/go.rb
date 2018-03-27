@@ -124,6 +124,10 @@ module Licensed
         @std_packages ||= Licensed::Shell.execute("go", "list", "std").lines.map(&:strip)
       end
 
+      def gopath
+        @gopath ||= File.expand_path(@config.dig("go", "GOPATH") || ENV["GOPATH"], @config.pwd)
+      end
+
       private
 
       def with_configured_gopath(&block)
@@ -135,10 +139,6 @@ module Licensed
         ensure
           ENV["GOPATH"] = original_gopath
         end
-      end
-
-      def gopath
-        @gopath ||= @config.dig("go", "GOPATH") || ENV["GOPATH"]
       end
     end
   end

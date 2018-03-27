@@ -33,17 +33,36 @@ if Licensed::Shell.tool_available?("go")
       end
     end
 
-    it "uses ENV['GOPATH'] if not set in configuration" do
-      begin
-        original_go_path = ENV["GOPATH"]
-        ENV["GOPATH"] = go_path
-        config.delete("go")
+    describe "gopath" do
+      it "works with an absolute configuration path" do
+        assert_equal go_path, source.gopath
+      end
 
-        Dir.chdir fixtures do
-          assert source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+      it "works with a configuration path relative to the source path" do
+        config["go"]["GOPATH"] = "test/fixtures/go"
+        assert_equal go_path, source.gopath
+      end
+
+      it "works with an expandable configuration path" do
+        config["go"]["GOPATH"] = "~"
+        assert_equal File.expand_path("~"), source.gopath
+      end
+
+      it "uses ENV['GOPATH'] if not set in configuration" do
+        begin
+          original_go_path = ENV["GOPATH"]
+          ENV["GOPATH"] = go_path
+          config.delete("go")
+
+          assert_equal go_path, source.gopath
+
+          # sanity test that finding dependencies using ENV works
+          Dir.chdir fixtures do
+            assert source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+          end
+        ensure
+          ENV["GOPATH"] = original_go_path
         end
-      ensure
-        ENV["GOPATH"] = original_go_path
       end
     end
 
