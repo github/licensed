@@ -4,9 +4,9 @@ require "tmpdir"
 
 if Licensed::Shell.tool_available?("go")
   describe Licensed::Source::Go do
-    let(:go_path) { File.expand_path("../../fixtures/go", __FILE__) }
-    let(:fixtures) { File.join(go_path, "src/test") }
-    let(:config) { Licensed::Configuration.new("go" => { "GOPATH" => go_path }) }
+    let(:gopath) { File.expand_path("../../fixtures/go", __FILE__) }
+    let(:fixtures) { File.join(gopath, "src/test") }
+    let(:config) { Licensed::Configuration.new("go" => { "GOPATH" => gopath }) }
     let(:source) { Licensed::Source::Go.new(config) }
 
     describe "enabled?" do
@@ -35,12 +35,12 @@ if Licensed::Shell.tool_available?("go")
 
     describe "gopath" do
       it "works with an absolute configuration path" do
-        assert_equal go_path, source.gopath
+        assert_equal gopath, source.gopath
       end
 
       it "works with a configuration path relative to the source path" do
         config["go"]["GOPATH"] = "test/fixtures/go"
-        assert_equal go_path, source.gopath
+        assert_equal gopath, source.gopath
       end
 
       it "works with an expandable configuration path" do
@@ -50,18 +50,18 @@ if Licensed::Shell.tool_available?("go")
 
       it "uses ENV['GOPATH'] if not set in configuration" do
         begin
-          original_go_path = ENV["GOPATH"]
-          ENV["GOPATH"] = go_path
+          original_gopath = ENV["GOPATH"]
+          ENV["GOPATH"] = gopath
           config.delete("go")
 
-          assert_equal go_path, source.gopath
+          assert_equal gopath, source.gopath
 
           # sanity test that finding dependencies using ENV works
           Dir.chdir fixtures do
             assert source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
           end
         ensure
-          ENV["GOPATH"] = original_go_path
+          ENV["GOPATH"] = original_gopath
         end
       end
     end
@@ -95,12 +95,12 @@ if Licensed::Shell.tool_available?("go")
       describe "with unavailable packages" do
         # use a custom go path that doesn't contain go libraries installed from
         # setup scripts
-        let(:go_path) { Dir.mktmpdir }
+        let(:gopath) { Dir.mktmpdir }
 
         before do
           # fixtures now points at the tmp location, copy go source to tmp
           # fixtures location
-          FileUtils.mkdir_p File.join(go_path, "src")
+          FileUtils.mkdir_p File.join(gopath, "src")
           FileUtils.cp_r File.expand_path("../../fixtures/go/src/test", __FILE__), fixtures
 
           # the tests are expected to print errors from `go list` which
@@ -112,7 +112,7 @@ if Licensed::Shell.tool_available?("go")
 
         after do
           $stderr.reopen(@previous_stderr)
-          FileUtils.rm_rf go_path
+          FileUtils.rm_rf gopath
         end
 
         it "do not raise an error if ignored" do
@@ -145,7 +145,7 @@ if Licensed::Shell.tool_available?("go")
           Dir.chdir fixtures do
             dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
             assert dep
-            assert_equal go_path, dep.search_root
+            assert_equal gopath, dep.search_root
           end
         end
       end
