@@ -30,7 +30,7 @@ if Licensed::Shell.tool_available?("ghc")
     end
 
     describe "dependencies" do
-      let(:local_db) { "dist-newstyle/packagedb/ghc-<ghc_version>" }
+      let(:local_db) { File.join(fixtures, "dist-newstyle/packagedb/ghc-<ghc_version>") }
       let(:user_db) { "~/.cabal/store/ghc-<ghc_version>/package.db" }
 
       describe "without configured package dbs" do
@@ -67,6 +67,38 @@ if Licensed::Shell.tool_available?("ghc")
           assert dep["homepage"]
           assert dep["summary"]
         end
+      end
+    end
+
+    describe "package_db_args" do
+      it "recognizes global as a special arg" do
+        config["cabal"] = { "ghc_package_db" => ["global"] }
+        assert_equal ["--global"], source.package_db_args
+      end
+
+      it "recognizes user as a special arg" do
+        config["cabal"] = { "ghc_package_db" => ["user"] }
+        assert_equal ["--user"], source.package_db_args
+      end
+
+      it "allows paths relative to the repository root" do
+        config["cabal"] = { "ghc_package_db" => ["test/fixtures/haskell"] }
+        assert_equal ["--package-db=#{fixtures}"], source.package_db_args
+      end
+
+      it "allows expandable paths" do
+        config["cabal"] = { "ghc_package_db" => ["~"] }
+        assert_equal ["--package-db=#{File.expand_path("~")}"], source.package_db_args
+      end
+
+      it "allows absolute paths" do
+        config["cabal"] = { "ghc_package_db" => [fixtures] }
+        assert_equal ["--package-db=#{fixtures}"], source.package_db_args
+      end
+
+      it "does not allow paths that don't exist" do
+        config["cabal"] = { "ghc_package_db" => ["bad/path"] }
+        assert_equal [], source.package_db_args
       end
     end
   end

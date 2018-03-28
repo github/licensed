@@ -133,7 +133,7 @@ module Licensed
         @gopath = if path.nil? || path.empty?
                     ENV["GOPATH"]
                   else
-                    File.expand_path(path, @config.pwd)
+                    File.expand_path(path, Licensed::Git.repository_root)
                   end
       end
 
