@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+if [ -z "$(which cabal)" ]; then
+  echo "A local cabal installation is required for cabal development." >&2
+  exit 127
+fi
+
+# setup test fixtures
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd $BASE_PATH/test/fixtures/haskell
+cabal new-build

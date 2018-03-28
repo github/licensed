@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+if [ -z "$(which bundler)" ]; then
+  echo "A local bundler instalation is required for bundler development." >&2
+  exit 127
+fi
+
+# setup test fixtures
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd $BASE_PATH/test/fixtures/bundler
+
+# unset any pre-existing gemfile when installing test fixtures
+unset BUNDLE_GEMFILE
+
+bundle install --path $BASE_PATH/test/fixtures/bundler/vendor/gems

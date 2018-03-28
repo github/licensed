@@ -17,14 +17,16 @@ module Licensed
       end
 
       def dependencies
-        @dependencies ||= definition.specs_for(groups).map do |spec|
-          Dependency.new(spec.gem_dir, {
-            "type"     => type,
-            "name"     => spec.name,
-            "version"  => spec.version.to_s,
-            "summary"  => spec.summary,
-            "homepage" => spec.homepage
-          })
+        @dependencies ||= with_local_configuration do
+          definition.specs_for(groups).map do |spec|
+            Dependency.new(spec.gem_dir, {
+              "type"     => type,
+              "name"     => spec.name,
+              "version"  => spec.version.to_s,
+              "summary"  => spec.summary,
+              "homepage" => spec.homepage
+            })
+          end
         end
       end
 
@@ -48,6 +50,24 @@ module Licensed
         @config.pwd.join ::Bundler.default_lockfile.basename.to_s
       end
 
+      private
+
+      # helper to clear all bundler environment around a yielded block
+      def with_local_configuration
+        # with a clean, original environment
+        ::Bundler.with_original_env do
+          # reset all bundler configuration
+          ::Bundler.reset!
+          # and re-configure with settings for current directory
+          ::Bundler.configure
+
+          yield
+        end
+      ensure
+        # restore bundler configuration
+        ::Bundler.reset!
+        ::Bundler.configure
+      end
     end
   end
 end
