@@ -38,7 +38,7 @@ if Licensed::Shell.tool_available?("go")
         assert_equal gopath, source.gopath
       end
 
-      it "works with a configuration path relative to the source path" do
+      it "works with a configuration path relative to repository root" do
         config["go"]["GOPATH"] = "test/fixtures/go"
         assert_equal gopath, source.gopath
       end
