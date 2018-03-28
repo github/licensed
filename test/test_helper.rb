@@ -52,7 +52,7 @@ def each_source(&block)
     next if source_type == :Go
 
     # if a specific source type is set via ENV, skip other source types
-    next if ENV["SOURCE_TEST"] && source_type.to_s.downcase != ENV["SOURCE_TEST"].downcase
+    next if ENV["SOURCE"] && source_type.to_s.downcase != ENV["SOURCE"].downcase
 
     block.call(source_type)
   end
