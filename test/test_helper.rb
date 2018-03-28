@@ -48,9 +48,8 @@ end
 
 def each_source(&block)
   Licensed::Source.constants.each do |source_type|
-    # TODO: enable bundler - needs bundler shims from bundler_test.rb when finding dependencies
     # TODO: enable go - needs dynamically settable GOPATH
-    next if source_type == :Go || source_type == :Bundler
+    next if source_type == :Go
 
     # if a specific source type is set via ENV, skip other source types
     next if ENV["SOURCE_TEST"] && source_type.to_s.downcase != ENV["SOURCE_TEST"].downcase
