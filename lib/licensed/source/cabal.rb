@@ -135,7 +135,7 @@ module Licensed
         Array(@config["cabal"]["ghc_package_db"]).map do |path|
           next "--#{path}" if %w(global user).include?(path)
           path = realized_ghc_package_path(path)
-          path = File.expand_path(path, @config.pwd)
+          path = File.expand_path(path, Licensed::Git.repository_root)
 
           next unless File.exist?(path)
           "--package-db=#{path}"

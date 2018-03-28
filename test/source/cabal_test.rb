@@ -30,7 +30,7 @@ if Licensed::Shell.tool_available?("ghc")
     end
 
     describe "dependencies" do
-      let(:local_db) { "dist-newstyle/packagedb/ghc-<ghc_version>" }
+      let(:local_db) { File.join(fixtures, "dist-newstyle/packagedb/ghc-<ghc_version>") }
       let(:user_db) { "~/.cabal/store/ghc-<ghc_version>/package.db" }
 
       describe "without configured package dbs" do
