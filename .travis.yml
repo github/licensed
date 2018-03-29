@@ -38,3 +38,6 @@ matrix:
       rvm: 2.4.0
       before_script: ./script/source-setup/bundler
       script: ./script/test bundler
+
+notifications:
+  disable: true
