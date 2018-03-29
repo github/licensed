@@ -6,3 +6,9 @@ matrix:
     - language: ruby
       rvm: 2.4.0
       script: bundle exec rake rubocop build
+
+    # go tests
+    - language: go
+      go: 1.7.x
+      before_script: ./script/source-setup/go
+      script: ./script/test go
