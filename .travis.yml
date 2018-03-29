@@ -1,4 +1,8 @@
-language: ruby
-rvm:
-  - 2.2.3
-before_install: gem install bundler -v 1.10.6
+install: ./script/bootstrap
+
+matrix:
+  include:
+    # lint and build
+    - language: ruby
+      rvm: 2.4.0
+      script: bundle exec rake rubocop build
