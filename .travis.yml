@@ -12,3 +12,9 @@ matrix:
       go: 1.7.x
       before_script: ./script/source-setup/go
       script: ./script/test go
+
+    # cabal tests
+    - language: haskell
+      ghc: "8.2"
+      before_script: ./script/source-setup/cabal
+      script: ./script/test cabal
