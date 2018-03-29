@@ -2,4 +2,8 @@
 
 set -e
 
-bundle exec rake test
+if [ $# -gt 0 ]; then
+  bundle exec rake "${@/#/test:}"
+else
+  bundle exec rake test
+fi
