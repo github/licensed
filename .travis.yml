@@ -39,5 +39,10 @@ matrix:
       before_script: ./script/source-setup/bundler
       script: ./script/test bundler
 
+    # manifest tests
+    - language: ruby
+      rvm: 2.4.0
+      script: ./script/test manifest
+
 notifications:
   disable: true
