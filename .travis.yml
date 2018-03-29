@@ -32,3 +32,9 @@ matrix:
         - npm install -g bower
         - ./script/source-setup/bower
       script: ./script/test bower
+
+    # bundler tests
+    - language: ruby
+      rvm: 2.4.0
+      before_script: ./script/source-setup/bundler
+      script: ./script/test bundler
