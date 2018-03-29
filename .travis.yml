@@ -18,3 +18,9 @@ matrix:
       ghc: "8.2"
       before_script: ./script/source-setup/cabal
       script: ./script/test cabal
+
+    # npm tests
+    - language: node_js
+      node_js: "8"
+      before_script: ./script/source-setup/npm
+      script: ./script/test npm
