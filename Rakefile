@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "bundler/gem_tasks"
 require "rake/testtask"
+require "rubocop/rake_task"
 
 desc "Run source setup scripts"
 task :setup do
@@ -51,6 +52,12 @@ Rake::TestTask.new(:test) do |t|
   t.libs << "test"
   t.libs << "lib"
   t.test_files = FileList["test/**/*_test.rb"]
+end
+
+# add rubocop task
+# -S adds styleguide urls to offense messages
+RuboCop::RakeTask.new do |t|
+  t.options.push "-S"
 end
 
 task default: :test
