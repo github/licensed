@@ -3,34 +3,57 @@ require "test_helper"
 
 describe Licensed::Command::Cache do
   let(:config) { Licensed::Configuration.new }
+  let(:source) { TestSource.new }
   let(:generator) { Licensed::Command::Cache.new(config) }
+  let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
     config.ui.level = "silent"
-    FileUtils.rm_rf config.cache_path
+    config.apps.each do |app|
+      app.sources.clear
+      app.sources << source
+    end
   end
 
-  it "extracts license info for each ruby dep" do
-    generator.run
-    assert config.cache_path.join("rubygem/licensee.txt").exist?
-    license = Licensed::License.read(config.cache_path.join("rubygem/licensee.txt"))
-    assert_equal "licensee", license["name"]
-    assert_equal "mit", license["license"]
+  after do
+    config.apps.each do |app|
+      FileUtils.rm_rf app.cache_path
+    end
+  end
+
+  each_source do |source_type|
+    describe "with #{source_type}" do
+      let(:yaml) { YAML.load_file(File.join(fixtures, "command/#{source_type.to_s.downcase}.yml")) }
+      let(:expected_dependency) { yaml["expected_dependency"] }
+
+      let(:config) { Licensed::Configuration.new(yaml["config"]) }
+      let(:source) { Licensed::Source.const_get(source_type).new(config) }
+
+      it "extracts license info" do
+        generator.run
+
+        path = config.cache_path.join("#{source.type}/#{expected_dependency}.txt")
+        assert path.exist?
+        license = Licensed::License.read(path)
+        assert_equal expected_dependency, license["name"]
+        assert license["license"]
+      end
+    end
   end
 
   it "cleans up old dependencies" do
-    FileUtils.mkdir_p config.cache_path.join("rubygem")
-    File.write config.cache_path.join("rubygem/old_dep.txt"), ""
+    FileUtils.mkdir_p config.cache_path.join("test")
+    File.write config.cache_path.join("test/old_dep.txt"), ""
     generator.run
-    refute config.cache_path.join("rubygem/old_dep.txt").exist?
+    refute config.cache_path.join("test/old_dep.txt").exist?
   end
 
   it "cleans up ignored dependencies" do
-    FileUtils.mkdir_p config.cache_path.join("rubygem")
-    File.write config.cache_path.join("rubygem/licensee.txt"), ""
-    config.ignore "type" => "rubygem", "name" => "licensee"
+    FileUtils.mkdir_p config.cache_path.join("test")
+    File.write config.cache_path.join("test/dependency.txt"), ""
+    config.ignore "type" => "test", "name" => "dependency"
     generator.run
-    refute config.cache_path.join("rubygem/licensee.txt").exist?
+    refute config.cache_path.join("test/dependency.txt").exist?
   end
 
   it "does not include ignored dependencies in dependency counts" do
@@ -38,9 +61,9 @@ describe Licensed::Command::Cache do
     out, _ = capture_io { generator.run }
     count = out.match(/dependencies: (\d+)/)[1].to_i
 
-    FileUtils.mkdir_p config.cache_path.join("rubygem")
-    File.write config.cache_path.join("rubygem/licensee.txt"), ""
-    config.ignore "type" => "rubygem", "name" => "licensee"
+    FileUtils.mkdir_p config.cache_path.join("test")
+    File.write config.cache_path.join("test/dependency.txt"), ""
+    config.ignore "type" => "test", "name" => "dependency"
 
     out, _ = capture_io { generator.run }
     ignored_count = out.match(/dependencies: (\d+)/)[1].to_i
@@ -66,21 +89,17 @@ describe Licensed::Command::Cache do
 
     it "caches metadata for all apps" do
       generator.run
-      assert config["apps"][0].cache_path.join("rubygem/licensee.txt").exist?
-      assert config["apps"][1].cache_path.join("rubygem/licensee.txt").exist?
+      assert config["apps"][0].cache_path.join("test/dependency.txt").exist?
+      assert config["apps"][1].cache_path.join("test/dependency.txt").exist?
     end
   end
 
   describe "with app.source_path" do
-    let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      config.stub(:enabled?, ->(type) { type == "npm" }) do
-        generator.run
-      end
-
-      assert config.cache_path.join("npm/autoprefixer.txt").exist?
+      source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
+      generator.run
     end
   end
 end

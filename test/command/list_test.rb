@@ -3,23 +3,41 @@ require "test_helper"
 
 describe Licensed::Command::List do
   let(:config) { Licensed::Configuration.new }
+  let(:source) { TestSource.new }
   let(:command) { Licensed::Command::List.new(config) }
+  let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
-  it "lists dependencies for all source types" do
-    out, = capture_io { command.run }
-    config.sources.each do |s|
-      assert_match(/#{s.type} dependencies:/, out)
+  before do
+    config.apps.each do |app|
+      app.sources.clear
+      app.sources << source
+    end
+  end
+
+  each_source do |source_type|
+    describe "with #{source_type}" do
+      let(:yaml) { YAML.load_file(File.join(fixtures, "command/#{source_type.to_s.downcase}.yml")) }
+      let(:expected_dependency) { yaml["expected_dependency"] }
+
+      let(:config) { Licensed::Configuration.new(yaml["config"]) }
+      let(:source) { Licensed::Source.const_get(source_type).new(config) }
+
+      it "lists dependencies" do
+        out, = capture_io { command.run }
+        assert_match(/Found #{expected_dependency}/, out)
+        assert_match(/#{source.type} dependencies:/, out)
+      end
     end
   end
 
   it "does not include ignored dependencies" do
     out, = capture_io { command.run }
-    assert_match(/licensee/, out)
+    assert_match(/dependency/, out)
     count = out.match(/dependencies: (\d+)/)[1].to_i
 
-    config.ignore("type" => "rubygem", "name" => "licensee")
+    config.ignore("type" => "test", "name" => "dependency")
     out, = capture_io { command.run }
-    refute_match(/licensee/, out)
+    refute_match(/dependency/, out)
     ignored_count = out.match(/dependencies: (\d+)/)[1].to_i
     assert_equal count - 1, ignored_count
   end
@@ -50,15 +68,11 @@ describe Licensed::Command::List do
   end
 
   describe "with app.source_path" do
-    let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      out, = config.stub(:enabled?, ->(type) { type == "npm" }) do
-        capture_io { command.run }
-      end
-
-      assert_match(/Found autoprefixer/, out)
+      source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
+      capture_io { command.run }
     end
   end
 end

@@ -1,0 +1,8 @@
+expected_dependency: text
+config:
+  source_path: test/fixtures/haskell
+  cabal:
+    ghc_package_db:
+      - global
+      - test/fixtures/haskell/dist-newstyle/packagedb/ghc-<ghc_version>
+      - ~/.cabal/store/ghc-<ghc_version>/package.db

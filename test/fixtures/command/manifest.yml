@@ -1,0 +1,5 @@
+expected_dependency: manifest_test
+config:
+  source_path: test/fixtures/manifest
+  manifest:
+    path: test/fixtures/manifest/manifest.yml
