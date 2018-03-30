@@ -74,7 +74,8 @@ module Licensed
     # Returns a Licensee::LicenseFile with the content of the license in the
     # dependency's repository to account for LICENSE files not being distributed
     def remote_license_file
-      @remote_license_file ||= Licensed.from_github(self["homepage"])
+      return @remote_license_file if defined?(@remote_license_file)
+      @remote_license_file = Licensed.from_github(self["homepage"])
     end
 
     # Regardless of the license detected, try to pull the license content

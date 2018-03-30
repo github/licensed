@@ -1,4 +1,55 @@
-language: ruby
-rvm:
-  - 2.2.3
-before_install: gem install bundler -v 1.10.6
+install: ./script/bootstrap
+
+matrix:
+  include:
+    # lint and build
+    - language: ruby
+      rvm: 2.4.0
+      script: bundle exec rake rubocop build
+      env: NAME="Lint and Build"
+
+    # go tests
+    - language: go
+      go: 1.7.x
+      before_script: ./script/source-setup/go
+      script: ./script/test go
+      env: NAME="go"
+
+    # cabal tests
+    - language: haskell
+      ghc: "8.2"
+      before_script: ./script/source-setup/cabal
+      script: ./script/test cabal
+      env: NAME="cabal"
+
+    # npm tests
+    - language: node_js
+      node_js: "8"
+      before_script: ./script/source-setup/npm
+      script: ./script/test npm
+      env: NAME="npm"
+
+    # bower tests
+    - language: node_js
+      node_js: "8"
+      before_script:
+        - npm install -g bower
+        - ./script/source-setup/bower
+      script: ./script/test bower
+      env: NAME="bower"
+
+    # bundler tests
+    - language: ruby
+      rvm: 2.4.0
+      before_script: ./script/source-setup/bundler
+      script: ./script/test bundler
+      env: NAME="bundler"
+
+    # manifest tests
+    - language: ruby
+      rvm: 2.4.0
+      script: ./script/test manifest
+      env: NAME="manifest"
+
+notifications:
+  disable: true
