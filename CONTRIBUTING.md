@@ -31,10 +31,10 @@ Here are a few things you can do that will increase the likelihood of your pull 
 
 Pull requests that include a new dependency source must also
 
-- Include [documentation](docs/sources) for the new source and update the [documented source list](README.md#Sources).
+- Include [documentation](docs/sources) for the new source and update the [documented source list](README.md#sources).
 - Add a [setup script](script/source-setup) if needed.
 - Include [tests](test/source) and [test fixtures](test/fixtures) needed to verify the source in CI.
-- Add a CI job to [.travis.yml][.travis.yml].
+- Add a CI job to [.travis.yml](.travis.yml).
 
 ## Releasing
 If you are the current maintainer of this gem:
