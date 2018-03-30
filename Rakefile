@@ -24,7 +24,8 @@ task :setup do
   end
 end
 
-sources = Dir["lib/licensed/source/*.rb"].map { |f| File.basename(f, ".*") }
+sources_search = File.expand_path("lib/licensed/source/*.rb", __dir__)
+sources = Dir[sources_search].map { |f| File.basename(f, ".*") }
 
 namespace :test do
   sources.each do |source|
