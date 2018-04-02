@@ -6,7 +6,6 @@ require "forwardable"
 module Licensed
   class License
     YAML_FRONTMATTER_PATTERN = /\A---\s*\n(.*?\n?)^---\s*$\n?(.*)\z/m
-    LEGAL_FILES = /\A(COPYING|NOTICE|LEGAL)(?:\..*)?\z/i
 
     # Read an existing license file
     #
