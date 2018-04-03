@@ -37,7 +37,11 @@ module Licensed
 
     # Extract legal notices from the dependency source
     def notices
-      local_files.uniq.map { |f| File.read(f) }
+      local_files.uniq # unique local file paths
+           .sort # sorted by the path
+           .map { |f| File.read(f) } # read the file contents
+           .map(&:strip) # strip whitespace
+           .select { |t| t.length > 0 } # files with content only 
     end
 
     # Returns an array of file paths used to locate legal notices
