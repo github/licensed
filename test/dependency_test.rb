@@ -109,6 +109,18 @@ describe Licensed::Dependency do
       end
     end
 
+    it "always contains a license text section if there are legal notices" do
+      mkproject do |dependency|
+        File.write "AUTHORS", "authors"
+
+        dependency.detect_license!
+
+        # the text should always start with license text (even if empty),
+        # followed by a separator if there are any legal notices
+        assert_match(/\A#{Licensed::License::TEXT_SEPARATOR}\n/, dependency.text)
+      end
+    end
+
     it "sets license to other if undetected" do
       mkproject do |dependency|
         File.write "LICENSE", "some unknown license"
