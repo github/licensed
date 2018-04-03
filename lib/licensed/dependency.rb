@@ -41,7 +41,7 @@ module Licensed
            .sort # sorted by the path
            .map { |f| File.read(f) } # read the file contents
            .map(&:strip) # strip whitespace
-           .select { |t| t.length > 0 } # files with content only 
+           .select { |t| t.length > 0 } # files with content only
     end
 
     # Returns an array of file paths used to locate legal notices
