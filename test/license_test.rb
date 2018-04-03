@@ -23,4 +23,31 @@ describe Licensed::License do
       Licensed::License.read(@filename)
     end
   end
+
+  describe "content" do
+    it "returns full text if the text separator is not found" do
+      license = Licensed::License.new({}, "license")
+      assert_equal "license", license.content
+    end
+
+    it "returns the license text if the text separator is found" do
+      license = Licensed::License.new({}, "license#{Licensed::License::TEXT_SEPARATOR}notice")
+      assert_equal "license", license.content
+    end
+  end
+
+  describe "license_text_match?" do
+    it "returns false for a non-License argument" do
+      license = Licensed::License.new
+      refute license.license_text_match? nil
+      refute license.license_text_match? ""
+    end
+
+    it "returns true if the normalized content is the same" do
+      license = Licensed::License.new({}, "test content")
+      other = Licensed::License.new({}, "* test content")
+
+      assert license.license_text_match?(other)
+    end
+  end
 end
