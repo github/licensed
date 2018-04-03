@@ -18,6 +18,7 @@ module Licensed
     #
     # Returns a Licensed::License
     def self.read(filename)
+      return unless File.exist?(filename)
       match = File.read(filename).scrub.match(YAML_FRONTMATTER_PATTERN)
       new(YAML.load(match[1]), match[2])
     end
