@@ -31,22 +31,66 @@ if Licensed::Shell.tool_available?("bundle")
     end
 
     describe "gemfile_path" do
-      it "returns a default gemfile path" do
-        gemfile_path    = source.gemfile_path
-        default_gemfile = ::Bundler.default_gemfile.basename.to_s
+      it "returns a the path to Gemfile local to the current directory" do
+        Dir.tmpdir do |tmp|
+          Dir.chdir(tmp) do
+            File.write("Gemfile", "")
+            assert_equal Pathname.pwd.join "Gemfile", source.gemfile_path
+          end
+        end
+      end
 
-        assert_equal Pathname, gemfile_path.class
-        assert_match(/#{Regexp.quote(default_gemfile)}$/, gemfile_path.to_s)
+      it "returns a the path to gems.rb local to the current directory" do
+        Dir.tmpdir do |tmp|
+          Dir.chdir(tmp) do
+            File.write("gems.rb", "")
+            assert_equal Pathname.pwd.join "gems.rb", source.gemfile_path
+          end
+        end
+      end
+
+      it "prefers Gemfile over gems.rb" do
+        Dir.tmpdir do |tmp|
+          Dir.chdir(tmp) do
+            File.write("Gemfile", "")
+            File.write("gems.rb", "")
+            assert_equal Pathname.pwd.join "Gemfile", source.gemfile_path
+          end
+        end
+      end
+
+      it "returns nil if a gem file can't be found" do
+        Dir.tmpdir do |tmp|
+          Dir.chdir(tmp) do
+            assert_nil source.gemfile_path
+          end
+        end
       end
     end
 
     describe "lockfile_path" do
-      it "returns a default lockfile path" do
-        lockfile_path    = source.lockfile_path
-        default_lockfile = ::Bundler.default_lockfile.basename.to_s
+      it "returns nil if gemfile_path is nil" do
+        source.stub(:gemfile_path, nil) do
+          assert_nil source.lockfile_path
+        end
+      end
 
-        assert_equal Pathname, lockfile_path.class
-        assert_match(/#{Regexp.quote(default_lockfile)}$/, lockfile_path.to_s)
+      it "returns Gemfile.lock for Gemfile gemfile_path" do
+        Dir.tmpdir do |tmp|
+          Dir.chdir(tmp) do
+            File.write("Gemfile", "")
+            assert_equal Pathname.pwd.join "Gemfile.lock", source.lockfile_path
+          end
+        end
+      end
+
+      it "returns gems.rb.lock for gems.rb gemfile_path" do
+        Dir.tmpdir do |tmp|
+          Dir.chdir(tmp) do
+            File.write("gems.rb", "")
+            assert_equal Pathname.pwd.join "gems.rb.lock", source.lockfile_path
+          end
+        end
       end
     end
 

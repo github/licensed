@@ -5,12 +5,14 @@ module Licensed
   module Source
     class Bundler
       BUNDLER_ENV_KEYS = %w(BUNDLE_GEMFILE).freeze
+      GEMFILES = %w{Gemfile gems.rb}.freeze
+
       def initialize(config)
         @config = config
       end
 
       def enabled?
-        @config.enabled?(type) && File.exist?(lockfile_path)
+        @config.enabled?(type) && lockfile_path && lockfile_path.exist?
       end
 
       def type
@@ -41,14 +43,16 @@ module Licensed
         definition.groups - [:test, :development]
       end
 
-      # Returns the expected path to the Bundler Gemfile
+      # Returns the path to the Bundler Gemfile
       def gemfile_path
-        @config.pwd.join ::Bundler.default_gemfile.basename.to_s
+        @gemfile_path ||= GEMFILES.map { |g| @config.pwd.join g }
+                                  .find { |f| f.exist? }
       end
 
-      # Returns the expected path to the Bundler Gemfile.lock
+      # Returns the path to the Bundler Gemfile.lock
       def lockfile_path
-        @config.pwd.join ::Bundler.default_lockfile.basename.to_s
+        return unless gemfile_path
+        @lockfile_path ||= gemfile_path.dirname.join("#{gemfile_path.basename}.lock")
       end
 
       private
