@@ -61,9 +61,8 @@ module Licensed
       def with_local_configuration
         # with a clean, original environment
         ::Bundler.with_original_env do
-          # bundler restores all ENV at the end of the `with_original_env`
-          # block.  we shouldn't need to restore these values manually
-          BUNDLER_ENV_KEYS.each { |k| ENV.delete(k) }
+          # force bundler to use the local gem file
+          ENV["BUNDLE_GEMFILE"] = gemfile_path.to_s
 
           # reset all bundler configuration
           ::Bundler.reset!
