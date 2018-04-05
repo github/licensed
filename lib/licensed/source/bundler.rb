@@ -4,7 +4,6 @@ require "bundler"
 module Licensed
   module Source
     class Bundler
-      BUNDLER_ENV_KEYS = %w(BUNDLE_GEMFILE).freeze
       GEMFILES = %w{Gemfile gems.rb}.freeze
 
       def initialize(config)
