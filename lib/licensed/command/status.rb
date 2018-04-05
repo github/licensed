@@ -36,7 +36,7 @@ module Licensed
                 if license["version"] != dependency["version"]
                   warnings << "cached license data out of date"
                 end
-                warnings << "missing license text" if license.text.strip.empty?
+                warnings << "missing license text" if license.license_text.empty?
                 unless allowed_or_reviewed?(app, license)
                   warnings << "license needs reviewed: #{license["license"]}."
                 end
