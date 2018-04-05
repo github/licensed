@@ -56,6 +56,22 @@ describe Licensed::Command::Cache do
     refute config.cache_path.join("test/dependency.txt").exist?
   end
 
+  it "uses cached license if license text does not change" do
+    generator.run
+
+    path = config.cache_path.join("test/dependency.txt")
+    license = Licensed::License.read(path)
+    license["license"] = "test"
+    license["version"] = "0.0"
+    license.save(path)
+
+    generator.run
+
+    license = Licensed::License.read(path)
+    assert_equal "test", license["license"]
+    refute_equal "0.0", license["version"]
+  end
+
   it "does not include ignored dependencies in dependency counts" do
     config.ui.level = "info"
     out, _ = capture_io { generator.run }

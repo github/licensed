@@ -109,6 +109,34 @@ describe Licensed::Dependency do
       end
     end
 
+    it "does not extract empty legal notices" do
+      mkproject do |dependency|
+        File.write "AUTHORS", ""
+        File.write "COPYING", "copying"
+        File.write "NOTICE", ""
+        File.write "LEGAL", "legal"
+
+        dependency.detect_license!
+
+        refute_match(/authors/, dependency.text)
+        assert_match(/copying/, dependency.text)
+        refute_match(/notice/, dependency.text)
+        assert_match(/legal/, dependency.text)
+      end
+    end
+
+    it "always contains a license text section if there are legal notices" do
+      mkproject do |dependency|
+        File.write "AUTHORS", "authors"
+
+        dependency.detect_license!
+
+        # the text should always start with license text (even if empty),
+        # followed by a separator if there are any legal notices
+        assert_match(/\A#{Licensed::License::TEXT_SEPARATOR}\n/, dependency.text)
+      end
+    end
+
     it "sets license to other if undetected" do
       mkproject do |dependency|
         File.write "LICENSE", "some unknown license"

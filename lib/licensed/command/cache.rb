@@ -34,19 +34,22 @@ module Licensed
                 names << name
                 filename = cache_path.join("#{name}.txt")
 
-                if File.exist?(filename)
-                  license = Licensed::License.read(filename)
+                # try to load existing license from disk
+                # or default to a blank license
+                license = Licensed::License.read(filename) || Licensed::License.new
 
-                  # Version did not change, no need to re-cache
-                  if !force && version == license["version"]
-                    @config.ui.info "    Using #{name} (#{version})"
-                    next
-                  end
+                # Version did not change, no need to re-cache
+                if !force && version == license["version"]
+                  @config.ui.info "    Using #{name} (#{version})"
+                  next
                 end
 
                 @config.ui.info "    Caching #{name} (#{version})"
 
                 dependency.detect_license!
+                # use the cached license value if the license text wasn't updated
+                dependency["license"] = license["license"] if dependency.license_text_match?(license)
+
                 dependency.save(filename)
               end
 
