@@ -4,13 +4,14 @@ require "bundler"
 module Licensed
   module Source
     class Bundler
-      BUNDLER_ENV_KEYS = %w(BUNDLE_GEMFILE).freeze
+      GEMFILES = %w{Gemfile gems.rb}.freeze
+
       def initialize(config)
         @config = config
       end
 
       def enabled?
-        @config.enabled?(type) && File.exist?(lockfile_path)
+        @config.enabled?(type) && lockfile_path && lockfile_path.exist?
       end
 
       def type
@@ -41,25 +42,28 @@ module Licensed
         definition.groups - [:test, :development]
       end
 
-      # Returns the expected path to the Bundler Gemfile
+      # Returns the path to the Bundler Gemfile
       def gemfile_path
-        @config.pwd.join ::Bundler.default_gemfile.basename.to_s
+        @gemfile_path ||= GEMFILES.map { |g| @config.pwd.join g }
+                                  .find { |f| f.exist? }
       end
 
-      # Returns the expected path to the Bundler Gemfile.lock
+      # Returns the path to the Bundler Gemfile.lock
       def lockfile_path
-        @config.pwd.join ::Bundler.default_lockfile.basename.to_s
+        return unless gemfile_path
+        @lockfile_path ||= gemfile_path.dirname.join("#{gemfile_path.basename}.lock")
       end
 
       private
 
       # helper to clear all bundler environment around a yielded block
       def with_local_configuration
+        original_bundle_gemfile = ENV["BUNDLE_GEMFILE"]
+
         # with a clean, original environment
         ::Bundler.with_original_env do
-          # bundler restores all ENV at the end of the `with_original_env`
-          # block.  we shouldn't need to restore these values manually
-          BUNDLER_ENV_KEYS.each { |k| ENV.delete(k) }
+          # force bundler to use the local gem file
+          ENV["BUNDLE_GEMFILE"] = gemfile_path.to_s
 
           # reset all bundler configuration
           ::Bundler.reset!
@@ -69,6 +73,7 @@ module Licensed
           yield
         end
       ensure
+        ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
         # restore bundler configuration
         ::Bundler.reset!
         ::Bundler.configure
