@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "test_helper"
 require "tmpdir"
-require "byebug"
 
 if Licensed::Shell.tool_available?("bundle")
   describe Licensed::Source::Bundler do
