@@ -58,6 +58,8 @@ module Licensed
 
       # helper to clear all bundler environment around a yielded block
       def with_local_configuration
+        original_bundle_gemfile = ENV["BUNDLE_GEMFILE"]
+
         # with a clean, original environment
         ::Bundler.with_original_env do
           # force bundler to use the local gem file
@@ -71,6 +73,7 @@ module Licensed
           yield
         end
       ensure
+        ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
         # restore bundler configuration
         ::Bundler.reset!
         ::Bundler.configure
