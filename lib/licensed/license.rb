@@ -44,9 +44,8 @@ module Licensed
       File.write(filename, YAML.dump(@metadata) + "---\n#{text}")
     end
 
-    # Returns the raw content for Licensee::ContentHelper#content_normalized.
-    # The content is the license text only without any notices
-    def content
+    # Returns the license text without any notices
+    def license_text
       return unless text
 
       # if the text contains the separator, the first string in the array
@@ -54,9 +53,9 @@ module Licensed
       # if the text didn't contain the separator, the text itself is the entirety
       # of the license text
       split = text.split(TEXT_SEPARATOR)
-      split.length > 1 ? split.first.strip : text
+      split.length > 1 ? split.first.strip : text.strip
     end
-
+    alias_method :content, :license_text # use license_text for content matching
 
     # Returns whether the current license should be updated to `other`
     # based on whether the normalized license content matches

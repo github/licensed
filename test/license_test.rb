@@ -25,6 +25,11 @@ describe Licensed::License do
   end
 
   describe "content" do
+    it "returns nil if text hasn't been set" do
+      license = Licensed::License.new
+      assert_nil license.license_text
+    end
+
     it "returns full text if the text separator is not found" do
       license = Licensed::License.new({}, "license")
       assert_equal "license", license.content
@@ -33,6 +38,23 @@ describe Licensed::License do
     it "returns the license text if the text separator is found" do
       license = Licensed::License.new({}, "license#{Licensed::License::TEXT_SEPARATOR}notice")
       assert_equal "license", license.content
+    end
+  end
+
+  describe "license_text" do
+    it "returns nil if text hasn't been set" do
+      license = Licensed::License.new
+      assert_nil license.license_text
+    end
+
+    it "returns full text if the text separator is not found" do
+      license = Licensed::License.new({}, "license")
+      assert_equal "license", license.license_text
+    end
+
+    it "returns the license text if the text separator is found" do
+      license = Licensed::License.new({}, "license#{Licensed::License::TEXT_SEPARATOR}notice")
+      assert_equal "license", license.license_text
     end
   end
 

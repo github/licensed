@@ -62,6 +62,26 @@ describe Licensed::Command::Status do
     assert_match(/missing license text/, out)
   end
 
+  it "warns if license is empty with notices" do
+    filename = config.cache_path.join("test/dependency.txt")
+    license = Licensed::License.read(filename)
+    license.text = "#{Licensed::License::TEXT_SEPARATOR}notice"
+    license.save(filename)
+
+    out, _ = capture_io { verifier.run }
+    assert_match(/missing license text/, out)
+  end
+
+  it "does not warn if license is not empty" do
+    filename = config.cache_path.join("test/dependency.txt")
+    license = Licensed::License.read(filename)
+    license.text = "license"
+    license.save(filename)
+
+    out, _ = capture_io { verifier.run }
+    refute_match(/missing license text/, out)
+  end
+
   it "warns if versions do not match" do
     verifier.app_dependencies(config.apps.first).first["version"] = "nope"
     out, _ = capture_io { verifier.run }
