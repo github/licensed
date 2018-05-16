@@ -10,7 +10,7 @@ module Licensed
       end
 
       def type
-        "python"
+        "pip"
       end
 
       def enabled?
