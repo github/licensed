@@ -38,8 +38,8 @@ module Licensed
       def parse_requirements_txt
         packages = []
         File.open(@config.pwd.join("requirements.txt")).each do |line|
-          p = line.split("=")
-          packages.push(p[0])
+          p_split = line.split("=")
+          packages.push(p_split[0])
         end
         packages
       end
@@ -47,8 +47,8 @@ module Licensed
       def package_info(package_name)
         info = {}
         p_info = pip_command(package_name).split("\n")
-        p_info.each do |p|
-          k, v = p.split(":", 2)
+        p_info.each do |pkg|
+          k, v = pkg.split(":", 2)
           info[k&.strip] = v&.strip
         end
         info
