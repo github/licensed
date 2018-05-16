@@ -28,10 +28,9 @@ module Licensed
               "name"        => package["Name"],
               "summary"     => package["Summary"],
               "homepage"    => package["Home-page"],
-              "search_root" => location,
               "version"     => package["Version"]
             })
-        end.compact
+        end
       end
 
       # Build the list of packages from a ''requirements.txt'
@@ -49,7 +48,7 @@ module Licensed
         info = {}
         p_info = pip_command(package_name).split("\n")
         p_info.each do |p|
-          k, v = p.split(":",2)
+          k, v = p.split(":", 2)
           info[k&.strip] = v&.strip
         end
         info
