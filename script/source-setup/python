@@ -5,4 +5,17 @@ if [ -z "$(which pip)" ]; then
   echo "A local pip installation is required for python development." >&2
   exit 127
 fi
-pip3
+
+if [ -z "$(which virtualenv)" ]; then
+    echo "A local virtualenv installation is required for python development." >&2
+    exit 127
+fi
+
+
+# setup test fixtures
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd $BASE_PATH/test/fixtures/python
+virtualenv venv
+. venv/bin/activate
+pip install -r requirements.txt
+deactivate

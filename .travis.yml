@@ -51,5 +51,14 @@ matrix:
       script: ./script/test manifest
       env: NAME="manifest"
 
+    # python tests
+    - language: python
+      python:
+        - "2.7"
+        - "3.6"
+      before_script: ./script/source-setup/python
+      script: ./script/test python
+      env: NAME="python"
+
 notifications:
   disable: true

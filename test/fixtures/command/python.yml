@@ -1,0 +1,5 @@
+expected_dependency: Jinja2
+config:
+  source_path: test/fixtures/python
+  python:
+    virtual_env_dir: "venv"

@@ -14,7 +14,7 @@ module Licensed
       end
 
       def enabled?
-        @config.enabled?(type) && File.exist?(@config.pwd.join("requirements,txt"))
+        @config.enabled?(type) && File.exist?(@config.pwd.join("requirements.txt"))
       end
 
       def dependencies
@@ -22,8 +22,8 @@ module Licensed
 
         @dependencies = packages.map do |package_name|
             package = package_info(package_name)
-            location = File.join(package["Location"],"-" + package["Version"] +".dist-info")
-            Dependency.new(package_dir, {
+            location = File.join(package["Location"], "-" + package["Version"] + ".dist-info")
+            Dependency.new(location, {
               "type"        => type,
               "name"        => package["Name"],
               "summary"     => package["Summary"],
@@ -38,26 +38,28 @@ module Licensed
       # Assumes that the requirements.txt follow the format pkg=1.0.0 or pkg==1.0.0
       def parse_requirements_txt
         packages = []
-        File.open(@config.pwd.join("requirements,txt")).each do |line|
+        File.open(@config.pwd.join("requirements.txt")).each do |line|
           p = line.split("=")
-          package.push(p[0])
+          packages.push(p[0])
         end
         packages
       end
 
       def package_info(package_name)
         info = {}
-        pip_command(package_name).each do |p|
-          k, v = p.split(":")
-          info[k.strip] = info[v.strip]
+        p_info = pip_command(package_name).split("\n")
+        p_info.each do |p|
+          k, v = p.split(":",2)
+          info[k&.strip] = v&.strip
         end
         info
       end
 
       def pip_command(*args)
-        Licensed::Shell.execute("pip", "--disable-pip-version-check", "show", *args)
+        venv_dir = @config.dig("python", "virtual_env_dir")
+        pip = File.join(venv_dir, "bin", "pip")
+        Licensed::Shell.execute(pip, "--disable-pip-version-check", "show", *args)
       end
-
     end
   end
 end
