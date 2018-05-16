@@ -4,7 +4,7 @@ require "English"
 
 module Licensed
   module Source
-    class Python
+    class Pip
       def initialize(config)
         @config = config
       end
@@ -33,7 +33,7 @@ module Licensed
         end
       end
 
-      # Build the list of packages from a ''requirements.txt'
+      # Build the list of packages from a 'requirements.txt'
       # Assumes that the requirements.txt follow the format pkg=1.0.0 or pkg==1.0.0
       def parse_requirements_txt
         packages = []
