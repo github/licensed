@@ -18,9 +18,7 @@ module Licensed
       end
 
       def dependencies
-        packages ||= parse_requirements_txt
-
-        @dependencies = packages.map do |package_name|
+        @dependencies ||= parse_requirements_txt.map do |package_name|
             package = package_info(package_name)
             location = File.join(package["Location"], "-" + package["Version"] + ".dist-info")
             Dependency.new(location, {
