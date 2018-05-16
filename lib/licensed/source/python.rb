@@ -1,0 +1,63 @@
+# frozen_string_literal: true
+require "json"
+require "English"
+
+module Licensed
+  module Source
+    class Python
+      def initialize(config)
+        @config = config
+      end
+
+      def type
+        "python"
+      end
+
+      def enabled?
+        @config.enabled?(type) && File.exist?(@config.pwd.join("requirements,txt"))
+      end
+
+      def dependencies
+        packages = parse_requirements_txt
+
+        @dependencies = packages.map do |package_name|
+            package = package_info(package_name)
+            location = File.join(package["Location"],"-" + package["Version"] +".dist-info")
+            Dependency.new(package_dir, {
+              "type"        => type,
+              "name"        => package["Name"],
+              "summary"     => package["Summary"],
+              "homepage"    => package["Home-page"],
+              "search_root" => location,
+              "version"     => package["Version"]
+            })
+        end.compact
+      end
+
+      # Build the list of packages from a ''requirements.txt'
+      # Assumes that the requirements.txt follow the format pkg=1.0.0 or pkg==1.0.0
+      def parse_requirements_txt
+        packages = []
+        File.open(@config.pwd.join("requirements,txt")).each do |line|
+          p = line.split("=")
+          package.push(p[0])
+        end
+        packages
+      end
+
+      def package_info(package_name)
+        info = {}
+        pip_command(package_name).each do |p|
+          k, v = p.split(":")
+          info[k.strip] = info[v.strip]
+        end
+        info
+      end
+
+      def pip_command(*args)
+        Licensed::Shell.execute("pip", "--disable-pip-version-check", "show", *args)
+      end
+
+    end
+  end
+end
