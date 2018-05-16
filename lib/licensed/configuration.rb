@@ -53,7 +53,7 @@ module Licensed
         Source::Go.new(self),
         Source::Manifest.new(self),
         Source::NPM.new(self),
-        Source::Python.new(self)
+        Source::Pip.new(self)
       ].select(&:enabled?)
     end
 
