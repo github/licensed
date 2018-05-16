@@ -18,7 +18,7 @@ module Licensed
       end
 
       def dependencies
-        packages = parse_requirements_txt
+        packages ||= parse_requirements_txt
 
         @dependencies = packages.map do |package_name|
             package = package_info(package_name)
