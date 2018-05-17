@@ -41,7 +41,7 @@ module Licensed
       end
 
       def package_info(package_name)
-        p_info = pip_command(package_name).split("\n")
+        p_info = pip_command(package_name).lines
         p_info.each_with_object(Hash.new(0)) { |pkg, a|
           k, v = pkg.split(":", 2)
           next if k.nil? || k.empty?
