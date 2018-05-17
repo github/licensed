@@ -56,9 +56,9 @@ matrix:
       python:
         - "2.7"
         - "3.6"
-      before_script: ./script/source-setup/python
-      script: ./script/test python
-      env: NAME="python"
+      before_script: ./script/source-setup/pip
+      script: ./script/test pip
+      env: NAME="pip"
 
 notifications:
   disable: true
