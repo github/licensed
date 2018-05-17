@@ -9,6 +9,14 @@ module Licensed
       ".licensed.yaml".freeze,
       ".licensed.json".freeze
     ].freeze
+    SOURCE_TYPES = [
+      Source::Bower,
+      Source::Bundler,
+      Source::Cabal,
+      Source::Go,
+      Source::Manifest,
+      Source::NPM
+    ].freeze
 
     def initialize(options = {}, inherited_options = {})
       super()
@@ -46,19 +54,14 @@ module Licensed
 
     # Returns an array of enabled app sources
     def sources
-      @sources ||= [
-        Source::Bundler.new(self),
-        Source::Bower.new(self),
-        Source::Cabal.new(self),
-        Source::Go.new(self),
-        Source::Manifest.new(self),
-        Source::NPM.new(self)
-      ].select(&:enabled?)
+      @sources ||= source_types.map { |t| t.new(self) }
+                               .select(&:enabled?)
     end
 
-    # Returns whether a source type is enabled
-    def enabled?(source_type)
-      self["sources"].fetch(source_type, true)
+    def source_types
+      # the default is false is any sources are set to true, false otherwise
+      default = !self["sources"].any? { |_, enabled| enabled }
+      SOURCE_TYPES.select { |source| self["sources"].fetch(source.type, default) }
     end
 
     # Is the given dependency reviewed?

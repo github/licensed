@@ -4,22 +4,22 @@ require "pathname/common_prefix"
 module Licensed
   module Source
     class Manifest
+      def self.type
+        "manifest"
+      end
+
       def initialize(config)
         @config = config
       end
 
       def enabled?
-        @config.enabled?(type) && File.exist?(manifest_path)
-      end
-
-      def type
-        "manifest"
+        File.exist?(manifest_path)
       end
 
       def dependencies
         @dependencies ||= packages.map do |package_name, sources|
           Dependency.new(sources_license_path(sources), {
-            "type"     => type,
+            "type"     => Manifest.type,
             "name"     => package_name,
             "version"  => package_version(sources)
           })

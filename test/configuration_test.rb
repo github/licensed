@@ -98,19 +98,20 @@ describe Licensed::Configuration do
     end
   end
 
-  describe "enabled?" do
-    it "defaults to true for unconfigured source" do
-      assert config.enabled?("npm")
+  describe "sources_types" do
+    it "returns all source types if none are configured" do
+      assert_equal Licensed::AppConfiguration::SOURCE_TYPES, config.source_types
     end
 
-    it "is false if enabled in config" do
-      config["sources"]["npm"] = true
-      assert config.enabled?("npm")
-    end
-
-    it "is false if disable in config" do
+    it "returns all source types that are not disabled, if no sources are configured enabled" do
       config["sources"]["npm"] = false
-      refute config.enabled?("npm")
+      assert_equal Licensed::AppConfiguration::SOURCE_TYPES - [Licensed::Source::NPM],
+                   config.source_types
+    end
+
+    it "returns only source types that are enabled, if any sources are configured enabled" do
+      config["sources"]["npm"] = true
+      assert_equal [Licensed::Source::NPM], config.source_types
     end
   end
 

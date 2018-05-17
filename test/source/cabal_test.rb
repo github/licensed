@@ -20,13 +20,6 @@ if Licensed::Shell.tool_available?("ghc")
           refute source.enabled?
         end
       end
-
-      it "is false if disabled" do
-        Dir.chdir(fixtures) do
-          config["sources"][source.type] = false
-          refute source.enabled?
-        end
-      end
     end
 
     describe "dependencies" do

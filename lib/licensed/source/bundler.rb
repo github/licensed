@@ -6,23 +6,23 @@ module Licensed
     class Bundler
       GEMFILES = %w{Gemfile gems.rb}.freeze
 
+      def self.type
+        "rubygem"
+      end
+
       def initialize(config)
         @config = config
       end
 
       def enabled?
-        @config.enabled?(type) && lockfile_path && lockfile_path.exist?
-      end
-
-      def type
-        "rubygem"
+        lockfile_path && lockfile_path.exist?
       end
 
       def dependencies
         @dependencies ||= with_local_configuration do
           definition.specs_for(groups).map do |spec|
             Dependency.new(spec.gem_dir, {
-              "type"     => type,
+              "type"     => Bundler.type,
               "name"     => spec.name,
               "version"  => spec.version.to_s,
               "summary"  => spec.summary,

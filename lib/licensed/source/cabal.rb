@@ -4,16 +4,16 @@ require "English"
 module Licensed
   module Source
     class Cabal
+      def self.type
+        "cabal"
+      end
+
       def initialize(config)
         @config = config
       end
 
-      def type
-        "cabal"
-      end
-
       def enabled?
-        @config.enabled?(type) && cabal_packages.any? && ghc?
+        cabal_packages.any? && ghc?
       end
 
       def dependencies
@@ -22,7 +22,7 @@ module Licensed
 
           path, search_root = package_docs_dirs(package)
           Dependency.new(path, {
-            "type"     => type,
+            "type"     => Cabal.type,
             "name"     => package["name"],
             "version"  => package["version"],
             "summary"  => package["synopsis"],
