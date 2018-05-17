@@ -98,20 +98,35 @@ describe Licensed::Configuration do
     end
   end
 
-  describe "sources_types" do
-    it "returns all source types if none are configured" do
-      assert_equal Licensed::AppConfiguration::SOURCE_TYPES, config.source_types
-    end
-
-    it "returns all source types that are not disabled, if no sources are configured enabled" do
-      config["sources"]["npm"] = false
-      assert_equal Licensed::AppConfiguration::SOURCE_TYPES - [Licensed::Source::NPM],
-                   config.source_types
-    end
-
-    it "returns only source types that are enabled, if any sources are configured enabled" do
+  describe "enabled?" do
+    it "returns true if source type is enabled" do
       config["sources"]["npm"] = true
-      assert_equal [Licensed::Source::NPM], config.source_types
+      assert config.enabled?("npm")
+    end
+
+    it "returns false if source type is disabled" do
+      config["sources"]["npm"] = false
+      refute config.enabled?("npm")
+    end
+
+    it "returns true if no source types are configured" do
+      Licensed::AppConfiguration::SOURCE_TYPES.each do |source|
+        assert config.enabled?(source.type)
+      end
+    end
+
+    it "returns true for source types that are not disabled, if no sources are configured enabled" do
+      config["sources"]["npm"] = false
+      Licensed::AppConfiguration::SOURCE_TYPES - [Licensed::Source::NPM].each do |source_type|
+        assert config.enabled?(source_type)
+      end
+    end
+
+    it "returns false for source types that are not enabled, if any sources are configured enabled" do
+      config["sources"]["npm"] = true
+      Licensed::AppConfiguration::SOURCE_TYPES - [Licensed::Source::NPM].each do |source_type|
+        refute config.enabled?(source_type)
+      end
     end
   end
 

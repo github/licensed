@@ -54,14 +54,16 @@ module Licensed
 
     # Returns an array of enabled app sources
     def sources
-      @sources ||= source_types.map { |t| t.new(self) }
+      @sources ||= SOURCE_TYPES.select { |source_class| enabled?(source_class.type) }
+                               .map { |source_class| source_class.new(self) }
                                .select(&:enabled?)
     end
 
-    def source_types
+    # Returns whether a source type is enabled
+    def enabled?(source_type)
       # the default is false is any sources are set to true, false otherwise
       default = !self["sources"].any? { |_, enabled| enabled }
-      SOURCE_TYPES.select { |source| self["sources"].fetch(source.type, default) }
+      self["sources"].fetch(source_type, default)
     end
 
     # Is the given dependency reviewed?
