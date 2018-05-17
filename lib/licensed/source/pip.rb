@@ -44,7 +44,8 @@ module Licensed
         p_info = pip_command(package_name).split("\n")
         p_info.each_with_object(Hash.new(0)) { |pkg, a|
           k, v = pkg.split(":", 2)
-          a[k&.strip] = v&.strip
+          next if k.nil? || k.empty?
+          a[k.strip] = v&.strip
         }
       end
 
