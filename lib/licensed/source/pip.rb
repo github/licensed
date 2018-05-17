@@ -19,15 +19,15 @@ module Licensed
 
       def dependencies
         @dependencies ||= parse_requirements_txt.map do |package_name|
-            package = package_info(package_name)
-            location = File.join(package["Location"], "-" + package["Version"] + ".dist-info")
-            Dependency.new(location, {
-              "type"        => type,
-              "name"        => package["Name"],
-              "summary"     => package["Summary"],
-              "homepage"    => package["Home-page"],
-              "version"     => package["Version"]
-            })
+          package = package_info(package_name)
+          location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
+          Dependency.new(location, {
+                           "type"        => type,
+                           "name"        => package["Name"],
+                           "summary"     => package["Summary"],
+                           "homepage"    => package["Home-page"],
+                           "version"     => package["Version"]
+                         })
         end
       end
 
@@ -41,13 +41,11 @@ module Licensed
       end
 
       def package_info(package_name)
-        info = {}
         p_info = pip_command(package_name).split("\n")
-        p_info.each do |pkg|
+        p_info.each_with_object(Hash.new(0)) { |pkg, a|
           k, v = pkg.split(":", 2)
-          info[k&.strip] = v&.strip
-        end
-        info
+          a[k&.strip] = v&.strip
+        }
       end
 
       def pip_command(*args)
