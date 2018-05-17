@@ -4,7 +4,7 @@ require "tmpdir"
 
 if Licensed::Shell.tool_available?("ghc")
   describe Licensed::Source::Cabal do
-    let(:fixtures) { File.expand_path("../../fixtures/haskell", __FILE__) }
+    let(:fixtures) { File.expand_path("../../fixtures/cabal", __FILE__) }
     let(:config) { Licensed::Configuration.new }
     let(:source) { Licensed::Source::Cabal.new(config) }
 
@@ -31,7 +31,7 @@ if Licensed::Shell.tool_available?("ghc")
           Dir.chdir(fixtures) do
             dep = nil
             capture_subprocess_io do
-              dep = source.dependencies.detect { |d| d["name"] == "text" }
+              dep = source.dependencies.detect { |d| d["name"] == "zlib" }
             end
             refute dep
           end
@@ -44,7 +44,6 @@ if Licensed::Shell.tool_available?("ghc")
           dep = source.dependencies.detect { |d| d["name"] == "bytestring" }
           assert dep
           assert_equal "cabal", dep["type"]
-          assert_equal "0.10.8.2", dep["version"]
           assert dep["homepage"]
           assert dep["summary"]
         end
@@ -53,11 +52,10 @@ if Licensed::Shell.tool_available?("ghc")
       it "finds direct dependencies" do
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d["name"] == "text" }
+          dep = source.dependencies.detect { |d| d["name"] == "zlib" }
           assert dep
           assert_equal "cabal", dep["type"]
-          assert_equal "1.2.2.1", dep["version"]
-          assert dep["homepage"]
+          assert_equal "0.6.2", dep["version"]
           assert dep["summary"]
         end
       end
@@ -75,7 +73,7 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "allows paths relative to the repository root" do
-        config["cabal"] = { "ghc_package_db" => ["test/fixtures/haskell"] }
+        config["cabal"] = { "ghc_package_db" => ["test/fixtures/cabal"] }
         assert_equal ["--package-db=#{fixtures}"], source.package_db_args
       end
 
