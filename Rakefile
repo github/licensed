@@ -4,12 +4,15 @@ require "rake/testtask"
 require "rubocop/rake_task"
 
 desc "Run source setup scripts"
-task :setup do
+task :setup, [:arguments] do |task, args|
+  arguments = args[:arguments].to_s.split
+  force = arguments.include?("-f") ? "-f" : ""
+
   Dir["script/source-setup/*"].each do |script|
     # green
     puts "\033[32mRunning #{script}.\e[0m"
 
-    if system(script)
+    if system(script, force)
       # green
       puts "\033[32mCompleted #{script}.\e[0m"
     elsif $?.exitstatus == 127
