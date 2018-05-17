@@ -1,4 +1,4 @@
-expected_dependency: Jinja2
+expected_dependency: MarkupSafe
 config:
   source_path: test/fixtures/pip
   python:

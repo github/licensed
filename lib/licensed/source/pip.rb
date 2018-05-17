@@ -34,12 +34,10 @@ module Licensed
       # Build the list of packages from a 'requirements.txt'
       # Assumes that the requirements.txt follow the format pkg=1.0.0 or pkg==1.0.0
       def parse_requirements_txt
-        packages = []
-        File.open(@config.pwd.join("requirements.txt")).each do |line|
+        File.open(@config.pwd.join("requirements.txt")).map do |line|
           p_split = line.split("=")
-          packages.push(p_split[0])
+          p_split[0]
         end
-        packages
       end
 
       def package_info(package_name)
