@@ -92,6 +92,12 @@ if Licensed::Shell.tool_available?("go")
         end
       end
 
+      it "doesn't include vendored dependencies from the go std library" do
+        Dir.chdir fixtures do
+          refute source.dependencies.any? { |d| d["name"] == "golang.org/x/net/http2/hpack" }
+        end
+      end
+
       describe "with unavailable packages" do
         # use a custom go path that doesn't contain go libraries installed from
         # setup scripts
