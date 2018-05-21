@@ -61,6 +61,13 @@ module Licensed
           .uniq
           .select { |d| !go_std_packages.include?(d) }
           .select { |d| !d.start_with?(root_package["ImportPath"]) || vendored_path?(d) }
+          .select do |d|
+          # this removes the packages listed in `go list std` as "vendor/golang_org/*" but are vendored
+          # as "vendor/golang.org/*"
+            go_std_packages.none? do |std_pkg|
+              std_pkg.sub(%r{^vendor/golang_org/}, "#{root_package["ImportPath"]}/vendor/golang.org/") == d
+            end
+          end
       end
 
       # Returns the root directory to search for a package license
