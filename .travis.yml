@@ -10,7 +10,9 @@ matrix:
 
     # go tests
     - language: go
-      go: 1.7.x
+      go:
+        - 1.7.x
+        - 1.10.x
       before_script: ./script/source-setup/go
       script: ./script/test go
       env: NAME="go"
