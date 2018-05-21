@@ -6,4 +6,3 @@ ignored = ["github.com/hashicorp/golang-lru"]
 
 [prune]
   unused-packages = true
-  non-go = true
