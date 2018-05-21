@@ -13,14 +13,14 @@ matrix:
       go: "1.7.x"
       before_script: ./script/source-setup/go
       script: ./script/test go
-      env: NAME="go 1.7"
+      env: NAME="go"
 
     # go 1.10 tests
     - language: go
       go: "1.10.x"
       before_script: ./script/source-setup/go
       script: ./script/test go
-      env: NAME="go 1.10"
+      env: NAME="go"
 
     # cabal tests
     - language: haskell
