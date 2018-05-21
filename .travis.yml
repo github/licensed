@@ -8,11 +8,19 @@ matrix:
       script: bundle exec rake rubocop build
       env: NAME="Lint and Build"
 
-    # go tests
+    # go 1.7 tests
     - language: go
+      go: "1.7.x"
       before_script: ./script/source-setup/go
       script: ./script/test go
-      env: NAME="go"
+      env: NAME="go 1.7"
+
+    # go 1.10 tests
+    - language: go
+      go: "1.10.x"
+      before_script: ./script/source-setup/go
+      script: ./script/test go
+      env: NAME="go 1.10"
 
     # cabal tests
     - language: haskell
@@ -49,10 +57,6 @@ matrix:
       rvm: 2.4.0
       script: ./script/test manifest
       env: NAME="manifest"
-
-go:
-  - "1.7.x"
-  - "1.10.x"
 
 notifications:
   disable: true
