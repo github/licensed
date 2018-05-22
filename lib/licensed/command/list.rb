@@ -13,14 +13,16 @@ module Licensed
           @config.ui.info "Displaying dependencies for #{app['name']}"
           Dir.chdir app.source_path do
             app.sources.each do |source|
-              @config.ui.info "  #{source.type} dependencies:"
+              type = source.class.type
+
+              @config.ui.info "  #{type} dependencies:"
 
               source_dependencies = dependencies(app, source)
               source_dependencies.each do |dependency|
                 @config.ui.info "    Found #{dependency['name']} (#{dependency['version']})"
               end
 
-              @config.ui.confirm "  * #{source.type} dependencies: #{source_dependencies.size}"
+              @config.ui.confirm "  * #{type} dependencies: #{source_dependencies.size}"
             end
           end
         end

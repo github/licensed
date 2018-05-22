@@ -4,17 +4,15 @@ require "json"
 module Licensed
   module Source
     class Bower
+      def self.type
+        "bower"
+      end
+
       def initialize(config)
         @config = config
       end
 
-      def type
-        "bower"
-      end
-
       def enabled?
-        return false unless @config.enabled?(type)
-
         [@config.pwd.join(".bowerrc"), @config.pwd.join("bower.json")].any? do |path|
           File.exist?(path)
         end
@@ -25,7 +23,7 @@ module Licensed
           package = JSON.parse(File.read(file))
           path = bower_path.join(file).dirname.to_path
           Dependency.new(path, {
-            "type"     => type,
+            "type"     => Bower.type,
             "name"     => package["name"],
             "version"  => package["version"] || package["_release"],
             "summary"  => package["description"],

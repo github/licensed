@@ -4,6 +4,37 @@ A configuration file specifies the details of enumerating and operating on licen
 
 Configuration can be specified in either YML or JSON formats.  Examples below are given in YML.
 
+## Restricting sources
+
+The `sources` configuration property specifies which sources `licensed` will use to enumerate dependencies.
+By default, `licensed` will generally try to enumerate dependencies from all sources.  As a result,
+the configuration property should be used to explicitly disable sources rather than to enable a particular source.
+
+Be aware that this configuration is separate from an individual sources `#enabled?` method, which determines
+whether the source is valid for the current project.  Even if a source is enabled in the configuration
+it may still determine that it can't enumerate dependencies for a project.
+
+```yml
+sources:
+  bower: true
+  rubygem: false
+```
+
+`licensed` determines which sources will try to enumerate dependencies based on the following rules:
+1. If no sources are configured, all sources are enabled
+2. If no sources are set to true, any unconfigured sources are enabled
+```yml
+sources:
+  bower: false
+  # all other sources are enabled by default since there are no sources set to true
+```
+3. If any sources are set to true, any unconfigured sources are disabled
+```yml
+sources:
+  bower: true
+  # all other sources are disabled by default because a source was set to true
+```
+
 ## Applications
 
 What is an "app"?  In the context of `licensed`, an app is a combination of a source path and a cache path.
@@ -23,7 +54,6 @@ cache_path: 'relative/path/to/cache'
 source_path: 'relative/path/to/source'
 
 # Sources of metadata
-# All sources will attempt to run unless explicitly disabled
 sources:
   bower: true
   rubygem: false

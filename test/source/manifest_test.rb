@@ -16,11 +16,6 @@ describe Licensed::Source::Manifest do
       config["cache_path"] = Dir.tmpdir
       refute source.enabled?
     end
-
-    it "is false if disabled" do
-      config["sources"][source.type] = false
-      refute source.enabled?
-    end
   end
 
   describe "dependencies" do

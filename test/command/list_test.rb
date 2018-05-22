@@ -25,7 +25,7 @@ describe Licensed::Command::List do
       it "lists dependencies" do
         out, = capture_io { command.run }
         assert_match(/Found #{expected_dependency}/, out)
-        assert_match(/#{source.type} dependencies:/, out)
+        assert_match(/#{source.class.type} dependencies:/, out)
       end
     end
   end

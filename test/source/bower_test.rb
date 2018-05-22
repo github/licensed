@@ -24,13 +24,6 @@ if Licensed::Shell.tool_available?("bower")
         end
       end
 
-      it "is false if bower is disabled" do
-        Dir.chdir(fixtures) do
-          config["sources"]["bower"] = false
-          refute source.enabled?
-        end
-      end
-
       it "is false no bower configs exist" do
         Dir.chdir(Dir.tmpdir) do
           refute source.enabled?

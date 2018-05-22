@@ -32,7 +32,7 @@ describe Licensed::Command::Cache do
       it "extracts license info" do
         generator.run
 
-        path = config.cache_path.join("#{source.type}/#{expected_dependency}.txt")
+        path = config.cache_path.join("#{source.class.type}/#{expected_dependency}.txt")
         assert path.exist?
         license = Licensed::License.read(path)
         assert_equal expected_dependency, license["name"]
