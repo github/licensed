@@ -54,7 +54,6 @@ cache_path: 'relative/path/to/cache'
 source_path: 'relative/path/to/source'
 
 # Sources of metadata
-# All sources will attempt to run unless explicitly disabled
 sources:
   bower: true
   rubygem: false
