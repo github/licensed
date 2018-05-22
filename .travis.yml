@@ -22,6 +22,13 @@ matrix:
       script: ./script/test go
       env: NAME="go"
 
+      # dep tests
+      - language: go
+        go: "1.10.x"
+        before_script: ./script/source-setup/go
+        script: ./script/test dep
+        env: NAME="go dep"
+
     # cabal tests
     - language: haskell
       ghc: "8.2"
