@@ -25,18 +25,6 @@ if Licensed::Shell.tool_available?("npm")
           refute @source.enabled?
         end
       end
-
-      it "is false if disabled" do
-        Dir.mktmpdir do |dir|
-          Dir.chdir(dir) do
-            File.write "package.json", ""
-
-            assert @source.enabled?
-            @config["sources"][@source.type] = false
-            refute @source.enabled?
-          end
-        end
-      end
     end
 
     describe "dependencies" do

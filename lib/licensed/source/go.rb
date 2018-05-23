@@ -5,16 +5,16 @@ require "English"
 module Licensed
   module Source
     class Go
+      def self.type
+        "go"
+      end
+
       def initialize(config)
         @config = config
       end
 
-      def type
-        "go"
-      end
-
       def enabled?
-        @config.enabled?(type) && go_source?
+        go_source?
       end
 
       def dependencies
@@ -24,13 +24,13 @@ module Licensed
             import_path = non_vendored_import_path(package_name)
 
             if package.empty?
-              next if @config.ignored?("type" => type, "name" => package_name)
+              next if @config.ignored?("type" => Go.type, "name" => package_name)
               raise "couldn't find package for #{import_path}"
             end
 
             package_dir = package["Dir"]
             Dependency.new(package_dir, {
-              "type"        => type,
+              "type"        => Go.type,
               "name"        => import_path,
               "summary"     => package["Doc"],
               "homepage"    => homepage(import_path),
@@ -61,6 +61,13 @@ module Licensed
           .uniq
           .select { |d| !go_std_packages.include?(d) }
           .select { |d| !d.start_with?(root_package["ImportPath"]) || vendored_path?(d) }
+          .select do |d|
+          # this removes the packages listed in `go list std` as "vendor/golang_org/*" but are vendored
+          # as "vendor/golang.org/*"
+            go_std_packages.none? do |std_pkg|
+              std_pkg.sub(%r{^vendor/golang_org/}, "#{root_package["ImportPath"]}/vendor/golang.org/") == d
+            end
+          end
       end
 
       # Returns the root directory to search for a package license

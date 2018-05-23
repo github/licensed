@@ -92,7 +92,13 @@ sources:
 
 ## Development
 
-After checking out the repo, run `script/bootstrap` to install dependencies. Then, run `script/cibuild` to run the tests. You can also run `script/console` for an interactive prompt that will allow you to experiment.
+To get started after checking out the repo, run
+1. `script/bootstrap` to install dependencies
+2. `script/setup` to setup test fixtures.
+  - `script/setup -f` will force a clean test fixture environment
+3. `script/cibuild` to run the tests.
+
+You can also run `script/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 

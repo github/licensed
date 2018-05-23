@@ -19,7 +19,8 @@ test/fixtures/npm/package-lock.json
 test/fixtures/go/src/*
 test/fixtures/go/pkg
 !test/fixtures/go/src/test
-test/fixtures/haskell/dist*
+test/fixtures/cabal/*
+!test/fixtures/cabal/app.cabal
 
 vendor/licenses
 .licenses

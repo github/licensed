@@ -1,0 +1,8 @@
+ignored = ["github.com/hashicorp/golang-lru"]
+
+[[constraint]]
+  branch = "release-branch.go1.7"
+  name = "golang.org/x/net"
+
+[prune]
+  unused-packages = true

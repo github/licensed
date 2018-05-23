@@ -23,14 +23,6 @@ if Licensed::Shell.tool_available?("go")
           end
         end
       end
-
-      it "is false if disabled" do
-        Dir.chdir(fixtures) do
-          assert source.enabled?
-          config["sources"][source.type] = false
-          refute source.enabled?
-        end
-      end
     end
 
     describe "gopath" do
@@ -89,6 +81,12 @@ if Licensed::Shell.tool_available?("go")
       it "doesn't include depenencies from the go std library" do
         Dir.chdir fixtures do
           refute source.dependencies.any? { |d| d["name"] == "runtime" }
+        end
+      end
+
+      it "doesn't include vendored dependencies from the go std library" do
+        Dir.chdir fixtures do
+          refute source.dependencies.any? { |d| d["name"] == "golang.org/x/net/http2/hpack" }
         end
       end
 

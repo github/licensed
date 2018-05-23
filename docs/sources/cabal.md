@@ -2,7 +2,7 @@
 
 The cabal source uses the `ghc-pkg` command to enumerate dependencies and provide metadata.  It is un-opinionated on GHC packagedb locations and requires some configuration to ensure that all packages are properly found.
 
-The rubygem source will detect dependencies when the source is enabled and a `.cabal` file is found at an apps `source_path`.
+The cabal source will detect dependencies when a `.cabal` file is found at an apps `source_path`.
 
 ### Specifying GHC packagedb locations through environment
 You can configure the `cabal` source to use specific packagedb locations by setting the `GHC_PACKAGE_PATH` environment variable before running `licensed`.
