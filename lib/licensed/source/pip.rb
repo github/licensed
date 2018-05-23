@@ -5,16 +5,16 @@ require "English"
 module Licensed
   module Source
     class Pip
+      def self.type
+        "pip"
+      end
+
       def initialize(config)
         @config = config
       end
 
-      def type
-        "pip"
-      end
-
       def enabled?
-        @config.enabled?(type) && File.exist?(@config.pwd.join("requirements.txt"))
+        File.exist?(@config.pwd.join("requirements.txt"))
       end
 
       def dependencies
@@ -22,7 +22,7 @@ module Licensed
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
           Dependency.new(location, {
-                           "type"        => type,
+                           "type"        => Pip.type,
                            "name"        => package["Name"],
                            "summary"     => package["Summary"],
                            "homepage"    => package["Home-page"],
