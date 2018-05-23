@@ -51,6 +51,9 @@ module Licensed
 
       def pip_command(*args)
         venv_dir = @config.dig("python", "virtual_env_dir")
+        if venv_dir.nil?
+          raise "Virtual env directory not set."
+        end
         pip = File.join(venv_dir, "bin", "pip")
         Licensed::Shell.execute(pip, "--disable-pip-version-check", "show", *args)
       end

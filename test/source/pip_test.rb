@@ -14,6 +14,25 @@ if Licensed::Shell.tool_available?("pip")
         assert source.enabled?
         end
       end
+
+      it "is false if go source is not available" do
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            refute source.enabled?
+          end
+        end
+      end
+    end
+
+    describe "config file params check" do
+      it "fails if virtual_env_dir is not set" do
+        config.delete("python")
+        assert_raises RuntimeError  do
+          Dir.chdir(fixtures) do
+            source.pip_command
+          end
+        end
+      end
     end
   end
 end
