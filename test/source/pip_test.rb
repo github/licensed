@@ -15,7 +15,7 @@ if Licensed::Shell.tool_available?("pip")
         end
       end
 
-      it "is false if go source is not available" do
+      it "is false if pip source is not available" do
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
             refute source.enabled?
