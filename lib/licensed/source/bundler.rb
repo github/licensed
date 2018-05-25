@@ -1,5 +1,7 @@
 # frozen_string_literal: true
-require "bundler"
+if Licensed::Shell.tool_available?("bundle")
+  require "bundler"
+end
 
 module Licensed
   module Source
@@ -15,7 +17,7 @@ module Licensed
       end
 
       def enabled?
-        lockfile_path && lockfile_path.exist?
+        Licensed::Shell.tool_available?("bundle") && lockfile_path && lockfile_path.exist?
       end
 
       def dependencies

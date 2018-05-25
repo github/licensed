@@ -14,7 +14,7 @@ module Licensed
       end
 
       def enabled?
-        go_source?
+        Licensed::Shell.tool_available?("go") && go_source?
       end
 
       def dependencies
