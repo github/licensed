@@ -4,16 +4,16 @@ require "json"
 module Licensed
   module Source
     class NPM
+      def self.type
+        "npm"
+      end
+
       def initialize(config)
         @config = config
       end
 
-      def type
-        "npm"
-      end
-
       def enabled?
-        @config.enabled?(type) && File.exist?(@config.pwd.join("package.json"))
+        File.exist?(@config.pwd.join("package.json"))
       end
 
       def dependencies
@@ -31,7 +31,7 @@ module Licensed
           path = package["realPath"] || locations["#{package["name"]}@#{package["version"]}"]
           fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(path, {
-            "type"     => type,
+            "type"     => NPM.type,
             "name"     => package["name"],
             "version"  => package["version"],
             "summary"  => package["description"],

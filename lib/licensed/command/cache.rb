@@ -18,10 +18,12 @@ module Licensed
 
             # map each available app source to it's dependencies
             app.sources.map do |source|
-              @config.ui.info "  #{source.type} dependencies:"
+              type = source.class.type
+
+              @config.ui.info "  #{type} dependencies:"
 
               names = []
-              cache_path = app.cache_path.join(source.type)
+              cache_path = app.cache_path.join(type)
 
               # exclude ignored dependencies
               dependencies = source.dependencies.select { |d| !app.ignored?(d) }
@@ -60,7 +62,7 @@ module Licensed
                 FileUtils.rm(file) unless names.include?(relative_path.chomp(".txt"))
               end
 
-              "* #{app_name} #{source.type} dependencies: #{dependencies.size}"
+              "* #{app_name} #{type} dependencies: #{dependencies.size}"
             end
           end
         end
