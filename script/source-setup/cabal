@@ -11,7 +11,7 @@ BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd $BASE_PATH/test/fixtures/cabal
 
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" -and -not -name "app\.cabal" -print0 | xargs -0 rm -rf
+  find . -not -regex "\.*" -and -not -path "*app*" -print0 | xargs -0 rm -rf
 fi
 
 cabal new-build
