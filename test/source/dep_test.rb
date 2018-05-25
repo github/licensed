@@ -31,14 +31,6 @@ describe Licensed::Source::Dep do
         refute source.enabled?
       end
     end
-
-    it "is false if disabled" do
-      Dir.chdir(fixtures) do
-        assert source.enabled?
-        config["sources"][source.type] = false
-        refute source.enabled?
-      end
-    end
   end
 
   describe "packages" do

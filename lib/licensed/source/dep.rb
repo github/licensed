@@ -4,16 +4,16 @@ require "tomlrb"
 module Licensed
   module Source
     class Dep
+      def self.type
+        "dep"
+      end
+
       def initialize(config)
         @config = config
       end
 
-      def type
-        "dep"
-      end
-
       def enabled?
-        @config.enabled?(type) && go_dep_available?
+        go_dep_available?
       end
 
       def dependencies
@@ -23,12 +23,12 @@ module Licensed
             search_root = @config.pwd.join("vendor", package[:project])
 
             unless package_dir.exist?
-              next if @config.ignored?("type" => type, "name" => package[:name])
+              next if @config.ignored?("type" => Dep.type, "name" => package[:name])
               raise "couldn't find package for #{package[:name]}"
             end
 
             Dependency.new(package_dir.to_s, {
-              "type"        => type,
+              "type"        => Dep.type,
               "name"        => package[:name],
               "homepage"    => "https://#{package[:name]}",
               "search_root" => search_root.to_s,
