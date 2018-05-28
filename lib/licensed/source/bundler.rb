@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-if Licensed::Shell.tool_available?("bundle")
+begin
   require "bundler"
+rescue LoadError
 end
 
 module Licensed
@@ -17,7 +18,7 @@ module Licensed
       end
 
       def enabled?
-        Licensed::Shell.tool_available?("bundle") && lockfile_path && lockfile_path.exist?
+        defined?(::Bundler) && lockfile_path && lockfile_path.exist?
       end
 
       def dependencies
