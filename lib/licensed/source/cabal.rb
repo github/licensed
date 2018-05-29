@@ -16,7 +16,7 @@ module Licensed
       end
 
       def enabled?
-        cabal_packages.any? && ghc?
+        cabal_file_dependencies.any? && ghc?
       end
 
       def dependencies
@@ -66,7 +66,7 @@ module Licensed
 
       # Returns a `Set` of the package ids for all cabal dependencies
       def package_ids
-        recursive_dependencies(cabal_packages)
+        recursive_dependencies(cabal_file_dependencies)
       end
 
       # Recursively finds the dependencies for each cabal package.
@@ -150,13 +150,14 @@ module Licensed
         path.gsub("<ghc_version>", ghc_version)
       end
 
-      def cabal_packages
+      # Returns a set containing the top-level dependencies found in cabal files
+      def cabal_file_dependencies
         cabal_files.each_with_object(Set.new) do |cabal_file, packages|
           content = File.read(cabal_file)
           next if content.nil? || content.empty?
 
-          # add any dependencies for explicitly matched content from
-          # the cabal file.  by default this will find executable's dependencies
+          # add any dependencies for matched targets from the cabal file.
+          # by default this will find executable and library dependencies
           content.scan(cabal_file_regex).each do |match|
             # match[1] is a string of "," separated dependencies
             dependencies = match[1].split(",").map(&:strip)
