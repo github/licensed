@@ -1,5 +1,8 @@
 # frozen_string_literal: true
-require "bundler"
+begin
+  require "bundler"
+rescue LoadError
+end
 
 module Licensed
   module Source
@@ -15,7 +18,7 @@ module Licensed
       end
 
       def enabled?
-        lockfile_path && lockfile_path.exist?
+        defined?(::Bundler) && lockfile_path && lockfile_path.exist?
       end
 
       def dependencies

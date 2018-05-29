@@ -13,7 +13,7 @@ module Licensed
       end
 
       def enabled?
-        File.exist?(@config.pwd.join("package.json"))
+        Licensed::Shell.tool_available?("npm") && File.exist?(@config.pwd.join("package.json"))
       end
 
       def dependencies
