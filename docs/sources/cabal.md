@@ -2,7 +2,25 @@
 
 The cabal source uses the `ghc-pkg` command to enumerate dependencies and provide metadata.  It is un-opinionated on GHC packagedb locations and requires some configuration to ensure that all packages are properly found.
 
-The cabal source will detect dependencies when a `.cabal` file is found at an apps `source_path`.
+The cabal source will detect dependencies when a `.cabal` file is found at an apps `source_path`.  By default, the cabal source will enumerate dependencies for all executable and library targets in a cabal file.
+
+### Specifying which cabal file targets should enumerate dependencies
+The cabal source can be configured to override which cabal file targets contain dependencies that need to be documented.
+
+The default configuration is equivalent to:
+```yml
+cabal:
+  cabal_file_targets:
+    - executable
+    - library
+```
+
+However if you only wanted to enumerate dependencies for a `my_cabal_exe` executable target, you could specify:
+```yml
+cabal:
+  cabal_file_targets:
+    - executable my_cabal_exe
+```
 
 ### Specifying GHC packagedb locations through environment
 You can configure the `cabal` source to use specific packagedb locations by setting the `GHC_PACKAGE_PATH` environment variable before running `licensed`.
