@@ -4,6 +4,9 @@ require "English"
 module Licensed
   module Source
     class Cabal
+      DEPENDENCY_REGEX = /\s*.+?\s*/.freeze
+      DEFAULT_TARGETS = %w{executable library}.freeze
+
       def self.type
         "cabal"
       end
@@ -13,7 +16,7 @@ module Licensed
       end
 
       def enabled?
-        cabal_packages.any? && ghc?
+        cabal_file_dependencies.any? && ghc?
       end
 
       def dependencies
@@ -63,8 +66,7 @@ module Licensed
 
       # Returns a `Set` of the package ids for all cabal dependencies
       def package_ids
-        deps = cabal_packages.flat_map { |n| package_dependencies(n, false) }
-        recursive_dependencies(deps)
+        recursive_dependencies(cabal_file_dependencies)
       end
 
       # Recursively finds the dependencies for each cabal package.
@@ -148,12 +150,56 @@ module Licensed
         path.gsub("<ghc_version>", ghc_version)
       end
 
-      # Return an array of the top-level cabal packages for the current app
-      def cabal_packages
-        cabal_files.map do |f|
-          name_match = File.read(f).match(/^name:\s*(.*)$/)
-          name_match[1] if name_match
-        end.compact
+      # Returns a set containing the top-level dependencies found in cabal files
+      def cabal_file_dependencies
+        cabal_files.each_with_object(Set.new) do |cabal_file, packages|
+          content = File.read(cabal_file)
+          next if content.nil? || content.empty?
+
+          # add any dependencies for matched targets from the cabal file.
+          # by default this will find executable and library dependencies
+          content.scan(cabal_file_regex).each do |match|
+            # match[1] is a string of "," separated dependencies
+            dependencies = match[1].split(",").map(&:strip)
+            dependencies.each do |dep|
+              # the dependency might have a version specifier.
+              # remove it so we can get the full id specifier for each package
+              id = cabal_package_id(dep.split(/\s/)[0])
+              packages.add(id) if id
+            end
+          end
+        end
+      end
+
+      # Returns an installed package id for the package.
+      def cabal_package_id(package_name)
+        field = ghc_pkg_field_command(package_name, ["id"])
+        id = field.split(":", 2)[1]
+        id.strip if id
+      end
+
+      # Find `build-depends` lists from specified targets in a cabal file
+      def cabal_file_regex
+        # this will match 0 or more occurences of
+        # match[0] - specifier, e.g. executable, library, etc
+        # match[1] - full list of matched dependencies
+        # match[2] - first matched dependency (required)
+        # match[3] - remainder of matched dependencies (not required)
+        @cabal_file_regex ||= /
+          # match a specifier, e.g. library or executable
+          ^(#{cabal_file_targets.join("|")})
+            .*? # stuff
+
+            # match a list of 1 or more dependencies
+            build-depends:(#{DEPENDENCY_REGEX}(,#{DEPENDENCY_REGEX})*)\n
+        /xmi
+      end
+
+      # Returns the targets to search for `build-depends` in a cabal file
+      def cabal_file_targets
+        targets = Array(@config.dig("cabal", "cabal_file_targets"))
+        targets.push(*DEFAULT_TARGETS) if targets.empty?
+        targets
       end
 
       # Returns an array of the local directory cabal package files

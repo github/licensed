@@ -20,7 +20,7 @@ test/fixtures/go/src/*
 test/fixtures/go/pkg
 !test/fixtures/go/src/test
 test/fixtures/cabal/*
-!test/fixtures/cabal/app.cabal
+!test/fixtures/cabal/app*
 
 vendor/licenses
 .licenses
