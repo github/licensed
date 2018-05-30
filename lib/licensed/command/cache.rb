@@ -40,8 +40,9 @@ module Licensed
                 # or default to a blank license
                 license = Licensed::License.read(filename) || Licensed::License.new
 
-                # Version did not change, no need to re-cache
-                if !force && version == license["version"]
+                # cached version string exists and did not change, no need to re-cache
+                has_version = !license["version"].nil? && !license["version"].empty?
+                if !force && has_version && version == license["version"]
                   @config.ui.info "    Using #{name} (#{version})"
                   next
                 end
