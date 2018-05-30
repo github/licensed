@@ -9,6 +9,7 @@ module Licensed
       ".licensed.yaml".freeze,
       ".licensed.json".freeze
     ].freeze
+    SOURCE_TYPES = Source.constants.map { |c| Source.const_get(c) }.freeze
 
     def initialize(options = {}, inherited_options = {})
       super()
@@ -46,10 +47,9 @@ module Licensed
 
     # Returns an array of enabled app sources
     def sources
-      @sources ||= Source.constants.map { |c| Source.const_get(c) }
-                         .select { |source_class| enabled?(source_class.type) }
-                         .map { |source_class| source_class.new(self) }
-                         .select(&:enabled?)
+      @sources ||= SOURCE_TYPES.select { |source_class| enabled?(source_class.type) }
+                               .map { |source_class| source_class.new(self) }
+                               .select(&:enabled?)
     end
 
     # Returns whether a source type is enabled
