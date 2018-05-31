@@ -11,7 +11,7 @@ module Licensed
       def run(force: false)
         summary = @config.apps.flat_map do |app|
           app_name = app["name"]
-          @config.ui.info "Caching licenes for #{app_name}:"
+          @config.ui.info "Caching licenses for #{app_name}:"
 
           # load the app environment
           Dir.chdir app.source_path do
