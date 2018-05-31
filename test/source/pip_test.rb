@@ -34,5 +34,27 @@ if Licensed::Shell.tool_available?("pip")
         end
       end
     end
+
+    describe "dependencies" do
+      it "includes direct dependencies" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "Jinja2" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
+      it "includes indirect dependencies" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "MarkupSafe" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+    end
   end
 end
