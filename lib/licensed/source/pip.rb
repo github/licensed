@@ -54,6 +54,7 @@ module Licensed
         if venv_dir.nil?
           raise "Virtual env directory not set."
         end
+        venv_dir = File.expand_path(venv_dir, Licensed::Git.repository_root)
         pip = File.join(venv_dir, "bin", "pip")
         Licensed::Shell.execute(pip, "--disable-pip-version-check", "show", *args)
       end

@@ -14,8 +14,16 @@ fi
 
 # setup test fixtures
 BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-cd $BASE_PATH/test/fixtures/pip
-virtualenv venv
-. venv/bin/activate
-pip install -r requirements.txt
+
+
+# clean up any previous fixture venv that might have been created.
+if [ "$1" == "-f" ]; then
+    echo "removing old fixture setup..."
+    rm -rf  $BASE_PATH/test/fixtures/pip/venv
+fi
+
+# set up a virtualenv and install the packages in the test requirements
+virtualenv $BASE_PATH/test/fixtures/pip/venv
+. $BASE_PATH/test/fixtures/pip/venv/bin/activate
+pip install -r $BASE_PATH/test/fixtures/pip/requirements.txt
 deactivate
