@@ -127,7 +127,7 @@ module Licensed
       # Runs a `ghc-pkg field` command for a given set of fields and arguments
       # Automatically includes ghc package DB locations in the command
       def ghc_pkg_field_command(id, fields, *args)
-        Licensed::Shell.execute("ghc-pkg", "field", id, fields.join(","), *args, *package_db_args)
+        Licensed::Shell.execute("ghc-pkg", "field", id, fields.join(","), *args, *package_db_args, allow_failure: true)
       end
 
       # Returns an array of ghc package DB locations as specified in the app
