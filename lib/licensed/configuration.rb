@@ -15,7 +15,8 @@ module Licensed
       Source::Cabal,
       Source::Go,
       Source::Manifest,
-      Source::NPM
+      Source::NPM,
+      Source::Pip
     ].freeze
 
     def initialize(options = {}, inherited_options = {})

@@ -1,0 +1,5 @@
+expected_dependency: MarkupSafe
+config:
+  source_path: test/fixtures/pip
+  python:
+    virtual_env_dir: "test/fixtures/pip/venv"
