@@ -9,15 +9,7 @@ module Licensed
       ".licensed.yaml".freeze,
       ".licensed.json".freeze
     ].freeze
-    SOURCE_TYPES = [
-      Source::Bower,
-      Source::Bundler,
-      Source::Cabal,
-      Source::Go,
-      Source::Manifest,
-      Source::NPM,
-      Source::Pip
-    ].freeze
+    SOURCE_TYPES = Source.constants.map { |c| Source.const_get(c) }.freeze
 
     def initialize(options = {}, inherited_options = {})
       super()
@@ -62,7 +54,7 @@ module Licensed
 
     # Returns whether a source type is enabled
     def enabled?(source_type)
-      # the default is false is any sources are set to true, false otherwise
+      # the default is false if any sources are set to true, true otherwise
       default = !self["sources"].any? { |_, enabled| enabled }
       self["sources"].fetch(source_type, default)
     end

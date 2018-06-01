@@ -77,9 +77,10 @@ Dependencies will be automatically detected for
 2. [Bundler (rubygem)](./docs/sources/bundler.md)
 3. [Cabal](./docs/sources/cabal.md)
 4. [Go](./docs/sources/go.md)
-5. [Manifest lists](./docs/sources/manifests.md)
-6. [NPM](./docs/sources/npm.md)
-7. [Pip](./docs/source/pip.md)
+5. [Go Dep](./docs/sources/dep.md)
+6. [Manifest lists](./docs/sources/manifests.md)
+7. [NPM](./docs/sources/npm.md)
+8. [Pip](./docs/source/pip.md)
 
 You can disable any of them in the configuration file:
 
