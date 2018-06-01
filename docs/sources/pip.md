@@ -7,14 +7,15 @@ Your repository root should also contain a `requirements.txt` file which contain
 pip freeze > requirements.txt
 ```
 
-A `virtualenv` is assumed to be setup before running `licensed`. You can setup a `virtualenv` by running the command:
+A `virtualenv` directory is required before running `licensed`. You can setup a `virtualenv` by running the command:
 ```
 virtualenv <your_venv_dir>
 ```
-_note_: `<your_venv_dir>` path should be relative to the repository root.
+_note_: `<your_venv_dir>` path should be relative to the repository root or can be specified as an absolute path.
 
-#### virtual_env_dir
- The `pip` command will be sourced from this directory.
+#### virtual_env_dir (Required)
+
+The `pip` command will be sourced from this directory.
 An example usage of this might look like:
 ```yaml
 python:
