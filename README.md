@@ -80,6 +80,7 @@ Dependencies will be automatically detected for
 5. [Go Dep](./docs/sources/dep.md)
 6. [Manifest lists](./docs/sources/manifests.md)
 7. [NPM](./docs/sources/npm.md)
+8. [Pip](./docs/source/pip.md)
 
 You can disable any of them in the configuration file:
 

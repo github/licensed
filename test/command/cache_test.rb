@@ -72,6 +72,50 @@ describe Licensed::Command::Cache do
     refute_equal "0.0", license["version"]
   end
 
+  it "does not reuse nil license version" do
+    generator.run
+
+    path = config.cache_path.join("test/dependency.txt")
+    license = Licensed::License.read(path)
+    license["license"] = "test"
+    license.save(path)
+
+    test_dependency = Licensed::Dependency.new(Dir.pwd, {
+      "type"     => TestSource.type,
+      "name"     => "dependency"
+    })
+    TestSource.stub(:create_dependency, test_dependency) do
+      generator.run
+    end
+
+    license = Licensed::License.read(path)
+    assert_equal "test", license["license"]
+    assert_equal "1.0", license["version"]
+  end
+
+  it "does not reuse empty license version" do
+    generator.run
+
+    path = config.cache_path.join("test/dependency.txt")
+    license = Licensed::License.read(path)
+    license["license"] = "test"
+    license["version"] = ""
+    license.save(path)
+
+    test_dependency = Licensed::Dependency.new(Dir.pwd, {
+      "type"     => TestSource.type,
+      "name"     => "dependency",
+      "version"  => ""
+    })
+    TestSource.stub(:create_dependency, test_dependency) do
+      generator.run
+    end
+
+    license = Licensed::License.read(path)
+    assert_equal "test", license["license"]
+    assert_equal "1.0", license["version"]
+  end
+
   it "does not include ignored dependencies in dependency counts" do
     config.ui.level = "info"
     out, _ = capture_io { generator.run }

@@ -23,7 +23,7 @@ module Licensed
         file = File.directory?(descriptor) ? "." : File.basename(descriptor)
 
         Dir.chdir dir do
-          Licensed::Shell.execute("git", "rev-list", "-1", "HEAD", "--", file)
+          Licensed::Shell.execute("git", "rev-list", "-1", "HEAD", "--", file, allow_failure: true)
         end
       end
 

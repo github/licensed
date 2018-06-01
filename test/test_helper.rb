@@ -36,13 +36,15 @@ class TestSource
 
   def dependencies
     @dependencies_hook.call if @dependencies_hook.respond_to?(:call)
-    @dependencies ||= [
-      Licensed::Dependency.new(Dir.pwd, {
-        "type"     => TestSource.type,
-        "name"     => "dependency",
-        "version"  => "1.0"
-      })
-    ]
+    @dependencies ||= [TestSource.create_dependency]
+  end
+
+  def self.create_dependency
+    Licensed::Dependency.new(Dir.pwd, {
+      "type"     => TestSource.type,
+      "name"     => "dependency",
+      "version"  => "1.0"
+    })
   end
 end
 

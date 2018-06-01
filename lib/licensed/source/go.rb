@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "json"
 require "English"
+require "pathname"
 
 module Licensed
   module Source
@@ -14,7 +15,7 @@ module Licensed
       end
 
       def enabled?
-        go_source?
+        Licensed::Shell.tool_available?("go") && go_source?
       end
 
       def dependencies
@@ -113,7 +114,7 @@ module Licensed
       # package - Go package import path
       def package_info_command(package)
         package ||= ""
-        Licensed::Shell.execute("go", "list", "-json", package)
+        Licensed::Shell.execute("go", "list", "-json", package, allow_failure: true)
       end
 
       # Returns the info for the package under test
@@ -140,7 +141,12 @@ module Licensed
         @gopath = if path.nil? || path.empty?
                     ENV["GOPATH"]
                   else
-                    File.expand_path(path, Licensed::Git.repository_root)
+                    root = begin
+                             Licensed::Git.repository_root
+                           rescue Licensed::Shell::Error
+                             Pathname.pwd
+                           end
+                    File.expand_path(path, root)
                   end
       end
 

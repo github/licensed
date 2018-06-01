@@ -59,6 +59,24 @@ if Licensed::Shell.tool_available?("ghc")
           assert dep["summary"]
         end
       end
+
+      it "finds dependencies for executables" do
+        config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.detect { |d| d["name"] == "Glob" }
+          assert dep
+          assert_equal "cabal", dep["type"]
+          assert_equal "0.9.2", dep["version"]
+          assert dep["summary"]
+        end
+      end
+
+      it "does not include the target project" do
+        config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
+        Dir.chdir(fixtures) do
+          refute source.dependencies.detect { |d| d["name"] == "app" }
+        end
+      end
     end
 
     describe "package_db_args" do
