@@ -14,7 +14,8 @@ module Licensed
       end
 
       def enabled?
-        Licensed::Shell.tool_available?(virtual_env_pip) && File.exist?(@config.pwd.join("requirements.txt"))
+        return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
+        File.exist?(@config.pwd.join("requirements.txt"))
       end
 
       def dependencies
@@ -54,6 +55,7 @@ module Licensed
       end
 
       def virtual_env_pip
+        return unless virtual_env_dir
         File.join(virtual_env_dir, "bin", "pip")
       end
 
