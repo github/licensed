@@ -30,6 +30,10 @@ describe Licensed::Command::Cache do
       let(:source) { Licensed::Source.const_get(source_type).new(config) }
 
       it "extracts license info" do
+        Dir.chdir config.source_path do
+          skip "#{source_type} not available" unless source.enabled?
+        end
+
         generator.run
 
         path = config.cache_path.join("#{source.class.type}/#{expected_dependency}.txt")
