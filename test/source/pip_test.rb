@@ -11,7 +11,7 @@ if Licensed::Shell.tool_available?("pip")
     describe "enabled?" do
       it "is true if pip source is available" do
         Dir.chdir(fixtures) do
-        assert source.enabled?
+          assert source.enabled?
         end
       end
 
@@ -19,17 +19,6 @@ if Licensed::Shell.tool_available?("pip")
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
             refute source.enabled?
-          end
-        end
-      end
-    end
-
-    describe "config file params check" do
-      it "fails if virtual_env_dir is not set" do
-        config.delete("python")
-        assert_raises RuntimeError  do
-          Dir.chdir(fixtures) do
-            source.pip_command
           end
         end
       end
