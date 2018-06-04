@@ -14,6 +14,7 @@ module Licensed
       end
 
       def enabled?
+        return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
         File.exist?(@config.pwd.join("requirements.txt"))
       end
 
@@ -50,13 +51,20 @@ module Licensed
       end
 
       def pip_command(*args)
-        venv_dir = @config.dig("python", "virtual_env_dir")
-        if venv_dir.nil?
-          raise "Virtual env directory not set."
+        Licensed::Shell.execute(virtual_env_pip, "--disable-pip-version-check", "show", *args)
+      end
+
+      def virtual_env_pip
+        return unless virtual_env_dir
+        File.join(virtual_env_dir, "bin", "pip")
+      end
+
+      def virtual_env_dir
+        return @virtual_env_dir if defined?(@virtual_env_dir)
+        @virtual_env_dir = begin
+          venv_dir = @config.dig("python", "virtual_env_dir")
+          File.expand_path(venv_dir, Licensed::Git.repository_root) if venv_dir
         end
-        venv_dir = File.expand_path(venv_dir, Licensed::Git.repository_root)
-        pip = File.join(venv_dir, "bin", "pip")
-        Licensed::Shell.execute(pip, "--disable-pip-version-check", "show", *args)
       end
     end
   end

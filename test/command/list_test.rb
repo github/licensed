@@ -23,6 +23,10 @@ describe Licensed::Command::List do
       let(:source) { Licensed::Source.const_get(source_type).new(config) }
 
       it "lists dependencies" do
+        Dir.chdir config.source_path do
+          skip "#{source_type} not available" unless source.enabled?
+        end
+
         out, = capture_io { command.run }
         assert_match(/Found #{expected_dependency}/, out)
         assert_match(/#{source.class.type} dependencies:/, out)
