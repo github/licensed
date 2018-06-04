@@ -6,11 +6,6 @@ This source is intended to be used when all of a projects dependencies have been
 The dep source will detect dependencies when the source is enabled and `Gopkg.lock` is found at an apps `source_path`.  It
 parses the `Gopkg.lock` file to find packages that have been vendored into the project directory.
 
-```yml
-dep:
-  allow_ignored: true # force source to run even if `Gopkg.toml` is non-empty
-```
-
 #### Limitations
 
 The dep dependency source has some limitations compared to the general-purpose go source.
