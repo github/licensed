@@ -60,19 +60,11 @@ module Licensed
       end
 
       def go_dep_available?
-        return false unless gopkg_lock_path.exist? && gopkg_toml_path.exist?
-        return true if @config.dig("dep", "allow_ignored") == true
-
-        gopkg_toml = Tomlrb.load_file(gopkg_toml_path, symbolize_keys: true)
-        gopkg_toml[:ignored].nil? || gopkg_toml[:ignored].empty?
+        gopkg_lock_path.exist?
       end
 
       def gopkg_lock_path
         @config.pwd.join("Gopkg.lock")
-      end
-
-      def gopkg_toml_path
-        @config.pwd.join("Gopkg.toml")
       end
 
       # Returns a list of go standard packages
