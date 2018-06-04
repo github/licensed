@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.1.0 - 2018-06-04
+### Added
+- Pip dependency source :tada:
+- Go Dep dependency source :tada:
+
+### Changed
+- Changed how `sources` configuration property affects which sources are enabled
+- Raise informative error messages when shell commands fail
+
+### Fixed
+- Don't reuse cached license when cached version metadata is missing
+- Disable dependency sources when dependent tools are not available
+- Vendored packages from the go std library are properly excluded
+- Cabal dependency enumeration properly includes executable targets
+
 ## 1.0.1 - 2018-04-26
 ### Added
 - GOPATH settable in configuration file
