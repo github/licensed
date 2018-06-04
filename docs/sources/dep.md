@@ -3,11 +3,8 @@ This source is intended to be used when all of a projects dependencies have been
 
 # Go Dep
 
-The dep source will detect dependencies when the source is enabled and both `Gopkg.toml` and `Gopkg.lock` are found at an apps `source_path`.  It
+The dep source will detect dependencies when the source is enabled and `Gopkg.lock` is found at an apps `source_path`.  It
 parses the `Gopkg.lock` file to find packages that have been vendored into the project directory.
-
-This source will self-disable if the `ignored` property in `Gopkg.toml` has any values.  While strongly discouraged, the source can be forced to run
-via configuration.
 
 ```yml
 dep:

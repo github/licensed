@@ -21,16 +21,6 @@ describe Licensed::Source::Dep do
         end
       end
     end
-
-    it "is false if Gopkg.toml contains ignored packages and allow_ignored is not true" do
-      Dir.chdir(fixtures) do
-        config["dep"]["allow_ignored"] = false
-        refute source.enabled?
-
-        config["dep"].delete("allow_ignored")
-        refute source.enabled?
-      end
-    end
   end
 
   describe "packages" do
