@@ -119,9 +119,7 @@ if Licensed::Shell.tool_available?("bundle")
       describe "when bundler is a listed dependency" do
         it "includes bundler as a dependency when included in dependencies" do
           Dir.chdir(fixtures) do
-            dep = source.dependencies.find { |d| d["name"] == "bundler" }
-            assert dep
-            assert_equal "1.16.1", dep["version"]
+            assert source.dependencies.find { |d| d["name"] == "bundler" }
           end
         end
 
