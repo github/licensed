@@ -28,6 +28,14 @@ if Licensed::Shell.tool_available?("bundle")
           refute source.enabled?
         end
       end
+
+      it "is false if bundle is not available" do
+        Licensed::Shell.stub(:tool_available?, false) do
+          Dir.chdir(fixtures) do
+            refute source.enabled?
+          end
+        end
+      end
     end
 
     describe "gemfile_path" do
@@ -117,19 +125,9 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       describe "when bundler is a listed dependency" do
-        it "includes bundler as a dependency when included in dependencies" do
+        it "includes bundler as a dependency" do
           Dir.chdir(fixtures) do
             assert source.dependencies.find { |d| d["name"] == "bundler" }
-          end
-        end
-
-        it "raises an error if bundle isn't available" do
-          Licensed::Shell.stub(:tool_available?, false) do
-            Dir.chdir(fixtures) do
-              assert_raises do
-                source.dependencies
-              end
-            end
           end
         end
       end

@@ -19,7 +19,7 @@ module Licensed
       end
 
       def enabled?
-        defined?(::Bundler) && lockfile_path && lockfile_path.exist?
+        defined?(::Bundler) && Licensed::Shell.tool_available?("bundle") && lockfile_path && lockfile_path.exist?
       end
 
       def dependencies
@@ -123,10 +123,6 @@ module Licensed
       def bundler_spec
         # cache this so we run CLI commands as few times as possible
         return @bundler_spec if defined?(@bundler_spec)
-
-        unless Licensed::Shell.tool_available?("bundle")
-          return @bundler_spec = nil
-        end
 
         # set GEM_PATH to nil in the execution environment to pick up host
         # information.  this is a specific hack for running from a
