@@ -115,6 +115,72 @@ if Licensed::Shell.tool_available?("bundle")
           assert_equal "1.6.0", dep["version"]
         end
       end
+
+      it "includes bundler as a dependency when included in dependencies" do
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.find { |d| d["name"] == "bundler" }
+          assert dep
+          assert_equal "1.16.1", dep["version"]
+        end
+      end
+
+      describe "when bundler is not explicitly listed as a dependency" do
+        let(:config) { Licensed::Configuration.new("rubygems" => { "without" => "bundler" }) }
+
+        it "does not include bundler as a dependency" do
+          Dir.chdir(fixtures) do
+            assert_nil source.dependencies.find { |d| d["name"] == "bundler" }
+          end
+        end
+      end
+
+
+      describe "with excluded groups in the configuration" do
+        let(:config) { Licensed::Configuration.new("rubygems" => { "without" => "exclude" }) }
+
+        it "ignores gems in the excluded groups" do
+          Dir.chdir(fixtures) do
+            assert_nil source.dependencies.find { |d| d["name"] == "i18n" }
+          end
+        end
+
+        it "does not ignore gems from development and test" do
+          Dir.chdir(fixtures) do
+            # test
+            dep = source.dependencies.find { |d| d["name"] == "minitest" }
+            assert dep
+            assert_equal "5.11.3", dep["version"]
+
+            # dev
+            dep = source.dependencies.find { |d| d["name"] == "tzinfo" }
+            assert dep
+            assert_equal "1.2.5", dep["version"]
+          end
+        end
+      end
+
+      it "ignores gems from development and test by default" do
+        Dir.chdir(fixtures) do
+          # test
+          assert_nil source.dependencies.find { |d| d["name"] == "minitest" }
+
+          # dev
+          assert_nil source.dependencies.find { |d| d["name"] == "tzinfo" }
+        end
+      end
+
+      it "ignores gems from bundler-configured 'without' groups" do
+        Dir.chdir(fixtures) do
+          assert_nil source.dependencies.find { |d| d["name"] == "json" }
+        end
+      end
+
+      it "ignores local gemspecs" do
+        fixtures = File.expand_path("../../fixtures/bundler", __FILE__)
+        Dir.chdir(fixtures) do
+          assert_nil source.dependencies.find { |d| d["name"] == "licensed" }
+        end
+      end
     end
   end
 end
