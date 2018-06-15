@@ -2,6 +2,29 @@
 
 The bundler source will detect dependencies `Gemfile` and `Gemfile.lock` files are found at an apps `source_path`.  The source uses the `Bundler` API to enumerate dependencies from `Gemfile` and `Gemfile.lock`.
 
-The bundler source will exclude gems in the `:development` and `:test` groups.  Be aware that if you have a local
-bundler configuration (e.g. `.bundle`), that configuration will be respected as well.  For example, if you have a local
-configuration set for `without: [':server']`, the bundler source will exclude all gems in the `:server` group.
+### Excluding gem groups
+
+The bundler source determines which gem groups to include or exclude with the following logic, in order of precedence.
+1. Include all groups specified in the Gemfile
+2. Exclude all groups from the `without` bundler configuration (e.g. `.bundle/config`)
+3. Include all groups from the `with` bundler configuration (e.g. `.bundle/config`)
+4. Exclude all groups from the `without` licensed configuration (`:development` and `:test` if not otherwise specified)
+
+`licensed` can be configured to override the default "without" development and test groups in the configuration file.
+
+Strings and string arrays are both :+1:
+
+```yml
+rubygems:
+  without: development
+```
+
+or
+
+```yml
+rubygems:
+  without:
+    - build
+    - development
+    - test
+```
