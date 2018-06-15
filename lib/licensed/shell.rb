@@ -6,8 +6,8 @@ module Licensed
     # Executes a command, returning its standard output on success. On failure,
     # it raises an exception that contains the error output, unless
     # `allow_failure` is true, in which case it returns an empty string.
-    def self.execute(cmd, *args, allow_failure: false)
-      stdout, stderr, status = Open3.capture3(cmd, *args)
+    def self.execute(cmd, *args, allow_failure: false, env: {})
+      stdout, stderr, status = Open3.capture3(env, cmd, *args)
 
       if status.success?
         stdout.strip
