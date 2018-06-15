@@ -116,11 +116,23 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
-      it "includes bundler as a dependency when included in dependencies" do
-        Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d["name"] == "bundler" }
-          assert dep
-          assert_equal "1.16.1", dep["version"]
+      describe "when bundler is a listed dependency" do
+        it "includes bundler as a dependency when included in dependencies" do
+          Dir.chdir(fixtures) do
+            dep = source.dependencies.find { |d| d["name"] == "bundler" }
+            assert dep
+            assert_equal "1.16.1", dep["version"]
+          end
+        end
+
+        it "raises an error if bundle isn't available" do
+          Licensed::Shell.stub(:tool_available?, false) do
+            Dir.chdir(fixtures) do
+              assert_raises do
+                source.dependencies
+              end
+            end
+          end
         end
       end
 
