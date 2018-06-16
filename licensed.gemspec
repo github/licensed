@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.required_ruby_version = ">= 2.3.0"
+
   spec.add_dependency "licensee", "~> 9.0"
   spec.add_dependency "thor", "~>0.19"
   spec.add_dependency "octokit", "~>4.0"
@@ -34,5 +36,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "webmock", "~> 1.21"
   spec.add_development_dependency "rubocop", "~> 0.49"
   spec.add_development_dependency "rubocop-github", "~> 0.6"
-  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "byebug", "~> 10.0.0"
 end
