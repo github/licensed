@@ -19,7 +19,7 @@ module Licensed
       end
 
       def enabled?
-        defined?(::Bundler) && Licensed::Shell.tool_available?("bundle") && lockfile_path && lockfile_path.exist?
+        defined?(::Bundler) && lockfile_path && lockfile_path.exist?
       end
 
       def dependencies
@@ -135,6 +135,12 @@ module Licensed
       def bundler_spec
         # cache this so we run CLI commands as few times as possible
         return @bundler_spec if defined?(@bundler_spec)
+
+        # finding the bundler gem is dependent on having `gem` available
+        unless Licensed::Shell.tool_available?("gem")
+          @bundler_spec = nil
+          return
+        end
 
         # Bundler is always used from the default gem install location.
         # we can use `gem specification bundler` with a clean ENV to
