@@ -129,20 +129,18 @@ module Licensed
         end
       end
 
+      # Returns a gemspec for bundler, found and loaded by running `gem specification bundler`
       # This is a hack to work around bundler not placing it's own spec at
       # `::Bundler.specs_path` when it's an explicit dependency
       def bundler_spec
         # cache this so we run CLI commands as few times as possible
         return @bundler_spec if defined?(@bundler_spec)
 
-        # set GEM_PATH to nil in the execution environment to pick up host
-        # information.  this is a specific hack for running from a
-        # ruby-packer built executable
-        path = Licensed::Shell.execute("bundle", "show", "bundler", env: { "GEM_PATH" => nil })
-        # get the gemspec path for the given bundler gem path
-        path = File.expand_path("../../specifications/#{File.basename(path)}.gemspec", path)
-
-        @bundler_spec = Gem::Specification.load(path)
+        # Bundler is always used from the default gem install location.
+        # we can use `gem specification bundler` with a clean ENV to
+        # get the system bundler gem as YAML
+        yaml = ::Bundler.with_original_env { Licensed::Shell.execute("gem", "specification", "bundler") }
+        @bundler_spec = Gem::Specification.from_yaml(yaml)
       end
 
       # Build the bundler definition
