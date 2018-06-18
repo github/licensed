@@ -39,8 +39,8 @@ module Licensed
       # Returns an array of Gem::Specifications for all gem dependencies
       def specs
         # get the specifications for all dependencies in a Gemfile
-        root_dependencies = definition.dependencies.select { |d| include?(d) }
-        root_specs = specs_for_dependencies(root_dependencies).compact
+        root_dependencies = definition.dependencies.select { |d| include?(d, nil) }
+        root_specs = specs_for_dependencies(root_dependencies, nil).compact
 
         # recursively find the remaining specifications
         all_specs = recursive_specs(root_specs)
@@ -59,8 +59,8 @@ module Licensed
 
         results.merge new_specs
 
-        dependency_specs = new_specs.flat_map { |s| specs_for_dependencies(s.dependencies) }
-                                    .compact
+        dependency_specs = new_specs.flat_map { |s| specs_for_dependencies(s.dependencies, s.source) }
+
         return results if dependency_specs.empty?
 
         results.merge recursive_specs(dependency_specs, results)
@@ -68,8 +68,8 @@ module Licensed
 
       # Returns the specs for dependencies that pass the checks in `include?`
       # Raises an error if the specification isn't found
-      def specs_for_dependencies(dependencies)
-        included_dependencies = dependencies.select { |d| include?(d) }
+      def specs_for_dependencies(dependencies, source)
+        included_dependencies = dependencies.select { |d| include?(d, source) }
         included_dependencies.map do |dep|
           gem_spec(dep) || raise("Unable to find a specification for #{dep.name} (#{dep.requirement}) in any sources")
         end
@@ -101,12 +101,14 @@ module Licensed
       end
 
       # Returns whether a dependency should be included in the final
-      def include?(dependency)
+      def include?(dependency, source)
         # ::Bundler::Dependency has an extra `should_include?`
         return false unless dependency.should_include? if dependency.respond_to?(:should_include?)
 
-        # Don't return gems listed as `:development` in the gemfile
-        return false if dependency.type == :development
+        # Don't return gems added from `add_development_dependency` in a gemspec
+        # if the :development group is excluded
+        gemspec_source = source.is_a?(::Bundler::Source::Gemspec)
+        return false if dependency.type == :development && (!gemspec_source || exclude_development_dependencies?)
 
         # Gem::Dependency don't have groups - in our usage these objects always
         # come as child-dependencies and are never directly from a Gemfile.
@@ -117,7 +119,16 @@ module Licensed
         (dependency.groups & groups).any?
       end
 
-      # Returns a gemspec for bundler, found and loaded by running `bundle show bundle`
+      # Returns whether development dependencies should be excluded
+      def exclude_development_dependencies?
+        @include_development ||= begin
+          # check whether the development dependency group is explicitly removed
+          # or added via bundler and licensed configurations
+          groups = [:development] - Array(::Bundler.settings[:without]) + Array(::Bundler.settings[:with]) - exclude_groups
+          !groups.include?(:development)
+        end
+      end
+
       # This is a hack to work around bundler not placing it's own spec at
       # `::Bundler.specs_path` when it's an explicit dependency
       def bundler_spec
