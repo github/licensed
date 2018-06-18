@@ -28,14 +28,6 @@ if Licensed::Shell.tool_available?("bundle")
           refute source.enabled?
         end
       end
-
-      it "is false if bundle is not available" do
-        Licensed::Shell.stub(:tool_available?, false) do
-          Dir.chdir(fixtures) do
-            refute source.enabled?
-          end
-        end
-      end
     end
 
     describe "gemfile_path" do
