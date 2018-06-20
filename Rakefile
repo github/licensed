@@ -52,6 +52,24 @@ namespace :test do
   end
 end
 
+task :package, [:target] do |task, args|
+  target = args[:target]
+  target = "*" if target.nil? || target.empty?
+  Dir["script/packages/#{target}"].each do |script|
+    puts "Building #{script}"
+
+    if Bundler.with_original_env { system(script) }
+      # green
+      puts "\033[32mCompleted #{script}.\e[0m"
+    else
+      # red
+      puts "\033[31mEncountered an error running #{script}.\e[0m"
+    end
+
+    puts
+  end
+end
+
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
   t.libs << "lib"
