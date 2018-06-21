@@ -14,9 +14,10 @@
 #/   [VERSION]         (optional, default to current git branch or SHA1) version of licensed to build exe at
 #/
 
-set -e
+set -euo pipefail
 
 BASE_DIR="$(cd "$(dirname $0)/../.." && pwd)"
+VERSION=${VERSION:=""}
 
 build_linux_docker() {
   IMAGE="licensed/build-linux"

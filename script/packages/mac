@@ -14,7 +14,7 @@
 #/   [VERSION]         (optional, default to current git branch or SHA1) version of licensed to build exe at
 #/
 
-set -e
+set -euo pipefail
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
   echo "A Mac OS is required to build a licensed executable for mac" >&2
