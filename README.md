@@ -118,6 +118,10 @@ if Licensed::Shell.tool_available?('bundle')
 end
 ```
 
+## Packaging
+
+Licensed can be built into an exe and packaged for distribution to systems that don't have ruby already available.  See the [packaging documentation](./docs/packaging.md) for details.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/github/licensed. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org/) code of conduct.  See [CONTRIBUTING](CONTRIBUTING.md) for more details.
