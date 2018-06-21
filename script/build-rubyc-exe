@@ -44,12 +44,15 @@ else
   VERSION="$(git rev-parse --abbrev-ref HEAD)"
 fi
 
+PACKAGE_DEST="$BASE_DIR/pkg"
+mkdir -p "$PACKAGE_DEST"
+
 PLATFORM="$(uname -s | tr '[:upper:]' '[:lower:]')"
-TARGET="licensed-$VERSION-$PLATFORM-x64"
+TARGET="licensed-$VERSION-$PLATFORM-x64.tar.gz"
 
 "$RUBYC" --clean-tmpdir -o "$BUILD_DEST/licensed" "$BASE_DIR/exe/licensed"
 
 chmod +x $BUILD_DEST/licensed
-tar -C "$BUILD_DEST" -czf "$BASE_DIR/pkg/$TARGET.tar.gz" "./licensed"
+tar -C "$BUILD_DEST" -czf "$PACKAGE_DEST/$TARGET" "./licensed"
 
-echo "licensed built to $BASE_DIR/pkg/$TARGET.tar.gz"
+echo "licensed built to $PACKAGE_DEST/$TARGET"
