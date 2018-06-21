@@ -24,7 +24,7 @@ usage(){
   grep "^#/" <"$0" | cut -c3-
 }
 
-BASE_DIR="$(cd "$(dirname $0)/../.." && pwd)"
+BASE_DIR="$(cd "$(dirname $0)/.." && pwd)"
 if [ ! -f "$RUBYC" ]; then
   echo "Please specify a rubyc compiler" >&2
   usage
