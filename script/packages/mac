@@ -18,7 +18,7 @@ set -e
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
   echo "A Mac OS is required to build a licensed executable for mac" >&2
-  exit 0
+  exit 1
 fi
 
 BASE_DIR="$(cd "$(dirname $0)/../.." && pwd)"
