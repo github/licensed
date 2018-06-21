@@ -52,29 +52,36 @@ namespace :test do
   end
 end
 
-task :package, [:target] do |task, args|
-  target = args[:target]
-  target = "*" if target.nil? || target.empty?
-  Dir["script/packages/#{target}"].each do |script|
-    puts "Building #{script}"
-
-    if Bundler.with_original_env { system(script) }
-      # green
-      puts "\033[32mCompleted #{script}.\e[0m"
-    else
-      # red
-      puts "\033[31mEncountered an error running #{script}.\e[0m"
-    end
-
-    puts
-  end
-end
-
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
   t.libs << "lib"
   t.test_files = FileList["test/**/*_test.rb"]
 end
+
+packages_search = File.expand_path("script/packages/*", __dir__)
+platforms = Dir[packages_search].map { |f| File.basename(f, ".*")}
+
+namespace :package do
+  platforms.each do |platform|
+    desc "Package licensed for #{platform}"
+    task platform.to_sym do
+      puts "Packaging licensed for #{platform}"
+
+      if Bundler.with_original_env { system("script/packages/#{platform}") }
+        # green
+        puts "\033[32mCompleted packaging for #{platform}.\e[0m"
+      else
+        # red
+        puts "\033[31mEncountered an error packaging for #{platform}.\e[0m"
+      end
+
+      puts
+    end
+  end
+end
+
+desc "Package licensed for all platforms"
+task package: platforms.map { |platform| "package:#{platform}" }
 
 # add rubocop task
 # -S adds styleguide urls to offense messages

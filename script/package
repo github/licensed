@@ -12,4 +12,9 @@
 
 set -e
 
-bundle exec rake package["$1"]
+PLATFORM=""
+if [ -n "$1" ]; then
+  PLATFORM=":$1"
+fi
+
+bundle exec rake "package$PLATFORM"

@@ -36,10 +36,7 @@ $ script/package linux
 or
 ```bash
 # build package for linux
-$ bundle exec rake package[linux]
-
-# if using the zsh shell then you'll need to escape the brackets
-$ bundle exec rake package\[linux\]
+$ bundle exec rake package:linux
 ```
 
 #### Building packages for a specific version
