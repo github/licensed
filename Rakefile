@@ -59,7 +59,7 @@ Rake::TestTask.new(:test) do |t|
 end
 
 packages_search = File.expand_path("script/packages/*", __dir__)
-platforms = Dir[packages_search].map { |f| File.basename(f, ".*")}
+platforms = Dir[packages_search].map { |f| File.basename(f, ".*") }
 
 namespace :package do
   platforms.each do |platform|
