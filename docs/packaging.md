@@ -12,6 +12,11 @@ The packaged executables contain a self-expanding file system containing ruby, l
 
 Packages are built as `licensed-$VERSION-$PLATFORM-x64.tar.gz` tarballs that contain a single `./licensed` executable.  After building a package through the available scripting, it will be available in the `pkg` directory.
 
+By default an exe is built for the current licensed git `HEAD`.  The
+`$VERSION` in the package name will be set to the current branch name if
+available, otherwise the current SHA.  To use a specific licensed version,
+set a `VERSION` environment variable when calling the packaging scripts.  `VERSION` can be set to any value that works with `git checkout`.
+
 #### Building all packages
 ```bash
 # build all packages
@@ -35,6 +40,17 @@ $ bundle exec rake package[linux]
 
 # if using the zsh shell then you'll need to escape the brackets
 $ bundle exec rake package\[linux\]
+```
+
+#### Building packages for a specific version
+```bash
+# VERSION can be set to anything that works with git checkout - tag, branch, SHA1
+$ VERSION="1.1.0" script/package
+```
+or
+```bash
+# VERSION can be set to anything that works with git checkout - tag, branch, SHA1
+$ VERSION="1.1.0" bundle exec rake package
 ```
 
 [ruby-packer]: https://github.com/pmq20/ruby-packer
