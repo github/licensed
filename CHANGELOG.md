@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.2.0 - 2018-06-22
+### Added
+- Building and packaging distributable exes for licensed releases
+- Can now configure which Gemfile groups are excluded from dependency enumeration
+
+### Fixed
+- Bundler is no longer always reported as a dependency
+- Set the minimum required ruby version for licensed
+
 ## 1.1.0 - 2018-06-04
 ### Added
 - Pip dependency source :tada:
@@ -36,4 +45,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.2.0...HEAD
