@@ -17,4 +17,4 @@ if [ "$1" == "-f" ]; then
   find . -not -regex "\.*" -and -not -name "Gemfile" -print0 | xargs -0 rm -rf
 fi
 
-bundle install --path vendor/gems
+bundle install --path vendor/gems --without ignore

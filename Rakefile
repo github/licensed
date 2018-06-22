@@ -47,7 +47,8 @@ namespace :test do
 
       # use negative lookahead to exclude all source tests except
       # the tests for `source`
-      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/source\/(?!#{source}).*?_test.rb/)
+      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/source\/(?!#{source}).*?_test.rb/,
+                                                           "test/fixtures/**/*_test.rb")
     end
   end
 end
@@ -55,7 +56,7 @@ end
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
   t.libs << "lib"
-  t.test_files = FileList["test/**/*_test.rb"]
+  t.test_files = FileList["test/**/*_test.rb"].exclude("test/fixtures/**/*_test.rb")
 end
 
 packages_search = File.expand_path("script/packages/*", __dir__)

@@ -2,3 +2,23 @@
 source "https://rubygems.org"
 
 gem "semantic", "1.6.0"
+
+group :ignore do
+  gem "json", "2.1.0"
+end
+
+group :bundler do
+  gem "bundler"
+end
+
+group :exclude do
+  gem "i18n", "1.0.1"
+end
+
+group :development do
+ gem "tzinfo", "1.2.5"
+end
+
+group :test do
+ gem "minitest", "5.11.3"
+end
