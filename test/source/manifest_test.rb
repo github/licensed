@@ -32,10 +32,39 @@ describe Licensed::Source::Manifest do
         assert_equal fixtures, dep.path
       end
 
-      it "uses the first source if there is no common path" do
+      it "uses the first source folder if there is no common path" do
         dep = source.dependencies.detect { |d| d["name"] == "other" }
-        assert dep.path.end_with?("script/console")
+        assert dep.path.end_with?("script")
       end
+    end
+
+    it "prefers licenses from license files" do
+      dep = source.dependencies.detect { |d| d["name"] == "mit_license_file" }
+      assert dep
+      dep.detect_license!
+      assert_equal "mit", dep["license"]
+      refute_nil dep.text
+    end
+
+    it "detects license from source header comments if license files are not found" do
+      dep = source.dependencies.detect { |d| d["name"] == "bsd3_single_header_license" }
+      assert dep
+      dep.detect_license!
+      assert_equal "bsd-3-clause", dep["license"]
+      refute_nil dep.text
+      refute dep.text.include?(Licensed::License::LICENSE_SEPARATOR)
+    end
+
+    it "detects unique license content from multiple headers" do
+      dep = source.dependencies.detect { |d| d["name"] == "bsd3_multi_header_license" }
+      assert dep
+      dep.detect_license!
+      # because there are different licenses/copyrights that need to be included
+      # we aren't able to specify that the actual license content is equivalent
+      # so we are left with "other"
+      assert_equal "other", dep["license"]
+      refute_nil dep.text
+      assert dep.text.include?(Licensed::License::LICENSE_SEPARATOR)
     end
   end
 
