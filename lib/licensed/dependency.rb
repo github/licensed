@@ -9,22 +9,27 @@ module Licensed
     attr_reader :search_root
 
     def initialize(path, metadata = {})
-      @path = path
       @search_root = metadata.delete("search_root")
-
-      # with licensee providing license_file[:dir],
-      # enforcing absolute paths makes life much easier when determining
-      # an absolute file path in notices
-      unless Pathname.new(path).absolute?
-        raise "Dependency path #{path} must be absolute"
-      end
-
       super metadata
+
+      self.path = path
     end
 
     # Returns a Licensee::Projects::FSProject for the dependency path
     def project
       @project ||= Licensee::Projects::FSProject.new(path, search_root: search_root, detect_packages: true, detect_readme: true)
+    end
+
+    # Sets the path to source dependency license information
+    def path=(path)
+      # enforcing absolute paths makes life much easier when determining
+      # an absolute file path in #notices
+      unless Pathname.new(path).absolute?
+        raise "Dependency path #{path} must be absolute"
+      end
+
+      @path = path
+      reset_license!
     end
 
     # Detects license information and sets it on this dependency object.
@@ -59,6 +64,16 @@ module Licensed
     end
 
     private
+
+    def reset_license!
+      @project = nil
+      @matched_project_file = nil
+      self.delete("license")
+      self.text = nil
+
+      # don't need to reset @remote_license_file as it's not affected by path or
+      # project resets
+    end
 
     # Returns the Licensee::ProjectFile representing the matched_project_file
     # or remote_license_file

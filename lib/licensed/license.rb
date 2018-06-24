@@ -23,7 +23,7 @@ module Licensed
       new(YAML.load(match[1]), match[2])
     end
 
-    def_delegators :@metadata, :[], :[]=
+    def_delegators :@metadata, :[], :[]=, :delete
 
     # The license text and other legal notices
     attr_accessor :text
