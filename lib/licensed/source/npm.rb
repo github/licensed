@@ -28,7 +28,7 @@ module Licensed
         packages = recursive_dependencies(JSON.parse(package_metadata_command)["dependencies"])
 
         @dependencies = packages.map do |name, package|
-          path = package["realPath"] || locations["#{package["name"]}@#{package["version"]}"]
+          path = package["path"] || package["realPath"] || locations["#{package["name"]}@#{package["version"]}"]
           fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(path, {
             "type"     => NPM.type,
