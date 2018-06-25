@@ -127,7 +127,7 @@ module Licensed
         # Returns the path to the license file
         def write_license_from_source_licenses(dir, sources)
           license_path = File.join(dir, "LICENSE")
-          File.open(license_path, 'w') do |f|
+          File.open(license_path, "w") do |f|
             licenses = source_comment_licenses(sources).uniq
             f.puts(licenses.join("\n#{LICENSE_SEPARATOR}\n"))
           end
