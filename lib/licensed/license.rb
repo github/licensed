@@ -11,6 +11,7 @@ module Licensed
 
     YAML_FRONTMATTER_PATTERN = /\A---\s*\n(.*?\n?)^---\s*$\n?(.*)\z/m
     TEXT_SEPARATOR = ("-" * 80).freeze
+    LICENSE_SEPARATOR = ("*" * 80).freeze
 
     # Read an existing license file
     #
