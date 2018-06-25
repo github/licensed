@@ -28,6 +28,9 @@ module Licensed
 
       # Returns the top-most directory that is common to all paths in `sources`
       def sources_license_path(sources)
+        # return the source directory if there is only one source given
+        return source_directory(sources[0]) if sources.size == 1
+
         common_prefix = Pathname.common_prefix(*sources).to_path
 
         # don't allow the repo root to be used as common prefix
@@ -35,8 +38,15 @@ module Licensed
         # or ignored in the config.  any license in the root should be ignored.
         return common_prefix if common_prefix != Licensed::Git.repository_root
 
-        # use the first source file as the license path.
-        sources.first
+        # use the first source directory as the license path.
+        source_directory(sources.first)
+      end
+
+      # Returns the directory for the source.  Checks whether the source
+      # is a file or a directory
+      def source_directory(source)
+        return File.dirname(source) if File.file?(source)
+        source
       end
 
       # Returns the latest git SHA available from `sources`
