@@ -53,6 +53,9 @@ describe Licensed::Source::Manifest do
       assert_equal "bsd-3-clause", dep["license"]
       refute_nil dep.text
       refute dep.text.include?(Licensed::License::LICENSE_SEPARATOR)
+
+      # verify that the license file was removed after evaluation
+      refute File.exist?(File.join(dep.path, "LICENSE"))
     end
 
     it "detects unique license content from multiple headers" do
