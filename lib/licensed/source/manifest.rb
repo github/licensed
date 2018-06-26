@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 require "pathname/common_prefix"
-require "tmpdir"
-require "fileutils"
 
 module Licensed
   module Source
@@ -82,19 +80,16 @@ module Licensed
         #  After calling `detect_license!``, the license is set at
         # `dependency["license"]` and legal text is set to `dependency.text`
         def detect_license!
-          tmp = nil
-
           # if no license key is found for the project, try to create a
           # temporary LICENSE file from unique source file license headers
           if license_key == "none"
-            tmp = Dir.mktmpdir
-            write_license_from_source_licenses(tmp, @sources)
-            self.path = tmp
+            tmp_license_file = write_license_from_source_licenses(self.path, @sources)
+            reset_license!
           end
 
           super
         ensure
-          FileUtils.rm_rf(tmp) if tmp && File.exist?(tmp)
+          File.delete(tmp_license_file) if tmp_license_file && File.exist?(tmp_license_file)
         end
 
         private
