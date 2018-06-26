@@ -64,7 +64,7 @@ module Licensed
       end
 
       class Dependency < Licensed::Dependency
-        ANY_EXCEPT_COMMENT_CLOSE_REGEX = /(\*(?!\/)|[^*])*/m.freeze
+        ANY_EXCEPT_COMMENT_CLOSE_REGEX = /(\*(?!\/)|[^\*])*/m.freeze
         HEADER_LICENSE_REGEX = /
           \/\*
             (#{ANY_EXCEPT_COMMENT_CLOSE_REGEX}#{Licensee::Matchers::Copyright::COPYRIGHT_SYMBOLS}#{ANY_EXCEPT_COMMENT_CLOSE_REGEX})

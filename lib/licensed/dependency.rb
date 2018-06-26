@@ -65,14 +65,12 @@ module Licensed
 
     private
 
+    # Resets all local project and license information
     def reset_license!
       @project = nil
       @matched_project_file = nil
       self.delete("license")
       self.text = nil
-
-      # don't need to reset @remote_license_file as it's not affected by path or
-      # project resets
     end
 
     # Returns the Licensee::ProjectFile representing the matched_project_file
