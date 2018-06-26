@@ -66,6 +66,14 @@ describe Licensed::Source::Manifest do
       refute_nil dep.text
       assert dep.text.include?(Licensed::License::LICENSE_SEPARATOR)
     end
+
+    it "preserves legal notices when detecting license content from comments" do
+      dep = source.dependencies.detect { |d| d["name"] == "notices" }
+      assert dep
+      dep.detect_license!
+      refute_nil dep.text
+      assert dep.text.include?(dep.notices.join("\n#{Licensed::License::TEXT_SEPARATOR}\n").strip)
+    end
   end
 
   describe "manifest" do
