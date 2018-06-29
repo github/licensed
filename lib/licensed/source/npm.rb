@@ -19,16 +19,10 @@ module Licensed
       def dependencies
         return @dependencies if defined?(@dependencies)
 
-        locations = {}
-        package_location_command.lines.each do |line|
-          path, id = line.split(":")[0, 2]
-          locations[id] ||= path
-        end
-
         packages = recursive_dependencies(JSON.parse(package_metadata_command)["dependencies"])
 
         @dependencies = packages.map do |name, package|
-          path = package["path"] || package["realPath"] || locations["#{package["name"]}@#{package["version"]}"]
+          path = package["path"]
           fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(path, {
             "type"     => NPM.type,
@@ -48,11 +42,6 @@ module Licensed
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
         result
-      end
-
-      # Returns the output from running `npm list` to get package paths
-      def package_location_command
-        npm_list_command("--parseable", "--production", "--long")
       end
 
       # Returns the output from running `npm list` to get package metadata

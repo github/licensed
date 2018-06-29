@@ -60,7 +60,6 @@ if Licensed::Shell.tool_available?("npm")
           Dir.chdir(dir) do
             error = assert_raises(Licensed::Shell::Error) { @source.dependencies }
             assert_includes error.message, "command exited with status 1"
-            assert_includes error.message, "npm list --parseable --production --long"
             assert_includes error.message, "npm ERR! missing: autoprefixer@"
           end
         end
