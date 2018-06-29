@@ -54,7 +54,7 @@ module Licensed
       # if the text didn't contain the separator, the text itself is the entirety
       # of the license text
       split = text.split(TEXT_SEPARATOR)
-      split.length > 1 ? split.first.strip : text.strip
+      split.length > 1 ? split.first.rstrip : text.rstrip
     end
     alias_method :content, :license_text # use license_text for content matching
 

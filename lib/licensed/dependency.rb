@@ -37,7 +37,7 @@ module Licensed
     # `dependency["license"]` and legal text is set to `dependency.text`
     def detect_license!
       self["license"] = license_key
-      self.text = [license_text, *notices].join("\n" + TEXT_SEPARATOR + "\n").strip
+      self.text = [license_text, *notices].join("\n" + TEXT_SEPARATOR + "\n").rstrip
     end
 
     # Extract legal notices from the dependency source
@@ -45,7 +45,7 @@ module Licensed
       local_files.uniq # unique local file paths
            .sort # sorted by the path
            .map { |f| File.read(f) } # read the file contents
-           .map(&:strip) # strip whitespace
+           .map(&:rstrip) # strip whitespace
            .select { |t| t.length > 0 } # files with content only
     end
 
