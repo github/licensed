@@ -66,9 +66,11 @@ module Licensed
       class Dependency < Licensed::Dependency
         ANY_EXCEPT_COMMENT_CLOSE_REGEX = /(\*(?!\/)|[^\*])*/m.freeze
         HEADER_LICENSE_REGEX = /
-          \/\*
-            (#{ANY_EXCEPT_COMMENT_CLOSE_REGEX}#{Licensee::Matchers::Copyright::COPYRIGHT_SYMBOLS}#{ANY_EXCEPT_COMMENT_CLOSE_REGEX})
-          \*\/
+          (
+            \/\*
+            #{ANY_EXCEPT_COMMENT_CLOSE_REGEX}#{Licensee::Matchers::Copyright::COPYRIGHT_SYMBOLS}#{ANY_EXCEPT_COMMENT_CLOSE_REGEX}
+            \*\/
+          )
         /imx.freeze
 
         def initialize(sources, metadata = {})
@@ -139,7 +141,17 @@ module Licensed
 
           comments.map do |comment|
             # strip leading "*" and whitespace
-            comment.lines.map { |line| line[/(\s*\*)?(.*)/m, 2].lstrip }.join
+            indent = nil
+            comment.lines.map do |line|
+              # find the length of the indent as the number of characters
+              # until the first word character
+              indent ||= line[/\A([^\w]*)\w/, 1]&.size
+
+              # insert newline for each line until a word character is found
+              next "\n" unless indent
+
+              line[/([^\r\n]{0,#{indent}})(.*)/m, 2]
+            end.join
           end
         end
       end
