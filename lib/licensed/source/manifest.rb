@@ -150,7 +150,7 @@ module Licensed
               # insert newline for each line until a word character is found
               next "\n" unless indent
 
-              line[/([^\r\n]{0,#{indent}})(.*)/m, 2]
+              line[/([^\w\r\n]{0,#{indent}})(.*)/m, 2]
             end.join
           end
         end
