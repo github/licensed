@@ -9,17 +9,10 @@ module Licensed
     attr_reader :search_root
 
     def initialize(path, metadata = {})
-      @path = path
       @search_root = metadata.delete("search_root")
-
-      # with licensee providing license_file[:dir],
-      # enforcing absolute paths makes life much easier when determining
-      # an absolute file path in notices
-      unless Pathname.new(path).absolute?
-        raise "Dependency path #{path} must be absolute"
-      end
-
       super metadata
+
+      self.path = path
     end
 
     # Returns a Licensee::Projects::FSProject for the dependency path
@@ -27,12 +20,24 @@ module Licensed
       @project ||= Licensee::Projects::FSProject.new(path, search_root: search_root, detect_packages: true, detect_readme: true)
     end
 
+    # Sets the path to source dependency license information
+    def path=(path)
+      # enforcing absolute paths makes life much easier when determining
+      # an absolute file path in #notices
+      unless Pathname.new(path).absolute?
+        raise "Dependency path #{path} must be absolute"
+      end
+
+      @path = path
+      reset_license!
+    end
+
     # Detects license information and sets it on this dependency object.
     #  After calling `detect_license!``, the license is set at
     # `dependency["license"]` and legal text is set to `dependency.text`
     def detect_license!
       self["license"] = license_key
-      self.text = [license_text, *notices].join("\n" + TEXT_SEPARATOR + "\n").strip
+      self.text = [license_text, *notices].join("\n" + TEXT_SEPARATOR + "\n").rstrip
     end
 
     # Extract legal notices from the dependency source
@@ -40,7 +45,7 @@ module Licensed
       local_files.uniq # unique local file paths
            .sort # sorted by the path
            .map { |f| File.read(f) } # read the file contents
-           .map(&:strip) # strip whitespace
+           .map(&:rstrip) # strip whitespace
            .select { |t| t.length > 0 } # files with content only
     end
 
@@ -59,6 +64,14 @@ module Licensed
     end
 
     private
+
+    # Resets all local project and license information
+    def reset_license!
+      @project = nil
+      @matched_project_file = nil
+      self.delete("license")
+      self.text = nil
+    end
 
     # Returns the Licensee::ProjectFile representing the matched_project_file
     # or remote_license_file

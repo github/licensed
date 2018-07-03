@@ -11,6 +11,7 @@ module Licensed
 
     YAML_FRONTMATTER_PATTERN = /\A---\s*\n(.*?\n?)^---\s*$\n?(.*)\z/m
     TEXT_SEPARATOR = ("-" * 80).freeze
+    LICENSE_SEPARATOR = ("*" * 80).freeze
 
     # Read an existing license file
     #
@@ -23,7 +24,7 @@ module Licensed
       new(YAML.load(match[1]), match[2])
     end
 
-    def_delegators :@metadata, :[], :[]=
+    def_delegators :@metadata, :[], :[]=, :delete
 
     # The license text and other legal notices
     attr_accessor :text
@@ -53,7 +54,7 @@ module Licensed
       # if the text didn't contain the separator, the text itself is the entirety
       # of the license text
       split = text.split(TEXT_SEPARATOR)
-      split.length > 1 ? split.first.strip : text.strip
+      split.length > 1 ? split.first.rstrip : text.rstrip
     end
     alias_method :content, :license_text # use license_text for content matching
 
