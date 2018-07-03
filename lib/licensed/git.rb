@@ -34,6 +34,11 @@ module Licensed
         return unless available? && sha
         Licensed::Shell.execute("git", "show", "-s", "-1", "--format=%ct", sha)
       end
+
+      def files
+        return unless available?
+        Licensed::Shell.execute("git", "ls-tree", "--full-tree", "-r", "--name-only", "HEAD")
+      end
     end
   end
 end
