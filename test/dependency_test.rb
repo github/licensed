@@ -133,7 +133,7 @@ describe Licensed::Dependency do
 
         # the text should always start with license text (even if empty),
         # followed by a separator if there are any legal notices
-        assert_match(/\A#{Licensed::License::TEXT_SEPARATOR}\n/, dependency.text)
+        assert_match(/\A\n#{Licensed::License::TEXT_SEPARATOR}\n/, dependency.text)
       end
     end
 
