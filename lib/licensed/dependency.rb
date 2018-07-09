@@ -81,7 +81,7 @@ module Licensed
       elsif project.license_files.map(&:license).uniq.size > 1
         # if there are multiple license types found from license files,
         # return 'other'
-        Licensee::License.find('other')
+        Licensee::License.find("other")
       else
         # check other project files if we haven't yet found a license type
         project.licenses.reject(&:other?).first
