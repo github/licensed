@@ -18,11 +18,12 @@ module Licensed
 
       def dependencies
         @dependencies ||= packages.map do |package_name, sources|
-          Dependency.new(sources, {
-            "type"     => Manifest.type,
-            "name"     => package_name,
-            "version"  => package_version(sources)
-          })
+          Licensed::Source::Manifest::Dependency.new(sources, {
+              "type"     => Manifest.type,
+              "name"     => package_name,
+              "version"  => package_version(sources)
+            }
+          )
         end
       end
 
