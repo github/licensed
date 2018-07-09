@@ -125,6 +125,31 @@ describe Licensed::Dependency do
       end
     end
 
+    it "extracts license text from multiple license files" do
+      mkproject do |dependency|
+        File.write "LICENSE", Licensee::License.find("mit").text
+        File.write "LICENSE.md", Licensee::License.find("bsd-3-clause").text
+
+        dependency.detect_license!
+
+        assert_equal 1, dependency.text.scan(/#{Regexp.escape(Licensed::License::LICENSE_SEPARATOR)}/).size
+        assert dependency.text.include?(Licensee::License.find("mit").text.strip)
+        assert dependency.text.include?(Licensee::License.find("bsd-3-clause").text.strip)
+        assert_equal "other", dependency["license"]
+      end
+    end
+
+    it "does not detect a license from package manager when multiple license files are given" do
+      mkproject do |dependency|
+        File.write "LICENSE", Licensee::License.find("mit").text
+        File.write "LICENSE.md", "See project.gemspec"
+        File.write "project.gemspec", "s.license = 'mit'"
+
+        dependency.detect_license!
+        assert_equal "other", dependency["license"]
+      end
+    end
+
     it "always contains a license text section if there are legal notices" do
       mkproject do |dependency|
         File.write "AUTHORS", "authors"

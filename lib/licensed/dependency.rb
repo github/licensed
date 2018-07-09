@@ -68,24 +68,24 @@ module Licensed
     # Resets all local project and license information
     def reset_license!
       @project = nil
-      @matched_project_file = nil
+      @project_license = nil
       self.delete("license")
       self.text = nil
     end
 
-    # Returns the Licensee::ProjectFile representing the matched_project_file
-    # or remote_license_file
-    def project_file
-      matched_project_file || remote_license_file
-    end
-
-    # Returns the Licensee::LicenseFile, Licensee::PackageManagerFile, or
-    # Licensee::ReadmeFile with a matched license, in that order or nil
-    # if no license file matched a known license
-    def matched_project_file
-      @matched_project_file ||= project.matched_files
-                                       .select { |f| f.license && !f.license.other? }
-                                       .first
+    # Finds and returns a license from the Licensee::FSProject for this dependency.
+    def project_license
+      @project_license ||= if project.license && !project.license.other?
+        # if Licensee has determined a project to have a specific license, use it!
+        project.license
+      elsif project.license_files.map(&:license).uniq.size > 1
+        # if there are multiple license types found from license files,
+        # return 'other'
+        Licensee::License.find('other')
+      else
+        # check other project files if we haven't yet found a license type
+        project.licenses.reject(&:other?).first
+      end
     end
 
     # Returns a Licensee::LicenseFile with the content of the license in the
@@ -96,21 +96,28 @@ module Licensed
     end
 
     # Regardless of the license detected, try to pull the license content
-    # from the local LICENSE, remote LICENSE, or the README, in that order
+    # from the local LICENSE-type files, remote LICENSE, or the README, in that order
     def license_text
-      content_file = project.license_file || remote_license_file || project.readme_file
-      content_file.content if content_file
+      content_files = Array(project.license_files)
+      content_files << remote_license_file if content_files.empty? && remote_license_file
+      content_files << project.readme_file if content_files.empty? && project.readme_file
+      content_files.map(&:content).join("\n#{LICENSE_SEPARATOR}\n")
     end
 
     # Returns a string representing the project's license
-    # Note, this will be "other" if a license file was found but the license
-    # could not be identified and "none" if no license file was found at all
     def license_key
-      if project_file && project_file.license
-        project_file.license.key
-      elsif project.license_file || remote_license_file
+      if project_license && !project_license.other?
+        # return a non-other license found from the Licensee
+        project_license.key
+      elsif remote_license_file && !remote_license_file.license.other?
+        # return a non-other license found from the remote source
+        remote_license_file.license.key
+      elsif project.license || remote_license_file
+        # if a license was otherwise found but couldn't be identified to a
+        # single license, return "other"
         "other"
       else
+        # no license found
         "none"
       end
     end
