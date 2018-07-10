@@ -68,14 +68,8 @@ module Licensed
     # Resets all local project and license information
     def reset_license!
       @project = nil
-      @project_license = nil
       self.delete("license")
       self.text = nil
-    end
-
-    # Finds and returns a license from the Licensee::FSProject for this dependency.
-    def project_license
-      @project_license ||= project.license
     end
 
     # Returns a Licensee::LicenseFile with the content of the license in the
@@ -96,11 +90,8 @@ module Licensed
 
     # Returns a string representing the project's license
     def license_key
-      if project_license
-        project_license.key
-      else
-        "none"
-      end
+      return "none" unless project.license
+      project.license.key
     end
   end
 end
