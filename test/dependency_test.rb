@@ -21,20 +21,6 @@ describe Licensed::Dependency do
       end
     end
 
-    it "gets license from github" do
-      Licensed.use_github = true
-
-      VCR.use_cassette("sshirokov/csgtool/license") do
-        dependency = Licensed::Dependency.new(Dir.tmpdir, {
-          "homepage" => "https://github.com/sshirokov/csgtool"
-        })
-        dependency.detect_license!
-
-        assert_equal "mit", dependency["license"]
-        assert_match(/Yaroslav Shirokov/, dependency.text)
-      end
-    end
-
     it "gets license from package manager" do
       mkproject do |dependency|
         File.write "project.gemspec", "s.license = 'mit'"
@@ -53,17 +39,17 @@ describe Licensed::Dependency do
       end
     end
 
-    it "pulls license from package manager if LICENSE file is other" do
+    it "package manager does not override if LICENSE file is other" do
       mkproject do |dependency|
         File.write "LICENSE.md", "See project.gemspec"
         File.write "project.gemspec", "s.license = 'mit'"
         dependency.detect_license!
 
-        assert_equal "mit", dependency["license"]
+        assert_equal "other", dependency["license"]
       end
     end
 
-    it "pulls license from README if LICENSE and package manager are other" do
+    it "pulls license from README if package manager has no license assertion" do
       mkproject do |dependency|
         File.write "project.gemspec", "foo"
         File.write "README.md", "# License\n" + Licensee::License.find("mit").text
@@ -74,21 +60,32 @@ describe Licensed::Dependency do
       end
     end
 
-    it "pulls license from GitHub if local sources are all other" do
+    it "pulls license text from GitHub if no local license text" do
       mkproject do |dependency|
-        File.write "LICENSE.md", "See README"
-        File.write "project.gemspec", "foo"
-        File.write "README.txt", "# License\n" + "The Remote MIT license"
+        File.write "project.gemspec", "s.license = 'mit'"
         Licensed.use_github = true
 
         VCR.use_cassette("sshirokov/csgtool/license") do
-          dependency = Licensed::Dependency.new(Dir.tmpdir, {
-            "homepage" => "https://github.com/sshirokov/csgtool"
-          })
+          dependency["homepage"] = "https://github.com/sshirokov/csgtool"
           dependency.detect_license!
 
           assert_equal "mit", dependency["license"]
           assert_match(/Yaroslav Shirokov/, dependency.text)
+        end
+      end
+    end
+
+    it "does not pull license text from GitHub mismatch with local assertion" do
+      mkproject do |dependency|
+        File.write "project.gemspec", "s.license = 'mpl-2.0'"
+        Licensed.use_github = true
+
+        VCR.use_cassette("sshirokov/csgtool/license") do
+          dependency["homepage"] = "https://github.com/sshirokov/csgtool"
+          dependency.detect_license!
+
+          assert_equal "mpl-2.0", dependency["license"]
+          assert_empty(dependency.text)
         end
       end
     end

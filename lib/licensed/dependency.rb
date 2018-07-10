@@ -75,17 +75,7 @@ module Licensed
 
     # Finds and returns a license from the Licensee::FSProject for this dependency.
     def project_license
-      @project_license ||= if project.license && !project.license.other?
-        # if Licensee has determined a project to have a specific license, use it!
-        project.license
-      elsif project.license_files.map(&:license).uniq.size > 1
-        # if there are multiple license types found from license files,
-        # return 'other'
-        Licensee::License.find("other")
-      else
-        # check other project files if we haven't yet found a license type
-        project.licenses.reject(&:other?).first
-      end
+      @project_license ||= project.license
     end
 
     # Returns a Licensee::LicenseFile with the content of the license in the
@@ -99,25 +89,16 @@ module Licensed
     # from the local LICENSE-type files, remote LICENSE, or the README, in that order
     def license_text
       content_files = Array(project.license_files)
-      content_files << remote_license_file if content_files.empty? && remote_license_file
+      content_files << remote_license_file if content_files.empty? && remote_license_file && remote_license_file.license.key == license_key
       content_files << project.readme_file if content_files.empty? && project.readme_file
       content_files.map(&:content).join("\n#{LICENSE_SEPARATOR}\n")
     end
 
     # Returns a string representing the project's license
     def license_key
-      if project_license && !project_license.other?
-        # return a non-other license found from the Licensee
+      if project_license
         project_license.key
-      elsif remote_license_file && !remote_license_file.license.other?
-        # return a non-other license found from the remote source
-        remote_license_file.license.key
-      elsif project.license || remote_license_file
-        # if a license was otherwise found but couldn't be identified to a
-        # single license, return "other"
-        "other"
       else
-        # no license found
         "none"
       end
     end
