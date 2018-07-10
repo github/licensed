@@ -60,36 +60,6 @@ describe Licensed::Dependency do
       end
     end
 
-    it "pulls license text from GitHub if no local license text" do
-      mkproject do |dependency|
-        File.write "project.gemspec", "s.license = 'mit'"
-        Licensed.use_github = true
-
-        VCR.use_cassette("sshirokov/csgtool/license") do
-          dependency["homepage"] = "https://github.com/sshirokov/csgtool"
-          dependency.detect_license!
-
-          assert_equal "mit", dependency["license"]
-          assert_match(/Yaroslav Shirokov/, dependency.text)
-        end
-      end
-    end
-
-    it "does not pull license text from GitHub mismatch with local assertion" do
-      mkproject do |dependency|
-        File.write "project.gemspec", "s.license = 'mpl-2.0'"
-        Licensed.use_github = true
-
-        VCR.use_cassette("sshirokov/csgtool/license") do
-          dependency["homepage"] = "https://github.com/sshirokov/csgtool"
-          dependency.detect_license!
-
-          assert_equal "mpl-2.0", dependency["license"]
-          assert_empty(dependency.text)
-        end
-      end
-    end
-
     it "extracts other legal notices" do
       mkproject do |dependency|
         File.write "AUTHORS", "authors"

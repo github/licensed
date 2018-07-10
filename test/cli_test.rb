@@ -11,20 +11,20 @@ describe "licensed" do
 
   describe "cache" do
     it "exits 0" do
-      _, status = Open3.capture2 "bundle exec exe/licensed cache -c #{config_path} --offline"
+      _, status = Open3.capture2 "bundle exec exe/licensed cache -c #{config_path}"
       assert status.success?
     end
 
     it "exits 1 when a config file isn't found" do
-      _, _, status = Open3.capture3 "bundle exec exe/licensed cache --offline"
+      _, _, status = Open3.capture3 "bundle exec exe/licensed cache"
       refute status.success?
     end
 
     it "accepts a path to a config file" do
-      out, status = Open3.capture2 "bundle exec exe/licensed cache -c #{config_path} --offline"
+      out, status = Open3.capture2 "bundle exec exe/licensed cache -c #{config_path}"
       refute out =~ /Usage/i
 
-      out, status = Open3.capture2 "bundle exec exe/licensed cache --config #{config_path} --offline"
+      out, status = Open3.capture2 "bundle exec exe/licensed cache --config #{config_path}"
       refute out =~ /Usage/i
     end
   end

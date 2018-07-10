@@ -72,18 +72,10 @@ module Licensed
       self.text = nil
     end
 
-    # Returns a Licensee::LicenseFile with the content of the license in the
-    # dependency's repository to account for LICENSE files not being distributed
-    def remote_license_file
-      return @remote_license_file if defined?(@remote_license_file)
-      @remote_license_file = Licensed.from_github(self["homepage"])
-    end
-
     # Regardless of the license detected, try to pull the license content
     # from the local LICENSE-type files, remote LICENSE, or the README, in that order
     def license_text
       content_files = Array(project.license_files)
-      content_files << remote_license_file if content_files.empty? && remote_license_file && remote_license_file.license.key == license_key
       content_files << project.readme_file if content_files.empty? && project.readme_file
       content_files.map(&:content).join("\n#{LICENSE_SEPARATOR}\n")
     end
