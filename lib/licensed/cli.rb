@@ -9,11 +9,10 @@ module Licensed
     method_option :force, type: :boolean,
       desc: "Overwrite licenses even if version has not changed."
     method_option :offline, type: :boolean,
-      desc: "Do not make network calls."
+      desc: "This option is deprecated and will be removed in the next major release."
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def cache
-      Licensed.use_github = false if options[:offline]
       run Licensed::Command::Cache.new(config), force: options[:force]
     end
 
