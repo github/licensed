@@ -90,7 +90,7 @@ module Licensed
 
         # if the specification is coming from a gemspec source,
         # we can get a non-lazy specification straight from the source
-        if spec.source.is_a?(::Bundler::Source::Gemspec)
+        if spec.source.is_a?(::Bundler::Source::Gemspec) || spec.source.is_a?(::Bundler::Source::Path)
           return spec.source.specs.first
         end
 
