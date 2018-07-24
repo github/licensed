@@ -149,7 +149,9 @@ module Licensed
 
       # Returns all tracked files in the project
       def all_files
+        # remove files if they are tracked but don't exist on the file system
         @all_files ||= Set.new(Licensed::Git.files || [])
+                          .delete_if { |f| !File.exist?(f) }
       end
 
       class Dependency < Licensed::Dependency
