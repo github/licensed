@@ -134,3 +134,14 @@ however for best results comments should not mix tabs and spaces in leading whit
  * <license text>
  */
 ```
+
+### From license files specified in the configuration
+
+If all else fails, the path to a dependency's license files can be specified manually
+in the configuration.  All paths should be relative to the repository root.
+
+```yaml
+manifest:
+  licenses:
+    package: path/to/LICENSE
+```

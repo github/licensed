@@ -18,7 +18,9 @@ module Licensed
 
       def dependencies
         @dependencies ||= packages.map do |package_name, sources|
-          Licensed::Source::Manifest::Dependency.new(sources, {
+          Licensed::Source::Manifest::Dependency.new(sources,
+            package_license(package_name),
+            {
               "type"     => Manifest.type,
               "name"     => package_name,
               "version"  => package_version(sources)
@@ -34,6 +36,16 @@ module Licensed
         sources.map { |s| Licensed::Git.version(s) }
                .compact
                .max_by { |sha| Licensed::Git.commit_date(sha) }
+      end
+
+      # Returns the license path for a package specified in the configuration.
+      def package_license(package_name)
+        license_path = @config.dig("manifest", "licenses", package_name)
+        return unless license_path
+
+        license_path = Licensed::Git.repository_root.join(license_path)
+        return unless license_path.exist?
+        license_path
       end
 
       # Returns a map of package names -> array of full source paths found
@@ -164,9 +176,10 @@ module Licensed
           )
         /imx.freeze
 
-        def initialize(sources, metadata = {})
+        def initialize(sources, license_path, metadata = {})
           @sources = sources
-          super sources_license_path(sources), metadata
+          license_path ||= sources_license_path(sources)
+          super license_path, metadata
         end
 
         # Detects license information and sets it on this dependency object.

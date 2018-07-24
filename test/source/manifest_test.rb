@@ -49,6 +49,22 @@ describe Licensed::Source::Manifest do
       end
     end
 
+    it "uses a license specified in the configuration if provided" do
+      config["manifest"] = {
+        "licenses" => {
+          "manifest_test" => "test/fixtures/manifest/with_license_file/LICENSE"
+        }
+      }
+
+      dep = source.dependencies.detect { |d| d["name"] == "manifest_test" }
+      assert dep
+      dep.detect_license!
+      assert_equal "mit", dep["license"]
+
+      license_path = File.join(Licensed::Git.repository_root, config.dig("manifest", "licenses", "manifest_test"))
+      assert_equal File.read(license_path).strip, dep.text
+    end
+
     it "prefers licenses from license files" do
       dep = source.dependencies.detect { |d| d["name"] == "mit_license_file" }
       assert dep
