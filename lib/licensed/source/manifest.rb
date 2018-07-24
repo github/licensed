@@ -38,7 +38,7 @@ module Licensed
                .max_by { |sha| Licensed::Git.commit_date(sha) }
       end
 
-      # Returns the given license path
+      # Returns the license path for a package specified in the configuration.
       def package_license(package_name)
         license_path = @config.dig("manifest", "licenses", package_name)
         return unless license_path
