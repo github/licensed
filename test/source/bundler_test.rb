@@ -116,6 +116,12 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
+      it "finds platform-specific dependencies" do
+        Dir.chdir(fixtures) do
+          assert source.dependencies.find { |d| d["name"] == "libv8" }
+        end
+      end
+
       describe "when bundler is a listed dependency" do
         it "includes bundler as a dependency" do
           Dir.chdir(fixtures) do

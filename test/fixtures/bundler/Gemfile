@@ -22,3 +22,7 @@ end
 group :test do
  gem "minitest", "5.11.3"
 end
+
+# verify https://github.com/github/licensed/issues/71
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+gem "mini_racer"
