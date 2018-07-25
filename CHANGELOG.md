@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.3.0 - 2018-07-25
+### Added
+- Manifests for the manifest dependency source can be specified using glob patterns in the configuration
+- Paths to licenses for dependencies from the manifest dependency source can be specified in the configuration
+- Manifest dependency source looks for license content in C-style comments if a license file isn't found
+
+## Changes
+- GitHub is no longer queried to find remote license information
+- Removed custom logic around determining whether to use the license key from `licensee`
+- NPM dependency enumeration doesn't use `npm list`
+- Licensed now tracks content from multiple license files when available
+
+### Fixed
+- Fixed regression finding platform-specific ruby gems
+
 ## 1.2.0 - 2018-06-22
 ### Added
 - Building and packaging distributable exes for licensed releases
@@ -45,4 +60,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.2.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.3.0...HEAD
