@@ -23,6 +23,8 @@ group :test do
  gem "minitest", "5.11.3"
 end
 
+gem "pathed-gem-fixture", path: "pathed-gem-fixture"
+
 # verify https://github.com/github/licensed/issues/71
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gem "mini_racer"
