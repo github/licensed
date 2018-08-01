@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.3.1 - 2018-08-01
+### Fixed
+- Fixed regression finding ruby gems by path
+
 ## 1.3.0 - 2018-07-25
 ### Added
 - Manifests for the manifest dependency source can be specified using glob patterns in the configuration
@@ -60,4 +64,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.3.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.3.1...HEAD
