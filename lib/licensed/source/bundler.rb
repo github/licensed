@@ -94,6 +94,13 @@ module Licensed
           return spec.source.specs.first
         end
 
+        # spec.source.specs gives access to specifications with more
+        # information than spec itself, including platform-specific gems.
+        # try to find a specification that matches `spec`
+        if source_spec = spec.source.specs.find { |s| s.name == spec.name && s.version == spec.version }
+          spec = source_spec
+        end
+
         # look for a specification at the bundler specs path
         spec_path = ::Bundler.specs_path.join("#{spec.full_name}.gemspec")
         return unless File.exist?(spec_path.to_s)

@@ -13,16 +13,19 @@ module Licensed
       end
 
       def enabled?
-        File.exist?(manifest_path)
+        File.exist?(manifest_path) || generate_manifest?
       end
 
       def dependencies
         @dependencies ||= packages.map do |package_name, sources|
-          Dependency.new(sources, {
-            "type"     => Manifest.type,
-            "name"     => package_name,
-            "version"  => package_version(sources)
-          })
+          Licensed::Source::Manifest::Dependency.new(sources,
+            package_license(package_name),
+            {
+              "type"     => Manifest.type,
+              "name"     => package_name,
+              "version"  => package_version(sources)
+            }
+          )
         end
       end
 
@@ -35,6 +38,16 @@ module Licensed
                .max_by { |sha| Licensed::Git.commit_date(sha) }
       end
 
+      # Returns the license path for a package specified in the configuration.
+      def package_license(package_name)
+        license_path = @config.dig("manifest", "licenses", package_name)
+        return unless license_path
+
+        license_path = Licensed::Git.repository_root.join(license_path)
+        return unless license_path.exist?
+        license_path
+      end
+
       # Returns a map of package names -> array of full source paths found
       # in the app manifest
       def packages
@@ -45,8 +58,10 @@ module Licensed
         end
       end
 
-      # Returns parsed manifest data for the app
+      # Returns parsed or generated manifest data for the app
       def manifest
+        return generate_manifest if generate_manifest?
+
         case manifest_path.extname.downcase.delete "."
         when "json"
           JSON.parse(File.read(manifest_path))
@@ -57,10 +72,98 @@ module Licensed
 
       # Returns the manifest location for the app
       def manifest_path
-        path = @config["manifest"]["path"] if @config["manifest"]
+        path = @config.dig("manifest", "path")
         return Licensed::Git.repository_root.join(path) if path
 
         @config.cache_path.join("manifest.json")
+      end
+
+      # Returns whether a manifest should be generated automatically
+      def generate_manifest?
+        !File.exist?(manifest_path) && !@config.dig("manifest", "dependencies").nil?
+      end
+
+      # Returns a manifest of files generated automatically based on patterns
+      # set in the licensed configuration file
+      def generate_manifest
+        verify_configured_dependencies!
+        configured_dependencies.each_with_object({}) do |(name, files), hsh|
+          files.each { |f| hsh[f] = name }
+        end
+      end
+
+      # Verify that the licensed configuration file is valid for the current project.
+      # Raises errors for issues found with configuration
+      def verify_configured_dependencies!
+        # verify that dependencies are configured
+        if configured_dependencies.empty?
+          raise "The manifest \"dependencies\" cannot be empty!"
+        end
+
+        # verify all included files match a single configured dependency
+        errors = included_files.map do |file|
+          matches = configured_dependencies.select { |name, files| files.include?(file) }
+                                           .map { |name, files| name }
+          case matches.size
+          when 0
+            "#{file} did not match a configured dependency"
+          when 1
+            nil
+          else
+            "#{file} matched multiple configured dependencies: #{matches.join(", ")}"
+          end
+        end
+
+        errors.compact!
+        raise errors.join($/) unless errors.empty?
+      end
+
+      # Returns the project dependencies specified from the licensed configuration
+      def configured_dependencies
+        @configured_dependencies ||= begin
+          dependencies = @config.dig("manifest", "dependencies")&.dup || {}
+
+          dependencies.each do |name, patterns|
+            # map glob pattern(s) listed for the dependency to a listing
+            # of files that match the patterns and are not excluded
+            dependencies[name] = files_from_pattern_list(patterns) & included_files
+          end
+
+          dependencies
+        end
+      end
+
+      # Returns the set of project files that are included in dependency evaluation
+      def included_files
+        @sources ||= all_files - files_from_pattern_list(@config.dig("manifest", "exclude"))
+      end
+
+      # Finds and returns all files in the project that match
+      # the glob pattern arguments.
+      def files_from_pattern_list(patterns)
+        return Set.new if patterns.nil? || patterns.empty?
+
+        # evaluate all patterns from the project root
+        Dir.chdir Licensed::Git.repository_root do
+          Array(patterns).reduce(Set.new) do |files, pattern|
+            if pattern.start_with?("!")
+              # if the pattern is an exclusion, remove all matching files
+              # from the result
+              files - Dir.glob(pattern[1..-1], File::FNM_DOTMATCH)
+            else
+              # if the pattern is an inclusion, add all matching files
+              # to the result
+              files + Dir.glob(pattern, File::FNM_DOTMATCH)
+            end
+          end
+        end
+      end
+
+      # Returns all tracked files in the project
+      def all_files
+        # remove files if they are tracked but don't exist on the file system
+        @all_files ||= Set.new(Licensed::Git.files || [])
+                          .delete_if { |f| !File.exist?(f) }
       end
 
       class Dependency < Licensed::Dependency
@@ -73,9 +176,10 @@ module Licensed
           )
         /imx.freeze
 
-        def initialize(sources, metadata = {})
+        def initialize(sources, license_path, metadata = {})
           @sources = sources
-          super sources_license_path(sources), metadata
+          license_path ||= sources_license_path(sources)
+          super license_path, metadata
         end
 
         # Detects license information and sets it on this dependency object.
