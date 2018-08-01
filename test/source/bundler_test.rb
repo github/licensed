@@ -116,6 +116,14 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
+      it "finds dependencies from path sources" do
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.find { |d| d["name"] == "pathed-gem-fixture" }
+          assert dep
+          assert_equal "0.0.1", dep["version"]
+        end
+      end
+
       describe "when bundler is a listed dependency" do
         it "includes bundler as a dependency" do
           Dir.chdir(fixtures) do
