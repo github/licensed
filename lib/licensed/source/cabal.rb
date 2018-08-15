@@ -66,7 +66,7 @@ module Licensed
 
       # Returns a `Set` of the package ids for all cabal dependencies
       def package_ids
-        recursive_dependencies(cabal_file_dependencies)
+        recursive_dependencies(cabal_file_dependency_ids)
       end
 
       # Recursively finds the dependencies for each cabal package.
@@ -151,8 +151,12 @@ module Licensed
       end
 
       # Returns a set containing the top-level dependencies found in cabal files
+      def cabal_file_dependency_ids
+        cabal_file_dependencies.map { |target| cabal_package_id(target) }.compact
+      end
+
       def cabal_file_dependencies
-        cabal_files.each_with_object(Set.new) do |cabal_file, packages|
+        @cabal_file_dependencies ||= cabal_files.each_with_object(Set.new) do |cabal_file, targets|
           content = File.read(cabal_file)
           next if content.nil? || content.empty?
 
@@ -161,12 +165,10 @@ module Licensed
           content.scan(cabal_file_regex).each do |match|
             # match[1] is a string of "," separated dependencies
             dependencies = match[1].split(",").map(&:strip)
-            dependencies.each do |dep|
-              # the dependency might have a version specifier.
-              # remove it so we can get the full id specifier for each package
-              id = cabal_package_id(dep.split(/\s/)[0])
-              packages.add(id) if id
-            end
+
+            # the dependency might have a version specifier.
+            # remove it so we can get the full id specifier for each package
+            targets.merge(dependencies.map { |dep| dep.split(/\s/)[0] })
           end
         end
       end
