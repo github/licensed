@@ -173,7 +173,12 @@ module Licensed
 
       # Returns an installed package id for the package.
       def cabal_package_id(package_name)
-        field = ghc_pkg_field_command(package_name, ["id"])
+        # using the first returned id assumes that package resolvers
+        # order returned package information in the same order that it would
+        # be used during build
+        field = ghc_pkg_field_command(package_name, ["id"]).lines.first
+        return unless field
+
         id = field.split(":", 2)[1]
         id.strip if id
       end
