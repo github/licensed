@@ -66,7 +66,7 @@ module Licensed
 
       # Returns a `Set` of the package ids for all cabal dependencies
       def package_ids
-        recursive_dependencies(cabal_file_dependencies)
+        recursive_dependencies(cabal_file_dependency_ids)
       end
 
       # Recursively finds the dependencies for each cabal package.
@@ -151,29 +151,35 @@ module Licensed
       end
 
       # Returns a set containing the top-level dependencies found in cabal files
+      def cabal_file_dependency_ids
+        cabal_file_dependencies.map { |target| cabal_package_id(target) }.compact
+      end
+
       def cabal_file_dependencies
-        cabal_files.each_with_object(Set.new) do |cabal_file, packages|
+        @cabal_file_dependencies ||= cabal_files.each_with_object(Set.new) do |cabal_file, targets|
           content = File.read(cabal_file)
           next if content.nil? || content.empty?
 
           # add any dependencies for matched targets from the cabal file.
           # by default this will find executable and library dependencies
           content.scan(cabal_file_regex).each do |match|
-            # match[1] is a string of "," separated dependencies
-            dependencies = match[1].split(",").map(&:strip)
-            dependencies.each do |dep|
-              # the dependency might have a version specifier.
-              # remove it so we can get the full id specifier for each package
-              id = cabal_package_id(dep.split(/\s/)[0])
-              packages.add(id) if id
-            end
+            # match[1] is a string of "," separated dependencies.
+            # dependency packages might have a version specifier, remove them
+            # to get the full id specifier for each package
+            dependencies = match[1].split(",").map { |dep| dep.strip.split(/\s/)[0] }
+            targets.merge(dependencies)
           end
         end
       end
 
       # Returns an installed package id for the package.
       def cabal_package_id(package_name)
-        field = ghc_pkg_field_command(package_name, ["id"])
+        # using the first returned id assumes that package resolvers
+        # order returned package information in the same order that it would
+        # be used during build
+        field = ghc_pkg_field_command(package_name, ["id"]).lines.first
+        return unless field
+
         id = field.split(":", 2)[1]
         id.strip if id
       end
