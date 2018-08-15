@@ -163,12 +163,11 @@ module Licensed
           # add any dependencies for matched targets from the cabal file.
           # by default this will find executable and library dependencies
           content.scan(cabal_file_regex).each do |match|
-            # match[1] is a string of "," separated dependencies
-            dependencies = match[1].split(",").map(&:strip)
-
-            # the dependency might have a version specifier.
-            # remove it so we can get the full id specifier for each package
-            targets.merge(dependencies.map { |dep| dep.split(/\s/)[0] })
+            # match[1] is a string of "," separated dependencies.
+            # dependency packages might have a version specifier, remove them
+            # to get the full id specifier for each package
+            dependencies = match[1].split(",").map { |dep| dep.strip.split(/\s/)[0] }
+            targets.merge(dependencies)
           end
         end
       end
