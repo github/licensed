@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.3.2 - 2018-08-15
+### Fixed
+- Fixed issue when multiple versions of a cabal package are found
+
 ## 1.3.1 - 2018-08-01
 ### Fixed
 - Fixed regression finding ruby gems by path
@@ -64,4 +68,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.3.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.3.2...HEAD
