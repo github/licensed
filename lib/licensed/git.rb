@@ -37,7 +37,7 @@ module Licensed
 
       def files
         return unless available?
-        output = Licensed::Shell.execute("git", "ls-tree", "--full-tree", "-r", "--name-only", "HEAD")
+        output = Licensed::Shell.execute("git", "ls-files", "--full-name", "--recurse-submodules")
         output.lines.map(&:strip)
       end
     end
