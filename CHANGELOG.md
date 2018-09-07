@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.3.3 - 2018-09-07
+### Fixed
+- Manifest source configuration globs correctly enumerates files from within submodules
+- The manifest source no longer errors when getting version information from submodules
+
 ## 1.3.2 - 2018-08-15
 ### Fixed
 - Fixed issue when multiple versions of a cabal package are found
@@ -68,4 +73,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.3.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.3.3...HEAD
