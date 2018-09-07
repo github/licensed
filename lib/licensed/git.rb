@@ -18,13 +18,7 @@ module Licensed
       # descriptor - file or directory to retrieve latest SHA for
       def version(descriptor)
         return unless available? && descriptor
-
-        dir = File.directory?(descriptor) ? descriptor : File.dirname(descriptor)
-        file = File.directory?(descriptor) ? "." : File.basename(descriptor)
-
-        Dir.chdir dir do
-          Licensed::Shell.execute("git", "rev-list", "-1", "HEAD", "--", file, allow_failure: true)
-        end
+        Licensed::Shell.execute("git", "rev-list", "-1", "HEAD", "--", descriptor, allow_failure: true)
       end
 
       # Returns the commit date for the provided SHA as a timestamp
