@@ -66,7 +66,7 @@ describe Licensed::License do
     end
 
     it "returns true if the normalized content is the same" do
-      license = Licensed::License.new({}, "test content")
+      license = Licensed::License.new({}, "- test content")
       other = Licensed::License.new({}, "* test content")
 
       assert license.license_text_match?(other)

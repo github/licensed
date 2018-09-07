@@ -36,9 +36,21 @@ module Licensed
               "summary"     => package["Doc"],
               "homepage"    => homepage(import_path),
               "search_root" => search_root(package_dir),
-              "version"     => Licensed::Git.version(package_dir)
+              "version"     => package_version(package_dir)
             })
           end.compact
+        end
+      end
+
+      # Returns the most recent git SHA for a package, or nil if SHA is
+      # not available
+      #
+      # package_directory - package location
+      def package_version(package_directory)
+        return unless package_directory
+
+        Dir.chdir package_directory do
+          Licensed::Git.version(".")
         end
       end
 
