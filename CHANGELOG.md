@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.3.4 - 2018-09-20
+### Changes
+- Bundler source will avoid looking for a gemspec file when possible
+
 ## 1.3.3 - 2018-09-07
 ### Fixed
 - Manifest source configuration globs correctly enumerates files from within submodules
@@ -73,4 +77,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.3.3...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.3.4...HEAD
