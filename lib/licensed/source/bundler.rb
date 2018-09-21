@@ -88,18 +88,12 @@ module Licensed
         spec = definition.resolve.find { |s| s.satisfies?(dependency) }
         return spec unless spec.is_a?(::Bundler::LazySpecification)
 
-        # if the specification is coming from a gemspec source,
-        # we can get a non-lazy specification straight from the source
-        if spec.source.is_a?(::Bundler::Source::Gemspec) || spec.source.is_a?(::Bundler::Source::Path)
-          return spec.source.specs.first
-        end
-
+        # try to find a non-lazy specification that matches `spec`
         # spec.source.specs gives access to specifications with more
         # information than spec itself, including platform-specific gems.
-        # try to find a specification that matches `spec`
-        if source_spec = spec.source.specs.find { |s| s.name == spec.name && s.version == spec.version }
-          spec = source_spec
-        end
+        # these objects should have all the information needed to detect license metadata
+        source_spec = spec.source.specs.find { |s| s.name == spec.name && s.version == spec.version }
+        return source_spec if source_spec
 
         # look for a specification at the bundler specs path
         spec_path = ::Bundler.specs_path.join("#{spec.full_name}.gemspec")
