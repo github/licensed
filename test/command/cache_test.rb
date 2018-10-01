@@ -88,7 +88,7 @@ describe Licensed::Command::Cache do
       "type"     => TestSource.type,
       "name"     => "dependency"
     })
-    TestSource.stub(:create_dependency, test_dependency) do
+    source.stub(:create_dependency, test_dependency) do
       generator.run
     end
 
@@ -111,7 +111,7 @@ describe Licensed::Command::Cache do
       "name"     => "dependency",
       "version"  => ""
     })
-    TestSource.stub(:create_dependency, test_dependency) do
+    source.stub(:create_dependency, test_dependency) do
       generator.run
     end
 
@@ -162,8 +162,17 @@ describe Licensed::Command::Cache do
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
       generator.run
+      assert_equal fixtures, source.dependencies.first["dir"]
+    end
+  end
+
+  describe "with explicit dependency file path" do
+    let(:source) { TestSource.new("path" => "dependency/path") }
+
+    it "caches metadata at the given file path" do
+      generator.run
+      assert config.cache_path.join("test/dependency/path.txt").exist?
     end
   end
 end

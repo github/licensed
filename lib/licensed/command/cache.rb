@@ -30,7 +30,7 @@ module Licensed
 
               # ensure each dependency is cached
               dependencies.each do |dependency|
-                name = dependency["name"]
+                name = dependency["path"] || dependency["name"]
                 version = dependency["version"]
 
                 names << name

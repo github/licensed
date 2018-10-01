@@ -142,8 +142,22 @@ describe Licensed::Command::Status do
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
       capture_io { verifier.run }
+      assert_equal fixtures, source.dependencies.first["dir"]
+    end
+  end
+
+  describe "with explicit dependency file path" do
+    let(:source) { TestSource.new("path" => "dependency/path") }
+
+    it "verifies content at explicit path" do
+      filename = config.cache_path.join("test/dependency/path.txt")
+      license = Licensed::License.read(filename)
+      license.text = ""
+      license.save(filename)
+
+      out, _ = capture_io { verifier.run }
+      assert_match(/missing license text/, out)
     end
   end
 end
