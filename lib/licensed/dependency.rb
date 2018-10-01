@@ -3,7 +3,7 @@ require "licensee"
 
 module Licensed
   class Dependency < License
-    LEGAL_FILES = /\A(AUTHORS|COPYING|NOTICE|LEGAL)(?:\..*)?\z/i
+    LEGAL_FILES = /\A(AUTHORS|NOTICE|LEGAL)(?:\..*)?\z/i
 
     attr_reader :path
     attr_reader :search_root
