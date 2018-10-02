@@ -83,6 +83,7 @@ matrix:
 
     - language: ruby
       rvm: 2.4.0
+      before_script: ./script/source-setup/git_submodule
       script: ./script/test git_submodule
       env: NAME="git_submodule"
 
