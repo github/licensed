@@ -22,8 +22,8 @@ for fixture in $FIXTURES; do
   fi
 
   git init -q .
-  touch .gitignore
-  git add .gitignore
+  cp $BASE_PATH/LICENSE .
+  git add LICENSE
   git commit -q -m "init"
 
   if [ -n "$SUBMODULE" ] ; then
