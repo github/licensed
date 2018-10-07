@@ -20,6 +20,8 @@ test/fixtures/go/pkg
 !test/fixtures/go/src/test
 test/fixtures/cabal/*
 !test/fixtures/cabal/app*
+test/fixtures/git_submodule/*
+!test/fixtures/git_submodule/README
 
 vendor/licenses
 .licenses

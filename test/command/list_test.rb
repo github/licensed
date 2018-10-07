@@ -75,8 +75,8 @@ describe Licensed::Command::List do
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      source.dependencies_hook = -> { assert_equal fixtures, Dir.pwd }
       capture_io { command.run }
+      assert_equal fixtures, source.dependencies.first["dir"]
     end
   end
 end

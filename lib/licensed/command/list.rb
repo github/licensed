@@ -10,7 +10,7 @@ module Licensed
 
       def run
         @config.apps.each do |app|
-          @config.ui.info "Displaying dependencies for #{app['name']}"
+          @config.ui.info "Displaying dependencies for #{app["name"]}"
           Dir.chdir app.source_path do
             app.sources.each do |source|
               type = source.class.type
@@ -19,7 +19,8 @@ module Licensed
 
               source_dependencies = dependencies(app, source)
               source_dependencies.each do |dependency|
-                @config.ui.info "    Found #{dependency['name']} (#{dependency['version']})"
+                name = dependency["path"] || dependency["name"]
+                @config.ui.info "    Found #{name} (#{dependency["version"]})"
               end
 
               @config.ui.confirm "  * #{type} dependencies: #{source_dependencies.size}"
