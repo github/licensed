@@ -1,6 +1,8 @@
 # Licensed
 
-Licensed is a Ruby gem to cache the licenses of dependencies and check their status.
+Licensed caches the licenses of dependencies and checks their status.
+
+Licensed is available as a Ruby gem for Ruby environments, and as a self-contained executable for non-Ruby environments.
 
 Licensed is **not** a complete open source license compliance solution. Please understand the important [disclaimer](#disclaimer) below to make appropriate use of Licensed.
 
@@ -11,6 +13,8 @@ Licensed is **not** a complete open source license compliance solution. Please u
 Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
 
 ## Installation
+
+### With a Gemfile
 
 Add this line to your application's Gemfile:
 
@@ -23,6 +27,19 @@ And then execute:
 ```bash
 $ bundle
 ```
+
+### As an executable
+
+Download a package from GitHub and extract the executable.  Executable packages are available for each release starting with version 1.2.0.
+
+```bash
+$ curl -sSL https://github.com/github/licensed/releases/download/<version>/licensed-<version>-<os>-x64.tar.gz > licensed.tar.gz
+$ tar -xzf licensed.tar.gz
+$ rm -f licensed.tar.gz
+$ ./licensed list
+```
+
+For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/local/bin`.
 
 #### Dependencies
 
@@ -118,10 +135,6 @@ if Licensed::Shell.tool_available?('bundle')
   end
 end
 ```
-
-## Packaging
-
-Licensed can be built into an exe and packaged for distribution to systems that don't have ruby already available.  See the [packaging documentation](./docs/packaging.md) for details.
 
 ## Contributing
 
