@@ -17,11 +17,7 @@ module Licensed
       end
 
       def dependencies
-        return @dependencies if defined?(@dependencies)
-
-        packages = recursive_dependencies(JSON.parse(package_metadata_command)["dependencies"])
-
-        @dependencies = packages.map do |name, package|
+        @dependencies ||= packages.map do |name, package|
           path = package["path"]
           fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(path, {
@@ -29,8 +25,24 @@ module Licensed
             "name"     => package["name"],
             "version"  => package["version"],
             "summary"  => package["description"],
-            "homepage" => package["homepage"]
+            "homepage" => package["homepage"],
+            "path"     => name
           })
+        end
+      end
+
+      def packages
+        root_dependencies = JSON.parse(package_metadata_command)["dependencies"]
+        recursive_dependencies(root_dependencies).each_with_object({}) do |(name, results), hsh|
+          results.uniq! { |package| package["version"] }
+          if results.size == 1
+            hsh[name] = results[0]
+          else
+            results.each do |package|
+              name_with_version = "#{name}-#{package["version"]}"
+              hsh[name_with_version] = package
+            end
+          end
         end
       end
 
@@ -38,7 +50,7 @@ module Licensed
       # package name to it's metadata
       def recursive_dependencies(dependencies, result = {})
         dependencies.each do |name, dependency|
-          (result[name] ||= {}).update(dependency)
+          (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
         result

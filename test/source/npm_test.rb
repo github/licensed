@@ -64,6 +64,25 @@ if Licensed::Shell.tool_available?("npm")
           end
         end
       end
+
+      describe "with multiple instances of a dependency" do
+        it "includes version in the dependency path for multiple unique versions" do
+          Dir.chdir fixtures do
+            graceful_fs_dependencies = @source.dependencies.select { |dep| dep["name"] == "graceful-fs" }
+            assert_equal 2, graceful_fs_dependencies.count
+            graceful_fs_dependencies.each do |dependency|
+              assert_equal "#{dependency["name"]}-#{dependency["version"]}", dependency["path"]
+            end
+          end
+        end
+
+        it "does not include version in the dependency path for a single unique version" do
+          Dir.chdir fixtures do
+            dep = @source.dependencies.detect { |dep| dep["name"] == "wrappy" }
+            assert_equal "wrappy", dep["path"]
+          end
+        end
+      end
     end
   end
 end
