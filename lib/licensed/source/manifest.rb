@@ -19,6 +19,7 @@ module Licensed
       def dependencies
         @dependencies ||= packages.map do |package_name, sources|
           Licensed::Source::Manifest::Dependency.new(sources,
+            @config.root,
             package_license(package_name),
             {
               "type"     => Manifest.type,
@@ -43,7 +44,7 @@ module Licensed
         license_path = @config.dig("manifest", "licenses", package_name)
         return unless license_path
 
-        license_path = Licensed::Git.repository_root.join(license_path)
+        license_path = @config.root.join(license_path)
         return unless license_path.exist?
         license_path
       end
@@ -54,7 +55,7 @@ module Licensed
         manifest.each_with_object({}) do |(src, package_name), hsh|
           next if src.nil? || src.empty?
           hsh[package_name] ||= []
-          hsh[package_name] << File.join(Licensed::Git.repository_root, src)
+          hsh[package_name] << File.join(@config.root, src)
         end
       end
 
@@ -73,7 +74,7 @@ module Licensed
       # Returns the manifest location for the app
       def manifest_path
         path = @config.dig("manifest", "path")
-        return Licensed::Git.repository_root.join(path) if path
+        return @config.root.join(path) if path
 
         @config.cache_path.join("manifest.json")
       end
@@ -144,7 +145,7 @@ module Licensed
         return Set.new if patterns.nil? || patterns.empty?
 
         # evaluate all patterns from the project root
-        Dir.chdir Licensed::Git.repository_root do
+        Dir.chdir @config.root do
           Array(patterns).reduce(Set.new) do |files, pattern|
             if pattern.start_with?("!")
               # if the pattern is an exclusion, remove all matching files
@@ -176,9 +177,9 @@ module Licensed
           )
         /imx.freeze
 
-        def initialize(sources, license_path, metadata = {})
+        def initialize(sources, root, license_path, metadata = {})
           @sources = sources
-          license_path ||= sources_license_path(sources)
+          license_path ||= sources_license_path(sources, root)
           super license_path, metadata
         end
 
@@ -201,16 +202,16 @@ module Licensed
         private
 
         # Returns the top-most directory that is common to all paths in `sources`
-        def sources_license_path(sources)
+        def sources_license_path(sources, root)
           # return the source directory if there is only one source given
           return source_directory(sources[0]) if sources.size == 1
 
           common_prefix = Pathname.common_prefix(*sources).to_path
 
-          # don't allow the repo root to be used as common prefix
+          # don't allow the workspace root to be used as common prefix
           # the project this is run for should be excluded from the manifest,
           # or ignored in the config.  any license in the root should be ignored.
-          return common_prefix if common_prefix != Licensed::Git.repository_root
+          return common_prefix if common_prefix != root
 
           # use the first source directory as the license path.
           source_directory(sources.first)

@@ -3,6 +3,7 @@ require "test_helper"
 
 describe Licensed::Configuration do
   let(:config) { Licensed::Configuration.new }
+  let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
 
   before do
     @package = {"type" => "rubygem", "name" => "bundler", "license" => "mit"}
@@ -10,19 +11,17 @@ describe Licensed::Configuration do
 
   it "accepts a license directory path option" do
     config["cache_path"] = "path"
-    assert_equal Licensed::Git.repository_root.join("path"), config.cache_path
+    assert_equal config.root.join("path"), config.cache_path
   end
 
   it "sets default values" do
     assert_equal Pathname.pwd, config.source_path
-    assert_equal Licensed::Git.repository_root.join(".licenses"),
+    assert_equal config.root.join(".licenses"),
                  config.cache_path
     assert_equal File.basename(Dir.pwd), config["name"]
   end
 
   describe "load_from" do
-    let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
-
     it "loads a config from a relative directory path" do
       relative_path = Pathname.new(fixtures).relative_path_from(Pathname.pwd)
       config = Licensed::Configuration.load_from(relative_path)
@@ -180,7 +179,7 @@ describe Licensed::Configuration do
 
       it "uses a default cache path" do
         apps[0].delete("cache_path")
-        assert_equal Licensed::Git.repository_root.join(".licenses/app1"),
+        assert_equal config.root.join(".licenses/app1"),
                      config.apps[0].cache_path
       end
 
@@ -188,7 +187,7 @@ describe Licensed::Configuration do
         apps[0].delete("cache_path")
         config = Licensed::Configuration.new("apps" => apps,
                                              "cache_path" => "vendor/cache")
-        assert_equal Licensed::Git.repository_root.join("vendor/cache/app1"),
+        assert_equal config.root.join("vendor/cache/app1"),
                      config.apps[0].cache_path
       end
 
@@ -202,6 +201,18 @@ describe Licensed::Configuration do
           Licensed::Configuration.new("apps" => apps)
         end
       end
+    end
+  end
+
+  describe "root" do
+    it "can be set from a configuration file" do
+      file = File.join(fixtures, "root.yml")
+      config = Licensed::Configuration.load_from(file)
+      assert_equal File.join(Licensed::Git.repository_root, "test"), config.root.to_s
+    end
+
+    it "defaults to the git repository root" do
+      assert_equal Licensed::Git.repository_root, config.root.to_s
     end
   end
 end
