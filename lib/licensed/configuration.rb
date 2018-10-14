@@ -191,10 +191,7 @@ module Licensed
       end
 
       if config["apps"]&.any?
-        config["apps"].each do |app_config|
-          next unless app_config["root"]
-          app_config["root"] = File.expand_path(app_config["root"], File.dirname(config_path))
-        end
+        config["apps"].each { |app_config| expand_config_roots(app_config, config_path) }
       end
     end
 
