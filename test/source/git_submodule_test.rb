@@ -46,7 +46,7 @@ if Licensed::Shell.tool_available?("git")
           dep = source.dependencies.find { |d| d["name"] == "submodule" }
           assert dep
           assert_equal latest_repository_commit(submodule_repo_path), dep["version"]
-          assert_equal "submodule", dep["path"]
+          assert_equal "submodule", dep.name
         end
       end
 
@@ -55,7 +55,7 @@ if Licensed::Shell.tool_available?("git")
           dep = source.dependencies.find { |d| d["name"] == "nested" }
           assert dep
           assert_equal latest_repository_commit(recursive_repo_path), dep["version"]
-          assert_equal "submodule/nested", dep["path"]
+          assert_equal "submodule/nested", dep.name
         end
       end
     end

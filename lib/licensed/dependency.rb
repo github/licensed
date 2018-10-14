@@ -7,9 +7,11 @@ module Licensed
 
     attr_reader :path
     attr_reader :search_root
+    attr_reader :name
 
     def initialize(path, metadata = {})
       @search_root = metadata.delete("search_root")
+      @name = metadata.delete("path") || metadata["name"]
       super metadata
 
       self.path = path
