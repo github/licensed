@@ -4,6 +4,16 @@ A configuration file specifies the details of enumerating and operating on licen
 
 Configuration can be specified in either YML or JSON formats.  Examples below are given in YML.
 
+## Configuration Paths
+
+`licensed` requires a path to enumerate dependencies at (`source_path`) and a path to store cached metadata (`cache_path`).
+
+To determine these paths across multiple environments where absolute paths will differ, a known root path is needed to evaluate relative paths against.
+In using a single root, relative source and cache paths can be specified in the configuration file.
+
+A root path can be manually configured as a path relative to the configuration file using the `root` property.  If a root path is not specified,
+it will default to using the root of the local git repository.
+
 ## Restricting sources
 
 The `sources` configuration property specifies which sources `licensed` will use to enumerate dependencies.
@@ -44,11 +54,16 @@ Configuration can be set up for single or multiple applications in the same repo
 # If not set, defaults to the directory name of `source_path`
 name: 'My application'
 
-# Path is relative to git repository root
+# Path is relative to the location of the configuration file and specifies
+# the root to expand all paths from
+# If not set, defaults to a git repository root
+root: 'relative/path/from/configuration/file/directory'
+
+# Path is relative to configuration root
 # If not set, defaults to '.licenses'
 cache_path: 'relative/path/to/cache'
 
-# Path is relative to git repository root and specifies the working directory when enumerating dependencies
+# Path is relative to configuration root and specifies the working directory when enumerating dependencies
 # Optional for single app configuration, required when specifying multiple apps
 # Defaults to current directory when running `licensed`
 source_path: 'relative/path/to/source'
