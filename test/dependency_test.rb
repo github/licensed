@@ -156,4 +156,21 @@ describe Licensed::Dependency do
       end
     end
   end
+
+  it "does not include the 'path' metadata property when caching dependency data" do
+    dep = Licensed::Dependency.new(Dir.pwd, "path" => "dependency/path", "name" => "dependency")
+    assert_nil dep["path"]
+  end
+
+  describe "name" do
+    it "is the 'path' metadata property, if available" do
+      dep = Licensed::Dependency.new(Dir.pwd, "path" => "dependency/path", "name" => "dependency")
+      assert_equal "dependency/path", dep.name
+    end
+
+    it "defaults to the 'name' metadata property" do
+      dep = Licensed::Dependency.new(Dir.pwd, "name" => "dependency")
+      assert_equal "dependency", dep.name
+    end
+  end
 end

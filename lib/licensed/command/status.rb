@@ -25,7 +25,7 @@ module Licensed
             @config.ui.info "Checking licenses for #{app['name']}: #{dependencies.size} dependencies"
 
             results = dependencies.map do |dependency|
-              name = dependency["path"] || dependency["name"]
+              name = dependency.name
               filename = app.cache_path.join(dependency["type"], "#{name}.txt")
 
               warnings = []

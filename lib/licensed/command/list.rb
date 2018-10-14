@@ -19,8 +19,7 @@ module Licensed
 
               source_dependencies = dependencies(app, source)
               source_dependencies.each do |dependency|
-                name = dependency["path"] || dependency["name"]
-                @config.ui.info "    Found #{name} (#{dependency["version"]})"
+                @config.ui.info "    Found #{dependency.name} (#{dependency["version"]})"
               end
 
               @config.ui.confirm "  * #{type} dependencies: #{source_dependencies.size}"
@@ -33,7 +32,7 @@ module Licensed
       def dependencies(app, source)
         source.dependencies
               .select { |d| !app.ignored?(d) }
-              .sort_by { |d| d["name"] }
+              .sort_by { |d| d.name }
       end
 
       def success?
