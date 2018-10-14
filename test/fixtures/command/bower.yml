@@ -1,3 +1,2 @@
 expected_dependency: jquery
-config:
-  source_path: test/fixtures/bower
+source_path: test/fixtures/bower

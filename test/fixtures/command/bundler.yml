@@ -1,3 +1,2 @@
 expected_dependency: semantic
-config:
-  source_path: test/fixtures/bundler
+source_path: test/fixtures/bundler
