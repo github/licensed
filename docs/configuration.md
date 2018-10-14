@@ -9,10 +9,13 @@ Configuration can be specified in either YML or JSON formats.  Examples below ar
 `licensed` requires a path to enumerate dependencies at (`source_path`) and a path to store cached metadata (`cache_path`).
 
 To determine these paths across multiple environments where absolute paths will differ, a known root path is needed to evaluate relative paths against.
-In using a single root, relative source and cache paths can be specified in the configuration file.
+In using a root, relative source and cache paths can be specified in the configuration file.
 
-A root path can be manually configured as a path relative to the configuration file using the `root` property.  If a root path is not specified,
-it will default to using the root of the local git repository.
+When using a configuration file, the root property can be set as either a path that can be expanded from the configuration file directory using `File.expand_path`, or the value `true` to use the configuration file directory as the root.
+
+When creating a `Licensed::Dependency` manually with a `root` property, the property must be an absolute path - no path expansion will occur.
+
+If a root path is not specified, it will default to using the root of the local git repository.
 
 ## Restricting sources
 

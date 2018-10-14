@@ -205,10 +205,16 @@ describe Licensed::Configuration do
   end
 
   describe "root" do
-    it "can be set from a configuration file" do
+    it "can be set to a path from a configuration file" do
       file = File.join(fixtures, "root.yml")
       config = Licensed::Configuration.load_from(file)
-      assert_equal File.join(Licensed::Git.repository_root, "test"), config.root.to_s
+      assert_equal File.expand_path("../..", fixtures), config.root.to_s
+    end
+
+    it "can be set to true in a configuration file" do
+      file = File.join(fixtures, "root_at_configuration.yml")
+      config = Licensed::Configuration.load_from(file)
+      assert_equal fixtures, config.root.to_s
     end
 
     it "defaults to the git repository root" do

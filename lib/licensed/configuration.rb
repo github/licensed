@@ -186,7 +186,9 @@ module Licensed
     # Expand any roots specified in a configuration file based on the configuration
     # files directory.
     def self.expand_config_roots(config, config_path)
-      if config["root"]
+      if config["root"] == true
+        config["root"] = File.dirname(config_path)
+      elsif config["root"]
         config["root"] = File.expand_path(config["root"], File.dirname(config_path))
       end
 
