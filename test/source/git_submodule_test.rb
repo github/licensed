@@ -47,13 +47,6 @@ if Licensed::Shell.tool_available?("git")
           assert dep
           assert_equal latest_repository_commit(submodule_repo_path), dep["version"]
           assert_equal "submodule", dep["path"]
-
-          # TODO: this should be tested from test/command/cache_test.rb,
-          # however due to the caching of Licensed::Git.repository_root and
-          # this source testing a git repo within a git repo (test fixtures),
-          # it's difficult to properly test from caching
-          dep.detect_license!
-          assert_equal "mit", dep["license"]
         end
       end
 
@@ -63,13 +56,6 @@ if Licensed::Shell.tool_available?("git")
           assert dep
           assert_equal latest_repository_commit(recursive_repo_path), dep["version"]
           assert_equal "submodule/nested", dep["path"]
-
-          # TODO: this should be tested from test/command/cache_test.rb,
-          # however due to the caching of Licensed::Git.repository_root and
-          # this source testing a git repo within a git repo (test fixtures),
-          # it's difficult to properly test from caching
-          dep.detect_license!
-          assert_equal "mit", dep["license"]
         end
       end
     end
