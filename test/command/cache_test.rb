@@ -23,11 +23,10 @@ describe Licensed::Command::Cache do
 
   each_source do |source_type|
     describe "with #{source_type}" do
-      let(:yaml) { YAML.load_file(File.join(fixtures, "command/#{source_type.to_s.downcase}.yml")) }
-      let(:expected_dependency) { yaml["expected_dependency"] }
-
-      let(:config) { Licensed::Configuration.new(yaml["config"]) }
+      let(:config_file) { File.join(fixtures, "command/#{source_type.to_s.downcase}.yml") }
+      let(:config) { Licensed::Configuration.load_from(config_file) }
       let(:source) { Licensed::Source.const_get(source_type).new(config) }
+      let(:expected_dependency) { config["expected_dependency"] }
 
       it "extracts license info" do
         Dir.chdir config.source_path do

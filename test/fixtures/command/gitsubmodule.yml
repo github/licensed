@@ -1,3 +1,2 @@
 expected_dependency: submodule
-config:
-  source_path: test/fixtures/git_submodule/project
+source_path: test/fixtures/git_submodule/project

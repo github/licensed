@@ -1,5 +1,4 @@
 expected_dependency: github.com/gorilla/context
-config:
-  source_path: test/fixtures/go/src/test
-  dep:
-    allow_ignored: true
+source_path: test/fixtures/go/src/test
+dep:
+  allow_ignored: true
