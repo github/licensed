@@ -63,7 +63,7 @@ module Licensed
         return @virtual_env_dir if defined?(@virtual_env_dir)
         @virtual_env_dir = begin
           venv_dir = @config.dig("python", "virtual_env_dir")
-          File.expand_path(venv_dir, Licensed::Git.repository_root) if venv_dir
+          File.expand_path(venv_dir, @config.root) if venv_dir
         end
       end
     end

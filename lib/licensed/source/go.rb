@@ -154,7 +154,7 @@ module Licensed
                     ENV["GOPATH"]
                   else
                     root = begin
-                             Licensed::Git.repository_root
+                             @config.root
                            rescue Licensed::Shell::Error
                              Pathname.pwd
                            end

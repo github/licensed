@@ -27,18 +27,28 @@ module Licensed
       self["ignored"] ||= {}
       self["allowed"] ||= []
 
+      # default the root to the git repository root,
+      # or the current directory if no other options are available
+      self["root"] ||= Licensed::Git.repository_root || Dir.pwd
+
       verify_arg "source_path"
       verify_arg "cache_path"
     end
 
+    # Returns the path to the workspace root as a Pathname.
+    # Defaults to Licensed::Git.repository_root if not explicitly set
+    def root
+      Pathname.new(self["root"])
+    end
+
     # Returns the path to the app cache directory as a Pathname
     def cache_path
-      Licensed::Git.repository_root.join(self["cache_path"])
+      root.join(self["cache_path"])
     end
 
     # Returns the path to the app source directory as a Pathname
     def source_path
-      Licensed::Git.repository_root.join(self["source_path"])
+      root.join(self["source_path"])
     end
 
     def pwd
@@ -88,6 +98,8 @@ module Licensed
     def allow(license)
       self["allowed"] << license
     end
+
+    private
 
     def defaults_for(options, inherited_options)
       name = options["name"] || File.basename(options["source_path"])
@@ -158,13 +170,30 @@ module Licensed
       return {} unless config_path.file?
 
       extension = config_path.extname.downcase.delete "."
-      case extension
+      config = case extension
       when "json"
         JSON.parse(File.read(config_path))
       when "yml", "yaml"
         YAML.load_file(config_path)
       else
         raise LoadError, "Unknown file type #{extension} for #{config_path}"
+      end
+
+      expand_config_roots(config, config_path)
+      config
+    end
+
+    # Expand any roots specified in a configuration file based on the configuration
+    # files directory.
+    def self.expand_config_roots(config, config_path)
+      if config["root"] == true
+        config["root"] = File.dirname(config_path)
+      elsif config["root"]
+        config["root"] = File.expand_path(config["root"], File.dirname(config_path))
+      end
+
+      if config["apps"]&.any?
+        config["apps"].each { |app_config| expand_config_roots(app_config, config_path) }
       end
     end
 

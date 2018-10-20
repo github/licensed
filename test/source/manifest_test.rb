@@ -61,7 +61,7 @@ describe Licensed::Source::Manifest do
       dep.detect_license!
       assert_equal "mit", dep["license"]
 
-      license_path = File.join(Licensed::Git.repository_root, config.dig("manifest", "licenses", "manifest_test"))
+      license_path = File.join(config.root, config.dig("manifest", "licenses", "manifest_test"))
       assert_equal File.read(license_path).strip, dep.text
     end
 
