@@ -15,7 +15,9 @@ When using a configuration file, the root property can be set as either a path t
 
 When creating a `Licensed::Dependency` manually with a `root` property, the property must be an absolute path - no path expansion will occur.
 
-If a root path is not specified, it will default to using the root of the local git repository.
+If a root path is not specified, it will default to using the following, in order of precedence
+1. the root of the local git repository, if run inside a git repository
+2. the current directory
 
 ## Restricting sources
 

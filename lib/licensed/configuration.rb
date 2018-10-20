@@ -27,8 +27,9 @@ module Licensed
       self["ignored"] ||= {}
       self["allowed"] ||= []
 
-      # default the root to the git repository root if not configured
-      self["root"] ||= Licensed::Git.repository_root
+      # default the root to the git repository root,
+      # or the current directory if no other options are available
+      self["root"] ||= Licensed::Git.repository_root || Dir.pwd
 
       verify_arg "source_path"
       verify_arg "cache_path"
@@ -37,7 +38,6 @@ module Licensed
     # Returns the path to the workspace root as a Pathname.
     # Defaults to Licensed::Git.repository_root if not explicitly set
     def root
-      return unless self["root"]
       Pathname.new(self["root"])
     end
 
