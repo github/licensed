@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.4.0 - 2018-10-20
+### Added
+- Git Submodules dependency source :tada:
+- Configuration option to explicitly set a root absolute path
+
+### Changes
+- `COPYING` file is no longer matched as a legal file
+
+### Fixed
+- NPM source will enumerate multiple versions of the same dependency
+- Running Licensed outside of a Git repository no longer raises an error
+- Packaging scripts will correctly return to the previous branch when the script is finished
+
 ## 1.3.4 - 2018-09-20
 ### Changes
 - Bundler source will avoid looking for a gemspec file when possible
@@ -77,4 +90,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.3.4...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.4.0...HEAD
