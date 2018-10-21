@@ -37,8 +37,8 @@ BUILD_DEST="$(mktemp -d)"
 trap "rm -rf $BUILD_DEST" EXIT
 
 if [ -n "$VERSION" ]; then
-  git checkout "$VERSION"
   CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+  git checkout "$VERSION"
   trap "rm -rf $BUILD_DEST; git checkout $CURRENT_BRANCH" EXIT
 else
   VERSION="$(git rev-parse --abbrev-ref HEAD)"
