@@ -34,6 +34,7 @@ module Licensed
       def packages
         root_dependencies = JSON.parse(package_metadata_command)["dependencies"]
         recursive_dependencies(root_dependencies).each_with_object({}) do |(name, results), hsh|
+          next if @config.ignored?("type" => NPM.type, "name" => name)
           results.uniq! { |package| package["version"] }
           if results.size == 1
             hsh[name] = results[0]

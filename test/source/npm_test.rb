@@ -54,6 +54,13 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
 
+      it "does not include ignored dependencies" do
+        Dir.chdir fixtures do
+          @config.ignore({ "type" => Licensed::Source::NPM.type, "name" => "autoprefixer" })
+          refute @source.dependencies.detect { |dep| dep["name"] == "autoprefixer" }
+        end
+      end
+
       it "raises when dependencies are missing" do
         Dir.mktmpdir do |dir|
           FileUtils.cp(File.join(fixtures, "package.json"), File.join(dir, "package.json"))
