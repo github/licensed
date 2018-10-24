@@ -74,9 +74,11 @@ Warnings:
 3 dependencies checked, 3 warnings found.
 ```
 
+- `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`
+
 ### Configuration
 
-All commands accept a `-c|--config` option to specify a path to a configuration file or directory.
+All commands, except `version`, accept a `-c|--config` option to specify a path to a configuration file or directory.
 
 If a directory is specified, `licensed` will look in that directory for a file named (in order of preference):
 1. `.licensed.yml`
