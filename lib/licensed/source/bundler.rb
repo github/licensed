@@ -80,13 +80,11 @@ module Licensed
       def gem_spec(dependency)
         return unless dependency
 
-        # bundler specifications aren't put in ::Bundler.specs_path, even if the
-        # gem is a runtime dependency.  it needs to be handled specially
-        return bundler_spec if dependency.name == "bundler"
-
         # find a specifiction from the resolved ::Bundler::Definition specs
         spec = definition.resolve.find { |s| s.satisfies?(dependency) }
-        return spec unless spec.is_a?(::Bundler::LazySpecification)
+
+        # a nil spec should be rare, generally only seen from bundler
+        return bundle_exec_gem_spec(dependency.name) if spec.nil?
 
         # try to find a non-lazy specification that matches `spec`
         # spec.source.specs gives access to specifications with more
@@ -97,8 +95,11 @@ module Licensed
 
         # look for a specification at the bundler specs path
         spec_path = ::Bundler.specs_path.join("#{spec.full_name}.gemspec")
-        return unless File.exist?(spec_path.to_s)
-        Gem::Specification.load(spec_path.to_s)
+        return Gem::Specification.load(spec_path.to_s) if File.exist?(spec_path.to_s)
+
+        # if the specification file doesn't exist, get the specification using
+        # the bundler and gem CLI
+        bundle_exec_gem_spec(dependency.name)
       end
 
       # Returns whether a dependency should be included in the final
@@ -130,24 +131,15 @@ module Licensed
         end
       end
 
-      # Returns a gemspec for bundler, found and loaded by running `gem specification bundler`
-      # This is a hack to work around bundler not placing it's own spec at
-      # `::Bundler.specs_path` when it's an explicit dependency
-      def bundler_spec
-        # cache this so we run CLI commands as few times as possible
-        return @bundler_spec if defined?(@bundler_spec)
+      # Load a gem specification from YAML returned from `gem specification bundler`
+      # This is a last resort when licensed can't obtain a specification from other means
+      def bundle_exec_gem_spec(name)
+        # `gem` must be available to run `gem specification`
+        return unless Licensed::Shell.tool_available?("gem")
 
-        # finding the bundler gem is dependent on having `gem` available
-        unless Licensed::Shell.tool_available?("gem")
-          @bundler_spec = nil
-          return
-        end
-
-        # Bundler is always used from the default gem install location.
-        # we can use `gem specification bundler` with a clean ENV to
-        # get the system bundler gem as YAML
-        yaml = ::Bundler.with_original_env { Licensed::Shell.execute("gem", "specification", "bundler") }
-        @bundler_spec = Gem::Specification.from_yaml(yaml)
+        # use `gem specification` with a clean ENV to get gem specification YAML
+        yaml = ::Bundler.with_original_env { Licensed::Shell.execute(bundler_exe, "exec", "gem", "specification", name) }
+        Gem::Specification.from_yaml(yaml)
       end
 
       # Build the bundler definition
@@ -191,6 +183,19 @@ module Licensed
         # force bundler to use the local gem file
         original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], gemfile_path.to_s
 
+        if ruby_packer?
+          # if running under ruby-packer, set environment from host
+
+          # hack: setting this ENV var allows licensed to use Gem paths outside
+          # of the ruby-packer filesystem.  this is needed to find spec sources
+          # from the host filesystem
+          ENV["ENCLOSE_IO_RUBYC_1ST_PASS"] = "1"
+
+          # set the ruby version to what was used during `bundle install`.
+          # this allows licensed to correctly find the gem and spec install dirs
+          local_ruby_version, Gem::ConfigMap[:ruby_version] = Gem::ConfigMap[:ruby_version], Licensed::Shell.execute(bundler_exe, "exec", "ruby", "-e", "puts RbConfig::CONFIG[\"ruby_version\"]")
+        end
+
         # reset all bundler configuration
         ::Bundler.reset!
         # and re-configure with settings for current directory
@@ -198,10 +203,30 @@ module Licensed
 
         yield
       ensure
+        if ruby_packer?
+          # if running under ruby-packer, restore environment after block is finished
+          ENV.delete("ENCLOSE_IO_RUBYC_1ST_PASS")
+          Gem::ConfigMap[:ruby_version] = local_ruby_version
+        end
+
         ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
         # restore bundler configuration
         ::Bundler.reset!
         ::Bundler.configure
+      end
+
+      # Returns the configured bundler executable, or `bundle` if not configured
+      def bundler_exe
+        @bundler_exe ||= if exe_path = @config.dig("rubygem", "bundler_exe")
+          File.expand_path(exe_path, @config.root)
+        else
+          "bundle"
+        end
+      end
+
+      # Returns whether the current licensed execution is running ruby-packer
+      def ruby_packer?
+        @ruby_packer ||= RbConfig::CONFIG["prefix"] =~ /__enclose_io_memfs__/
       end
     end
   end

@@ -15,16 +15,28 @@ The bundler source determines which gem groups to include or exclude with the fo
 Strings and string arrays are both :+1:
 
 ```yml
-rubygems:
+rubygem:
   without: development
 ```
 
 or
 
 ```yml
-rubygems:
+rubygem:
   without:
     - build
     - development
     - test
+```
+
+### Specifying a custom bundler executable
+
+A custom bundler executable can be specified in the `licensed` configuration file.  The path can be set as
+- an absolute path
+- an expandable path with special characters (e.g. `~`)
+- a path relative to the configured root absolute path
+
+```yml
+rubygem:
+  bundler_exe: "bin/bundle"
 ```
