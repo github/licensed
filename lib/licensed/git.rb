@@ -7,16 +7,16 @@ module Licensed
         @git ||= Licensed::Shell.tool_available?("git")
       end
 
-      def git_repo?
-        return false unless available?
-        !Licensed::Shell.execute("git", "status", allow_failure: true).empty?
-      end
-
       # Returns the root of the current git repository
       # or nil if not in a git repository.
       def repository_root
-        return unless git_repo?
-        Licensed::Shell.execute("git", "rev-parse", "--show-toplevel")
+        return unless available?
+        Licensed::Shell.execute("git", "rev-parse", "--show-toplevel", allow_failure: true)
+      end
+
+      # Returns true if a git repository is found, false otherwise
+      def git_repo?
+        !repository_root.to_s.empty?
       end
 
       # Returns the most recent git SHA for a file or directory
