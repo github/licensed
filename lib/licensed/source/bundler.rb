@@ -158,7 +158,8 @@ module Licensed
       # Defaults to [:development, :test] + ::Bundler.settings[:without]
       def exclude_groups
         @exclude_groups ||= begin
-          exclude = Array(@config.dig("rubygems", "without"))
+          exclude = Array(@config.dig("rubygem", "without"))
+          exclude ||= Array(@config.dig("rubygems", "without")) # :sad:
           exclude.push(*DEFAULT_WITHOUT_GROUPS) if exclude.empty?
           exclude.uniq.map(&:to_sym)
         end
