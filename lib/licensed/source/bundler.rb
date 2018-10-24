@@ -213,7 +213,7 @@ module Licensed
 
       # Returns whether the current licensed execution is running ruby-packer
       def ruby_packer?
-        @ruby_packer ||= RbConfig::CONFIG["prefix"] =~ /__enclose_io_memfs__/
+        @ruby_packer ||= RbConfig::TOPDIR =~ /__enclose_io_memfs__/
       end
     end
   end
