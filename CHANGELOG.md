@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.5.0 - 2018-10-24
+### Added
+- `licensed (version | -v | --version)` command to see the current licensed version (:tada: @mwagz! https://github.com/github/licensed/pull/101)
+
+### Fixed
+- NPM source no longer raises an error when ignored dependencies aren't found (:tada: @mwagz! https://github.com/github/licensed/pull/100)
+- Checking for a Git repo will no longer possibly modify `.git/index` (:tada: @dbussink https://github.com/github/licensed/pull/102)
+- Fixed a scenario where licensed wasn't finding bundler dependencies when run as an executable (https://github.com/github/licensed/pull/103)
+
 ## 1.4.0 - 2018-10-20
 ### Added
 - Git Submodules dependency source :tada:
@@ -90,4 +99,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.4.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.5.0...HEAD
