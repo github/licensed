@@ -15,14 +15,14 @@ The bundler source determines which gem groups to include or exclude with the fo
 Strings and string arrays are both :+1:
 
 ```yml
-rubygems:
+rubygem:
   without: development
 ```
 
 or
 
 ```yml
-rubygems:
+rubygem:
   without:
     - build
     - development
