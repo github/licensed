@@ -30,6 +30,13 @@ module Licensed
       run Licensed::Command::List.new(config)
     end
 
+    map "-v" => :version
+    map "--version" => :version
+    desc "version", "Show Installed Version of Licensed, [-v, --version]"
+    def version
+      run Licensed::Command::Version.new
+    end
+
     private
 
     # Returns a configuration object for the CLI command

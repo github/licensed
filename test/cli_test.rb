@@ -68,4 +68,18 @@ describe "licensed" do
       refute out =~ /Usage/i
     end
   end
+
+  describe "version" do
+    it "outputs VERSION constant" do
+      expected_out = "#{Licensed::VERSION}\n"
+      out, status = Open3.capture2 "bundle exec exe/licensed version"
+      assert_equal out, expected_out
+
+      out, status = Open3.capture2 "bundle exec exe/licensed -v"
+      assert_equal out, expected_out
+
+      out, status = Open3.capture2 "bundle exec exe/licensed --version"
+      assert_equal out, expected_out
+    end
+  end
 end
