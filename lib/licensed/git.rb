@@ -9,7 +9,7 @@ module Licensed
 
       def git_repo?
         return false unless available?
-        !Licensed::Shell.execute("git", "status", allow_failure: true).empty?
+        !Licensed::Shell.execute("git", "rev-parse", "HEAD", allow_failure: true).empty?
       end
 
       # Returns the root of the current git repository
