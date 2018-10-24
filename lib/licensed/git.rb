@@ -16,7 +16,7 @@ module Licensed
 
       # Returns true if a git repository is found, false otherwise
       def git_repo?
-        repository_root.empty?
+        !repository_root.empty?
       end
 
       # Returns the most recent git SHA for a file or directory
