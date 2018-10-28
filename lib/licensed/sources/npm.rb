@@ -2,7 +2,7 @@
 require "json"
 
 module Licensed
-  module Source
+  module Sources
     class NPM
       def self.type
         "npm"

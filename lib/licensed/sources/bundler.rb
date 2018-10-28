@@ -5,7 +5,7 @@ rescue LoadError
 end
 
 module Licensed
-  module Source
+  module Sources
     class Bundler
       GEMFILES = %w{Gemfile gems.rb}.freeze
       DEFAULT_WITHOUT_GROUPS = %i{development test}

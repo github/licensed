@@ -25,7 +25,7 @@ describe Licensed::Command::Cache do
     describe "with #{source_type}" do
       let(:config_file) { File.join(fixtures, "command/#{source_type.to_s.downcase}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
-      let(:source) { Licensed::Source.const_get(source_type).new(config) }
+      let(:source) { Licensed::Sources.const_get(source_type).new(config) }
       let(:expected_dependency) { config["expected_dependency"] }
 
       it "extracts license info" do

@@ -2,7 +2,7 @@
 require "tomlrb"
 
 module Licensed
-  module Source
+  module Sources
     class Dep
       def self.type
         "dep"

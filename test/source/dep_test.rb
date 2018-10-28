@@ -2,10 +2,10 @@
 require "test_helper"
 require "tmpdir"
 
-describe Licensed::Source::Dep do
+describe Licensed::Sources::Dep do
   let(:fixtures) { File.expand_path("../../fixtures/go/src/test", __FILE__) }
   let(:config) { Licensed::Configuration.new("dep" => { "allow_ignored" => true }) }
-  let(:source) { Licensed::Source::Dep.new(config) }
+  let(:source) { Licensed::Sources::Dep.new(config) }
 
   describe "enabled?" do
     it "is true if Gopkg files exist" do

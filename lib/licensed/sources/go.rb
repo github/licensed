@@ -4,7 +4,7 @@ require "English"
 require "pathname"
 
 module Licensed
-  module Source
+  module Sources
     class Go
       def self.type
         "go"

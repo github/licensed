@@ -2,7 +2,7 @@
 require "English"
 
 module Licensed
-  module Source
+  module Sources
     class Cabal
       DEPENDENCY_REGEX = /\s*.+?\s*/.freeze
       DEFAULT_TARGETS = %w{executable library}.freeze

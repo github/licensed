@@ -3,11 +3,11 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("go")
-  describe Licensed::Source::Go do
+  describe Licensed::Sources::Go do
     let(:gopath) { File.expand_path("../../fixtures/go", __FILE__) }
     let(:fixtures) { File.join(gopath, "src/test") }
     let(:config) { Licensed::Configuration.new("go" => { "GOPATH" => gopath }) }
-    let(:source) { Licensed::Source::Go.new(config) }
+    let(:source) { Licensed::Sources::Go.new(config) }
 
     describe "enabled?" do
       it "is true if go source is available" do

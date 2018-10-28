@@ -4,11 +4,11 @@ require "tmpdir"
 require "fileutils"
 
 if Licensed::Shell.tool_available?("npm")
-  describe Licensed::Source::NPM do
+  describe Licensed::Sources::NPM do
     before do
       @config = Licensed::Configuration.new
       @config.ui.level = "silent"
-      @source = Licensed::Source::NPM.new(@config)
+      @source = Licensed::Sources::NPM.new(@config)
     end
 
     describe "enabled?" do
@@ -56,7 +56,7 @@ if Licensed::Shell.tool_available?("npm")
 
       it "does not include ignored dependencies" do
         Dir.chdir fixtures do
-          @config.ignore({ "type" => Licensed::Source::NPM.type, "name" => "autoprefixer" })
+          @config.ignore({ "type" => Licensed::Sources::NPM.type, "name" => "autoprefixer" })
           refute @source.dependencies.detect { |dep| dep["name"] == "autoprefixer" }
         end
       end

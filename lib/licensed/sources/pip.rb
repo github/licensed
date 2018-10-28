@@ -3,7 +3,7 @@ require "json"
 require "English"
 
 module Licensed
-  module Source
+  module Sources
     class Pip
       def self.type
         "pip"

@@ -2,7 +2,7 @@
 require "pathname/common_prefix"
 
 module Licensed
-  module Source
+  module Sources
     class Manifest
       def self.type
         "manifest"
@@ -18,7 +18,7 @@ module Licensed
 
       def dependencies
         @dependencies ||= packages.map do |package_name, sources|
-          Licensed::Source::Manifest::Dependency.new(sources,
+          Licensed::Sources::Manifest::Dependency.new(sources,
             @config.root,
             package_license(package_name),
             {

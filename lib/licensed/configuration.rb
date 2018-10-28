@@ -9,7 +9,7 @@ module Licensed
       ".licensed.yaml".freeze,
       ".licensed.json".freeze
     ].freeze
-    SOURCE_TYPES = Source.constants.map { |c| Source.const_get(c) }.freeze
+    SOURCE_TYPES = Sources.constants.map { |c| Sources.const_get(c) }.freeze
 
     def initialize(options = {}, inherited_options = {})
       super()

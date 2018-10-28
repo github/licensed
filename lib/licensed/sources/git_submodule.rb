@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Licensed
-  module Source
+  module Sources
     class GitSubmodule
       REMOTE_URL_ARGUMENT = "$(git remote get-url origin)".freeze
       GIT_SUBMODULES_ARGUMENTS = [

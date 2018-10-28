@@ -3,10 +3,10 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("pip")
-  describe Licensed::Source::Pip do
+  describe Licensed::Sources::Pip do
     let (:fixtures)  { File.expand_path("../../fixtures/pip", __FILE__) }
     let (:config)   { Licensed::Configuration.new("python" => {"virtual_env_dir" => "test/fixtures/pip/venv"}) }
-    let (:source)   { Licensed::Source::Pip.new(config) }
+    let (:source)   { Licensed::Sources::Pip.new(config) }
 
     describe "enabled?" do
       it "is true if pip source is available" do
