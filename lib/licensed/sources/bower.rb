@@ -3,23 +3,15 @@ require "json"
 
 module Licensed
   module Sources
-    class Bower
-      def self.type
-        "bower"
-      end
-
-      def initialize(config)
-        @config = config
-      end
-
+    class Bower < Source
       def enabled?
         [@config.pwd.join(".bowerrc"), @config.pwd.join("bower.json")].any? do |path|
           File.exist?(path)
         end
       end
 
-      def dependencies
-        @dependencies ||= Dir.glob(bower_path.join("*/.bower.json")).map do |file|
+      def enumerate_dependencies
+        Dir.glob(bower_path.join("*/.bower.json")).map do |file|
           package = JSON.parse(File.read(file))
           path = bower_path.join(file).dirname.to_path
           Dependency.new(path, {

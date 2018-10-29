@@ -32,10 +32,10 @@ class TestSource
 end
 
 def each_source(&block)
-  Licensed::Sources.constants.each do |source_type|
+  Licensed::Sources::Source.sources.each do |source_class|
     # if a specific source type is set via ENV, skip other source types
-    next if ENV["SOURCE"] && source_type.to_s.downcase != ENV["SOURCE"].downcase
+    next if ENV["SOURCE"] && source_class.type != ENV["SOURCE"].downcase
 
-    block.call(source_type)
+    block.call(source_class)
   end
 end

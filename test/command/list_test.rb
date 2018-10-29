@@ -14,11 +14,12 @@ describe Licensed::Command::List do
     end
   end
 
-  each_source do |source_type|
-    describe "with #{source_type}" do
-      let(:config_file) { File.join(fixtures, "command/#{source_type.to_s.downcase}.yml") }
+  each_source do |source_class|
+    describe "with #{source_class.type}" do
+      let(:source_type) { source_class.type }
+      let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
-      let(:source) { Licensed::Sources.const_get(source_type).new(config) }
+      let(:source) { source_class.new(config) }
       let(:expected_dependency) { config["expected_dependency"] }
 
       it "lists dependencies" do
@@ -28,7 +29,7 @@ describe Licensed::Command::List do
 
         out, = capture_io { command.run }
         assert_match(/Found #{expected_dependency}/, out)
-        assert_match(/#{source.class.type} dependencies:/, out)
+        assert_match(/#{source_type} dependencies:/, out)
       end
     end
   end

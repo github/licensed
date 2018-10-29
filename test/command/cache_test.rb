@@ -21,11 +21,12 @@ describe Licensed::Command::Cache do
     end
   end
 
-  each_source do |source_type|
-    describe "with #{source_type}" do
-      let(:config_file) { File.join(fixtures, "command/#{source_type.to_s.downcase}.yml") }
+  each_source do |source_class|
+    describe "with #{source_class.type}" do
+      let(:source_type) { source_class.type }
+      let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
-      let(:source) { Licensed::Sources.const_get(source_type).new(config) }
+      let(:source) { source_class.new(config) }
       let(:expected_dependency) { config["expected_dependency"] }
 
       it "extracts license info" do
@@ -35,7 +36,7 @@ describe Licensed::Command::Cache do
 
         generator.run
 
-        path = config.cache_path.join("#{source.class.type}/#{expected_dependency}.txt")
+        path = config.cache_path.join("#{source_type}/#{expected_dependency}.txt")
         assert path.exist?
         license = Licensed::License.read(path)
         assert_equal expected_dependency, license["name"]

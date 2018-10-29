@@ -3,24 +3,16 @@ require "English"
 
 module Licensed
   module Sources
-    class Cabal
+    class Cabal < Source
       DEPENDENCY_REGEX = /\s*.+?\s*/.freeze
       DEFAULT_TARGETS = %w{executable library}.freeze
-
-      def self.type
-        "cabal"
-      end
-
-      def initialize(config)
-        @config = config
-      end
 
       def enabled?
         cabal_file_dependencies.any? && ghc?
       end
 
-      def dependencies
-        @dependencies ||= package_ids.map do |id|
+      def enumerate_dependencies
+        package_ids.map do |id|
           package = package_info(id)
 
           path, search_root = package_docs_dirs(package)

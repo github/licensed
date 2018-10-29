@@ -3,21 +3,13 @@ require "pathname/common_prefix"
 
 module Licensed
   module Sources
-    class Manifest
-      def self.type
-        "manifest"
-      end
-
-      def initialize(config)
-        @config = config
-      end
-
+    class Manifest < Source
       def enabled?
         File.exist?(manifest_path) || generate_manifest?
       end
 
-      def dependencies
-        @dependencies ||= packages.map do |package_name, sources|
+      def enumerate_dependencies
+        packages.map do |package_name, sources|
           Licensed::Sources::Manifest::Dependency.new(sources,
             @config.root,
             package_license(package_name),

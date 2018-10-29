@@ -5,21 +5,13 @@ require "pathname"
 
 module Licensed
   module Sources
-    class Go
-      def self.type
-        "go"
-      end
-
-      def initialize(config)
-        @config = config
-      end
-
+    class Go < Source
       def enabled?
         Licensed::Shell.tool_available?("go") && go_source?
       end
 
-      def dependencies
-        @dependencies ||= with_configured_gopath do
+      def enumerate_dependencies
+        with_configured_gopath do
           packages.map do |package_name|
             package = package_info(package_name)
             import_path = non_vendored_import_path(package_name)
@@ -38,7 +30,7 @@ module Licensed
               "search_root" => search_root(package_dir),
               "version"     => package_version(package_dir)
             })
-          end.compact
+          end
         end
       end
 

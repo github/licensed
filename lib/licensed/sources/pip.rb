@@ -4,22 +4,14 @@ require "English"
 
 module Licensed
   module Sources
-    class Pip
-      def self.type
-        "pip"
-      end
-
-      def initialize(config)
-        @config = config
-      end
-
+    class Pip < Source
       def enabled?
         return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
         File.exist?(@config.pwd.join("requirements.txt"))
       end
 
       def dependencies
-        @dependencies ||= parse_requirements_txt.map do |package_name|
+        parse_requirements_txt.map do |package_name|
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
           Dependency.new(location, {
