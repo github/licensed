@@ -11,8 +11,12 @@ module Licensed
     ].freeze
     SOURCE_TYPES = Source.constants.map { |c| Source.const_get(c) }.freeze
 
+    attr_reader :ui
+
     def initialize(options = {}, inherited_options = {})
       super()
+
+      @ui = Licensed::UI::Shell.new
 
       # update order:
       # 1. anything inherited from root config
@@ -120,8 +124,6 @@ module Licensed
   class Configuration < AppConfiguration
     class LoadError < StandardError; end
 
-    attr_accessor :ui
-
     # Loads and returns a Licensed::Configuration object from the given path.
     # The path can be relative or absolute, and can point at a file or directory.
     # If the path given is a directory, the directory will be searched for a
@@ -133,8 +135,6 @@ module Licensed
     end
 
     def initialize(options = {})
-      @ui = Licensed::UI::Shell.new
-
       apps = options.delete("apps") || []
       super(default_options.merge(options))
 

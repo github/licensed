@@ -207,6 +207,19 @@ module Licensed
             # set the ruby version in Gem::ConfigMap to the ruby version from the host.
             # this helps Bundler find the correct spec sources and paths
             Gem::ConfigMap[:ruby_version] = bundle_exec_ruby_version
+          else
+            # running a ruby-packer-built licensed exe when ruby and bundler aren't available
+            # is possible but could lead to errors if the host ruby version doesn't
+            # match the built executable's ruby version
+            @config.ui.warn <<~WARNING
+              Ruby and/or bundler weren't found when enumerating bundler
+              dependencies using the licensed executable.  This can cause a
+              ruby mismatch between licensed and bundled dependencies and a
+              failure to find gem specifications.
+
+              If licensed is unable to find gem specifications that you believe are present,
+              please ensure that ruby and bundler are available and try again.
+            WARNING
           end
         end
 
