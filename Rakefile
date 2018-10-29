@@ -47,7 +47,7 @@ namespace :test do
 
       # use negative lookahead to exclude all source tests except
       # the tests for `source`
-      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/source\/(?!#{source}).*?_test.rb/,
+      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/sources\/(?!#{source}).*?_test.rb/,
                                                            "test/fixtures/**/*_test.rb")
     end
   end
