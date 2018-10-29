@@ -16,7 +16,11 @@ module Licensed
         end
 
         def type
-          self.name.split(/::/).last.gsub(/([A-Z\d]+)([A-Z][a-z])/,'\1_\2').downcase
+          self.name.split(/::/)
+                   .last
+                   .gsub(/([A-Z\d]+)([A-Z][a-z])/, "\\1_\\2".freeze)
+                   .gsub(/([a-z\d])([A-Z])/, "\\1_\\2".freeze)
+                   .downcase
         end
       end
 
