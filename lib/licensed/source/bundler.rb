@@ -135,10 +135,10 @@ module Licensed
       # This is a last resort when licensed can't obtain a specification from other means
       def bundle_exec_gem_spec(name)
         # `gem` must be available to run `gem specification`
-        return unless Licensed::Shell.tool_available?("gem")
+        return unless Licensed::Shell.tool_available?("gem") && Licensed::Shell.tool_available?(bundler_exe)
 
         # use `gem specification` with a clean ENV to get gem specification YAML
-        yaml = ::Bundler.with_original_env { Licensed::Shell.execute("gem", "specification", name) }
+        yaml = ::Bundler.with_original_env { Licensed::Shell.execute(bundler_exe, "exec", "gem", "specification", name) }
         Gem::Specification.from_yaml(yaml)
       end
 
@@ -177,6 +177,16 @@ module Licensed
         @lockfile_path ||= gemfile_path.dirname.join("#{gemfile_path.basename}.lock")
       end
 
+      # Returns the configured bundler executable to use, or "bundle" by default.
+      def bundler_exe
+        @bundler_exe ||= begin
+          exe = @config.dig("rubygem", "bundler_exe")
+          return "bundle" unless exe
+          return exe if Licensed::Shell.tool_available?(exe)
+          @config.root.join(exe)
+        end
+      end
+
       private
 
       # helper to clear all bundler environment around a yielded block
@@ -191,6 +201,13 @@ module Licensed
           # of the ruby-packer filesystem.  this is needed to find spec sources
           # from the host filesystem
           ENV["ENCLOSE_IO_RUBYC_1ST_PASS"] = "1"
+          ruby_version = Gem::ConfigMap[:ruby_version]
+
+          if Licensed::Shell.tool_available?(bundler_exe) && Licensed::Shell.tool_available?("ruby")
+            # set the ruby version in Gem::ConfigMap to the ruby version from the host.
+            # this helps Bundler find the correct spec sources and paths
+            Gem::ConfigMap[:ruby_version] = bundle_exec_ruby_version
+          end
         end
 
         # reset all bundler configuration
@@ -203,6 +220,7 @@ module Licensed
         if ruby_packer?
           # if running under ruby-packer, restore environment after block is finished
           ENV.delete("ENCLOSE_IO_RUBYC_1ST_PASS")
+          Gem::ConfigMap[:ruby_version] = ruby_version
         end
 
         ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
@@ -214,6 +232,11 @@ module Licensed
       # Returns whether the current licensed execution is running ruby-packer
       def ruby_packer?
         @ruby_packer ||= RbConfig::TOPDIR =~ /__enclose_io_memfs__/
+      end
+
+      # Returns the ruby version found in the bundler environment
+      def bundle_exec_ruby_version
+        Licensed::Shell.execute(bundler_exe, "exec", "ruby", "-e", "puts Gem::ConfigMap[:ruby_version]")
       end
     end
   end
