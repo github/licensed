@@ -212,5 +212,19 @@ if Licensed::Shell.tool_available?("bundle")
         assert_equal config.root.join("lib/licensed.rb"), source.bundler_exe
       end
     end
+
+    describe "ruby_command_args" do
+      it "returns 'bundle exec args' when bundler exe is available'" do
+        Licensed::Shell.stub(:tool_available?, true) do
+          assert_equal "bundle exec test", source.ruby_command_args("test").join(" ")
+        end
+      end
+
+      it "returns args when bundler exe is not available'" do
+        Licensed::Shell.stub(:tool_available?, false) do
+          assert_equal "test", source.ruby_command_args("test").join(" ")
+        end
+      end
+    end
   end
 end
