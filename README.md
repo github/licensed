@@ -110,6 +110,7 @@ sources:
   npm: false
   bower: false
   cabal: false
+  pip: false
 ```
 
 ## Development

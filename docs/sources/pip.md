@@ -16,8 +16,12 @@ _note_: `<your_venv_dir>` path should be relative to the repository root or can 
 #### virtual_env_dir (Required)
 
 The `pip` command will be sourced from this directory.
+You have to add this setting to `.licensed.yaml`.
 An example usage of this might look like:
 ```yaml
+sources:
+  pip: true
+
 python:
     virtual_env_dir:"/path/to/your/venv_dir"
 ```
