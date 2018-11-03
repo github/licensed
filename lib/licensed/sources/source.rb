@@ -35,7 +35,7 @@ module Licensed
       end
 
       def dependencies
-        @dependencies ||= enumerate_dependencies.compact.reject { |d| ignored?(d) }
+        cached_dependencies.reject { |d| ignored?(d) }
       end
 
       def enumerate_dependencies
@@ -43,6 +43,10 @@ module Licensed
       end
 
       private
+
+      def cached_dependencies
+        @dependencies ||= enumerate_dependencies.compact
+      end
 
       def ignored?(dependency)
         config.ignored?("type" => self.class.type, "name" => dependency["name"])
