@@ -35,7 +35,7 @@ module Licensed
       end
 
       def dependencies
-        @dependencies ||= enumerate_dependencies.compact.reject { |d| ignored?(d["name"]) }
+        @dependencies ||= enumerate_dependencies.compact.reject { |d| ignored?(d) }
       end
 
       def enumerate_dependencies
@@ -44,8 +44,8 @@ module Licensed
 
       private
 
-      def ignored?(name)
-        config.ignored?("type" => self.class.type, "name" => name)
+      def ignored?(dependency)
+        config.ignored?("type" => self.class.type, "name" => dependency["name"])
       end
     end
   end
