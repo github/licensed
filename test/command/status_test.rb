@@ -3,7 +3,7 @@ require "test_helper"
 
 describe Licensed::Command::Status do
   let(:config) { Licensed::Configuration.new }
-  let(:source) { TestSource.new }
+  let(:source) { TestSource.new(config) }
   let(:verifier) { Licensed::Command::Status.new(config) }
 
   before do
@@ -148,7 +148,7 @@ describe Licensed::Command::Status do
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new("path" => "dependency/path") }
+    let(:source) { TestSource.new(config, "path" => "dependency/path") }
 
     it "verifies content at explicit path" do
       filename = config.cache_path.join("test/dependency/path.txt")

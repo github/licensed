@@ -3,7 +3,7 @@ require "test_helper"
 
 describe Licensed::Command::List do
   let(:config) { Licensed::Configuration.new }
-  let(:source) { TestSource.new }
+  let(:source) { TestSource.new(config) }
   let(:command) { Licensed::Command::List.new(config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
