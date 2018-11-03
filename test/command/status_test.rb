@@ -83,7 +83,7 @@ describe Licensed::Command::Status do
   end
 
   it "warns if versions do not match" do
-    verifier.app_dependencies(config.apps.first).first["version"] = "nope"
+    source.dependencies.first["version"] = "nope"
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data out of date/, out)
   end
