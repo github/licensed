@@ -134,7 +134,7 @@ module Licensed
         return unless Licensed::Shell.tool_available?("gem")
 
         # use `gem specification` with a clean ENV to get gem specification YAML
-        yaml = ::Bundler.with_original_env { Licensed::Shell.execute("gem", "specification", name) }
+        yaml = ::Bundler.with_original_env { Licensed::Shell.execute(*ruby_command_args("gem", "specification", name)) }
         Gem::Specification.from_yaml(yaml)
       end
 
@@ -173,6 +173,23 @@ module Licensed
         @lockfile_path ||= gemfile_path.dirname.join("#{gemfile_path.basename}.lock")
       end
 
+      # Returns the configured bundler executable to use, or "bundle" by default.
+      def bundler_exe
+        @bundler_exe ||= begin
+          exe = @config.dig("rubygem", "bundler_exe")
+          return "bundle" unless exe
+          return exe if Licensed::Shell.tool_available?(exe)
+          @config.root.join(exe)
+        end
+      end
+
+      # Determines if the configured bundler executable is available and returns
+      # shell command args with or without `bundle exec` depending on availability.
+      def ruby_command_args(*args)
+        return Array(args) unless Licensed::Shell.tool_available?(bundler_exe)
+        [bundler_exe, "exec", *args]
+      end
+
       private
 
       # helper to clear all bundler environment around a yielded block
@@ -187,6 +204,26 @@ module Licensed
           # of the ruby-packer filesystem.  this is needed to find spec sources
           # from the host filesystem
           ENV["ENCLOSE_IO_RUBYC_1ST_PASS"] = "1"
+          ruby_version = Gem::ConfigMap[:ruby_version]
+
+          if Licensed::Shell.tool_available?("ruby")
+            # set the ruby version in Gem::ConfigMap to the ruby version from the host.
+            # this helps Bundler find the correct spec sources and paths
+            Gem::ConfigMap[:ruby_version] = host_ruby_version
+          else
+            # running a ruby-packer-built licensed exe when ruby and bundler aren't available
+            # is possible but could lead to errors if the host ruby version doesn't
+            # match the built executable's ruby version
+            @config.ui.warn <<~WARNING
+              Ruby wasn't found when enumerating bundler
+              dependencies using the licensed executable.  This can cause a
+              ruby mismatch between licensed and bundled dependencies and a
+              failure to find gem specifications.
+
+              If licensed is unable to find gem specifications that you believe are present,
+              please ensure that ruby and bundler are available and try again.
+            WARNING
+          end
         end
 
         # reset all bundler configuration
@@ -199,6 +236,7 @@ module Licensed
         if ruby_packer?
           # if running under ruby-packer, restore environment after block is finished
           ENV.delete("ENCLOSE_IO_RUBYC_1ST_PASS")
+          Gem::ConfigMap[:ruby_version] = ruby_version
         end
 
         ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
@@ -210,6 +248,11 @@ module Licensed
       # Returns whether the current licensed execution is running ruby-packer
       def ruby_packer?
         @ruby_packer ||= RbConfig::TOPDIR =~ /__enclose_io_memfs__/
+      end
+
+      # Returns the ruby version found in the bundler environment
+      def host_ruby_version
+        Licensed::Shell.execute(*ruby_command_args("ruby", "-e", "puts Gem::ConfigMap[:ruby_version]"))
       end
     end
   end

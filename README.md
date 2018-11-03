@@ -91,16 +91,16 @@ See the [configuration file documentation](./docs/configuration.md) for more det
 
 ### Sources
 
-Dependencies will be automatically detected for
-1. [Bower](./docs/sources/bower.md)
+Dependencies will be automatically detected for all of the following sources by default.
+1. [Bower (bower)](./docs/sources/bower.md)
 2. [Bundler (rubygem)](./docs/sources/bundler.md)
-3. [Cabal](./docs/sources/cabal.md)
-4. [Go](./docs/sources/go.md)
-5. [Go Dep](./docs/sources/dep.md)
-6. [Manifest lists](./docs/sources/manifests.md)
-7. [NPM](./docs/sources/npm.md)
-8. [Pip](./docs/sources/pip.md)
-9. [Git Submodules](./docs/sources/git_submodule.md)
+3. [Cabal (cabal)](./docs/sources/cabal.md)
+4. [Go (go)](./docs/sources/go.md)
+5. [Go Dep (dep)](./docs/sources/dep.md)
+6. [Manifest lists (manifests)](./docs/sources/manifests.md)
+7. [NPM (npm)](./docs/sources/npm.md)
+8. [Pip (pip)](./docs/sources/pip.md)
+9. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
 
 You can disable any of them in the configuration file:
 

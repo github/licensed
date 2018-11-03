@@ -196,5 +196,35 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
     end
+
+    describe "bundler_exe" do
+      it "returns bundle if not configured" do
+        assert_equal "bundle", source.bundler_exe
+      end
+
+      it "returns the configured value if specifying an available tool" do
+        (config["rubygem"] ||= {})["bundler_exe"] = "ruby"
+        assert_equal "ruby", source.bundler_exe
+      end
+
+      it "returns the configured value relative to the configuration root" do
+        (config["rubygem"] ||= {})["bundler_exe"] = "lib/licensed.rb"
+        assert_equal config.root.join("lib/licensed.rb"), source.bundler_exe
+      end
+    end
+
+    describe "ruby_command_args" do
+      it "returns 'bundle exec args' when bundler exe is available'" do
+        Licensed::Shell.stub(:tool_available?, true) do
+          assert_equal "bundle exec test", source.ruby_command_args("test").join(" ")
+        end
+      end
+
+      it "returns args when bundler exe is not available'" do
+        Licensed::Shell.stub(:tool_available?, false) do
+          assert_equal "test", source.ruby_command_args("test").join(" ")
+        end
+      end
+    end
   end
 end

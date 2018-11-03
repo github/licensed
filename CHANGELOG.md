@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.5.1 - 2018-10-30
+
+### Fixed
+- Fixed a scenario where licensed wasn't finding bundler dependencies when run as an executable due to a ruby version mismatch (https://github.com/github/licensed/pull/106)
+
 ## 1.5.0 - 2018-10-24
 ### Added
 - `licensed (version | -v | --version)` command to see the current licensed version (:tada: @mwagz! https://github.com/github/licensed/pull/101)
@@ -99,4 +104,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.5.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.5.1...HEAD
