@@ -30,9 +30,7 @@ module Licensed
 
       # Returns an apps non-ignored dependencies, sorted by name
       def dependencies(app, source)
-        source.dependencies
-              .select { |d| !app.ignored?(d) }
-              .sort_by { |d| d.name }
+        source.dependencies.sort_by { |d| d.name }
       end
 
       def success?

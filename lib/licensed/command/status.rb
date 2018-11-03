@@ -14,14 +14,10 @@ module Licensed
         app.allowed?(dependency) || app.reviewed?(dependency)
       end
 
-      def app_dependencies(app)
-        app.sources.flat_map(&:dependencies).select { |d| !app.ignored?(d) }
-      end
-
       def run
         @results = @config.apps.flat_map do |app|
           Dir.chdir app.source_path do
-            dependencies = app_dependencies(app)
+            dependencies = app.sources.flat_map(&:dependencies)
             @config.ui.info "Checking licenses for #{app['name']}: #{dependencies.size} dependencies"
 
             results = dependencies.map do |dependency|

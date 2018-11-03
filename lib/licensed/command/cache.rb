@@ -25,11 +25,8 @@ module Licensed
               names = []
               cache_path = app.cache_path.join(type)
 
-              # exclude ignored dependencies
-              dependencies = source.dependencies.select { |d| !app.ignored?(d) }
-
               # ensure each dependency is cached
-              dependencies.each do |dependency|
+              source.dependencies.each do |dependency|
                 name = dependency.name
                 version = dependency["version"]
 
@@ -63,7 +60,7 @@ module Licensed
                 FileUtils.rm(file) unless names.include?(relative_path.chomp(".txt"))
               end
 
-              "* #{app_name} #{type} dependencies: #{dependencies.size}"
+              "* #{app_name} #{type} dependencies: #{source.dependencies.size}"
             end
           end
         end
