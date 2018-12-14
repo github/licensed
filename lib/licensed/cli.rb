@@ -37,6 +37,11 @@ module Licensed
       run Licensed::Command::Version.new
     end
 
+    # If an error occurs (e.g. a missing command or argument), exit 1.
+    def self.exit_on_failure?
+      true
+    end
+
     private
 
     # Returns a configuration object for the CLI command

@@ -82,4 +82,11 @@ describe "licensed" do
       assert_equal out, expected_out
     end
   end
+
+  describe "missing subcommand" do
+    it "exits 1 when a subcommand isn't defined" do
+      _, _, status = Open3.capture3 "bundle exec exe/licensed verify"
+      refute status.success?
+    end
+  end
 end
