@@ -20,7 +20,7 @@ This section covers the `Licensed::Sources::Source#enabled?` method.  This metho
 whether `Licensed::Source::Sources#enumerate_dependencies` should be called on the current dependency source object.
 
 Determining whether dependencies should be enumerated depends on whether all the tools or files needed to find dependencies are present.
-For example, to enumerate `npm` dependencies the `npm` CLI tool must be reachable and a `package.json` file needs to exist in the licensed app's configured [`source_path`](./configuration.md#configuration_paths).
+For example, to enumerate `npm` dependencies the `npm` CLI tool must be reachable and a `package.json` file needs to exist in the licensed app's configured [`source_path`](./configuration.md#configuration-paths).
 
 ## Enumerating dependencies
 
@@ -47,18 +47,18 @@ that share a license file, e.g. `github.com/go/pkg/1` and `github.com/go/pkg/2` 
 #### Required properties
 
 1. name
-  - The name of the dependency.
+   - The name of the dependency.
 2. version
-  - The current version of the dependency, used to determine when a dependency has changed.
+   - The current version of the dependency, used to determine when a dependency has changed.
 
 Together the name and the version should identify a unique dependency package that is used in a project.
 
 #### Optional properties
 
 1. summary
-  - A short description of the dependencies purpose.
+   - A short description of the dependencies purpose.
 2. homepage
-  - The dependency's homepage.
+   - The dependency's homepage.
 3. search_root
-  - The root of the directory hierarchy to search for a license file.
+   - The root of the directory hierarchy to search for a license file.
 4. Any other information that you find useful for reviewing or auditing dependencies.
