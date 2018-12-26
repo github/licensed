@@ -26,7 +26,7 @@ describe Licensed::Sources::Dep do
   describe "packages" do
     it "returns package information from Gopkg.lock" do
       Dir.chdir fixtures do
-        package = source.packages.detect { |package| package[:name] == "github.com/gorilla/context" }
+        package = source.packages.detect { |pkg| pkg[:name] == "github.com/gorilla/context" }
         assert package
         assert "github.com/gorilla/context", package[:project]
         assert package[:version]

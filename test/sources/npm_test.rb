@@ -85,7 +85,7 @@ if Licensed::Shell.tool_available?("npm")
 
         it "does not include version in the dependency path for a single unique version" do
           Dir.chdir fixtures do
-            dep = @source.dependencies.detect { |dep| dep["name"] == "wrappy" }
+            dep = @source.dependencies.detect { |d| d["name"] == "wrappy" }
             assert_equal "wrappy", dep.name
           end
         end
