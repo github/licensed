@@ -51,16 +51,16 @@ module Licensed
         raise DependencyEnumerationNotImplementedError
       end
 
+      # Returns whether a dependency is ignored in the configuration.
+      def ignored?(dependency)
+        config.ignored?("type" => self.class.type, "name" => dependency["name"])
+      end
+
       private
 
       # Returns a cached list of dependencies
       def cached_dependencies
         @dependencies ||= enumerate_dependencies.compact
-      end
-
-      # Returns whether a dependency is ignored in the configuration.
-      def ignored?(dependency)
-        config.ignored?("type" => self.class.type, "name" => dependency["name"])
       end
     end
   end
