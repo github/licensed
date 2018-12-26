@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Licensed
   module Sources
     require "licensed/sources/source"
