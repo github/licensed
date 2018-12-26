@@ -20,15 +20,8 @@ module Licensed
 
       def dependencies
         @dependencies ||= with_configured_gopath do
-          packages.map do |package_name|
-            package = package_info(package_name)
-            import_path = non_vendored_import_path(package_name)
-
-            if package.empty?
-              next if @config.ignored?("type" => Go.type, "name" => package_name)
-              raise "couldn't find package for #{import_path}"
-            end
-
+          packages.map do |package|
+            import_path = non_vendored_import_path(package["ImportPath"])
             package_dir = package["Dir"]
             Dependency.new(package_dir, {
               "type"        => Go.type,
@@ -38,7 +31,7 @@ module Licensed
               "search_root" => search_root(package_dir),
               "version"     => package_version(package_dir)
             })
-          end.compact
+          end
         end
       end
 
@@ -72,15 +65,20 @@ module Licensed
         # don't include packages under the root project that aren't vendored
         root_package["Deps"]
           .uniq
-          .select { |d| !go_std_packages.include?(d) }
-          .select { |d| !d.start_with?(root_package["ImportPath"]) || vendored_path?(d) }
-          .select do |d|
-          # this removes the packages listed in `go list std` as "vendor/golang_org/*" but are vendored
-          # as "vendor/golang.org/*"
-            go_std_packages.none? do |std_pkg|
-              std_pkg.sub(%r{^vendor/golang_org/}, "#{root_package["ImportPath"]}/vendor/golang.org/") == d
-            end
-          end
+          .reject { |name| @config.ignored?("type" => Go.type, "name" => name) }
+          .reject { |pkg| go_std_package?(pkg) }
+          .reject { |pkg| d.start_with?(root_package["ImportPath"]) && !vendored_path?(d) }
+          .map { |name| package_info(name) }
+      end
+
+      # Returns whether the given package import path belongs to the
+      # go std library or not
+      #
+      # import_path - package import path to check
+      def go_std_package?(import_path)
+        # modify the import path to look like the import path `go list` returns for vendored std packages
+        std_vendor_import_path = import_path.sub(%r{^#{root_package["ImportPath"]}/vendor/golang.org}, "vendor/golang_org")
+        go_std_packages.include?(import_path) || go_std_packages.include?(std_vendor_import_path)
       end
 
       # Returns the root directory to search for a package license
@@ -116,9 +114,7 @@ module Licensed
       #
       # package - Go package import path
       def package_info(package = nil)
-        info = package_info_command(package)
-        return {} if info.empty?
-        JSON.parse(info)
+        JSON.parse(package_info_command(package))
       end
 
       # Returns package information as a JSON string
@@ -126,7 +122,7 @@ module Licensed
       # package - Go package import path
       def package_info_command(package)
         package ||= ""
-        Licensed::Shell.execute("go", "list", "-json", package, allow_failure: true)
+        Licensed::Shell.execute("go", "list", "-json", package).strip
       end
 
       # Returns the info for the package under test
