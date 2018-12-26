@@ -35,28 +35,6 @@ module Licensed
         end
       end
 
-      # Returns the most recent git SHA for a package, or nil if SHA is
-      # not available
-      #
-      # package_directory - package location
-      def package_version(package_directory)
-        return unless package_directory
-
-        Dir.chdir package_directory do
-          Licensed::Git.version(".")
-        end
-      end
-
-      # Returns the homepage for a package import_path.  Assumes that the
-      # import path itself is a url domain and path
-      def homepage(import_path)
-        return unless import_path
-
-        # hacky but generally works due to go packages looking like
-        # "github.com/..." or "golang.org/..."
-        "https://#{import_path}"
-      end
-
       # Returns an array of dependency package import paths
       def packages
         return [] unless root_package["Deps"]
@@ -79,6 +57,28 @@ module Licensed
         # modify the import path to look like the import path `go list` returns for vendored std packages
         std_vendor_import_path = import_path.sub(%r{^#{root_package["ImportPath"]}/vendor/golang.org}, "vendor/golang_org")
         go_std_packages.include?(import_path) || go_std_packages.include?(std_vendor_import_path)
+      end
+
+      # Returns the most recent git SHA for a package, or nil if SHA is
+      # not available
+      #
+      # package_directory - package location
+      def package_version(package_directory)
+        return unless package_directory
+
+        Dir.chdir package_directory do
+          Licensed::Git.version(".")
+        end
+      end
+
+      # Returns the homepage for a package import_path.  Assumes that the
+      # import path itself is a url domain and path
+      def homepage(import_path)
+        return unless import_path
+
+        # hacky but generally works due to go packages looking like
+        # "github.com/..." or "golang.org/..."
+        "https://#{import_path}"
       end
 
       # Returns the root directory to search for a package license
