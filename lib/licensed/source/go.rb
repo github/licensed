@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require "json"
-require "English"
 require "pathname"
 
 module Licensed
@@ -20,15 +19,8 @@ module Licensed
 
       def dependencies
         @dependencies ||= with_configured_gopath do
-          packages.map do |package_name|
-            package = package_info(package_name)
-            import_path = non_vendored_import_path(package_name)
-
-            if package.empty?
-              next if @config.ignored?("type" => Go.type, "name" => package_name)
-              raise "couldn't find package for #{import_path}"
-            end
-
+          packages.map do |package|
+            import_path = non_vendored_import_path(package["ImportPath"])
             package_dir = package["Dir"]
             Dependency.new(package_dir, {
               "type"        => Go.type,
@@ -36,19 +28,88 @@ module Licensed
               "summary"     => package["Doc"],
               "homepage"    => homepage(import_path),
               "search_root" => search_root(package_dir),
-              "version"     => package_version(package_dir)
+              "version"     => package_version(package)
             })
-          end.compact
+          end
         end
       end
 
-      # Returns the most recent git SHA for a package, or nil if SHA is
-      # not available
+      # Returns an array of dependency package import paths
+      def packages
+        dependency_packages = if go_version < Gem::Version.new("1.11.0")
+          root_package_deps
+        else
+          go_list_deps
+        end
+
+        # don't include go std packages
+        # don't include packages under the root project that aren't vendored
+        dependency_packages
+          .reject { |pkg| go_std_package?(pkg) }
+          .reject { |pkg| local_package?(pkg) }
+      end
+
+      # Returns non-ignored packages found from the root packages "Deps" property
+      def root_package_deps
+        # check for ignored packages to avoid raising errors calling `go list`
+        # when ignored package is not found
+        Array(root_package["Deps"])
+          .reject { |name| @config.ignored?("type" => Go.type, "name" => name) }
+          .map { |name| package_info(name) }
+      end
+
+      # Returns the list of dependencies as returned by "go list -json -deps"
+      # available in go 1.11
+      def go_list_deps
+        @go_list_deps ||= begin
+          deps = package_info_command("-deps")
+          # the CLI command returns packages in a pretty-printed JSON format but
+          # not separated by commas. this gsub adds commas after all non-indented
+          # "}" that close root level objects.
+          # (?!\z) uses negative lookahead to not match the final "}"
+          deps.gsub!(/^}(?!\z)$/m, "},")
+          JSON.parse("[#{deps}]")
+            .reject { |pkg| @config.ignored?("type" => Go.type, "name" => pkg["ImportPath"]) }
+            .each { |pkg| raise pkg.dig("Error", "Err") if pkg["Error"] }
+        end
+      end
+
+      # Returns whether the given package import path belongs to the
+      # go std library or not
       #
-      # package_directory - package location
-      def package_version(package_directory)
+      # package - package to check as part of the go standard library
+      def go_std_package?(package)
+        return false unless package
+        return true if package["Standard"]
+
+        import_path = package["ImportPath"]
+        return false unless import_path
+
+        # modify the import path to look like the import path `go list` returns for vendored std packages
+        std_vendor_import_path = import_path.sub(%r{^#{root_package["ImportPath"]}/vendor/golang.org}, "vendor/golang_org")
+        go_std_packages.include?(import_path) || go_std_packages.include?(std_vendor_import_path)
+      end
+
+      # Returns whether the package is local to the current project
+      def local_package?(package)
+        return false unless package && package["ImportPath"]
+        import_path = package["ImportPath"]
+        import_path.start_with?(root_package["ImportPath"]) && !vendored_path?(import_path)
+      end
+
+      # Returns the version for a given package
+      #
+      # package - package to get version of
+      def package_version(package)
+        # use module version if it exists
+        go_mod = package["Module"]
+        return go_mod["Version"] if go_mod
+
+        package_directory = package["Dir"]
         return unless package_directory
 
+        # find most recent git SHA for a package, or nil if SHA is
+        # not available
         Dir.chdir package_directory do
           Licensed::Git.version(".")
         end
@@ -62,25 +123,6 @@ module Licensed
         # hacky but generally works due to go packages looking like
         # "github.com/..." or "golang.org/..."
         "https://#{import_path}"
-      end
-
-      # Returns an array of dependency package import paths
-      def packages
-        return [] unless root_package["Deps"]
-
-        # don't include go std packages
-        # don't include packages under the root project that aren't vendored
-        root_package["Deps"]
-          .uniq
-          .select { |d| !go_std_packages.include?(d) }
-          .select { |d| !d.start_with?(root_package["ImportPath"]) || vendored_path?(d) }
-          .select do |d|
-          # this removes the packages listed in `go list std` as "vendor/golang_org/*" but are vendored
-          # as "vendor/golang.org/*"
-            go_std_packages.none? do |std_pkg|
-              std_pkg.sub(%r{^vendor/golang_org/}, "#{root_package["ImportPath"]}/vendor/golang.org/") == d
-            end
-          end
       end
 
       # Returns the root directory to search for a package license
@@ -112,31 +154,28 @@ module Licensed
         import_path.split("vendor/")[1]
       end
 
-      # Returns package information, or {} if package isn't found
+      # Returns a hash of information about the package with a given import path
       #
-      # package - Go package import path
-      def package_info(package = nil)
-        info = package_info_command(package)
-        return {} if info.empty?
-        JSON.parse(info)
+      # import_path - Go package import path
+      def package_info(import_path)
+        JSON.parse(package_info_command(import_path))
       end
 
       # Returns package information as a JSON string
       #
-      # package - Go package import path
-      def package_info_command(package)
-        package ||= ""
-        Licensed::Shell.execute("go", "list", "-json", package, allow_failure: true)
+      # args - additional arguments to `go list`, e.g. Go package import path
+      def package_info_command(*args)
+        Licensed::Shell.execute("go", "list", "-json", *Array(args)).strip
       end
 
       # Returns the info for the package under test
       def root_package
-        @root_package ||= package_info
+        @root_package ||= package_info(".")
       end
 
       # Returns whether go source is found
       def go_source?
-        @go_source ||= with_configured_gopath { Licensed::Shell.success?("go", "doc") }
+        with_configured_gopath { Licensed::Shell.success?("go", "doc") }
       end
 
       # Returns a list of go standard packages
@@ -160,6 +199,15 @@ module Licensed
                            end
                     File.expand_path(path, root)
                   end
+      end
+
+      # Returns the current version of go available, as a Gem::Version
+      def go_version
+        @go_version ||= begin
+          full_version = Licensed::Shell.execute("go", "version").strip
+          version_string = full_version.gsub(%r{.*go(\d+\.\d+(\.\d+)?).*}, "\\1")
+          Gem::Version.new(version_string)
+        end
       end
 
       private
