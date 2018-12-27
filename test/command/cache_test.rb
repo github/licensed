@@ -3,7 +3,7 @@ require "test_helper"
 
 describe Licensed::Command::Cache do
   let(:config) { Licensed::Configuration.new }
-  let(:source) { TestSource.new }
+  let(:source) { TestSource.new(config) }
   let(:generator) { Licensed::Command::Cache.new(config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
@@ -21,11 +21,12 @@ describe Licensed::Command::Cache do
     end
   end
 
-  each_source do |source_type|
-    describe "with #{source_type}" do
-      let(:config_file) { File.join(fixtures, "command/#{source_type.to_s.downcase}.yml") }
+  each_source do |source_class|
+    describe "with #{source_class.type}" do
+      let(:source_type) { source_class.type }
+      let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
-      let(:source) { Licensed::Source.const_get(source_type).new(config) }
+      let(:source) { source_class.new(config) }
       let(:expected_dependency) { config["expected_dependency"] }
 
       it "extracts license info" do
@@ -35,7 +36,7 @@ describe Licensed::Command::Cache do
 
           generator.run
 
-          path = app.cache_path.join("#{source.class.type}/#{expected_dependency}.txt")
+          path = app.cache_path.join("#{source_type}/#{expected_dependency}.txt")
           assert path.exist?
           license = Licensed::License.read(path)
           assert_equal expected_dependency, license["name"]
@@ -88,7 +89,7 @@ describe Licensed::Command::Cache do
       "type"     => TestSource.type,
       "name"     => "dependency"
     })
-    source.stub(:create_dependency, test_dependency) do
+    source.stub(:enumerate_dependencies, [test_dependency]) do
       generator.run
     end
 
@@ -111,7 +112,7 @@ describe Licensed::Command::Cache do
       "name"     => "dependency",
       "version"  => ""
     })
-    source.stub(:create_dependency, test_dependency) do
+    source.stub(:enumerate_dependencies, [test_dependency]) do
       generator.run
     end
 
@@ -168,7 +169,7 @@ describe Licensed::Command::Cache do
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new("path" => "dependency/path") }
+    let(:source) { TestSource.new(config, "path" => "dependency/path") }
 
     it "caches metadata at the given file path" do
       generator.run

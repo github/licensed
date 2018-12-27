@@ -3,10 +3,10 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("ghc")
-  describe Licensed::Source::Cabal do
+  describe Licensed::Sources::Cabal do
     let(:fixtures) { File.expand_path("../../fixtures/cabal", __FILE__) }
     let(:config) { Licensed::Configuration.new }
-    let(:source) { Licensed::Source::Cabal.new(config) }
+    let(:source) { Licensed::Sources::Cabal.new(config) }
 
     describe "enabled?" do
       it "is true if cabal packages exist" do

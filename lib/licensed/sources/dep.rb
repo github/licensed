@@ -2,16 +2,8 @@
 require "tomlrb"
 
 module Licensed
-  module Source
-    class Dep
-      def self.type
-        "dep"
-      end
-
-      def initialize(config)
-        @config = config
-      end
-
+  module Sources
+    class Dep < Source
       def enabled?
         go_dep_available?
       end

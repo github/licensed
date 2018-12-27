@@ -3,22 +3,14 @@ require "json"
 require "pathname"
 
 module Licensed
-  module Source
-    class Go
-      def self.type
-        "go"
-      end
-
-      def initialize(config)
-        @config = config
-      end
-
+  module Sources
+    class Go < Source
       def enabled?
         Licensed::Shell.tool_available?("go") && go_source?
       end
 
-      def dependencies
-        @dependencies ||= with_configured_gopath do
+      def enumerate_dependencies
+        with_configured_gopath do
           packages.map do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
             package_dir = package["Dir"]

@@ -27,7 +27,7 @@ task :setup, [:arguments] do |task, args|
   end
 end
 
-sources_search = File.expand_path("lib/licensed/source/*.rb", __dir__)
+sources_search = File.expand_path("lib/licensed/sources/*.rb", __dir__)
 sources = Dir[sources_search].map { |f| File.basename(f, ".*") }
 
 namespace :test do
@@ -47,7 +47,7 @@ namespace :test do
 
       # use negative lookahead to exclude all source tests except
       # the tests for `source`
-      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/source\/(?!#{source}).*?_test.rb/,
+      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/sources\/(?!#{source}).*?_test.rb/,
                                                            "test/fixtures/**/*_test.rb")
     end
   end

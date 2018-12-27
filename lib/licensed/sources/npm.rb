@@ -2,22 +2,18 @@
 require "json"
 
 module Licensed
-  module Source
-    class NPM
+  module Sources
+    class NPM < Source
       def self.type
         "npm"
-      end
-
-      def initialize(config)
-        @config = config
       end
 
       def enabled?
         Licensed::Shell.tool_available?("npm") && File.exist?(@config.pwd.join("package.json"))
       end
 
-      def dependencies
-        @dependencies ||= packages.map do |name, package|
+      def enumerate_dependencies
+        packages.map do |name, package|
           path = package["path"]
           fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(path, {

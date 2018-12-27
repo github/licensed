@@ -2,10 +2,10 @@
 require "test_helper"
 require "tmpdir"
 
-describe Licensed::Source::Manifest do
+describe Licensed::Sources::Manifest do
   let(:fixtures) { File.expand_path("../../fixtures/manifest", __FILE__) }
   let(:config) { Licensed::Configuration.new("cache_path" => fixtures) }
-  let(:source) { Licensed::Source::Manifest.new(config) }
+  let(:source) { Licensed::Sources::Manifest.new(config) }
 
   describe "enabled?" do
     it "is true if manifest file exists" do
@@ -226,26 +226,26 @@ describe Licensed::Source::Manifest do
 
     it "finds files for a single pattern" do
       files = source.files_from_pattern_list(["lib/**/*.rb"])
-      assert files.include?("lib/licensed/source/manifest.rb")
+      assert files.include?("lib/licensed/sources/manifest.rb")
       assert files.include?("lib/licensed/command/list.rb")
       refute files.include?("test/command/cache_test.rb")
     end
 
     it "finds files for an array of patterns" do
       files = source.files_from_pattern_list(["lib/**/manifest.rb", "lib/**/list.rb"])
-      assert files.include?("lib/licensed/source/manifest.rb")
+      assert files.include?("lib/licensed/sources/manifest.rb")
       assert files.include?("lib/licensed/command/list.rb")
     end
 
     it "finds files for a directory pattern" do
-      files = source.files_from_pattern_list(["lib/**/source/*"])
-      assert files.include?("lib/licensed/source/manifest.rb")
-      assert files.include?("lib/licensed/source/bundler.rb")
+      files = source.files_from_pattern_list(["lib/**/sources/*"])
+      assert files.include?("lib/licensed/sources/manifest.rb")
+      assert files.include?("lib/licensed/sources/bundler.rb")
     end
 
     it "understands exclusion patterns" do
-      files = source.files_from_pattern_list(["lib/**/source/*", "!**/manifest.rb"])
-      refute files.include?("lib/licensed/source/manifest.rb")
+      files = source.files_from_pattern_list(["lib/**/sources/*", "!**/manifest.rb"])
+      refute files.include?("lib/licensed/sources/manifest.rb")
     end
 
     it "finds filenames starting with \".\"" do

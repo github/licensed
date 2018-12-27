@@ -3,10 +3,10 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("bundle")
-  describe Licensed::Source::Bundler do
+  describe Licensed::Sources::Bundler do
     let(:fixtures) { File.expand_path("../../fixtures/bundler", __FILE__) }
     let(:config) { Licensed::Configuration.new }
-    let(:source) { Licensed::Source::Bundler.new(config) }
+    let(:source) { Licensed::Sources::Bundler.new(config) }
 
     before do
       @original_bundle_gemfile = ENV["BUNDLE_GEMFILE"]

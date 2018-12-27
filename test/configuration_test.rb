@@ -109,21 +109,21 @@ describe Licensed::Configuration do
     end
 
     it "returns true if no source types are configured" do
-      Licensed::AppConfiguration::SOURCE_TYPES.each do |source|
+      Licensed::Sources::Source.sources.each do |source|
         assert config.enabled?(source.type)
       end
     end
 
     it "returns true for source types that are not disabled, if no sources are configured enabled" do
       config["sources"]["npm"] = false
-      Licensed::AppConfiguration::SOURCE_TYPES - [Licensed::Source::NPM].each do |source_type|
+      Licensed::Sources::Source.sources - [Licensed::Sources::NPM].each do |source_type|
         assert config.enabled?(source_type)
       end
     end
 
     it "returns false for source types that are not enabled, if any sources are configured enabled" do
       config["sources"]["npm"] = true
-      Licensed::AppConfiguration::SOURCE_TYPES - [Licensed::Source::NPM].each do |source_type|
+      Licensed::Sources::Source.sources - [Licensed::Sources::NPM].each do |source_type|
         refute config.enabled?(source_type)
       end
     end

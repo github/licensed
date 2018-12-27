@@ -3,10 +3,10 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("bower")
-  describe Licensed::Source::Bower do
+  describe Licensed::Sources::Bower do
     let(:fixtures) { File.expand_path("../../fixtures/bower", __FILE__) }
     let(:config) { Licensed::Configuration.new }
-    let(:source) { Licensed::Source::Bower.new(config) }
+    let(:source) { Licensed::Sources::Bower.new(config) }
 
     describe "enabled?" do
       it "is true if .bowerrc exists" do

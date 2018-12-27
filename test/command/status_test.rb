@@ -3,7 +3,7 @@ require "test_helper"
 
 describe Licensed::Command::Status do
   let(:config) { Licensed::Configuration.new }
-  let(:source) { TestSource.new }
+  let(:source) { TestSource.new(config) }
   let(:verifier) { Licensed::Command::Status.new(config) }
 
   before do
@@ -83,7 +83,7 @@ describe Licensed::Command::Status do
   end
 
   it "warns if versions do not match" do
-    verifier.app_dependencies(config.apps.first).first["version"] = "nope"
+    source.dependencies.first["version"] = "nope"
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data out of date/, out)
   end
@@ -148,7 +148,7 @@ describe Licensed::Command::Status do
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new("path" => "dependency/path") }
+    let(:source) { TestSource.new(config, "path" => "dependency/path") }
 
     it "verifies content at explicit path" do
       filename = config.cache_path.join("test/dependency/path.txt")

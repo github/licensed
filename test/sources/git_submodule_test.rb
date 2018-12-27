@@ -3,10 +3,10 @@ require "test_helper"
 require "tmpdir"
 
 if Licensed::Shell.tool_available?("git")
-  describe Licensed::Source::GitSubmodule do
+  describe Licensed::Sources::GitSubmodule do
     let(:fixtures) { File.expand_path("../../fixtures/git_submodule/project", __FILE__) }
     let(:config) { Licensed::Configuration.new }
-    let(:source) { Licensed::Source::GitSubmodule.new(config) }
+    let(:source) { Licensed::Sources::GitSubmodule.new(config) }
     let(:submodule_repo_path) { File.expand_path("../submodule", fixtures) }
     let(:recursive_repo_path) { File.expand_path("../nested", fixtures) }
 

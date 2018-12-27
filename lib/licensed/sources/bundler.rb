@@ -5,8 +5,8 @@ rescue LoadError
 end
 
 module Licensed
-  module Source
-    class Bundler
+  module Sources
+    class Bundler < Source
       GEMFILES = %w{Gemfile gems.rb}.freeze
       DEFAULT_WITHOUT_GROUPS = %i{development test}
 
@@ -14,16 +14,12 @@ module Licensed
         "rubygem"
       end
 
-      def initialize(config)
-        @config = config
-      end
-
       def enabled?
         defined?(::Bundler) && lockfile_path && lockfile_path.exist?
       end
 
-      def dependencies
-        @dependencies ||= with_local_configuration do
+      def enumerate_dependencies
+        with_local_configuration do
           specs.map do |spec|
             Licensed::Dependency.new(spec.gem_dir, {
               "type"     => Bundler.type,
