@@ -176,7 +176,7 @@ module Licensed
 
       # Returns whether go source is found
       def go_source?
-        @go_source ||= with_configured_gopath { Licensed::Shell.success?("go", "doc") }
+        with_configured_gopath { Licensed::Shell.success?("go", "doc") }
       end
 
       # Returns a list of go standard packages

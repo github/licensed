@@ -1,4 +1,7 @@
 expected_dependency: github.com/gorilla/context
-source_path: test/fixtures/go/src/test
 go:
   GOPATH: test/fixtures/go
+
+apps:
+  - source_path: test/fixtures/go/src/test
+  - source_path: test/fixtures/go
