@@ -30,17 +30,18 @@ describe Licensed::Command::Cache do
       let(:expected_dependency) { config["expected_dependency"] }
 
       it "extracts license info" do
-        Dir.chdir config.source_path do
-          skip "#{source_type} not available" unless source.enabled?
+        config.apps.each do |app|
+          enabled = Dir.chdir(app.source_path) { source.enabled? }
+          next unless enabled
+
+          generator.run
+
+          path = app.cache_path.join("#{source_type}/#{expected_dependency}.txt")
+          assert path.exist?
+          license = Licensed::License.read(path)
+          assert_equal expected_dependency, license["name"]
+          assert license["license"]
         end
-
-        generator.run
-
-        path = config.cache_path.join("#{source_type}/#{expected_dependency}.txt")
-        assert path.exist?
-        license = Licensed::License.read(path)
-        assert_equal expected_dependency, license["name"]
-        assert license["license"]
       end
     end
   end

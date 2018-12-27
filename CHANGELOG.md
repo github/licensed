@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.5.2 - 2018-12-27
+
+### Changes
+- Go source added support for Go modules and Golang 1.11+ (https://github.com/github/licensed/pull/113)
+
+### Fixed
+- Licensed will have a non-zero exit code when commands fail (:tada: @parkr https://github.com/github/licensed/pull/111)
+
 ## 1.5.1 - 2018-10-30
 
 ### Fixed
@@ -104,4 +112,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.5.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/1.5.2...HEAD

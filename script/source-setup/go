@@ -12,8 +12,20 @@ export GOPATH="$BASE_PATH/test/fixtures/go"
 cd $BASE_PATH/test/fixtures/go
 
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" -and -not -path "*/src/test*" -and -not -path "*/src" -print0 | xargs -0 rm -rf
+  find . -not -regex "\.*" \
+    -and -not -path "*/src/test*" \
+    -and -not -path "*/src/modules_test*" \
+    -and -not -path "*/pkg/mod*" \
+    -and -not -path "*/pkg" \
+    -and -not -path "*/src" \
+    -print0 | xargs -0 rm -rf
+
+  if go help mod >/dev/null; then
+    go clean -modcache
+  fi
 fi
 
-cd src/test
-go get
+(cd src/test && go get)
+if go help mod >/dev/null; then
+  (cd src/modules_test && GO111MODULE=on go mod download)
+fi

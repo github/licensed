@@ -23,13 +23,14 @@ describe Licensed::Command::List do
       let(:expected_dependency) { config["expected_dependency"] }
 
       it "lists dependencies" do
-        Dir.chdir config.source_path do
-          skip "#{source_type} not available" unless source.enabled?
-        end
+        config.apps.each do |app|
+          enabled = Dir.chdir(app.source_path) { source.enabled? }
+          next unless enabled
 
-        out, = capture_io { command.run }
-        assert_match(/Found #{expected_dependency}/, out)
-        assert_match(/#{source_type} dependencies:/, out)
+          out, = capture_io { command.run }
+          assert_match(/Found #{expected_dependency}/, out)
+          assert_match(/#{source_type} dependencies:/, out)
+        end
       end
     end
   end
