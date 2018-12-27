@@ -59,6 +59,13 @@ if Licensed::Shell.tool_available?("go")
     end
 
     describe "dependencies" do
+      it "does not include the current package" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"].end_with?("test") }
+          refute dep
+        end
+      end
+
       it "includes direct dependencies" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
@@ -78,7 +85,7 @@ if Licensed::Shell.tool_available?("go")
         end
       end
 
-      it "doesn't include depenencies from the go std library" do
+      it "doesn't include dependencies from the go std library" do
         Dir.chdir fixtures do
           refute source.dependencies.any? { |d| d["name"] == "runtime" }
         end
@@ -149,19 +156,39 @@ if Licensed::Shell.tool_available?("go")
       end
 
       describe "package version" do
-        it "is nil when git is unavailable" do
-          Dir.chdir fixtures do
-            Licensed::Git.stub(:available?, false) do
-              dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
-              assert_nil dep["version"]
+        describe "with go module information" do
+          let(:fixtures) { File.join(gopath, "src/modules_test") }
+
+          it "is the module version" do
+            skip unless source.go_version >= Gem::Version.new("1.11.0")
+
+            begin
+              ENV["GO111MODULE"] = "on"
+              Dir.chdir fixtures do
+                dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+                assert_equal "v1.1.1", dep["version"]
+              end
+            ensure
+              ENV["GO111MODULE"] = nil
             end
           end
         end
 
-        it "is the latest git SHA of the package directory" do
-          Dir.chdir fixtures do
-            dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
-            assert_match(/[a-f0-9]{40}/, dep["version"])
+        describe "without go module information" do
+          it "is nil when git is unavailable" do
+            Dir.chdir fixtures do
+              Licensed::Git.stub(:available?, false) do
+                dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+                assert_nil dep["version"]
+              end
+            end
+          end
+
+          it "is the latest git SHA of the package directory" do
+            Dir.chdir fixtures do
+              dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+              assert_match(/[a-f0-9]{40}/, dep["version"])
+            end
           end
         end
       end
