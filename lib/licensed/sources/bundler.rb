@@ -10,10 +10,6 @@ module Licensed
       GEMFILES = %w{Gemfile gems.rb}.freeze
       DEFAULT_WITHOUT_GROUPS = %i{development test}
 
-      def self.type
-        "rubygem"
-      end
-
       def enabled?
         defined?(::Bundler) && lockfile_path && lockfile_path.exist?
       end
@@ -154,8 +150,7 @@ module Licensed
       # Defaults to [:development, :test] + ::Bundler.settings[:without]
       def exclude_groups
         @exclude_groups ||= begin
-          exclude = Array(@config.dig("rubygem", "without"))
-          exclude = Array(@config.dig("rubygems", "without")) if exclude.empty? # :sad:
+          exclude = Array(@config.dig("bundler", "without"))
           exclude = DEFAULT_WITHOUT_GROUPS if exclude.empty?
           exclude.uniq.map(&:to_sym)
         end
@@ -176,7 +171,7 @@ module Licensed
       # Returns the configured bundler executable to use, or "bundle" by default.
       def bundler_exe
         @bundler_exe ||= begin
-          exe = @config.dig("rubygem", "bundler_exe")
+          exe = @config.dig("bundler", "bundler_exe")
           return "bundle" unless exe
           return exe if Licensed::Shell.tool_available?(exe)
           @config.root.join(exe)

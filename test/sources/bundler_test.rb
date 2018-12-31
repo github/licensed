@@ -139,7 +139,7 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       describe "when bundler is not explicitly listed as a dependency" do
-        let(:config) { Licensed::Configuration.new("rubygems" => { "without" => "bundler" }) }
+        let(:config) { Licensed::Configuration.new("bundler" => { "without" => "bundler" }) }
 
         it "does not include bundler as a dependency" do
           Dir.chdir(fixtures) do
@@ -150,7 +150,7 @@ if Licensed::Shell.tool_available?("bundle")
 
 
       describe "with excluded groups in the configuration" do
-        let(:config) { Licensed::Configuration.new("rubygems" => { "without" => "exclude" }) }
+        let(:config) { Licensed::Configuration.new("bundler" => { "without" => "exclude" }) }
 
         it "ignores gems in the excluded groups" do
           Dir.chdir(fixtures) do
@@ -203,12 +203,12 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       it "returns the configured value if specifying an available tool" do
-        (config["rubygem"] ||= {})["bundler_exe"] = "ruby"
+        (config["bundler"] ||= {})["bundler_exe"] = "ruby"
         assert_equal "ruby", source.bundler_exe
       end
 
       it "returns the configured value relative to the configuration root" do
-        (config["rubygem"] ||= {})["bundler_exe"] = "lib/licensed.rb"
+        (config["bundler"] ||= {})["bundler_exe"] = "lib/licensed.rb"
         assert_equal config.root.join("lib/licensed.rb"), source.bundler_exe
       end
     end

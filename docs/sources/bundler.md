@@ -1,4 +1,4 @@
-# Bundler (rubygem)
+# Bundler
 
 The bundler source will detect dependencies `Gemfile` and `Gemfile.lock` files are found at an apps `source_path`.  The source uses the `Bundler` API to enumerate dependencies from `Gemfile` and `Gemfile.lock`.
 
@@ -27,14 +27,14 @@ The bundler source determines which gem groups to include or exclude with the fo
 Strings and string arrays are both :+1:
 
 ```yml
-rubygem:
+bundler:
   without: development
 ```
 
 or
 
 ```yml
-rubygem:
+bundler:
   without:
     - build
     - development

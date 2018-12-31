@@ -6,7 +6,7 @@ describe Licensed::Configuration do
   let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
 
   before do
-    @package = {"type" => "rubygem", "name" => "bundler", "license" => "mit"}
+    @package = {"type" => "bundler", "name" => "bundler", "license" => "mit"}
   end
 
   it "accepts a license directory path option" do
