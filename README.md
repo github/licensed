@@ -61,10 +61,10 @@ Checking licenses for 3 dependencies
 
 Warnings:
 
-.licenses/rubygem/bundler.txt:
+.licenses/bundler/bundler.txt:
   - license needs reviewed: mit.
 
-.licenses/rubygem/licensee.txt:
+.licenses/bundler/licensee.txt:
   - cached license data missing
 
 .licenses/bower/jquery.txt:
@@ -93,7 +93,7 @@ See the [configuration file documentation](./docs/configuration.md) for more det
 
 Dependencies will be automatically detected for all of the following sources by default.
 1. [Bower (bower)](./docs/sources/bower.md)
-2. [Bundler (rubygem)](./docs/sources/bundler.md)
+2. [Bundler](./docs/sources/bundler.md)
 3. [Cabal (cabal)](./docs/sources/cabal.md)
 4. [Go (go)](./docs/sources/go.md)
 5. [Go Dep (dep)](./docs/sources/dep.md)
@@ -106,7 +106,7 @@ You can disable any of them in the configuration file:
 
 ```yml
 sources:
-  rubygem: false
+  bundler: false
   npm: false
   bower: false
   cabal: false
