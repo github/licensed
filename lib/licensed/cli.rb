@@ -8,8 +8,6 @@ module Licensed
     desc "cache", "Cache the licenses of dependencies"
     method_option :force, type: :boolean,
       desc: "Overwrite licenses even if version has not changed."
-    method_option :offline, type: :boolean,
-      desc: "This option is deprecated and will be removed in the next major release."
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def cache
