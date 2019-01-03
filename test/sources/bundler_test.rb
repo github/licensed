@@ -110,30 +110,30 @@ if Licensed::Shell.tool_available?("bundle")
     describe "dependencies" do
       it "finds dependencies from Gemfile" do
         Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d["name"] == "semantic" }
+          dep = source.dependencies.find { |d| d.name == "semantic" }
           assert dep
-          assert_equal "1.6.0", dep["version"]
+          assert_equal "1.6.0", dep.data["version"]
         end
       end
 
       it "finds platform-specific dependencies" do
         Dir.chdir(fixtures) do
-          assert source.dependencies.find { |d| d["name"] == "libv8" }
+          assert source.dependencies.find { |d| d.name == "libv8" }
         end
       end
 
       it "finds dependencies from path sources" do
         Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d["name"] == "pathed-gem-fixture" }
+          dep = source.dependencies.find { |d| d.name == "pathed-gem-fixture" }
           assert dep
-          assert_equal "0.0.1", dep["version"]
+          assert_equal "0.0.1", dep.data["version"]
         end
       end
 
       describe "when bundler is a listed dependency" do
         it "includes bundler as a dependency" do
           Dir.chdir(fixtures) do
-            assert source.dependencies.find { |d| d["name"] == "bundler" }
+            assert source.dependencies.find { |d| d.name == "bundler" }
           end
         end
       end
@@ -143,7 +143,7 @@ if Licensed::Shell.tool_available?("bundle")
 
         it "does not include bundler as a dependency" do
           Dir.chdir(fixtures) do
-            assert_nil source.dependencies.find { |d| d["name"] == "bundler" }
+            assert_nil source.dependencies.find { |d| d.name == "bundler" }
           end
         end
       end
@@ -154,21 +154,21 @@ if Licensed::Shell.tool_available?("bundle")
 
         it "ignores gems in the excluded groups" do
           Dir.chdir(fixtures) do
-            assert_nil source.dependencies.find { |d| d["name"] == "i18n" }
+            assert_nil source.dependencies.find { |d| d.name == "i18n" }
           end
         end
 
         it "does not ignore gems from development and test" do
           Dir.chdir(fixtures) do
             # test
-            dep = source.dependencies.find { |d| d["name"] == "minitest" }
+            dep = source.dependencies.find { |d| d.name == "minitest" }
             assert dep
-            assert_equal "5.11.3", dep["version"]
+            assert_equal "5.11.3", dep.data["version"]
 
             # dev
-            dep = source.dependencies.find { |d| d["name"] == "tzinfo" }
+            dep = source.dependencies.find { |d| d.name == "tzinfo" }
             assert dep
-            assert_equal "1.2.5", dep["version"]
+            assert_equal "1.2.5", dep.data["version"]
           end
         end
       end
@@ -176,23 +176,23 @@ if Licensed::Shell.tool_available?("bundle")
       it "ignores gems from development and test by default" do
         Dir.chdir(fixtures) do
           # test
-          assert_nil source.dependencies.find { |d| d["name"] == "minitest" }
+          assert_nil source.dependencies.find { |d| d.name == "minitest" }
 
           # dev
-          assert_nil source.dependencies.find { |d| d["name"] == "tzinfo" }
+          assert_nil source.dependencies.find { |d| d.name == "tzinfo" }
         end
       end
 
       it "ignores gems from bundler-configured 'without' groups" do
         Dir.chdir(fixtures) do
-          assert_nil source.dependencies.find { |d| d["name"] == "json" }
+          assert_nil source.dependencies.find { |d| d.name == "json" }
         end
       end
 
       it "ignores local gemspecs" do
         fixtures = File.expand_path("../../fixtures/bundler", __FILE__)
         Dir.chdir(fixtures) do
-          assert_nil source.dependencies.find { |d| d["name"] == "licensed" }
+          assert_nil source.dependencies.find { |d| d.name == "licensed" }
         end
       end
     end

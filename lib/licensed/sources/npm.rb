@@ -16,14 +16,17 @@ module Licensed
         packages.map do |name, package|
           path = package["path"]
           fail "couldn't locate #{name} under node_modules/" unless path
-          Dependency.new(path, {
-            "type"     => NPM.type,
-            "name"     => package["name"],
-            "version"  => package["version"],
-            "summary"  => package["description"],
-            "homepage" => package["homepage"],
-            "path"     => name
-          })
+          Dependency.new(
+            name: name,
+            path: path,
+            metadata: {
+              "type"     => NPM.type,
+              "name"     => package["name"],
+              "version"  => package["version"],
+              "summary"  => package["description"],
+              "homepage" => package["homepage"]
+            }
+          )
         end
       end
 

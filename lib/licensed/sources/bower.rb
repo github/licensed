@@ -14,13 +14,16 @@ module Licensed
         Dir.glob(bower_path.join("*/.bower.json")).map do |file|
           package = JSON.parse(File.read(file))
           path = bower_path.join(file).dirname.to_path
-          Dependency.new(path, {
-            "type"     => Bower.type,
-            "name"     => package["name"],
-            "version"  => package["version"] || package["_release"],
-            "summary"  => package["description"],
-            "homepage" => package["homepage"]
-          })
+          Dependency.new(
+            name: package["name"],
+            path: path,
+            metadata: {
+              "type"     => Bower.type,
+              "version"  => package["version"] || package["_release"],
+              "summary"  => package["description"],
+              "homepage" => package["homepage"]
+            }
+          )
         end
       end
 

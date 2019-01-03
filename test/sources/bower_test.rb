@@ -34,9 +34,9 @@ if Licensed::Shell.tool_available?("bower")
     describe "dependencies" do
       it "finds bower dependencies" do
         Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d["name"] == "jquery" }
+          dep = source.dependencies.find { |d| d.name == "jquery" }
           assert dep
-          assert_equal "2.1.4", dep["version"]
+          assert_equal "2.1.4", dep.data["version"]
         end
       end
     end

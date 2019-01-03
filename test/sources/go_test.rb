@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 require "tmpdir"
+require "byebug"
 
 if Licensed::Shell.tool_available?("go")
   describe Licensed::Sources::Go do
@@ -50,7 +51,7 @@ if Licensed::Shell.tool_available?("go")
 
           # sanity test that finding dependencies using ENV works
           Dir.chdir fixtures do
-            assert source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+            assert source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
           end
         ensure
           ENV["GOPATH"] = original_gopath
@@ -61,39 +62,64 @@ if Licensed::Shell.tool_available?("go")
     describe "dependencies" do
       it "does not include the current package" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d["name"].end_with?("test") }
+          dep = source.dependencies.detect { |d| d.name.end_with?("test") }
           refute dep
         end
       end
 
       it "includes direct dependencies" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
+          dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
           assert dep
-          assert_equal "go", dep["type"]
-          assert dep["homepage"]
-          assert dep["summary"]
+          assert_equal "go", dep.data["type"]
+          assert dep.data["homepage"]
+          assert dep.data["summary"]
         end
       end
 
       it "includes indirect dependencies" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru/simplelru" }
+          dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
           assert dep
-          assert_equal "go", dep["type"]
-          assert dep["homepage"]
+          assert_equal "go", dep.data["type"]
+          assert dep.data["homepage"]
         end
       end
 
       it "doesn't include dependencies from the go std library" do
         Dir.chdir fixtures do
-          refute source.dependencies.any? { |d| d["name"] == "runtime" }
+          refute source.dependencies.any? { |d| d.name == "runtime" }
         end
       end
 
       it "doesn't include vendored dependencies from the go std library" do
         Dir.chdir fixtures do
-          refute source.dependencies.any? { |d| d["name"] == "golang.org/x/net/http2/hpack" }
+          refute source.dependencies.any? { |d| d.name == "golang.org/x/net/http2/hpack" }
+        end
+      end
+
+      it "searches for license files under the vendor folder for vendored dependencies" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "github.com/davecgh/go-spew/spew" }
+          assert dep
+
+          # find the license one directory higher
+          license_path = File.join(fixtures, "vendor/github.com/davecgh/go-spew/LICENSE")
+          assert_includes dep.data.licenses, File.read(license_path)
+
+          # do not find the license outside the vendor folder
+          license_path = File.join(fixtures, "LICENSE")
+          refute_includes dep.data.licenses, File.read(license_path)
+        end
+      end
+
+      it "searches for license files in the folder hierarchy up to GOPATH" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
+          assert dep
+
+          license_path = File.join(gopath, "src/github.com/hashicorp/golang-lru/LICENSE")
+          assert_includes dep.data.licenses, File.read(license_path)
         end
       end
 
@@ -137,24 +163,6 @@ if Licensed::Shell.tool_available?("go")
         end
       end
 
-      describe "search root" do
-        it "is set to the vendor path for vendored packages" do
-          Dir.chdir fixtures do
-            dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
-            assert dep
-            assert_equal File.join(fixtures, "vendor"), dep.search_root
-          end
-        end
-
-        it "is set to #gopath" do
-          Dir.chdir fixtures do
-            dep = source.dependencies.detect { |d| d["name"] == "github.com/hashicorp/golang-lru" }
-            assert dep
-            assert_equal gopath, dep.search_root
-          end
-        end
-      end
-
       describe "package version" do
         describe "with go module information" do
           let(:fixtures) { File.join(gopath, "src/modules_test") }
@@ -165,8 +173,8 @@ if Licensed::Shell.tool_available?("go")
             begin
               ENV["GO111MODULE"] = "on"
               Dir.chdir fixtures do
-                dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
-                assert_equal "v1.1.1", dep["version"]
+                dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+                assert_equal "v1.1.1", dep.data["version"]
               end
             ensure
               ENV["GO111MODULE"] = nil
@@ -178,16 +186,16 @@ if Licensed::Shell.tool_available?("go")
           it "is nil when git is unavailable" do
             Dir.chdir fixtures do
               Licensed::Git.stub(:available?, false) do
-                dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
-                assert_nil dep["version"]
+                dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+                assert_nil dep.data["version"]
               end
             end
           end
 
           it "is the latest git SHA of the package directory" do
             Dir.chdir fixtures do
-              dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
-              assert_match(/[a-f0-9]{40}/, dep["version"])
+              dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+              assert_match(/[a-f0-9]{40}/, dep.data["version"])
             end
           end
         end

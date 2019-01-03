@@ -17,13 +17,16 @@ module Licensed
       def enumerate_dependencies
         with_local_configuration do
           specs.map do |spec|
-            Licensed::Dependency.new(spec.gem_dir, {
-              "type"     => Bundler.type,
-              "name"     => spec.name,
-              "version"  => spec.version.to_s,
-              "summary"  => spec.summary,
-              "homepage" => spec.homepage
-            })
+            Licensed::Dependency.new(
+              name: spec.name,
+              path: spec.gem_dir,
+              metadata: {
+                "type"     => Bundler.type,
+                "version"  => spec.version.to_s,
+                "summary"  => spec.summary,
+                "homepage" => spec.homepage
+              }
+            )
           end
         end
       end

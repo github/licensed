@@ -31,7 +31,7 @@ if Licensed::Shell.tool_available?("ghc")
           Dir.chdir(fixtures) do
             dep = nil
             capture_subprocess_io do
-              dep = source.dependencies.detect { |d| d["name"] == "zlib" }
+              dep = source.dependencies.detect { |d| d.name == "zlib" }
             end
             refute dep
           end
@@ -41,40 +41,40 @@ if Licensed::Shell.tool_available?("ghc")
       it "finds indirect dependencies" do
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d["name"] == "bytestring" }
+          dep = source.dependencies.detect { |d| d.name == "bytestring" }
           assert dep
-          assert_equal "cabal", dep["type"]
-          assert dep["homepage"]
-          assert dep["summary"]
+          assert_equal "cabal", dep.data["type"]
+          assert dep.data["homepage"]
+          assert dep.data["summary"]
         end
       end
 
       it "finds direct dependencies" do
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d["name"] == "zlib" }
+          dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep
-          assert_equal "cabal", dep["type"]
-          assert_equal "0.6.2", dep["version"]
-          assert dep["summary"]
+          assert_equal "cabal", dep.data["type"]
+          assert_equal "0.6.2", dep.data["version"]
+          assert dep.data["summary"]
         end
       end
 
       it "finds dependencies for executables" do
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d["name"] == "Glob" }
+          dep = source.dependencies.detect { |d| d.name == "Glob" }
           assert dep
-          assert_equal "cabal", dep["type"]
-          assert_equal "0.9.2", dep["version"]
-          assert dep["summary"]
+          assert_equal "cabal", dep.data["type"]
+          assert_equal "0.9.2", dep.data["version"]
+          assert dep.data["summary"]
         end
       end
 
       it "does not include the target project" do
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
-          refute source.dependencies.detect { |d| d["name"] == "app" }
+          refute source.dependencies.detect { |d| d.name == "app" }
         end
       end
     end

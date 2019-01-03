@@ -38,17 +38,17 @@ describe Licensed::Sources::Dep do
   describe "dependencies" do
     it "includes dependent packages" do
       Dir.chdir fixtures do
-        dep = source.dependencies.detect { |d| d["name"] == "github.com/gorilla/context" }
+        dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
         assert dep
-        assert_equal "dep", dep["type"]
-        assert_equal "https://github.com/gorilla/context", dep["homepage"]
+        assert_equal "dep", dep.data["type"]
+        assert_equal "https://github.com/gorilla/context", dep.data["homepage"]
       end
     end
 
     if Licensed::Shell.tool_available?("go")
       it "doesn't include vendored dependencies from the go std library" do
         Dir.chdir fixtures do
-          refute source.dependencies.any? { |d| d["name"] == "golang.org/x/net/http2/hpack" }
+          refute source.dependencies.any? { |d| d.name == "golang.org/x/net/http2/hpack" }
         end
       end
     end
@@ -56,7 +56,7 @@ describe Licensed::Sources::Dep do
     it "includes vendored dependencies from the go std library if go is not available" do
       Licensed::Shell.stub(:tool_available?, false) do
         Dir.chdir fixtures do
-          assert source.dependencies.any? { |d| d["name"] == "golang.org/x/net/http2/hpack" }
+          assert source.dependencies.any? { |d| d.name == "golang.org/x/net/http2/hpack" }
         end
       end
     end
@@ -77,6 +77,7 @@ describe Licensed::Sources::Dep do
 
       it "do not raise an error if ignored" do
         config.ignore("type" => "dep", "name" => "github.com/gorilla/context")
+        config.ignore("type" => "dep", "name" => "github.com/davecgh/go-spew/spew")
 
         Dir.chdir fixtures do
           source.dependencies

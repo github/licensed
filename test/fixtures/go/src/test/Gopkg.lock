@@ -2,19 +2,35 @@
 
 
 [[projects]]
+  digest = "1:2f7f7dc60a1e4160196e4ba7e773ace2ffd874fedcc4e79682863892d6362e1f"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "U"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
+  digest = "1:3060e60f436bf58e1324f1e6b70451a622cf0192d8a9a2f4497db99cc1a207d1"
   name = "github.com/gorilla/context"
   packages = ["."]
+  pruneopts = "U"
   revision = "14f550f51af52180c2eefed15e5fd18d63c0a64a"
 
 [[projects]]
   branch = "release-branch.go1.7"
+  digest = "1:040cf2b3003eda56429a11ab661cae8414d2df7d22a52eb36b54440de54c045d"
   name = "golang.org/x/net"
   packages = ["http2/hpack"]
+  pruneopts = "U"
   revision = "d4c55e66d8c3a2f3382d264b08e3e3454a66355a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "017fb1dca68a8986a61e255a9ff2ff4d146c111d3783971186f484fd3fa98a54"
+  input-imports = [
+    "github.com/davecgh/go-spew/spew",
+    "github.com/gorilla/context",
+    "golang.org/x/net/http2/hpack",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
