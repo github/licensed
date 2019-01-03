@@ -33,32 +33,29 @@ Relying on external tools always has a risk that the tool could change.  It's ge
 or other implementation details as these could change over time.  CLI tools that provides the necessary information are generally preferred
 as they will more likely have requirements for backwards compatibility.
 
-When enumerating dependencies, `licensed` requires a path to find a license file as well as a couple of properties.
-We also suggest a few optional properties that can make reviewing your cached dependency information easier.
+#### Creating dependency objects
 
-#### Finding a license file
+Creating a new `Licensed::Dependency` object requires name, version, and path arguments.  Dependency objects optionally accept a path to use as search root when finding licenses along with any other metadata that is useful to identify the dependency.
 
-`Licensed::Dependency#initialize` accepts a path argument which is used by [`Licensee`](https://github.com/benbalter/licensee) to find a license
-file for the dependency.  The path can be either a directory that contains the license file or the path to the file itself.
+##### `Licensed::Dependency` arguments
 
-In some cases the license file will be in a parent directory of the specified location.  This can happen for instance with Golang packages
-that share a license file, e.g. `github.com/go/pkg/1` and `github.com/go/pkg/2` might share a license at `github.com/go/pkg`.  In this case, license dependencies will accept an additional `search_root` optional property that denotes the root of the directory hierarchy that should be searched.  Directories will be examined in order from the given license location to the `search_root` location to prefer license files with more specificity, i.e. `github.com/go/pkg/1` will be searched before `github.com/go/pkg`.
-
-#### Required properties
-
-1. name
-   - The name of the dependency.
-2. version
-   - The current version of the dependency, used to determine when a dependency has changed.
-
-Together the name and the version should identify a unique dependency package that is used in a project.
-
-#### Optional properties
-
-1. summary
-   - A short description of the dependencies purpose.
-2. homepage
-   - The dependency's homepage.
-3. search_root
+1. name (required)
+   - The name of the dependency. Together with the version, this should uniquely identify the dependency.
+2. version (required)
+   - The current version of the dependency, used to determine when a dependency has changed. Together with the name, this should uniquely identify the dependency.
+3. path (required)
+   - A path used by [`Licensee`](https://github.com/benbalter/licensee) to find dependency license content.  Can be either a folder or a file.
+4. search_root (optional)
    - The root of the directory hierarchy to search for a license file.
-4. Any other information that you find useful for reviewing or auditing dependencies.
+5. metadata (optional)
+   - Any additional metadata that would be useful in identifying the dependency.
+   - suggested metadata
+      1. summary
+         - A short description of the dependencies purpose.
+      2. homepage
+         - The dependency's homepage.
+
+#### Finding licenses
+
+In some cases, license content will be in a parent directory of the specified location.  For instance, this can happen with Golang packages
+that share a license file, e.g. `github.com/go/pkg/1` and `github.com/go/pkg/2` might share a license at `github.com/go/pkg`.  In this case, create a `Licensed::Dependency` with the optional `search_root` property, which denotes the root of the directory hierarchy that should be searched.  Directories will be examined in order from the given license location to the `search_root` location to prefer license files with more specificity, i.e. `github.com/go/pkg/1` will be searched before `github.com/go/pkg`.
