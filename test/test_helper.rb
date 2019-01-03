@@ -5,9 +5,10 @@ require "licensed"
 require "English"
 
 class TestSource < Licensed::Sources::Source
-  def initialize(config, metadata = {})
+  def initialize(config, name = "dependency", metadata = {})
     super config
     @metadata = metadata
+    @name = name
   end
 
   def self.type
@@ -20,12 +21,15 @@ class TestSource < Licensed::Sources::Source
 
   def enumerate_dependencies
     [
-      Licensed::Dependency.new(Dir.pwd, {
-        "type"     => TestSource.type,
-        "name"     => "dependency",
-        "version"  => "1.0",
-        "dir"      => Dir.pwd
-      }.merge(@metadata))
+      Licensed::Dependency.new(
+        name: @name,
+        path: Dir.pwd,
+        metadata: {
+          "type"     => TestSource.type,
+          "version"  => "1.0",
+          "dir"      => Dir.pwd
+        }.merge(@metadata)
+      )
     ]
   end
 end

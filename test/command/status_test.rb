@@ -54,8 +54,7 @@ describe Licensed::Command::Status do
 
   it "warns if license is empty" do
     filename = config.cache_path.join("test/dependency.txt")
-    license = Licensed::License.read(filename)
-    license.text = ""
+    license = Licensed::License.new
     license.save(filename)
 
     out, _ = capture_io { verifier.run }
@@ -64,8 +63,7 @@ describe Licensed::Command::Status do
 
   it "warns if license is empty with notices" do
     filename = config.cache_path.join("test/dependency.txt")
-    license = Licensed::License.read(filename)
-    license.text = "#{Licensed::License::TEXT_SEPARATOR}notice"
+    license = Licensed::License.new(notices: ["notice"])
     license.save(filename)
 
     out, _ = capture_io { verifier.run }
@@ -74,8 +72,7 @@ describe Licensed::Command::Status do
 
   it "does not warn if license is not empty" do
     filename = config.cache_path.join("test/dependency.txt")
-    license = Licensed::License.read(filename)
-    license.text = "license"
+    license = Licensed::License.new(licenses: ["license"])
     license.save(filename)
 
     out, _ = capture_io { verifier.run }
@@ -83,7 +80,7 @@ describe Licensed::Command::Status do
   end
 
   it "warns if versions do not match" do
-    source.dependencies.first["version"] = "nope"
+    source.dependencies.first.data["version"] = "nope"
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data out of date/, out)
   end
@@ -143,17 +140,16 @@ describe Licensed::Command::Status do
 
     it "changes the current directory to app.source_path while running" do
       capture_io { verifier.run }
-      assert_equal fixtures, source.dependencies.first["dir"]
+      assert_equal fixtures, source.dependencies.first.data["dir"]
     end
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new(config, "path" => "dependency/path") }
+    let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency") }
 
     it "verifies content at explicit path" do
       filename = config.cache_path.join("test/dependency/path.txt")
-      license = Licensed::License.read(filename)
-      license.text = ""
+      license = Licensed::License.new
       license.save(filename)
 
       out, _ = capture_io { verifier.run }

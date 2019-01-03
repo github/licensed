@@ -85,10 +85,13 @@ describe Licensed::Command::Cache do
     license["license"] = "test"
     license.save(path)
 
-    test_dependency = Licensed::Dependency.new(Dir.pwd, {
-      "type"     => TestSource.type,
-      "name"     => "dependency"
-    })
+    test_dependency = Licensed::Dependency.new(
+      name: "dependency",
+      path: Dir.pwd,
+      metadata: {
+        "type"     => TestSource.type
+      }
+    )
     source.stub(:enumerate_dependencies, [test_dependency]) do
       generator.run
     end
@@ -107,11 +110,13 @@ describe Licensed::Command::Cache do
     license["version"] = ""
     license.save(path)
 
-    test_dependency = Licensed::Dependency.new(Dir.pwd, {
-      "type"     => TestSource.type,
-      "name"     => "dependency",
-      "version"  => ""
-    })
+    test_dependency = Licensed::Dependency.new(
+      name: "dependency",
+      path: Dir.pwd,
+      metadata: {
+        "type"     => TestSource.type
+      }
+    )
     source.stub(:enumerate_dependencies, [test_dependency]) do
       generator.run
     end
@@ -164,12 +169,12 @@ describe Licensed::Command::Cache do
 
     it "changes the current directory to app.source_path while running" do
       generator.run
-      assert_equal fixtures, source.dependencies.first["dir"]
+      assert_equal fixtures, source.dependencies.first.data["dir"]
     end
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new(config, "path" => "dependency/path") }
+    let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency") }
 
     it "caches metadata at the given file path" do
       generator.run

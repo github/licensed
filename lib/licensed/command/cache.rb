@@ -28,7 +28,7 @@ module Licensed
               # ensure each dependency is cached
               source.dependencies.each do |dependency|
                 name = dependency.name
-                version = dependency["version"]
+                version = dependency.data["version"]
 
                 names << name
                 filename = cache_path.join("#{name}.txt")
@@ -46,11 +46,10 @@ module Licensed
 
                 @config.ui.info "    Caching #{name} (#{version})"
 
-                dependency.detect_license!
                 # use the cached license value if the license text wasn't updated
-                dependency["license"] = license["license"] if dependency.license_text_match?(license)
+                dependency.data["license"] = license["license"] if dependency.data.matches?(license)
 
-                dependency.save(filename)
+                dependency.data.save(filename)
               end
 
               # Clean up cached files that dont match current dependencies
