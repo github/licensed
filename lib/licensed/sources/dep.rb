@@ -21,12 +21,12 @@ module Licensed
 
             Dependency.new(
               name: package[:name],
+              version: package[:version],
               path: package_dir.to_s,
               search_root: search_root.to_s,
               metadata: {
                 "type"        => Dep.type,
-                "homepage"    => "https://#{package[:name]}",
-                "version"     => package[:version]
+                "homepage"    => "https://#{package[:name]}"
               }
             )
           end

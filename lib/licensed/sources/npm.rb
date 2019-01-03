@@ -18,11 +18,11 @@ module Licensed
           fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(
             name: name,
+            version: package["version"],
             path: path,
             metadata: {
               "type"     => NPM.type,
               "name"     => package["name"],
-              "version"  => package["version"],
               "summary"  => package["description"],
               "homepage" => package["homepage"]
             }

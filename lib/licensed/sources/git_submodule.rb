@@ -30,11 +30,11 @@ module Licensed
 
           Licensed::Dependency.new(
             name: submodule_path,
+            version: version,
             path: @config.pwd.join(displaypath),
             metadata: {
               "type" => self.class.type,
               "name" => name,
-              "version" => version,
               "homepage" => homepage
             }
           )

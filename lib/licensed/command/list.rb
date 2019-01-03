@@ -19,7 +19,7 @@ module Licensed
 
               source_dependencies = dependencies(app, source)
               source_dependencies.each do |dependency|
-                @config.ui.info "    Found #{dependency.name} (#{dependency.data["version"]})"
+                @config.ui.info "    Found #{dependency.name} (#{dependency.version})"
               end
 
               @config.ui.confirm "  * #{type} dependencies: #{source_dependencies.size}"

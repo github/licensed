@@ -34,7 +34,7 @@ describe Licensed::Sources::Manifest do
       dep = source.dependencies.detect { |d| d.name == "manifest_test" }
       assert dep
       assert_equal "manifest", dep.data["type"]
-      assert dep.data["version"] # version comes from git, just make sure its there
+      assert dep.version # version comes from git, just make sure its there
     end
 
     it "uses a license specified in the configuration if provided" do

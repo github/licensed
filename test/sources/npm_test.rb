@@ -36,7 +36,7 @@ if Licensed::Shell.tool_available?("npm")
           dep = @source.dependencies.detect { |d| d.name == "autoprefixer" }
           assert dep
           assert_equal "npm", dep.data["type"]
-          assert_equal "5.2.0", dep.data["version"]
+          assert_equal "5.2.0", dep.version
           assert dep.data["homepage"]
           assert dep.data["summary"]
         end
@@ -81,7 +81,7 @@ if Licensed::Shell.tool_available?("npm")
             graceful_fs_dependencies = @source.dependencies.select { |dep| dep.name =~ /graceful-fs/ }
             assert_equal 2, graceful_fs_dependencies.size
             graceful_fs_dependencies.each do |dependency|
-              assert_equal "#{dependency.data["name"]}-#{dependency.data["version"]}", dependency.name
+              assert_equal "#{dependency.data["name"]}-#{dependency.version}", dependency.name
             end
           end
         end

@@ -18,13 +18,13 @@ module Licensed
           path, search_root = package_docs_dirs(package)
           Dependency.new(
             name: package["name"],
+            version: package["version"],
             path: path,
             search_root: search_root,
             metadata: {
               "type"     => Cabal.type,
-              "version"  => package["version"],
               "summary"  => package["synopsis"],
-              "homepage" => safe_homepage(package["homepage"]),
+              "homepage" => safe_homepage(package["homepage"])
             }
           )
         end

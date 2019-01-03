@@ -45,7 +45,7 @@ if Licensed::Shell.tool_available?("git")
         Dir.chdir(fixtures) do
           dep = source.dependencies.find { |d| d.name == "submodule" }
           assert dep
-          assert_equal latest_repository_commit(submodule_repo_path), dep.data["version"]
+          assert_equal latest_repository_commit(submodule_repo_path), dep.version
           assert_equal "submodule", dep.data["name"]
         end
       end
@@ -54,7 +54,7 @@ if Licensed::Shell.tool_available?("git")
         Dir.chdir(fixtures) do
           dep = source.dependencies.find { |d| d.name == "submodule/nested" }
           assert dep
-          assert_equal latest_repository_commit(recursive_repo_path), dep.data["version"]
+          assert_equal latest_repository_commit(recursive_repo_path), dep.version
           assert_equal "nested", dep.data["name"]
         end
       end

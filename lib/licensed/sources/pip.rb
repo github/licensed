@@ -16,12 +16,12 @@ module Licensed
           location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
             name: package["Name"],
+            version: package["Version"],
             path: location,
             metadata: {
               "type"        => Pip.type,
               "summary"     => package["Summary"],
-              "homepage"    => package["Home-page"],
-              "version"     => package["Version"]
+              "homepage"    => package["Home-page"]
             }
           )
         end

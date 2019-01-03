@@ -80,7 +80,11 @@ describe Licensed::Command::Status do
   end
 
   it "warns if versions do not match" do
-    source.dependencies.first.data["version"] = "nope"
+    filename = config.cache_path.join("test/dependency.txt")
+    license = Licensed::License.read(filename)
+    license["version"] = "9001"
+    license.save(filename)
+
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data out of date/, out)
   end

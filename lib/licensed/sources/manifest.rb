@@ -12,12 +12,12 @@ module Licensed
         packages.map do |package_name, sources|
           Licensed::Sources::Manifest::Dependency.new(
             name: package_name,
+            version: package_version(sources),
             path: configured_license_path(package_name) || sources_license_path(sources),
             sources: sources,
             metadata: {
               "type"     => Manifest.type,
-              "name"     => package_name,
-              "version"  => package_version(sources)
+              "name"     => package_name
             }
           )
         end
@@ -189,9 +189,9 @@ module Licensed
           )
         /imx.freeze
 
-        def initialize(name:, path:, sources:, metadata: {})
+        def initialize(name:, version:, path:, sources:, metadata: {})
           @sources = sources
-          super(name: name, path: path, metadata: metadata)
+          super(name: name, version: version, path: path, metadata: metadata)
         end
 
         def project_files

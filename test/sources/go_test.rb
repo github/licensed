@@ -174,7 +174,7 @@ if Licensed::Shell.tool_available?("go")
               ENV["GO111MODULE"] = "on"
               Dir.chdir fixtures do
                 dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-                assert_equal "v1.1.1", dep.data["version"]
+                assert_equal "v1.1.1", dep.version
               end
             ensure
               ENV["GO111MODULE"] = nil
@@ -187,7 +187,7 @@ if Licensed::Shell.tool_available?("go")
             Dir.chdir fixtures do
               Licensed::Git.stub(:available?, false) do
                 dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-                assert_nil dep.data["version"]
+                assert_nil dep.version
               end
             end
           end
@@ -195,7 +195,7 @@ if Licensed::Shell.tool_available?("go")
           it "is the latest git SHA of the package directory" do
             Dir.chdir fixtures do
               dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-              assert_match(/[a-f0-9]{40}/, dep.data["version"])
+              assert_match(/[a-f0-9]{40}/, dep.version)
             end
           end
         end

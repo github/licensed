@@ -3,35 +3,35 @@ require "test_helper"
 require "tmpdir"
 
 describe Licensed::Dependency do
-  def mkproject(metadata: {}, &block)
+  def mkproject(&block)
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        yield Licensed::Dependency.new(name: "test", path: dir, metadata: metadata)
+        yield Licensed::Dependency.new(name: "test", version: "1.0", path: dir)
       end
     end
   end
 
   it "raises an error if the path argument is not an absolute path" do
     assert_raises ArgumentError do
-      Licensed::Dependency.new(name: "test", path: ".")
+      Licensed::Dependency.new(name: "test", version: "1.0", path: ".")
     end
   end
 
   describe "license" do
     it "returns a Licensed::License object with dependency data" do
-      mkproject(metadata: { "version" => "1.0" }) do |dependency|
+      mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "AUTHORS", "author"
         assert_equal "mit", dependency.data["license"]
         assert_equal "test", dependency.data["name"]
-        assert_equal "1.0", dependency.data["version"]
+        assert_equal "1.0", dependency.version
         assert_includes dependency.data.licenses, Licensee::License.find("mit").text
         assert_includes dependency.data.notices, "author"
       end
     end
 
     it "prefers a name given via metadata over the `name` kwarg" do
-      dep = Licensed::Dependency.new(name: "name", path: Dir.pwd, metadata: { "name" => "meta_name" })
+      dep = Licensed::Dependency.new(name: "name", version: "1.0", path: Dir.pwd, metadata: { "name" => "meta_name" })
       assert_equal "meta_name", dep.data["name"]
     end
   end
@@ -164,7 +164,7 @@ describe Licensed::Dependency do
 
           Dir.mkdir "dependency"
           Dir.chdir "dependency" do
-            dep = Licensed::Dependency.new(name: "test", path: Dir.pwd, search_root: File.expand_path(".."))
+            dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd, search_root: File.expand_path(".."))
             assert_includes dep.license_contents, "license"
           end
         end

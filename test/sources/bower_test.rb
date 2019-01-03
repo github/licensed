@@ -36,7 +36,7 @@ if Licensed::Shell.tool_available?("bower")
         Dir.chdir(fixtures) do
           dep = source.dependencies.find { |d| d.name == "jquery" }
           assert dep
-          assert_equal "2.1.4", dep.data["version"]
+          assert_equal "2.1.4", dep.version
         end
       end
     end

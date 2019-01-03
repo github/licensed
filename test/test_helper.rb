@@ -23,10 +23,10 @@ class TestSource < Licensed::Sources::Source
     [
       Licensed::Dependency.new(
         name: @name,
+        version: "1.0",
         path: Dir.pwd,
         metadata: {
           "type"     => TestSource.type,
-          "version"  => "1.0",
           "dir"      => Dir.pwd
         }.merge(@metadata)
       )

@@ -6,8 +6,9 @@ module Licensed
     LEGAL_FILES_PATTERN = /(AUTHORS|NOTICE|LEGAL)(?:\..*)?\z/i
 
     attr_reader :name
+    attr_reader :version
 
-    def initialize(name:, path:, search_root: nil, metadata: {})
+    def initialize(name:, version:, path:, search_root: nil, metadata: {})
       # enforcing absolute paths makes life much easier when determining
       # an absolute file path in #notices
       unless Pathname.new(path).absolute?
@@ -15,6 +16,7 @@ module Licensed
       end
 
       @name = name
+      @version = version
       @metadata = metadata
       super(path, search_root: search_root, detect_readme: true, detect_packages: true)
     end
@@ -62,11 +64,14 @@ module Licensed
     # is written to YAML in the dependencys cached text file
     def license_metadata
       {
-        "name" => name, # name can be overriden by a name given in metadata
+        # can be overriden by values in @metadata
+        "name" => name,
+        "version" => version
       }.merge(
         @metadata
       ).merge({
-        "license" => license_key # license determination overrides metadata
+        # overrides all other values
+        "license" => license_key
       })
     end
   end

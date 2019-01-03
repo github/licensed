@@ -87,6 +87,7 @@ describe Licensed::Command::Cache do
 
     test_dependency = Licensed::Dependency.new(
       name: "dependency",
+      version: "1.0",
       path: Dir.pwd,
       metadata: {
         "type"     => TestSource.type
@@ -112,6 +113,7 @@ describe Licensed::Command::Cache do
 
     test_dependency = Licensed::Dependency.new(
       name: "dependency",
+      version: "1.0",
       path: Dir.pwd,
       metadata: {
         "type"     => TestSource.type

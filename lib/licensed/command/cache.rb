@@ -28,7 +28,7 @@ module Licensed
               # ensure each dependency is cached
               source.dependencies.each do |dependency|
                 name = dependency.name
-                version = dependency.data["version"]
+                version = dependency.version
 
                 names << name
                 filename = cache_path.join("#{name}.txt")

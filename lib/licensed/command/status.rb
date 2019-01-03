@@ -30,7 +30,7 @@ module Licensed
               if File.exist?(filename)
                 license = License.read(filename)
 
-                if license["version"] != dependency.data["version"]
+                if license["version"] != dependency.version
                   warnings << "cached license data out of date"
                 end
                 warnings << "missing license text" if license.licenses.empty?

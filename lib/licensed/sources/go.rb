@@ -16,13 +16,13 @@ module Licensed
             package_dir = package["Dir"]
             Dependency.new(
               name: import_path,
+              version: package_version(package),
               path: package_dir,
               search_root: search_root(package_dir),
               metadata: {
                 "type"        => Go.type,
                 "summary"     => package["Doc"],
-                "homepage"    => homepage(import_path),
-                "version"     => package_version(package)
+                "homepage"    => homepage(import_path)
               }
             )
           end

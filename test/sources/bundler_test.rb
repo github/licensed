@@ -112,7 +112,7 @@ if Licensed::Shell.tool_available?("bundle")
         Dir.chdir(fixtures) do
           dep = source.dependencies.find { |d| d.name == "semantic" }
           assert dep
-          assert_equal "1.6.0", dep.data["version"]
+          assert_equal "1.6.0", dep.version
         end
       end
 
@@ -126,7 +126,7 @@ if Licensed::Shell.tool_available?("bundle")
         Dir.chdir(fixtures) do
           dep = source.dependencies.find { |d| d.name == "pathed-gem-fixture" }
           assert dep
-          assert_equal "0.0.1", dep.data["version"]
+          assert_equal "0.0.1", dep.version
         end
       end
 
@@ -163,12 +163,12 @@ if Licensed::Shell.tool_available?("bundle")
             # test
             dep = source.dependencies.find { |d| d.name == "minitest" }
             assert dep
-            assert_equal "5.11.3", dep.data["version"]
+            assert_equal "5.11.3", dep.version
 
             # dev
             dep = source.dependencies.find { |d| d.name == "tzinfo" }
             assert dep
-            assert_equal "1.2.5", dep.data["version"]
+            assert_equal "1.2.5", dep.version
           end
         end
       end

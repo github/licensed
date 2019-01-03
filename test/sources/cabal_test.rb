@@ -55,7 +55,7 @@ if Licensed::Shell.tool_available?("ghc")
           dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep
           assert_equal "cabal", dep.data["type"]
-          assert_equal "0.6.2", dep.data["version"]
+          assert_equal "0.6.2", dep.version
           assert dep.data["summary"]
         end
       end
@@ -66,7 +66,7 @@ if Licensed::Shell.tool_available?("ghc")
           dep = source.dependencies.detect { |d| d.name == "Glob" }
           assert dep
           assert_equal "cabal", dep.data["type"]
-          assert_equal "0.9.2", dep.data["version"]
+          assert_equal "0.9.2", dep.version
           assert dep.data["summary"]
         end
       end

@@ -16,10 +16,10 @@ module Licensed
           path = bower_path.join(file).dirname.to_path
           Dependency.new(
             name: package["name"],
+            version: package["version"] || package["_release"],
             path: path,
             metadata: {
               "type"     => Bower.type,
-              "version"  => package["version"] || package["_release"],
               "summary"  => package["description"],
               "homepage" => package["homepage"]
             }

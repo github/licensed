@@ -19,10 +19,10 @@ module Licensed
           specs.map do |spec|
             Licensed::Dependency.new(
               name: spec.name,
+              version: spec.version.to_s,
               path: spec.gem_dir,
               metadata: {
                 "type"     => Bundler.type,
-                "version"  => spec.version.to_s,
                 "summary"  => spec.summary,
                 "homepage" => spec.homepage
               }
