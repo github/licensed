@@ -9,9 +9,16 @@ module Licensed
     include Licensee::ContentHelper
     extend Forwardable
 
-    YAML_FRONTMATTER_PATTERN = /\A---\s*\n(.*?\n?)^---\s*$\n?(.*)\z/m
     TEXT_SEPARATOR = ("-" * 80).freeze
     LICENSE_SEPARATOR = ("*" * 80).freeze
+    LICENSE_FILE_PATTERN = /\A
+      ---\s*
+      (.*?)\s*
+      ---\s*
+      ((.*?(\s*#{Regexp.escape(LICENSE_SEPARATOR)}\s*)?)*)
+      ((\s*#{Regexp.escape(TEXT_SEPARATOR)}\s*.*?)*)?
+      \s*
+    \z/mx
 
     # Read an existing license file
     #
@@ -20,48 +27,58 @@ module Licensed
     # Returns a Licensed::License
     def self.read(filename)
       return unless File.exist?(filename)
-      match = File.read(filename).scrub.match(YAML_FRONTMATTER_PATTERN)
-      new(YAML.load(match[1]), match[2])
+      match = File.read(filename).scrub.match(LICENSE_FILE_PATTERN)
+      return unless match
+
+      metadata = YAML.load(match[1])
+      licenses = match[2].split("\n#{LICENSE_SEPARATOR}\n").reject(&:empty?)
+      notices = match[5].split("\n#{TEXT_SEPARATOR}\n").reject(&:empty?)
+      new(licenses: licenses, notices: notices, metadata: metadata)
     end
 
-    def_delegators :@metadata, :[], :[]=, :delete
-
-    # The license text and other legal notices
-    attr_accessor :text
+    def_delegators :@metadata, :[], :[]=
+    attr_reader :licenses
+    attr_reader :notices
 
     # Construct a new license
     #
-    # filename - the String path of the file
+    # licenses - a string, or array of strings, representing the content of each license
+    # notices - a string, or array of strings, representing the
     # metadata - a Hash of the metadata for the package
-    # text     - a String of the license text and other legal notices
-    def initialize(metadata = {}, text = nil)
+    def initialize(licenses: [], notices: [], metadata: {})
+      @licenses = Array(licenses).compact
+      @notices = Array(notices).compact
       @metadata = metadata
-      @text = text
     end
 
     # Save the metadata and license to a file
+    #
+    # filename - The destination file to save license contents at
     def save(filename)
       FileUtils.mkdir_p(File.dirname(filename))
-      File.write(filename, YAML.dump(@metadata) + "---\n#{text}")
+      File.open(filename, "w") do |f|
+        f.puts YAML.dump(@metadata).strip
+        f.puts "---"
+        f.puts licenses.join("\n#{LICENSE_SEPARATOR}\n") if licenses.any?
+        if notices.any?
+          f.puts TEXT_SEPARATOR
+          f.puts notices.join("\n#{TEXT_SEPARATOR}\n")
+        end
+      end
     end
 
-    # Returns the license text without any notices
-    def license_text
-      return unless text
-
-      # if the text contains the separator, the first string in the array
-      # should always be the license text whether empty or not.
-      # if the text didn't contain the separator, the text itself is the entirety
-      # of the license text
-      split = text.split(TEXT_SEPARATOR)
-      split.length > 1 ? split.first.rstrip : text.rstrip
+    # Returns the content used to compare two licenses using normalization from
+    # `Licensee::CotentHelper`
+    def content
+      return if licenses.nil? || licenses.empty?
+      licenses.join
     end
-    alias_method :content, :license_text # use license_text for content matching
 
-    # Returns whether the current license should be updated to `other`
-    # based on whether the normalized license content matches
-    def license_text_match?(other)
+    # Returns whether two licenses match based on their contents
+    def matches?(other)
       return false unless other.is_a?(License)
+      return false if self.content_normalized.nil?
+
       self.content_normalized == other.content_normalized
     end
   end
