@@ -31,22 +31,10 @@ describe Licensed::Sources::Manifest do
 
   describe "dependencies" do
     it "includes dependencies from the manifest" do
-      dep = source.dependencies.detect { |d| d["name"] == "manifest_test" }
+      dep = source.dependencies.detect { |d| d.name == "manifest_test" }
       assert dep
-      assert_equal "manifest", dep["type"]
-      assert dep["version"] # version comes from git, just make sure its there
-    end
-
-    describe "paths" do
-      it "finds the common folder path for the dependency" do
-        dep = source.dependencies.detect { |d| d["name"] == "manifest_test" }
-        assert_equal fixtures, dep.path
-      end
-
-      it "uses the first source folder if there is no common path" do
-        dep = source.dependencies.detect { |d| d["name"] == "other" }
-        assert dep.path.end_with?("script")
-      end
+      assert_equal "manifest", dep.data["type"]
+      assert dep.data["version"] # version comes from git, just make sure its there
     end
 
     it "uses a license specified in the configuration if provided" do
@@ -56,53 +44,39 @@ describe Licensed::Sources::Manifest do
         }
       }
 
-      dep = source.dependencies.detect { |d| d["name"] == "manifest_test" }
+      dep = source.dependencies.detect { |d| d.name == "manifest_test" }
       assert dep
-      dep.detect_license!
-      assert_equal "mit", dep["license"]
+      assert_equal "mit", dep.data["license"]
 
       license_path = File.join(config.root, config.dig("manifest", "licenses", "manifest_test"))
-      assert_equal File.read(license_path).strip, dep.text
+      assert_includes dep.data.licenses, File.read(license_path)
     end
 
     it "prefers licenses from license files" do
-      dep = source.dependencies.detect { |d| d["name"] == "mit_license_file" }
+      dep = source.dependencies.detect { |d| d.name == "mit_license_file" }
       assert dep
-      dep.detect_license!
-      assert_equal "mit", dep["license"]
-      refute_nil dep.text
+      assert_equal "mit", dep.data["license"]
+      refute_empty dep.data.licenses
     end
 
     it "detects license from source header comments if license files are not found" do
-      dep = source.dependencies.detect { |d| d["name"] == "bsd3_single_header_license" }
+      dep = source.dependencies.detect { |d| d.name == "bsd3_single_header_license" }
       assert dep
-      dep.detect_license!
-      assert_equal "bsd-3-clause", dep["license"]
-      refute_nil dep.text
-      refute dep.text.include?(Licensed::License::LICENSE_SEPARATOR)
-
-      # verify that the license file was removed after evaluation
-      refute File.exist?(File.join(dep.path, "LICENSE"))
+      assert_equal "bsd-3-clause", dep.data["license"]
+      assert_equal 1, dep.data.licenses.uniq.size
     end
 
     it "detects unique license content from multiple headers" do
-      dep = source.dependencies.detect { |d| d["name"] == "bsd3_multi_header_license" }
+      dep = source.dependencies.detect { |d| d.name == "bsd3_multi_header_license" }
       assert dep
-      dep.detect_license!
-      # because there are different licenses/copyrights that need to be included
-      # we aren't able to specify that the actual license content is equivalent
-      # so we are left with "other"
-      assert_equal "other", dep["license"]
-      refute_nil dep.text
-      assert dep.text.include?(Licensed::License::LICENSE_SEPARATOR)
+      assert_equal "bsd-3-clause", dep.data["license"]
+      assert_equal 2, dep.data.licenses.uniq.size
     end
 
     it "preserves legal notices when detecting license content from comments" do
-      dep = source.dependencies.detect { |d| d["name"] == "notices" }
+      dep = source.dependencies.detect { |d| d.name == "notices" }
       assert dep
-      dep.detect_license!
-      refute_nil dep.text
-      assert dep.text.include?(dep.notices.join("\n#{Licensed::License::TEXT_SEPARATOR}\n").strip)
+      refute_empty dep.data.notices
     end
   end
 
