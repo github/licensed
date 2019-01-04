@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "licensed/version"
 require "licensed/shell"
-require "licensed/license"
+require "licensed/dependency_record"
 require "licensed/dependency"
 require "licensed/git"
 require "licensed/sources"

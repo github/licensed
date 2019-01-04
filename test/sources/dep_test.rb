@@ -40,8 +40,8 @@ describe Licensed::Sources::Dep do
       Dir.chdir fixtures do
         dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
         assert dep
-        assert_equal "dep", dep.data["type"]
-        assert_equal "https://github.com/gorilla/context", dep.data["homepage"]
+        assert_equal "dep", dep.record["type"]
+        assert_equal "https://github.com/gorilla/context", dep.record["homepage"]
       end
     end
 

@@ -17,22 +17,22 @@ describe Licensed::Dependency do
     end
   end
 
-  describe "license" do
-    it "returns a Licensed::License object with dependency data" do
+  describe "record" do
+    it "returns a Licensed::DependencyRecord object with dependency data" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "AUTHORS", "author"
-        assert_equal "mit", dependency.data["license"]
-        assert_equal "test", dependency.data["name"]
+        assert_equal "mit", dependency.record["license"]
+        assert_equal "test", dependency.record["name"]
         assert_equal "1.0", dependency.version
-        assert_includes dependency.data.licenses, Licensee::License.find("mit").text
-        assert_includes dependency.data.notices, "author"
+        assert_includes dependency.record.licenses, Licensee::License.find("mit").text
+        assert_includes dependency.record.notices, "author"
       end
     end
 
     it "prefers a name given via metadata over the `name` kwarg" do
       dep = Licensed::Dependency.new(name: "name", version: "1.0", path: Dir.pwd, metadata: { "name" => "meta_name" })
-      assert_equal "meta_name", dep.data["name"]
+      assert_equal "meta_name", dep.record["name"]
     end
   end
 

@@ -29,9 +29,9 @@ if Licensed::Shell.tool_available?("pip")
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "Jinja2" }
           assert dep
-          assert_equal "pip", dep.data["type"]
-          assert dep.data["homepage"]
-          assert dep.data["summary"]
+          assert_equal "pip", dep.record["type"]
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
         end
       end
 
@@ -39,9 +39,9 @@ if Licensed::Shell.tool_available?("pip")
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "MarkupSafe" }
           assert dep
-          assert_equal "pip", dep.data["type"]
-          assert dep.data["homepage"]
-          assert dep.data["summary"]
+          assert_equal "pip", dep.record["type"]
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
         end
       end
     end

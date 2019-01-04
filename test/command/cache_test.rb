@@ -38,7 +38,7 @@ describe Licensed::Command::Cache do
 
           path = app.cache_path.join("#{source_type}/#{expected_dependency}.txt")
           assert path.exist?
-          license = Licensed::License.read(path)
+          license = Licensed::DependencyRecord.read(path)
           assert_equal expected_dependency, license["name"]
           assert license["license"]
         end
@@ -65,14 +65,14 @@ describe Licensed::Command::Cache do
     generator.run
 
     path = config.cache_path.join("test/dependency.txt")
-    license = Licensed::License.read(path)
+    license = Licensed::DependencyRecord.read(path)
     license["license"] = "test"
     license["version"] = "0.0"
     license.save(path)
 
     generator.run
 
-    license = Licensed::License.read(path)
+    license = Licensed::DependencyRecord.read(path)
     assert_equal "test", license["license"]
     refute_equal "0.0", license["version"]
   end
@@ -81,7 +81,7 @@ describe Licensed::Command::Cache do
     generator.run
 
     path = config.cache_path.join("test/dependency.txt")
-    license = Licensed::License.read(path)
+    license = Licensed::DependencyRecord.read(path)
     license["license"] = "test"
     license.save(path)
 
@@ -97,7 +97,7 @@ describe Licensed::Command::Cache do
       generator.run
     end
 
-    license = Licensed::License.read(path)
+    license = Licensed::DependencyRecord.read(path)
     assert_equal "test", license["license"]
     assert_equal "1.0", license["version"]
   end
@@ -106,7 +106,7 @@ describe Licensed::Command::Cache do
     generator.run
 
     path = config.cache_path.join("test/dependency.txt")
-    license = Licensed::License.read(path)
+    license = Licensed::DependencyRecord.read(path)
     license["license"] = "test"
     license["version"] = ""
     license.save(path)
@@ -123,7 +123,7 @@ describe Licensed::Command::Cache do
       generator.run
     end
 
-    license = Licensed::License.read(path)
+    license = Licensed::DependencyRecord.read(path)
     assert_equal "test", license["license"]
     assert_equal "1.0", license["version"]
   end
@@ -171,7 +171,7 @@ describe Licensed::Command::Cache do
 
     it "changes the current directory to app.source_path while running" do
       generator.run
-      assert_equal fixtures, source.dependencies.first.data["dir"]
+      assert_equal fixtures, source.dependencies.first.record["dir"]
     end
   end
 

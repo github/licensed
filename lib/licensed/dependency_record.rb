@@ -5,7 +5,7 @@ require "forwardable"
 require "licensee"
 
 module Licensed
-  class License
+  class DependencyRecord
     include Licensee::ContentHelper
     extend Forwardable
 
@@ -20,11 +20,11 @@ module Licensed
       \s*
     \z/mx
 
-    # Read an existing license file
+    # Read an existing record file
     #
     # filename - A String path to the file
     #
-    # Returns a Licensed::License
+    # Returns a Licensed::DependencyRecord
     def self.read(filename)
       return unless File.exist?(filename)
       match = File.read(filename).scrub.match(LICENSE_FILE_PATTERN)
@@ -40,10 +40,10 @@ module Licensed
     attr_reader :licenses
     attr_reader :notices
 
-    # Construct a new license
+    # Construct a new record
     #
     # licenses - a string, or array of strings, representing the content of each license
-    # notices - a string, or array of strings, representing the
+    # notices - a string, or array of strings, representing the content of each legal notice
     # metadata - a Hash of the metadata for the package
     def initialize(licenses: [], notices: [], metadata: {})
       @licenses = Array(licenses).compact
@@ -51,9 +51,9 @@ module Licensed
       @metadata = metadata
     end
 
-    # Save the metadata and license to a file
+    # Save the metadata and text to a file
     #
-    # filename - The destination file to save license contents at
+    # filename - The destination file to save record contents at
     def save(filename)
       FileUtils.mkdir_p(File.dirname(filename))
       File.open(filename, "w") do |f|
@@ -74,9 +74,9 @@ module Licensed
       licenses.join
     end
 
-    # Returns whether two licenses match based on their contents
+    # Returns whether two records match based on their contents
     def matches?(other)
-      return false unless other.is_a?(License)
+      return false unless other.is_a?(DependencyRecord)
       return false if self.content_normalized.nil?
 
       self.content_normalized == other.content_normalized

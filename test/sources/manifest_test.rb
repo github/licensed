@@ -33,7 +33,7 @@ describe Licensed::Sources::Manifest do
     it "includes dependencies from the manifest" do
       dep = source.dependencies.detect { |d| d.name == "manifest_test" }
       assert dep
-      assert_equal "manifest", dep.data["type"]
+      assert_equal "manifest", dep.record["type"]
       assert dep.version # version comes from git, just make sure its there
     end
 
@@ -46,37 +46,37 @@ describe Licensed::Sources::Manifest do
 
       dep = source.dependencies.detect { |d| d.name == "manifest_test" }
       assert dep
-      assert_equal "mit", dep.data["license"]
+      assert_equal "mit", dep.record["license"]
 
       license_path = File.join(config.root, config.dig("manifest", "licenses", "manifest_test"))
-      assert_includes dep.data.licenses, File.read(license_path)
+      assert_includes dep.record.licenses, File.read(license_path)
     end
 
     it "prefers licenses from license files" do
       dep = source.dependencies.detect { |d| d.name == "mit_license_file" }
       assert dep
-      assert_equal "mit", dep.data["license"]
-      refute_empty dep.data.licenses
+      assert_equal "mit", dep.record["license"]
+      refute_empty dep.record.licenses
     end
 
     it "detects license from source header comments if license files are not found" do
       dep = source.dependencies.detect { |d| d.name == "bsd3_single_header_license" }
       assert dep
-      assert_equal "bsd-3-clause", dep.data["license"]
-      assert_equal 1, dep.data.licenses.uniq.size
+      assert_equal "bsd-3-clause", dep.record["license"]
+      assert_equal 1, dep.record.licenses.uniq.size
     end
 
     it "detects unique license content from multiple headers" do
       dep = source.dependencies.detect { |d| d.name == "bsd3_multi_header_license" }
       assert dep
-      assert_equal "bsd-3-clause", dep.data["license"]
-      assert_equal 2, dep.data.licenses.uniq.size
+      assert_equal "bsd-3-clause", dep.record["license"]
+      assert_equal 2, dep.record.licenses.uniq.size
     end
 
     it "preserves legal notices when detecting license content from comments" do
       dep = source.dependencies.detect { |d| d.name == "notices" }
       assert dep
-      refute_empty dep.data.notices
+      refute_empty dep.record.notices
     end
   end
 
