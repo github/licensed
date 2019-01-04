@@ -22,7 +22,7 @@ module Licensed
 
             results = dependencies.map do |dependency|
               name = dependency.name
-              filename = app.cache_path.join(dependency["type"], "#{name}.txt")
+              filename = app.cache_path.join(dependency.data["type"], "#{name}.txt")
 
               warnings = []
 
@@ -30,10 +30,10 @@ module Licensed
               if File.exist?(filename)
                 license = License.read(filename)
 
-                if license["version"] != dependency["version"]
+                if license["version"] != dependency.version
                   warnings << "cached license data out of date"
                 end
-                warnings << "missing license text" if license.license_text.empty?
+                warnings << "missing license text" if license.licenses.empty?
                 unless allowed_or_reviewed?(app, license)
                   warnings << "license needs reviewed: #{license["license"]}."
                 end

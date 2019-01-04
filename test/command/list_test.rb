@@ -77,7 +77,7 @@ describe Licensed::Command::List do
 
     it "changes the current directory to app.source_path while running" do
       capture_io { command.run }
-      assert_equal fixtures, source.dependencies.first["dir"]
+      assert_equal fixtures, source.dependencies.first.data["dir"]
     end
   end
 end

@@ -14,14 +14,17 @@ module Licensed
           packages.map do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
             package_dir = package["Dir"]
-            Dependency.new(package_dir, {
-              "type"        => Go.type,
-              "name"        => import_path,
-              "summary"     => package["Doc"],
-              "homepage"    => homepage(import_path),
-              "search_root" => search_root(package_dir),
-              "version"     => package_version(package)
-            })
+            Dependency.new(
+              name: import_path,
+              version: package_version(package),
+              path: package_dir,
+              search_root: search_root(package_dir),
+              metadata: {
+                "type"        => Go.type,
+                "summary"     => package["Doc"],
+                "homepage"    => homepage(import_path)
+              }
+            )
           end
         end
       end

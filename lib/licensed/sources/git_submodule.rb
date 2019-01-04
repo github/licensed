@@ -28,13 +28,16 @@ module Licensed
           end
           submodule_paths[name] = submodule_path
 
-          Licensed::Dependency.new(@config.pwd.join(displaypath), {
-            "type" => self.class.type,
-            "name" => name,
-            "version" => version,
-            "homepage" => homepage,
-            "path" => submodule_path
-          })
+          Licensed::Dependency.new(
+            name: submodule_path,
+            version: version,
+            path: @config.pwd.join(displaypath),
+            metadata: {
+              "type" => self.class.type,
+              "name" => name,
+              "homepage" => homepage
+            }
+          )
         end
       end
 

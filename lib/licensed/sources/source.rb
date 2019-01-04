@@ -53,7 +53,7 @@ module Licensed
 
       # Returns whether a dependency is ignored in the configuration.
       def ignored?(dependency)
-        config.ignored?("type" => self.class.type, "name" => dependency["name"])
+        config.ignored?("type" => self.class.type, "name" => dependency.name)
       end
 
       private

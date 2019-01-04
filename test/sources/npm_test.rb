@@ -33,31 +33,31 @@ if Licensed::Shell.tool_available?("npm")
 
       it "includes declared dependencies" do
         Dir.chdir fixtures do
-          dep = @source.dependencies.detect { |d| d["name"] == "autoprefixer" }
+          dep = @source.dependencies.detect { |d| d.name == "autoprefixer" }
           assert dep
-          assert_equal "npm", dep["type"]
-          assert_equal "5.2.0", dep["version"]
-          assert dep["homepage"]
-          assert dep["summary"]
+          assert_equal "npm", dep.data["type"]
+          assert_equal "5.2.0", dep.version
+          assert dep.data["homepage"]
+          assert dep.data["summary"]
         end
       end
 
       it "includes transient dependencies" do
         Dir.chdir fixtures do
-          assert @source.dependencies.detect { |dep| dep["name"] == "autoprefixer" }
+          assert @source.dependencies.detect { |dep| dep.name == "autoprefixer" }
         end
       end
 
       it "does not include dev dependencies" do
         Dir.chdir fixtures do
-          refute @source.dependencies.detect { |dep| dep["name"] == "string.prototype.startswith" }
+          refute @source.dependencies.detect { |dep| dep.name == "string.prototype.startswith" }
         end
       end
 
       it "does not include ignored dependencies" do
         Dir.chdir fixtures do
           @config.ignore({ "type" => Licensed::Sources::NPM.type, "name" => "autoprefixer" })
-          refute @source.dependencies.detect { |dep| dep["name"] == "autoprefixer" }
+          refute @source.dependencies.detect { |dep| dep.name == "autoprefixer" }
         end
       end
 
@@ -73,19 +73,22 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       describe "with multiple instances of a dependency" do
-        it "includes version in the dependency path for multiple unique versions" do
+        it "includes version in the dependency name for multiple unique versions" do
           Dir.chdir fixtures do
-            graceful_fs_dependencies = @source.dependencies.select { |dep| dep["name"] == "graceful-fs" }
-            assert_equal 2, graceful_fs_dependencies.count
+            graceful_fs_dependencies = @source.dependencies.select { |dep| dep.name == /graceful-fs/ }
+            assert_empty graceful_fs_dependencies
+
+            graceful_fs_dependencies = @source.dependencies.select { |dep| dep.name =~ /graceful-fs/ }
+            assert_equal 2, graceful_fs_dependencies.size
             graceful_fs_dependencies.each do |dependency|
-              assert_equal "#{dependency["name"]}-#{dependency["version"]}", dependency.name
+              assert_equal "#{dependency.data["name"]}-#{dependency.version}", dependency.name
             end
           end
         end
 
-        it "does not include version in the dependency path for a single unique version" do
+        it "does not include version in the dependency name for a single unique version" do
           Dir.chdir fixtures do
-            dep = @source.dependencies.detect { |d| d["name"] == "wrappy" }
+            dep = @source.dependencies.detect { |d| d.name == "wrappy" }
             assert_equal "wrappy", dep.name
           end
         end

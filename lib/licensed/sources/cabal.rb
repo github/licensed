@@ -16,14 +16,17 @@ module Licensed
           package = package_info(id)
 
           path, search_root = package_docs_dirs(package)
-          Dependency.new(path, {
-            "type"     => Cabal.type,
-            "name"     => package["name"],
-            "version"  => package["version"],
-            "summary"  => package["synopsis"],
-            "homepage" => safe_homepage(package["homepage"]),
-            "search_root" => search_root
-          })
+          Dependency.new(
+            name: package["name"],
+            version: package["version"],
+            path: path,
+            search_root: search_root,
+            metadata: {
+              "type"     => Cabal.type,
+              "summary"  => package["synopsis"],
+              "homepage" => safe_homepage(package["homepage"])
+            }
+          )
         end
       end
 

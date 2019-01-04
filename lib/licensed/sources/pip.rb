@@ -10,17 +10,20 @@ module Licensed
         File.exist?(@config.pwd.join("requirements.txt"))
       end
 
-      def dependencies
+      def enumerate_dependencies
         parse_requirements_txt.map do |package_name|
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
-          Dependency.new(location, {
-                           "type"        => Pip.type,
-                           "name"        => package["Name"],
-                           "summary"     => package["Summary"],
-                           "homepage"    => package["Home-page"],
-                           "version"     => package["Version"]
-                         })
+          Dependency.new(
+            name: package["Name"],
+            version: package["Version"],
+            path: location,
+            metadata: {
+              "type"        => Pip.type,
+              "summary"     => package["Summary"],
+              "homepage"    => package["Home-page"]
+            }
+          )
         end
       end
 

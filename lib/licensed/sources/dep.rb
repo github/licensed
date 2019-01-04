@@ -19,13 +19,16 @@ module Licensed
               raise "couldn't find package for #{package[:name]}"
             end
 
-            Dependency.new(package_dir.to_s, {
-              "type"        => Dep.type,
-              "name"        => package[:name],
-              "homepage"    => "https://#{package[:name]}",
-              "search_root" => search_root.to_s,
-              "version"     => package[:version]
-            })
+            Dependency.new(
+              name: package[:name],
+              version: package[:version],
+              path: package_dir.to_s,
+              search_root: search_root.to_s,
+              metadata: {
+                "type"        => Dep.type,
+                "homepage"    => "https://#{package[:name]}"
+              }
+            )
           end
         end
       end

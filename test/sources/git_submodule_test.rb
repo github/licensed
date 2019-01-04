@@ -43,19 +43,19 @@ if Licensed::Shell.tool_available?("git")
     describe "dependencies" do
       it "finds submodule dependencies" do
         Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d["name"] == "submodule" }
+          dep = source.dependencies.find { |d| d.name == "submodule" }
           assert dep
-          assert_equal latest_repository_commit(submodule_repo_path), dep["version"]
-          assert_equal "submodule", dep.name
+          assert_equal latest_repository_commit(submodule_repo_path), dep.version
+          assert_equal "submodule", dep.data["name"]
         end
       end
 
       it "finds nested submodule dependencies" do
         Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d["name"] == "nested" }
+          dep = source.dependencies.find { |d| d.name == "submodule/nested" }
           assert dep
-          assert_equal latest_repository_commit(recursive_repo_path), dep["version"]
-          assert_equal "submodule/nested", dep.name
+          assert_equal latest_repository_commit(recursive_repo_path), dep.version
+          assert_equal "nested", dep.data["name"]
         end
       end
     end
