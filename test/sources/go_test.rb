@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "test_helper"
 require "tmpdir"
-require "byebug"
 
 if Licensed::Shell.tool_available?("go")
   describe Licensed::Sources::Go do
