@@ -34,8 +34,8 @@ module Licensed
     # notices - a string, or array of strings, representing the
     # metadata - a Hash of the metadata for the package
     def initialize(licenses: [], notices: [], metadata: {})
-      @licenses = Array(licenses).compact
-      @notices = Array(notices).compact
+      @licenses = [licenses].flatten.compact
+      @notices = [notices].flatten.compact
       @metadata = metadata
     end
 
@@ -56,7 +56,13 @@ module Licensed
     # `Licensee::CotentHelper`
     def content
       return if licenses.nil? || licenses.empty?
-      licenses.join
+      licenses.map do |license|
+        if license.is_a?(String)
+          license
+        elsif license.respond_to?(:[])
+          license["text"]
+        end
+      end.join
     end
 
     # Returns whether two licenses match based on their contents

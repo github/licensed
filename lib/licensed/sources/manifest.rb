@@ -200,19 +200,28 @@ module Licensed
           files
         end
 
+        # Returns an enumeration of Licensee::ProjectFiles::LicenseFile
+        # representing licenses found in source header comments
         def source_files
           @source_files ||= begin
-            @sources.select { |f| File.file?(f) }
-                    .map { |f| File.read(f) }
-                    .flat_map { |content| content.scan(HEADER_LICENSE_REGEX) }
-                    .map { |match| match[0] }
-                    .map { |comment| source_comment_text(comment) }
-                    .compact
-                    .map { |content| Licensee::ProjectFiles::LicenseFile.new(content) }
+            @sources
+              .select { |file| File.file?(file) }
+              .flat_map { |file| source_file_comments(file) }
+              .map do |comment, file|
+                Licensee::ProjectFiles::LicenseFile.new(comment, file)
+              end
           end
         end
 
         private
+
+        # Returns all source header comments for a file
+        def source_file_comments(file)
+          file_parts = { dir: File.dirname(file), name: File.basename(file) }
+          content = File.read(file)
+          matches = content.scan(HEADER_LICENSE_REGEX)
+          matches.map { |match| [source_comment_text(match[0]), file_parts] }
+        end
 
         # Returns the comment text with leading * and whitespace stripped
         def source_comment_text(comment)

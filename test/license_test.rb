@@ -68,7 +68,7 @@ describe Licensed::License do
 
     it "returns joined text of all licenses" do
       license = Licensed::License.new(licenses: ["license1", "license2"])
-      assert_equal license.licenses.join, license.content
+      assert_equal "license1license2", license.content
     end
   end
 
@@ -79,9 +79,17 @@ describe Licensed::License do
       refute license.matches? ""
     end
 
-    it "returns true if the normalized content is the same" do
+    it "returns true if the normalized content is the same for strings" do
       license = Licensed::License.new(licenses: "- test content")
       other = Licensed::License.new(licenses: "* test content")
+
+      assert license.matches?(other)
+    end
+
+    it "returns true if the normalized content is the same for text+source data" do
+
+      license = Licensed::License.new(licenses: { "text" => "- test content" })
+      other = Licensed::License.new(licenses: { "text" => "* test content" })
 
       assert license.matches?(other)
     end
