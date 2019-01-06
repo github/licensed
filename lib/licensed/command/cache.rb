@@ -31,7 +31,7 @@ module Licensed
                 version = dependency.version
 
                 names << name
-                filename = cache_path.join("#{name}.txt")
+                filename = cache_path.join("#{name}.dependency")
 
                 # try to load existing license from disk
                 # or default to a blank license
@@ -53,10 +53,10 @@ module Licensed
               end
 
               # Clean up cached files that dont match current dependencies
-              Dir.glob(cache_path.join("**/*.txt")).each do |file|
+              Dir.glob(cache_path.join("**/*.dependency")).each do |file|
                 file_path = Pathname.new(file)
                 relative_path = file_path.relative_path_from(cache_path).to_s
-                FileUtils.rm(file) unless names.include?(relative_path.chomp(".txt"))
+                FileUtils.rm(file) unless names.include?(relative_path.chomp(".dependency"))
               end
 
               "* #{app_name} #{type} dependencies: #{source.dependencies.size}"

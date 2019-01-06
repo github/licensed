@@ -36,11 +36,11 @@ describe Licensed::Command::Status do
 
   it "does not warn if dependency is ignored" do
     out, _ = capture_io { verifier.run }
-    assert_match(/dependency.txt/, out)
+    assert_match(/dependency.dependency/, out)
 
     config.ignore "type" => "test", "name" => "dependency"
     out, _ = capture_io { verifier.run }
-    refute_match(/dependency.txt/, out)
+    refute_match(/dependency.dependency/, out)
   end
 
   it "does not warn if dependency is reviewed" do
@@ -53,7 +53,7 @@ describe Licensed::Command::Status do
   end
 
   it "warns if license is empty" do
-    filename = config.cache_path.join("test/dependency.txt")
+    filename = config.cache_path.join("test/dependency.dependency")
     license = Licensed::License.new
     license.save(filename)
 
@@ -62,7 +62,7 @@ describe Licensed::Command::Status do
   end
 
   it "warns if license is empty with notices" do
-    filename = config.cache_path.join("test/dependency.txt")
+    filename = config.cache_path.join("test/dependency.dependency")
     license = Licensed::License.new(notices: ["notice"])
     license.save(filename)
 
@@ -71,7 +71,7 @@ describe Licensed::Command::Status do
   end
 
   it "does not warn if license is not empty" do
-    filename = config.cache_path.join("test/dependency.txt")
+    filename = config.cache_path.join("test/dependency.dependency")
     license = Licensed::License.new(licenses: ["license"])
     license.save(filename)
 
@@ -80,7 +80,7 @@ describe Licensed::Command::Status do
   end
 
   it "warns if versions do not match" do
-    filename = config.cache_path.join("test/dependency.txt")
+    filename = config.cache_path.join("test/dependency.dependency")
     license = Licensed::License.read(filename)
     license["version"] = "9001"
     license.save(filename)
@@ -90,13 +90,13 @@ describe Licensed::Command::Status do
   end
 
   it "warns if cached license data missing" do
-    FileUtils.rm config.cache_path.join("test/dependency.txt")
+    FileUtils.rm config.cache_path.join("test/dependency.dependency")
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data missing/, out)
   end
 
   it "does not warn if cached license data missing for ignored gem" do
-    FileUtils.rm config.cache_path.join("test/dependency.txt")
+    FileUtils.rm config.cache_path.join("test/dependency.dependency")
     config.ignore "type" => "test", "name" => "dependency"
 
     out, _ = capture_io { verifier.run }
@@ -152,7 +152,7 @@ describe Licensed::Command::Status do
     let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency") }
 
     it "verifies content at explicit path" do
-      filename = config.cache_path.join("test/dependency/path.txt")
+      filename = config.cache_path.join("test/dependency/path.dependency")
       license = Licensed::License.new
       license.save(filename)
 

@@ -16,18 +16,12 @@ describe Licensed::License do
     end
 
     it "loads dependency information from a file" do
-      File.write(@filename, <<~CONTENT.rstrip)
-        ---
-        name: test
-        ---
-        license1
-        #{Licensed::License::LICENSE_SEPARATOR}
-        license2
-        #{Licensed::License::TEXT_SEPARATOR}
-        notice
-        #{Licensed::License::TEXT_SEPARATOR}
-        author
-      CONTENT
+      data = {
+        "name" => "test",
+        "licenses" => ["license1", "license2"],
+        "notices" => ["notice", "author"]
+      }
+      File.write(@filename, data.to_yaml)
 
       content = Licensed::License.read(@filename)
       assert_equal "test", content["name"]
@@ -47,22 +41,21 @@ describe Licensed::License do
       assert_equal <<~CONTENT, File.read(@filename)
         ---
         name: test
-        ---
-        license
-        #{Licensed::License::TEXT_SEPARATOR}
-        notice
+        licenses:
+        - license
+        notices:
+        - notice
       CONTENT
     end
 
-    it "always contains a license text section if there are legal notices" do
-      license = Licensed::License.new(notices: "notice", metadata: { "name" => "test" })
+    it "always contains a licenses and notices properties" do
+      license = Licensed::License.new(metadata: { "name" => "test" })
       license.save(@filename)
       assert_equal <<~CONTENT, File.read(@filename)
         ---
         name: test
-        ---
-        #{Licensed::License::TEXT_SEPARATOR}
-        notice
+        licenses: []
+        notices: []
       CONTENT
     end
   end
