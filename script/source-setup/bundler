@@ -14,7 +14,7 @@ cd $BASE_PATH/test/fixtures/bundler
 unset BUNDLE_GEMFILE
 
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" -and -not -name "Gemfile" -print0 | xargs -0 rm -rf
+  find . -not -regex "\.*" -and -not -name "Gemfile" -and -not \( -path ./pathed-gem-fixture -prune \) -print0 | xargs -0 rm -rf
 fi
 
 bundle install --path vendor/gems --without ignore
