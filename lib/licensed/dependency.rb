@@ -21,8 +21,8 @@ module Licensed
       super(path, search_root: search_root, detect_readme: true, detect_packages: true)
     end
 
-    def data
-      @data ||= License.new(
+    def record
+      @record ||= DependencyRecord.new(
         metadata: license_metadata,
         licenses: license_contents,
         notices: notice_contents

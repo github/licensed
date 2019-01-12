@@ -31,15 +31,15 @@ module Licensed
                 version = dependency.version
 
                 names << name
-                filename = cache_path.join("#{name}.#{License::EXTENSION}")
+                filename = cache_path.join("#{name}.#{DependencyRecord::EXTENSION}")
 
-                # try to load existing license from disk
-                # or default to a blank license
-                license = Licensed::License.read(filename) || Licensed::License.new
+                # try to load existing record from disk
+                # or default to a blank record
+                cached_record = Licensed::DependencyRecord.read(filename) || Licensed::DependencyRecord.new
 
                 # cached version string exists and did not change, no need to re-cache
-                has_version = !license["version"].nil? && !license["version"].empty?
-                if !force && has_version && version == license["version"]
+                has_version = !cached_record["version"].nil? && !cached_record["version"].empty?
+                if !force && has_version && version == cached_record["version"]
                   @config.ui.info "    Using #{name} (#{version})"
                   next
                 end
@@ -47,16 +47,16 @@ module Licensed
                 @config.ui.info "    Caching #{name} (#{version})"
 
                 # use the cached license value if the license text wasn't updated
-                dependency.data["license"] = license["license"] if dependency.data.matches?(license)
+                dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
 
-                dependency.data.save(filename)
+                dependency.record.save(filename)
               end
 
               # Clean up cached files that dont match current dependencies
-              Dir.glob(cache_path.join("**/*.#{License::EXTENSION}")).each do |file|
+              Dir.glob(cache_path.join("**/*.#{DependencyRecord::EXTENSION}")).each do |file|
                 file_path = Pathname.new(file)
                 relative_path = file_path.relative_path_from(cache_path).to_s
-                FileUtils.rm(file) unless names.include?(relative_path.chomp(".#{License::EXTENSION}"))
+                FileUtils.rm(file) unless names.include?(relative_path.chomp(".#{DependencyRecord::EXTENSION}"))
               end
 
               "* #{app_name} #{type} dependencies: #{source.dependencies.size}"

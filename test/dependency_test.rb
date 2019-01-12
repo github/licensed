@@ -17,24 +17,24 @@ describe Licensed::Dependency do
     end
   end
 
-  describe "license" do
-    it "returns a Licensed::License object with dependency data" do
+  describe "record" do
+    it "returns a Licensed::DependencyRecord object with dependency data" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "AUTHORS", "author"
-        assert_equal "mit", dependency.data["license"]
-        assert_equal "test", dependency.data["name"]
+        assert_equal "mit", dependency.record["license"]
+        assert_equal "test", dependency.record["name"]
         assert_equal "1.0", dependency.version
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
-        assert_includes dependency.data.notices,
+        assert_includes dependency.record.notices,
                         { "sources" => "AUTHORS", "text" => "author" }
       end
     end
 
     it "prefers a name given via metadata over the `name` kwarg" do
       dep = Licensed::Dependency.new(name: "name", version: "1.0", path: Dir.pwd, metadata: { "name" => "meta_name" })
-      assert_equal "meta_name", dep.data["name"]
+      assert_equal "meta_name", dep.record["name"]
     end
   end
 
@@ -113,7 +113,7 @@ describe Licensed::Dependency do
     it "gets license content from license file" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
       end
     end
@@ -121,14 +121,14 @@ describe Licensed::Dependency do
     it "does not get license content from package manager file" do
       mkproject do |dependency|
         File.write "project.gemspec", "s.license = 'mit'"
-        assert_empty dependency.data.licenses
+        assert_empty dependency.record.licenses
       end
     end
 
     it "gets license from readme" do
       mkproject do |dependency|
         File.write "README.md", "# License\n" + Licensee::License.find("mit").text
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "README.md", "text" => Licensee::License.find("mit").text.rstrip }
       end
     end
@@ -137,7 +137,7 @@ describe Licensed::Dependency do
       mkproject do |dependency|
         File.write "project.gemspec", "foo"
         File.write "README.md", "# License\n" + Licensee::License.find("mit").text
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "README.md", "text" => Licensee::License.find("mit").text.rstrip }
       end
     end
@@ -147,9 +147,9 @@ describe Licensed::Dependency do
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "LICENSE.md", Licensee::License.find("bsd-3-clause").text
 
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "LICENSE.md", "text" => Licensee::License.find("bsd-3-clause").text }
       end
     end
@@ -159,9 +159,9 @@ describe Licensed::Dependency do
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "README.md", "# License\n" + Licensee::License.find("bsd-3-clause").text
 
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "README.md", "text" => Licensee::License.find("bsd-3-clause").text.rstrip }
       end
     end
@@ -175,7 +175,7 @@ describe Licensed::Dependency do
           Dir.chdir "dependency" do
             dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd, search_root: File.expand_path(".."))
             source = Pathname.new(dir).basename.join("LICENSE").to_path
-            assert_includes dep.data.licenses,
+            assert_includes dep.record.licenses,
                             { "sources" => source, "text" => "license" }
           end
         end
@@ -187,7 +187,7 @@ describe Licensed::Dependency do
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "LICENSE.md", Licensee::License.find("mit").text
 
-        assert_includes dependency.data.licenses,
+        assert_includes dependency.record.licenses,
                         { "sources" => "LICENSE, LICENSE.md", "text" => Licensee::License.find("mit").text }
       end
     end
@@ -200,11 +200,11 @@ describe Licensed::Dependency do
         File.write "NOTICE", "notice"
         File.write "LEGAL", "legal"
 
-        assert_includes dependency.data.notices,
+        assert_includes dependency.record.notices,
                         { "sources" => "AUTHORS", "text" => "authors" }
-        assert_includes dependency.data.notices,
+        assert_includes dependency.record.notices,
                         { "sources" => "NOTICE", "text" => "notice" }
-        assert_includes dependency.data.notices,
+        assert_includes dependency.record.notices,
                         { "sources" => "LEGAL", "text" => "legal" }
       end
     end
@@ -215,11 +215,11 @@ describe Licensed::Dependency do
         File.write "NOTICE", ""
         File.write "LEGAL", "legal"
 
-        refute_includes dependency.data.notices,
+        refute_includes dependency.record.notices,
                         { "sources" => "AUTHORS", "text" => "authors" }
-        refute_includes dependency.data.notices,
+        refute_includes dependency.record.notices,
                         { "sources" => "NOTICE", "text" => "notice" }
-        assert_includes dependency.data.notices,
+        assert_includes dependency.record.notices,
                         { "sources" => "LEGAL", "text" => "legal" }
       end
     end

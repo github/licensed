@@ -2,12 +2,12 @@
 require "test_helper"
 require "tempfile"
 
-describe Licensed::License do
+describe Licensed::DependencyRecord do
   it "acts like a hash" do
-    license = Licensed::License.new(metadata: { "name" => "test" })
-    assert_equal "test", license["name"]
-    license["name"] = "changed"
-    assert_equal "changed", license["name"]
+    record = Licensed::DependencyRecord.new(metadata: { "name" => "test" })
+    assert_equal "test", record["name"]
+    record["name"] = "changed"
+    assert_equal "changed", record["name"]
   end
 
   describe "read" do
@@ -23,7 +23,7 @@ describe Licensed::License do
       }
       File.write(@filename, data.to_yaml)
 
-      content = Licensed::License.read(@filename)
+      content = Licensed::DependencyRecord.read(@filename)
       assert_equal "test", content["name"]
       assert_equal ["license1", "license2"], content.licenses
       assert_equal ["notice", "author"], content.notices
@@ -36,8 +36,8 @@ describe Licensed::License do
     end
 
     it "writes text and metadata" do
-      license = Licensed::License.new(licenses: "license", notices: "notice", metadata: { "name" => "test" })
-      license.save(@filename)
+      record = Licensed::DependencyRecord.new(licenses: "license", notices: "notice", metadata: { "name" => "test" })
+      record.save(@filename)
       assert_equal <<~CONTENT, File.read(@filename)
         ---
         name: test
@@ -48,9 +48,9 @@ describe Licensed::License do
       CONTENT
     end
 
-    it "always contains a licenses and notices properties" do
-      license = Licensed::License.new(metadata: { "name" => "test" })
-      license.save(@filename)
+    it "always contains licenses and notices properties" do
+      record = Licensed::DependencyRecord.new(metadata: { "name" => "test" })
+      record.save(@filename)
       assert_equal <<~CONTENT, File.read(@filename)
         ---
         name: test
@@ -62,36 +62,35 @@ describe Licensed::License do
 
   describe "content" do
     it "returns nil if license text hasn't been set" do
-      license = Licensed::License.new
-      assert_nil license.content
+      record = Licensed::DependencyRecord.new
+      assert_nil record.content
     end
 
     it "returns joined text of all licenses" do
-      license = Licensed::License.new(licenses: ["license1", "license2"])
-      assert_equal "license1license2", license.content
+      record = Licensed::DependencyRecord.new(licenses: ["license1", "license2"])
+      assert_equal "license1license2", record.content
     end
   end
 
   describe "matches?" do
-    it "returns false for a non-License argument" do
-      license = Licensed::License.new
-      refute license.matches? nil
-      refute license.matches? ""
+    it "returns false for a non-DependencyRecord argument" do
+      record = Licensed::DependencyRecord.new
+      refute record.matches? nil
+      refute record.matches? ""
     end
 
     it "returns true if the normalized content is the same for strings" do
-      license = Licensed::License.new(licenses: "- test content")
-      other = Licensed::License.new(licenses: "* test content")
+      record = Licensed::DependencyRecord.new(licenses: "- test content")
+      other = Licensed::DependencyRecord.new(licenses: "* test content")
 
-      assert license.matches?(other)
+      assert record.matches?(other)
     end
 
     it "returns true if the normalized content is the same for text+source data" do
+      record = Licensed::DependencyRecord.new(licenses: { "text" => "- test content" })
+      other = Licensed::DependencyRecord.new(licenses: { "text" => "* test content" })
 
-      license = Licensed::License.new(licenses: { "text" => "- test content" })
-      other = Licensed::License.new(licenses: { "text" => "* test content" })
-
-      assert license.matches?(other)
+      assert record.matches?(other)
     end
   end
 end

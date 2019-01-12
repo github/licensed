@@ -70,9 +70,9 @@ if Licensed::Shell.tool_available?("go")
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
           assert dep
-          assert_equal "go", dep.data["type"]
-          assert dep.data["homepage"]
-          assert dep.data["summary"]
+          assert_equal "go", dep.record["type"]
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
         end
       end
 
@@ -80,8 +80,8 @@ if Licensed::Shell.tool_available?("go")
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
           assert dep
-          assert_equal "go", dep.data["type"]
-          assert dep.data["homepage"]
+          assert_equal "go", dep.record["type"]
+          assert dep.record["homepage"]
         end
       end
 
@@ -104,12 +104,12 @@ if Licensed::Shell.tool_available?("go")
 
           # find the license one directory higher
           license_path = File.join(fixtures, "vendor/github.com/davecgh/go-spew/LICENSE")
-          assert_includes dep.data.licenses,
+          assert_includes dep.record.licenses,
                           { "sources" => "go-spew/LICENSE", "text" => File.read(license_path) }
 
           # do not find the license outside the vendor folder
           license_path = File.join(fixtures, "LICENSE")
-          refute_includes dep.data.licenses,
+          refute_includes dep.record.licenses,
                           { "sources" => "LICENSE", "text" => File.read(license_path) }
         end
       end
@@ -120,7 +120,7 @@ if Licensed::Shell.tool_available?("go")
           assert dep
 
           license_path = File.join(gopath, "src/github.com/hashicorp/golang-lru/LICENSE")
-          assert_includes dep.data.licenses,
+          assert_includes dep.record.licenses,
                           { "sources" => "golang-lru/LICENSE", "text" => File.read(license_path) }
         end
       end

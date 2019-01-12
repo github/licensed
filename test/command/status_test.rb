@@ -36,11 +36,11 @@ describe Licensed::Command::Status do
 
   it "does not warn if dependency is ignored" do
     out, _ = capture_io { verifier.run }
-    assert_match(/dependency.#{Licensed::License::EXTENSION}/, out)
+    assert_match(/dependency.#{Licensed::DependencyRecord::EXTENSION}/, out)
 
     config.ignore "type" => "test", "name" => "dependency"
     out, _ = capture_io { verifier.run }
-    refute_match(/dependency.#{Licensed::License::EXTENSION}/, out)
+    refute_match(/dependency.#{Licensed::DependencyRecord::EXTENSION}/, out)
   end
 
   it "does not warn if dependency is reviewed" do
@@ -53,50 +53,50 @@ describe Licensed::Command::Status do
   end
 
   it "warns if license is empty" do
-    filename = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
-    license = Licensed::License.new
-    license.save(filename)
+    filename = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+    record = Licensed::DependencyRecord.new
+    record.save(filename)
 
     out, _ = capture_io { verifier.run }
     assert_match(/missing license text/, out)
   end
 
-  it "warns if license is empty with notices" do
-    filename = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
-    license = Licensed::License.new(notices: ["notice"])
-    license.save(filename)
+  it "warns if record is empty with notices" do
+    filename = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+    record = Licensed::DependencyRecord.new(notices: ["notice"])
+    record.save(filename)
 
     out, _ = capture_io { verifier.run }
     assert_match(/missing license text/, out)
   end
 
   it "does not warn if license is not empty" do
-    filename = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
-    license = Licensed::License.new(licenses: ["license"])
-    license.save(filename)
+    filename = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+    record = Licensed::DependencyRecord.new(licenses: ["license"])
+    record.save(filename)
 
     out, _ = capture_io { verifier.run }
     refute_match(/missing license text/, out)
   end
 
   it "warns if versions do not match" do
-    filename = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
-    license = Licensed::License.read(filename)
-    license["version"] = "9001"
-    license.save(filename)
+    filename = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+    record = Licensed::DependencyRecord.read(filename)
+    record["version"] = "9001"
+    record.save(filename)
 
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data out of date/, out)
   end
 
   it "warns if cached license data missing" do
-    FileUtils.rm config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
+    FileUtils.rm config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
     out, _ = capture_io { verifier.run }
     assert_match(/cached license data missing/, out)
   end
 
   it "does not warn if cached license data missing for ignored gem" do
-    FileUtils.rm config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
+    FileUtils.rm config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
     config.ignore "type" => "test", "name" => "dependency"
 
     out, _ = capture_io { verifier.run }
@@ -144,7 +144,7 @@ describe Licensed::Command::Status do
 
     it "changes the current directory to app.source_path while running" do
       capture_io { verifier.run }
-      assert_equal fixtures, source.dependencies.first.data["dir"]
+      assert_equal fixtures, source.dependencies.first.record["dir"]
     end
   end
 
@@ -152,9 +152,9 @@ describe Licensed::Command::Status do
     let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency") }
 
     it "verifies content at explicit path" do
-      filename = config.cache_path.join("test/dependency/path.#{Licensed::License::EXTENSION}")
-      license = Licensed::License.new
-      license.save(filename)
+      filename = config.cache_path.join("test/dependency/path.#{Licensed::DependencyRecord::EXTENSION}")
+      record = Licensed::DependencyRecord.new
+      record.save(filename)
 
       out, _ = capture_io { verifier.run }
       assert_match(/missing license text/, out)

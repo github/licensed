@@ -43,9 +43,9 @@ if Licensed::Shell.tool_available?("ghc")
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "bytestring" }
           assert dep
-          assert_equal "cabal", dep.data["type"]
-          assert dep.data["homepage"]
-          assert dep.data["summary"]
+          assert_equal "cabal", dep.record["type"]
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
         end
       end
 
@@ -54,9 +54,9 @@ if Licensed::Shell.tool_available?("ghc")
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep
-          assert_equal "cabal", dep.data["type"]
+          assert_equal "cabal", dep.record["type"]
           assert_equal "0.6.2", dep.version
-          assert dep.data["summary"]
+          assert dep.record["summary"]
         end
       end
 
@@ -65,9 +65,9 @@ if Licensed::Shell.tool_available?("ghc")
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "Glob" }
           assert dep
-          assert_equal "cabal", dep.data["type"]
+          assert_equal "cabal", dep.record["type"]
           assert_equal "0.9.2", dep.version
-          assert dep.data["summary"]
+          assert dep.record["summary"]
         end
       end
 
