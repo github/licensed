@@ -8,6 +8,8 @@ module Licensed
     include Licensee::ContentHelper
     extend Forwardable
 
+    EXTENSION = "dep.yml".freeze
+
     # Read an existing license file
     #
     # filename - A String path to the file

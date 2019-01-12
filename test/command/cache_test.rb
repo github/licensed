@@ -36,7 +36,7 @@ describe Licensed::Command::Cache do
 
           generator.run
 
-          path = app.cache_path.join("#{source_type}/#{expected_dependency}.dependency")
+          path = app.cache_path.join("#{source_type}/#{expected_dependency}.#{Licensed::License::EXTENSION}")
           assert path.exist?
           license = Licensed::License.read(path)
           assert_equal expected_dependency, license["name"]
@@ -48,23 +48,23 @@ describe Licensed::Command::Cache do
 
   it "cleans up old dependencies" do
     FileUtils.mkdir_p config.cache_path.join("test")
-    File.write config.cache_path.join("test/old_dep.dependency"), ""
+    File.write config.cache_path.join("test/old_dep.#{Licensed::License::EXTENSION}"), ""
     generator.run
-    refute config.cache_path.join("test/old_dep.dependency").exist?
+    refute config.cache_path.join("test/old_dep.#{Licensed::License::EXTENSION}").exist?
   end
 
   it "cleans up ignored dependencies" do
     FileUtils.mkdir_p config.cache_path.join("test")
-    File.write config.cache_path.join("test/dependency.dependency"), ""
+    File.write config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}"), ""
     config.ignore "type" => "test", "name" => "dependency"
     generator.run
-    refute config.cache_path.join("test/dependency.dependency").exist?
+    refute config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}").exist?
   end
 
   it "uses cached license if license text does not change" do
     generator.run
 
-    path = config.cache_path.join("test/dependency.dependency")
+    path = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
     license = Licensed::License.read(path)
     license["license"] = "test"
     license["version"] = "0.0"
@@ -80,7 +80,7 @@ describe Licensed::Command::Cache do
   it "does not reuse nil license version" do
     generator.run
 
-    path = config.cache_path.join("test/dependency.dependency")
+    path = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
     license = Licensed::License.read(path)
     license["license"] = "test"
     license.save(path)
@@ -105,7 +105,7 @@ describe Licensed::Command::Cache do
   it "does not reuse empty license version" do
     generator.run
 
-    path = config.cache_path.join("test/dependency.dependency")
+    path = config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}")
     license = Licensed::License.read(path)
     license["license"] = "test"
     license["version"] = ""
@@ -134,7 +134,7 @@ describe Licensed::Command::Cache do
     count = out.match(/dependencies: (\d+)/)[1].to_i
 
     FileUtils.mkdir_p config.cache_path.join("test")
-    File.write config.cache_path.join("test/dependency.dependency"), ""
+    File.write config.cache_path.join("test/dependency.#{Licensed::License::EXTENSION}"), ""
     config.ignore "type" => "test", "name" => "dependency"
 
     out, _ = capture_io { generator.run }
@@ -161,8 +161,8 @@ describe Licensed::Command::Cache do
 
     it "caches metadata for all apps" do
       generator.run
-      assert config["apps"][0].cache_path.join("test/dependency.dependency").exist?
-      assert config["apps"][1].cache_path.join("test/dependency.dependency").exist?
+      assert config["apps"][0].cache_path.join("test/dependency.#{Licensed::License::EXTENSION}").exist?
+      assert config["apps"][1].cache_path.join("test/dependency.#{Licensed::License::EXTENSION}").exist?
     end
   end
 
@@ -180,7 +180,7 @@ describe Licensed::Command::Cache do
 
     it "caches metadata at the given file path" do
       generator.run
-      assert config.cache_path.join("test/dependency/path.dependency").exist?
+      assert config.cache_path.join("test/dependency/path.#{Licensed::License::EXTENSION}").exist?
     end
   end
 end
