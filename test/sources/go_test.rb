@@ -104,11 +104,13 @@ if Licensed::Shell.tool_available?("go")
 
           # find the license one directory higher
           license_path = File.join(fixtures, "vendor/github.com/davecgh/go-spew/LICENSE")
-          assert_includes dep.data.licenses, File.read(license_path)
+          assert_includes dep.data.licenses,
+                          { "sources" => "go-spew/LICENSE", "text" => File.read(license_path) }
 
           # do not find the license outside the vendor folder
           license_path = File.join(fixtures, "LICENSE")
-          refute_includes dep.data.licenses, File.read(license_path)
+          refute_includes dep.data.licenses,
+                          { "sources" => "LICENSE", "text" => File.read(license_path) }
         end
       end
 
@@ -118,7 +120,8 @@ if Licensed::Shell.tool_available?("go")
           assert dep
 
           license_path = File.join(gopath, "src/github.com/hashicorp/golang-lru/LICENSE")
-          assert_includes dep.data.licenses, File.read(license_path)
+          assert_includes dep.data.licenses,
+                          { "sources" => "golang-lru/LICENSE", "text" => File.read(license_path) }
         end
       end
 

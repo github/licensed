@@ -49,7 +49,8 @@ describe Licensed::Sources::Manifest do
       assert_equal "mit", dep.data["license"]
 
       license_path = File.join(config.root, config.dig("manifest", "licenses", "manifest_test"))
-      assert_includes dep.data.licenses, File.read(license_path)
+      assert_includes dep.data.licenses,
+                      { "sources" => "LICENSE", "text" => File.read(license_path) }
     end
 
     it "prefers licenses from license files" do
@@ -59,18 +60,22 @@ describe Licensed::Sources::Manifest do
       refute_empty dep.data.licenses
     end
 
-    it "detects license from source header comments if license files are not found" do
+    it "detects unique license content from redundant source header comments" do
       dep = source.dependencies.detect { |d| d.name == "bsd3_single_header_license" }
       assert dep
       assert_equal "bsd-3-clause", dep.data["license"]
-      assert_equal 1, dep.data.licenses.uniq.size
+      assert_equal 1, dep.data.licenses.size
+
+      _, sources = source.packages.detect { |name, _| name == "bsd3_single_header_license" }
+      assert_equal sources.map { |s| File.basename(s) }.join(", "),
+                   dep.data.licenses.first["sources"]
     end
 
     it "detects unique license content from multiple headers" do
       dep = source.dependencies.detect { |d| d.name == "bsd3_multi_header_license" }
       assert dep
       assert_equal "bsd-3-clause", dep.data["license"]
-      assert_equal 2, dep.data.licenses.uniq.size
+      assert_equal 2, dep.data.licenses.size
     end
 
     it "preserves legal notices when detecting license content from comments" do
