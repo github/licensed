@@ -25,8 +25,10 @@ describe Licensed::Dependency do
         assert_equal "mit", dependency.record["license"]
         assert_equal "test", dependency.record["name"]
         assert_equal "1.0", dependency.version
-        assert_includes dependency.record.licenses, Licensee::License.find("mit").text
-        assert_includes dependency.record.notices, "author"
+        assert_includes dependency.record.licenses,
+                        { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
+        assert_includes dependency.record.notices,
+                        { "sources" => "AUTHORS", "text" => "author" }
       end
     end
 
@@ -111,21 +113,23 @@ describe Licensed::Dependency do
     it "gets license content from license file" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
-        assert_includes dependency.license_contents, Licensee::License.find("mit").text
+        assert_includes dependency.record.licenses,
+                        { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
       end
     end
 
     it "does not get license content from package manager file" do
       mkproject do |dependency|
         File.write "project.gemspec", "s.license = 'mit'"
-        assert_empty dependency.license_contents
+        assert_empty dependency.record.licenses
       end
     end
 
     it "gets license from readme" do
       mkproject do |dependency|
         File.write "README.md", "# License\n" + Licensee::License.find("mit").text
-        assert_includes dependency.license_contents, Licensee::License.find("mit").text.rstrip
+        assert_includes dependency.record.licenses,
+                        { "sources" => "README.md", "text" => Licensee::License.find("mit").text.rstrip }
       end
     end
 
@@ -133,7 +137,8 @@ describe Licensed::Dependency do
       mkproject do |dependency|
         File.write "project.gemspec", "foo"
         File.write "README.md", "# License\n" + Licensee::License.find("mit").text
-        assert_includes dependency.license_contents, Licensee::License.find("mit").text.rstrip
+        assert_includes dependency.record.licenses,
+                        { "sources" => "README.md", "text" => Licensee::License.find("mit").text.rstrip }
       end
     end
 
@@ -142,8 +147,10 @@ describe Licensed::Dependency do
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "LICENSE.md", Licensee::License.find("bsd-3-clause").text
 
-        assert_includes dependency.license_contents, Licensee::License.find("mit").text
-        assert_includes dependency.license_contents, Licensee::License.find("bsd-3-clause").text
+        assert_includes dependency.record.licenses,
+                        { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
+        assert_includes dependency.record.licenses,
+                        { "sources" => "LICENSE.md", "text" => Licensee::License.find("bsd-3-clause").text }
       end
     end
 
@@ -152,8 +159,10 @@ describe Licensed::Dependency do
         File.write "LICENSE", Licensee::License.find("mit").text
         File.write "README.md", "# License\n" + Licensee::License.find("bsd-3-clause").text
 
-        assert_includes dependency.license_contents, Licensee::License.find("mit").text
-        assert_includes dependency.license_contents, Licensee::License.find("bsd-3-clause").text.rstrip
+        assert_includes dependency.record.licenses,
+                        { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
+        assert_includes dependency.record.licenses,
+                        { "sources" => "README.md", "text" => Licensee::License.find("bsd-3-clause").text.rstrip }
       end
     end
 
@@ -165,9 +174,21 @@ describe Licensed::Dependency do
           Dir.mkdir "dependency"
           Dir.chdir "dependency" do
             dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd, search_root: File.expand_path(".."))
-            assert_includes dep.license_contents, "license"
+            source = Pathname.new(dir).basename.join("LICENSE").to_path
+            assert_includes dep.record.licenses,
+                            { "sources" => source, "text" => "license" }
           end
         end
+      end
+    end
+
+    it "attributes the same content to multiple sources" do
+      mkproject do |dependency|
+        File.write "LICENSE", Licensee::License.find("mit").text
+        File.write "LICENSE.md", Licensee::License.find("mit").text
+
+        assert_includes dependency.record.licenses,
+                        { "sources" => "LICENSE, LICENSE.md", "text" => Licensee::License.find("mit").text }
       end
     end
   end
@@ -179,9 +200,12 @@ describe Licensed::Dependency do
         File.write "NOTICE", "notice"
         File.write "LEGAL", "legal"
 
-        assert_includes dependency.notice_contents, "authors"
-        assert_includes dependency.notice_contents, "notice"
-        assert_includes dependency.notice_contents, "legal"
+        assert_includes dependency.record.notices,
+                        { "sources" => "AUTHORS", "text" => "authors" }
+        assert_includes dependency.record.notices,
+                        { "sources" => "NOTICE", "text" => "notice" }
+        assert_includes dependency.record.notices,
+                        { "sources" => "LEGAL", "text" => "legal" }
       end
     end
 
@@ -191,9 +215,12 @@ describe Licensed::Dependency do
         File.write "NOTICE", ""
         File.write "LEGAL", "legal"
 
-        refute_includes dependency.notice_contents, "authors"
-        refute_includes dependency.notice_contents, "notice"
-        assert_includes dependency.notice_contents, "legal"
+        refute_includes dependency.record.notices,
+                        { "sources" => "AUTHORS", "text" => "authors" }
+        refute_includes dependency.record.notices,
+                        { "sources" => "NOTICE", "text" => "notice" }
+        assert_includes dependency.record.notices,
+                        { "sources" => "LEGAL", "text" => "legal" }
       end
     end
   end

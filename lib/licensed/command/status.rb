@@ -22,7 +22,7 @@ module Licensed
 
             results = dependencies.map do |dependency|
               name = dependency.name
-              filename = app.cache_path.join(dependency.record["type"], "#{name}.txt")
+              filename = app.cache_path.join(dependency.record["type"], "#{name}.#{DependencyRecord::EXTENSION}")
 
               warnings = []
 

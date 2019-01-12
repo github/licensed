@@ -16,18 +16,12 @@ describe Licensed::DependencyRecord do
     end
 
     it "loads dependency information from a file" do
-      File.write(@filename, <<~CONTENT.rstrip)
-        ---
-        name: test
-        ---
-        license1
-        #{Licensed::DependencyRecord::LICENSE_SEPARATOR}
-        license2
-        #{Licensed::DependencyRecord::TEXT_SEPARATOR}
-        notice
-        #{Licensed::DependencyRecord::TEXT_SEPARATOR}
-        author
-      CONTENT
+      data = {
+        "name" => "test",
+        "licenses" => ["license1", "license2"],
+        "notices" => ["notice", "author"]
+      }
+      File.write(@filename, data.to_yaml)
 
       content = Licensed::DependencyRecord.read(@filename)
       assert_equal "test", content["name"]
@@ -47,22 +41,21 @@ describe Licensed::DependencyRecord do
       assert_equal <<~CONTENT, File.read(@filename)
         ---
         name: test
-        ---
-        license
-        #{Licensed::DependencyRecord::TEXT_SEPARATOR}
-        notice
+        licenses:
+        - license
+        notices:
+        - notice
       CONTENT
     end
 
-    it "always contains a license text section if there are legal notices" do
-      record = Licensed::DependencyRecord.new(notices: "notice", metadata: { "name" => "test" })
+    it "always contains licenses and notices properties" do
+      record = Licensed::DependencyRecord.new(metadata: { "name" => "test" })
       record.save(@filename)
       assert_equal <<~CONTENT, File.read(@filename)
         ---
         name: test
-        ---
-        #{Licensed::DependencyRecord::TEXT_SEPARATOR}
-        notice
+        licenses: []
+        notices: []
       CONTENT
     end
   end
@@ -75,7 +68,7 @@ describe Licensed::DependencyRecord do
 
     it "returns joined text of all licenses" do
       record = Licensed::DependencyRecord.new(licenses: ["license1", "license2"])
-      assert_equal record.licenses.join, record.content
+      assert_equal "license1license2", record.content
     end
   end
 
@@ -86,9 +79,16 @@ describe Licensed::DependencyRecord do
       refute record.matches? ""
     end
 
-    it "returns true if the normalized content is the same" do
+    it "returns true if the normalized content is the same for strings" do
       record = Licensed::DependencyRecord.new(licenses: "- test content")
       other = Licensed::DependencyRecord.new(licenses: "* test content")
+
+      assert record.matches?(other)
+    end
+
+    it "returns true if the normalized content is the same for text+source data" do
+      record = Licensed::DependencyRecord.new(licenses: { "text" => "- test content" })
+      other = Licensed::DependencyRecord.new(licenses: { "text" => "* test content" })
 
       assert record.matches?(other)
     end
