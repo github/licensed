@@ -70,7 +70,7 @@ module Licensed
     # Returns whether two licenses match based on their contents
     def matches?(other)
       return false unless other.is_a?(License)
-      return false if self.content_normalized.nil?
+      return false if self.content.nil?
 
       self.content_normalized == other.content_normalized
     end
