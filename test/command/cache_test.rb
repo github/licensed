@@ -38,9 +38,9 @@ describe Licensed::Command::Cache do
 
           path = app.cache_path.join("#{source_type}/#{expected_dependency}.#{Licensed::DependencyRecord::EXTENSION}")
           assert path.exist?
-          license = Licensed::DependencyRecord.read(path)
-          assert_equal expected_dependency, license["name"]
-          assert license["license"]
+          record = Licensed::DependencyRecord.read(path)
+          assert_equal expected_dependency, record["name"]
+          assert record["license"]
         end
       end
     end
@@ -61,29 +61,29 @@ describe Licensed::Command::Cache do
     refute config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}").exist?
   end
 
-  it "uses cached license if license text does not change" do
+  it "uses cached record if license text does not change" do
     generator.run
 
     path = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
-    license = Licensed::DependencyRecord.read(path)
-    license["license"] = "test"
-    license["version"] = "0.0"
-    license.save(path)
+    record = Licensed::DependencyRecord.read(path)
+    record["license"] = "test"
+    record["version"] = "0.0"
+    record.save(path)
 
     generator.run
 
-    license = Licensed::DependencyRecord.read(path)
-    assert_equal "test", license["license"]
-    refute_equal "0.0", license["version"]
+    record = Licensed::DependencyRecord.read(path)
+    assert_equal "test", record["license"]
+    refute_equal "0.0", record["version"]
   end
 
-  it "does not reuse nil license version" do
+  it "does not reuse nil record version" do
     generator.run
 
     path = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
-    license = Licensed::DependencyRecord.read(path)
-    license["license"] = "test"
-    license.save(path)
+    record = Licensed::DependencyRecord.read(path)
+    record["license"] = "test"
+    record.save(path)
 
     test_dependency = Licensed::Dependency.new(
       name: "dependency",
@@ -97,19 +97,19 @@ describe Licensed::Command::Cache do
       generator.run
     end
 
-    license = Licensed::DependencyRecord.read(path)
-    assert_equal "test", license["license"]
-    assert_equal "1.0", license["version"]
+    record = Licensed::DependencyRecord.read(path)
+    assert_equal "test", record["license"]
+    assert_equal "1.0", record["version"]
   end
 
-  it "does not reuse empty license version" do
+  it "does not reuse empty record version" do
     generator.run
 
     path = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
-    license = Licensed::DependencyRecord.read(path)
-    license["license"] = "test"
-    license["version"] = ""
-    license.save(path)
+    record = Licensed::DependencyRecord.read(path)
+    record["license"] = "test"
+    record["version"] = ""
+    record.save(path)
 
     test_dependency = Licensed::Dependency.new(
       name: "dependency",
@@ -123,9 +123,9 @@ describe Licensed::Command::Cache do
       generator.run
     end
 
-    license = Licensed::DependencyRecord.read(path)
-    assert_equal "test", license["license"]
-    assert_equal "1.0", license["version"]
+    record = Licensed::DependencyRecord.read(path)
+    assert_equal "test", record["license"]
+    assert_equal "1.0", record["version"]
   end
 
   it "does not include ignored dependencies in dependency counts" do

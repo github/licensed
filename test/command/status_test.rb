@@ -61,7 +61,7 @@ describe Licensed::Command::Status do
     assert_match(/missing license text/, out)
   end
 
-  it "warns if license is empty with notices" do
+  it "warns if record is empty with notices" do
     filename = config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
     record = Licensed::DependencyRecord.new(notices: ["notice"])
     record.save(filename)
