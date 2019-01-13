@@ -38,10 +38,10 @@ module Licensed
 
                 # try to load existing license from disk
                 # or default to a blank license
-                license = Licensed::License.read(filename) || Licensed::License.new
+                license = Licensed::License.read(filename)
 
                 # cached version string exists and did not change, no need to re-cache
-                has_version = !license["version"].nil? && !license["version"].empty?
+                has_version = license && !license["version"].nil? && !license["version"].empty?
                 if !force && has_version && version == license["version"]
                   @config.ui.info "    Using #{name} (#{version})"
                   next
