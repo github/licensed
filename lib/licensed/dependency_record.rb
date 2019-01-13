@@ -70,8 +70,6 @@ module Licensed
     # Returns whether two records match based on their contents
     def matches?(other)
       return false unless other.is_a?(DependencyRecord)
-      return false if self.content.nil?
-
       self.content_normalized == other.content_normalized
     end
   end

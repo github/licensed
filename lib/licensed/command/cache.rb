@@ -35,10 +35,10 @@ module Licensed
 
                 # try to load existing record from disk
                 # or default to a blank record
-                cached_record = Licensed::DependencyRecord.read(filename) || Licensed::DependencyRecord.new
+                cached_record = Licensed::DependencyRecord.read(filename)
 
                 # cached version string exists and did not change, no need to re-cache
-                has_version = !cached_record["version"].nil? && !cached_record["version"].empty?
+                has_version = cached_record && !cached_record["version"].nil? && !cached_record["version"].empty?
                 if !force && has_version && version == cached_record["version"]
                   @config.ui.info "    Using #{name} (#{version})"
                   next
