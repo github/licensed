@@ -191,7 +191,7 @@ module Licensed
           # temporary LICENSE file from unique source file license headers
           if license_key == "none"
             tmp_license_file = write_license_from_source_licenses(self.path, @sources)
-            reset_license!
+            reset_license! if tmp_license_file && File.exist?(tmp_license_file)
           end
 
           super
@@ -228,9 +228,11 @@ module Licensed
         # file at `dir`
         # Returns the path to the license file
         def write_license_from_source_licenses(dir, sources)
+          licenses = source_comment_licenses(sources).uniq
+          return if licenses.nil? || licenses.empty?
+
           license_path = File.join(dir, "LICENSE")
           File.open(license_path, "w") do |f|
-            licenses = source_comment_licenses(sources).uniq
             f.puts(licenses.join("\n#{LICENSE_SEPARATOR}\n"))
           end
 
