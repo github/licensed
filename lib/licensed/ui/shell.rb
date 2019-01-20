@@ -31,6 +31,10 @@ module Licensed
         @shell.say msg, :red, newline if level?("error")
       end
 
+      def newline
+        info ""
+      end
+
       def level=(level)
         raise ArgumentError unless LEVELS.include?(level.to_s)
         @level = level
