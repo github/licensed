@@ -54,8 +54,7 @@ module Licensed
     end
 
     def run(command, *args)
-      command.run(*args)
-      exit command.success?
+      exit command.run(*args)
     end
   end
 end
