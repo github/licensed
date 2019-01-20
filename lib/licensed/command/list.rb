@@ -3,38 +3,35 @@ module Licensed
   module Command
     class List
       attr_reader :config
+      attr_reader :reporter
 
-      def initialize(config)
+      def initialize(config, reporter = Licensed::Reporters::ListReporter.new)
         @config = config
+        @reporter = reporter
       end
 
       def run
-        @config.apps.each do |app|
-          @config.ui.info "Displaying dependencies for #{app["name"]}"
+        reporter.report_run do
+          config.apps.each { |app| list_app_dependencies(app) }
+        end
+
+        true
+      end
+
+      def list_app_dependencies(app)
+        reporter.report_app(app) do
           Dir.chdir app.source_path do
-            app.sources.each do |source|
-              type = source.class.type
-
-              @config.ui.info "  #{type} dependencies:"
-
-              source_dependencies = dependencies(app, source)
-              source_dependencies.each do |dependency|
-                @config.ui.info "    Found #{dependency.name} (#{dependency.version})"
-              end
-
-              @config.ui.confirm "  * #{type} dependencies: #{source_dependencies.size}"
-            end
+            app.sources.each { |source| list_source_dependencies(source) }
           end
         end
       end
 
-      # Returns an apps non-ignored dependencies, sorted by name
-      def dependencies(app, source)
-        source.dependencies.sort_by { |d| d.name }
-      end
-
-      def success?
-        true
+      def list_source_dependencies(source)
+        reporter.report_source(source) do
+          source.dependencies
+                .sort_by { |dependency| dependency.name }
+                .each { |dependency| reporter.report_dependency(dependency) { } }
+        end
       end
     end
   end

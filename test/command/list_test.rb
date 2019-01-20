@@ -2,9 +2,10 @@
 require "test_helper"
 
 describe Licensed::Command::List do
+  let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:command) { Licensed::Command::List.new(config) }
+  let(:command) { Licensed::Command::List.new(config, reporter) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
@@ -27,23 +28,29 @@ describe Licensed::Command::List do
           enabled = Dir.chdir(app.source_path) { source.enabled? }
           next unless enabled
 
-          out, = capture_io { command.run }
-          assert_match(/Found #{expected_dependency}/, out)
-          assert_match(/#{source_type} dependencies:/, out)
+          command.run
+          source_results = reporter.results.values.first
+          assert source_results.key?(source_type)
+          assert source_results[source_type].key?(expected_dependency)
         end
       end
     end
   end
 
   it "does not include ignored dependencies" do
-    out, = capture_io { command.run }
-    assert_match(/dependency/, out)
-    count = out.match(/dependencies: (\d+)/)[1].to_i
+    command.run
+    dependencies = reporter.results.flat_map { |_, source_results| source_results.values }
+                                   .reduce(&:merge)
+    assert dependencies.key?("dependency")
+    count = dependencies.size
 
     config.ignore("type" => "test", "name" => "dependency")
-    out, = capture_io { command.run }
-    refute_match(/dependency/, out)
-    ignored_count = out.match(/dependencies: (\d+)/)[1].to_i
+    command.run
+    dependencies = reporter.results.flat_map { |_, source_results| source_results.values }
+                                   .reduce(&:merge)
+    refute dependencies.key?("dependency")
+    ignored_count = dependencies.size
+
     assert_equal count - 1, ignored_count
   end
 
@@ -65,9 +72,9 @@ describe Licensed::Command::List do
     let(:config) { Licensed::Configuration.new("apps" => apps) }
 
     it "lists dependencies for all apps" do
-      out, = capture_io { command.run }
-      config.apps.each do |app|
-        assert_match(/Displaying dependencies for #{app['name']}/, out)
+      command.run
+      apps.each do |app|
+        assert_includes reporter.results.keys, app["name"]
       end
     end
   end
@@ -76,7 +83,7 @@ describe Licensed::Command::List do
     let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
 
     it "changes the current directory to app.source_path while running" do
-      capture_io { command.run }
+      command.run
       assert_equal fixtures, source.dependencies.first.record["dir"]
     end
   end
