@@ -8,9 +8,6 @@ module Licensed
 
       def run
         @ui.info(Licensed::VERSION)
-      end
-
-      def success?
         true
       end
     end

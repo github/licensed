@@ -57,21 +57,22 @@ For example, on macOS with Homebrew: `brew install cmake pkg-config` and on Ubun
 
 ```
 $ bundle exec licensed status
-Checking licenses for 3 dependencies
+Checking cached dependency records for licensed
+..F.F....F...
 
-Warnings:
+Errors:
 
-.licenses/bundler/bundler.txt:
-  - license needs reviewed: mit.
+* bundler.pathname-common_prefix
+  filename: /Users/jonabc/github/licensed/.licenses/bundler/pathname-common_prefix.dep.yml
+    - license needs reviewed: other
 
-.licenses/bundler/licensee.txt:
-  - cached license data missing
+* bundler.bundler
+  filename: /Users/jonabc/github/licensed/.licenses/bundler/bundler.dep.yml
+    - cached dependency record not found  
 
-.licenses/bower/jquery.txt:
-  - license needs reviewed: mit.
-  - cached license data out of date
-
-3 dependencies checked, 3 warnings found.
+* bundler.addressable
+  filename: /Users/jonabc/github/licensed/.licenses/bundler/addressable.dep.yml
+    - license needs reviewed: apache-2.0
 ```
 
 - `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`

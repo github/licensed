@@ -5,9 +5,11 @@ module Licensed
   module Command
     class Status
       attr_reader :config
+      attr_reader :reporter
 
-      def initialize(config)
+      def initialize(config, reporter = Licensed::Reporters::StatusReporter.new)
         @config = config
+        @reporter = reporter
       end
 
       def allowed_or_reviewed?(app, dependency)
@@ -15,60 +17,49 @@ module Licensed
       end
 
       def run
-        @results = @config.apps.flat_map do |app|
+        reporter.report_run do
+          config.apps.map { |app| verify_app(app) }.all?
+        end
+      end
+
+      def verify_app(app)
+        reporter.report_app(app) do
           Dir.chdir app.source_path do
-            dependencies = app.sources.flat_map(&:dependencies)
-            @config.ui.info "Checking licenses for #{app['name']}: #{dependencies.size} dependencies"
-
-            results = dependencies.map do |dependency|
-              name = dependency.name
-              filename = app.cache_path.join(dependency.record["type"], "#{name}.#{DependencyRecord::EXTENSION}")
-
-              warnings = []
-
-              # verify cached license data for dependency
-              if File.exist?(filename)
-                cached_record = DependencyRecord.read(filename)
-
-                if cached_record["version"] != dependency.version
-                  warnings << "cached license data out of date"
-                end
-                warnings << "missing license text" if cached_record.licenses.empty?
-                unless allowed_or_reviewed?(app, cached_record)
-                  warnings << "license needs reviewed: #{cached_record["license"]}."
-                end
-              else
-                warnings << "cached license data missing"
-              end
-
-              if warnings.size > 0
-                @config.ui.error("F", false)
-                [filename, warnings]
-              else
-                @config.ui.confirm(".", false)
-                nil
-              end
-            end.compact
-
-            unless results.empty?
-              @config.ui.warn "\n\nWarnings:"
-
-              results.each do |filename, warnings|
-                @config.ui.info "\n#{filename}:"
-                warnings.each do |warning|
-                  @config.ui.error "  - #{warning}"
-                end
-              end
-            end
-
-            puts "\n#{dependencies.size} dependencies checked, #{results.size} warnings found."
-            results
+            app.sources.map { |source| verify_source(app, source) }.all?
           end
         end
       end
 
-      def success?
-        @results.empty?
+      def verify_source(app, source)
+        reporter.report_source(source) do
+          source.dependencies.map { |dependency| verify_dependency(app, source, dependency) }.all?
+        end
+      end
+
+      def verify_dependency(app, source, dependency)
+        reporter.report_dependency(dependency) do |report|
+          filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
+          cached_record = cached_record(filename)
+
+          errors = []
+          if cached_record.nil?
+            errors << "cached dependency record not found"
+          else
+            errors << "cached dependency record out of date" if cached_record["version"] != dependency.version
+            errors << "missing license text" if cached_record.licenses.empty?
+            errors << "license needs reviewed: #{cached_record["license"]}" unless allowed_or_reviewed?(app, cached_record)
+          end
+
+          report["errors"] = errors
+          report["filename"] = filename
+
+          errors.empty?
+        end
+      end
+
+      def cached_record(filename)
+        return nil unless File.exist?(filename)
+        DependencyRecord.read(filename)
       end
     end
   end

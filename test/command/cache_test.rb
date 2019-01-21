@@ -2,9 +2,10 @@
 require "test_helper"
 
 describe Licensed::Command::Cache do
+  let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:generator) { Licensed::Command::Cache.new(config) }
+  let(:generator) { Licensed::Command::Cache.new(config, reporter) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
@@ -129,16 +130,19 @@ describe Licensed::Command::Cache do
   end
 
   it "does not include ignored dependencies in dependency counts" do
-    config.ui.level = "info"
-    out, _ = capture_io { generator.run }
-    count = out.match(/dependencies: (\d+)/)[1].to_i
+    generator.run
+    count = reporter.results.flat_map { |_, source_results| source_results.values }
+                            .reduce(&:merge)
+                            .size
 
     FileUtils.mkdir_p config.cache_path.join("test")
     File.write config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}"), ""
     config.ignore "type" => "test", "name" => "dependency"
 
-    out, _ = capture_io { generator.run }
-    ignored_count = out.match(/dependencies: (\d+)/)[1].to_i
+    generator.run
+    ignored_count = reporter.results.flat_map { |_, source_results| source_results.values }
+                                    .reduce(&:merge)
+                                    .size
     assert_equal count - 1, ignored_count
   end
 
