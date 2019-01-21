@@ -18,7 +18,7 @@ module Licensed
           dependencies_count = report.sum { |_, dependency_reports| dependency_reports.size }
           error_data = report.flat_map do |source_type, dependency_reports|
             dependency_reports.reject { |_, data| data["errors"].nil? || data["errors"].empty? }
-                              .map { |name, data| data.merge("source" => source_type, "dependency" => name)}
+                              .map { |name, data| data.merge("source" => source_type, "dependency" => name) }
           end
 
           error_count = error_data.flat_map { |data| data["errors"] }.size

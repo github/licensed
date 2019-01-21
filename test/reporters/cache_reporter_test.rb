@@ -32,7 +32,7 @@ describe Licensed::Reporters::CacheReporter do
 
     it "prints an informative message to the shell" do
       reporter.report_run do
-        reporter.report_app(app) { }
+        reporter.report_app(app) {}
 
         assert_includes shell.messages,
                         {
@@ -75,7 +75,7 @@ describe Licensed::Reporters::CacheReporter do
     it "prints informative messages to the shell" do
       reporter.report_run do
         reporter.report_app(app) do
-          reporter.report_source(source) { }
+          reporter.report_source(source) {}
           assert_includes shell.messages,
                           {
                              message: "  #{source.class.type} dependencies:",

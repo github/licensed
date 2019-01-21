@@ -30,7 +30,7 @@ module Licensed
         reporter.report_source(source) do
           source.dependencies
                 .sort_by { |dependency| dependency.name }
-                .each { |dependency| reporter.report_dependency(dependency) { } }
+                .each { |dependency| reporter.report_dependency(dependency) {} }
         end
       end
     end

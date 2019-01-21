@@ -136,7 +136,7 @@ describe Licensed::Reporters::StatusReporter do
       reporter.report_run do
         reporter.report_app(app) do
           reporter.report_source(source) do
-            reporter.report_dependency(dependency) { }
+            reporter.report_dependency(dependency) {}
             assert_includes shell.messages,
                             {
                                message: ".",

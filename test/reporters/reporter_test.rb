@@ -59,7 +59,7 @@ describe Licensed::Reporters::Reporter do
       reporter.report_run do
         reporter.report_app(app) do
           assert_raises Licensed::Reporters::Reporter::ReportingError do
-            reporter.report_app(app) { }
+            reporter.report_app(app) {}
           end
         end
       end
@@ -67,7 +67,7 @@ describe Licensed::Reporters::Reporter do
 
     it "raises an error if called outside of run_report" do
       assert_raises Licensed::Reporters::Reporter::ReportingError do
-        reporter.report_app(app) { }
+        reporter.report_app(app) {}
       end
     end
   end
@@ -117,7 +117,7 @@ describe Licensed::Reporters::Reporter do
         reporter.report_app(app) do
           reporter.report_source(source) do
             assert_raises Licensed::Reporters::Reporter::ReportingError do
-              reporter.report_source(source) { }
+              reporter.report_source(source) {}
             end
           end
         end
@@ -126,7 +126,7 @@ describe Licensed::Reporters::Reporter do
 
     it "raises an error if called outside of report_app" do
       assert_raises Licensed::Reporters::Reporter::ReportingError do
-        reporter.report_source(source) { }
+        reporter.report_source(source) {}
       end
     end
   end
@@ -181,7 +181,7 @@ describe Licensed::Reporters::Reporter do
 
     it "raises an error if called outside of report_source" do
       assert_raises Licensed::Reporters::Reporter::ReportingError do
-        reporter.report_dependency(dependency) { }
+        reporter.report_dependency(dependency) {}
       end
     end
   end
