@@ -78,7 +78,7 @@ describe Licensed::Reporters::ListReporter do
           reporter.report_source(source) {}
           assert_includes shell.messages,
                           {
-                             message: "  #{source.class.type} dependencies:",
+                             message: "  #{source.class.type}",
                              newline: true,
                              style: :info
                           }

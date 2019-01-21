@@ -25,7 +25,7 @@ module Licensed
       # Note - must be called from inside the `report_run` scope
       def report_source(source)
         super do |report|
-          shell.info "  #{source.class.type} dependencies:"
+          shell.info "  #{source.class.type}"
           result = yield report
           shell.confirm "  * #{report.size} #{source.class.type} dependencies"
 

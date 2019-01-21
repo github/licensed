@@ -22,21 +22,21 @@ as showing whether a dependency was cached or if a cached record was found and r
 
 example output
 ```
-Caching licenses for licensed:
-  bundler dependencies:
-    Using licensee (9.11.0)
-    Using thor (0.20.3)
-    Using pathname-common_prefix (0.0.1)
-    Using tomlrb (1.2.8)
-    Using bundler (1.16.3)
-    Using dotenv (2.6.0)
-    Using octokit (4.8.0)
-    Using rugged (0.27.7)
-    Using sawyer (0.8.1)
+Caching dependency records for licensed
+  bundler
+    Caching licensee (9.11.0)
+    Caching thor (0.20.3)
+    Caching pathname-common_prefix (0.0.1)
+    Caching tomlrb (1.2.8)
+    Caching bundler (1.16.3)
+    Caching dotenv (2.6.0)
+    Caching octokit (4.8.0)
+    Caching rugged (0.27.7)
+    Caching sawyer (0.8.1)
     Caching addressable (2.5.2)
-    Using faraday (0.15.4)
-    Using public_suffix (3.0.3)
-    Using multipart-post (2.0.0)
+    Caching faraday (0.15.4)
+    Caching public_suffix (3.0.3)
+    Caching multipart-post (2.0.0)
   * 13 bundler dependencies
 ```
 
@@ -48,8 +48,8 @@ the name and version of each dependency found.
 
 example output
 ```
-Dependencies for licensed
-  bundler dependencies:
+Listing dependencies for licensed
+  bundler
     addressable (2.5.2)
     bundler (1.16.3)
     dotenv (2.6.0)
@@ -86,7 +86,7 @@ Errors:
 
 * bundler.bundler
   filename: /Users/jonabc/github/licensed/.licenses/bundler/bundler.dep.yml
-    - cached license data missing
+    - cached dependency record not found  
 
 * bundler.addressable
   filename: /Users/jonabc/github/licensed/.licenses/bundler/addressable.dep.yml

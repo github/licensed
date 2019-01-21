@@ -10,7 +10,7 @@ module Licensed
       # Note - must be called from inside the `report_run` scope
       def report_app(app)
         super do |report|
-          shell.info "Caching dependency records for #{app["name"]}:"
+          shell.info "Caching dependency records for #{app["name"]}"
           yield report
         end
       end
@@ -24,7 +24,7 @@ module Licensed
       # Note - must be called from inside the `report_run` scope
       def report_source(source)
         super do |report|
-          shell.info "  #{source.class.type} dependencies:"
+          shell.info "  #{source.class.type}"
           result = yield report
           shell.confirm "  * #{report.size} #{source.class.type} dependencies"
           result

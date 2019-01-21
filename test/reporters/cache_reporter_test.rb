@@ -36,7 +36,7 @@ describe Licensed::Reporters::CacheReporter do
 
         assert_includes shell.messages,
                         {
-                           message: "Caching dependency records for #{app["name"]}:",
+                           message: "Caching dependency records for #{app["name"]}",
                            newline: true,
                            style: :info
                         }
@@ -78,7 +78,7 @@ describe Licensed::Reporters::CacheReporter do
           reporter.report_source(source) {}
           assert_includes shell.messages,
                           {
-                             message: "  #{source.class.type} dependencies:",
+                             message: "  #{source.class.type}",
                              newline: true,
                              style: :info
                           }
