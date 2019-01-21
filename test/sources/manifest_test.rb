@@ -206,14 +206,14 @@ describe Licensed::Sources::Manifest do
     it "finds files for a single pattern" do
       files = source.files_from_pattern_list(["lib/**/*.rb"])
       assert files.include?("lib/licensed/sources/manifest.rb")
-      assert files.include?("lib/licensed/command/list.rb")
-      refute files.include?("test/command/cache_test.rb")
+      assert files.include?("lib/licensed/commands/list.rb")
+      refute files.include?("test/commands/cache_test.rb")
     end
 
     it "finds files for an array of patterns" do
       files = source.files_from_pattern_list(["lib/**/manifest.rb", "lib/**/list.rb"])
       assert files.include?("lib/licensed/sources/manifest.rb")
-      assert files.include?("lib/licensed/command/list.rb")
+      assert files.include?("lib/licensed/commands/list.rb")
     end
 
     it "finds files for a directory pattern" do

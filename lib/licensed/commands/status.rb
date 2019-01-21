@@ -2,7 +2,7 @@
 require "yaml"
 
 module Licensed
-  module Command
+  module Commands
     class Status
       attr_reader :config
       attr_reader :reporter

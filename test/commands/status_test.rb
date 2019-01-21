@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 require "test_helper"
 
-describe Licensed::Command::Status do
+describe Licensed::Commands::Status do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:verifier) { Licensed::Command::Status.new(config, reporter) }
+  let(:verifier) { Licensed::Commands::Status.new(config, reporter) }
 
   before do
     config.apps.each do |app|
@@ -14,7 +14,7 @@ describe Licensed::Command::Status do
     end
 
     config.ui.silence do
-      Licensed::Command::Cache.new(config.dup, reporter).run(force: true)
+      Licensed::Commands::Cache.new(config.dup, reporter).run(force: true)
     end
   end
 

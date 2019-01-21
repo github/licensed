@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 require "test_helper"
 
-describe Licensed::Command::Cache do
+describe Licensed::Commands::Cache do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:generator) { Licensed::Command::Cache.new(config, reporter) }
+  let(:generator) { Licensed::Commands::Cache.new(config, reporter) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
