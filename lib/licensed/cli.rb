@@ -32,7 +32,7 @@ module Licensed
     map "--version" => :version
     desc "version", "Show Installed Version of Licensed, [-v, --version]"
     def version
-      run Licensed::Command::Version.new
+      puts Licensed::VERSION
     end
 
     # If an error occurs (e.g. a missing command or argument), exit 1.
