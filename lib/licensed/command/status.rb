@@ -43,9 +43,9 @@ module Licensed
 
           errors = []
           if cached_record.nil?
-            errors << "cached license data missing"
+            errors << "cached dependency record not found"
           else
-            errors << "cached license data out of date" if cached_record["version"] != dependency.version
+            errors << "cached dependency record out of date" if cached_record["version"] != dependency.version
             errors << "missing license text" if cached_record.licenses.empty?
             errors << "license needs reviewed: #{cached_record["license"]}" unless allowed_or_reviewed?(app, cached_record)
           end

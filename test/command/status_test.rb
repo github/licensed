@@ -95,13 +95,13 @@ describe Licensed::Command::Status do
     record.save(filename)
 
     verifier.run
-    assert_includes dependency_errors, "cached license data out of date"
+    assert_includes dependency_errors, "cached dependency record out of date"
   end
 
   it "warns if cached license data missing" do
     FileUtils.rm config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
     verifier.run
-    assert_includes dependency_errors, "cached license data missing"
+    assert_includes dependency_errors, "cached dependency record not found"
   end
 
   it "does not warn if cached license data missing for ignored gem" do
