@@ -36,7 +36,7 @@ describe Licensed::Reporters::ListReporter do
 
         assert_includes shell.messages,
                         {
-                           message: "Dependencies for #{app["name"]}",
+                           message: "Listing dependencies for #{app["name"]}",
                            newline: true,
                            style: :info
                         }
@@ -87,7 +87,7 @@ describe Licensed::Reporters::ListReporter do
                           {
                              message: "  * 0 #{source.class.type} dependencies",
                              newline: true,
-                             style: :info
+                             style: :confirm
                           }
         end
       end

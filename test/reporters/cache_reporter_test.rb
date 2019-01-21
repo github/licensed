@@ -36,7 +36,7 @@ describe Licensed::Reporters::CacheReporter do
 
         assert_includes shell.messages,
                         {
-                           message: "Caching licenses for #{app["name"]}:",
+                           message: "Caching dependency records for #{app["name"]}:",
                            newline: true,
                            style: :info
                         }
@@ -87,7 +87,7 @@ describe Licensed::Reporters::CacheReporter do
                           {
                              message: "  * 0 #{source.class.type} dependencies",
                              newline: true,
-                             style: :info
+                             style: :confirm
                           }
         end
       end
