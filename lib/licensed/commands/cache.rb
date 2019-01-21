@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Licensed
-  module Command
+  module Commands
     class Cache
       attr_reader :config
       attr_reader :reporter
