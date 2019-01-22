@@ -7,7 +7,6 @@ if Licensed::Shell.tool_available?("npm")
   describe Licensed::Sources::NPM do
     before do
       @config = Licensed::Configuration.new
-      @config.ui.level = "silent"
       @source = Licensed::Sources::NPM.new(@config)
     end
 
