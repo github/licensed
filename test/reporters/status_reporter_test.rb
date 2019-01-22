@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require "test_helper"
-require "byebug"
 
 describe Licensed::Reporters::StatusReporter do
   let(:shell) { TestShell.new }

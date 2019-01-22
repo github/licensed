@@ -13,9 +13,7 @@ describe Licensed::Commands::Status do
       app.sources << source
     end
 
-    config.ui.silence do
-      Licensed::Commands::Cache.new(config.dup, reporter).run(force: true)
-    end
+    Licensed::Commands::Cache.new(config.dup, reporter).run(force: true)
   end
 
   after do

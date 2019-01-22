@@ -9,7 +9,6 @@ describe Licensed::Commands::Cache do
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
-    config.ui.level = "silent"
     config.apps.each do |app|
       app.sources.clear
       app.sources << source

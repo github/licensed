@@ -10,12 +10,8 @@ module Licensed
       ".licensed.json".freeze
     ].freeze
 
-    attr_reader :ui
-
     def initialize(options = {}, inherited_options = {})
       super()
-
-      @ui = Licensed::UI::Shell.new
 
       # update order:
       # 1. anything inherited from root config
