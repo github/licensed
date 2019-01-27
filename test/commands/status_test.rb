@@ -5,7 +5,7 @@ describe Licensed::Commands::Status do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:verifier) { Licensed::Commands::Status.new(config, reporter) }
+  let(:verifier) { Licensed::Commands::Status.new(config: config, reporter: reporter) }
 
   before do
     config.apps.each do |app|
@@ -13,7 +13,7 @@ describe Licensed::Commands::Status do
       app.sources << source
     end
 
-    Licensed::Commands::Cache.new(config.dup, reporter).run(force: true)
+    Licensed::Commands::Cache.new(config: config.dup, reporter: reporter).run(force: true)
   end
 
   after do

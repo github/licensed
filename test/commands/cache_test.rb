@@ -5,7 +5,7 @@ describe Licensed::Commands::Cache do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:generator) { Licensed::Commands::Cache.new(config, reporter) }
+  let(:generator) { Licensed::Commands::Cache.new(config: config, reporter: reporter) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do

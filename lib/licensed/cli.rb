@@ -11,21 +11,21 @@ module Licensed
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def cache
-      run Licensed::Commands::Cache.new(config), force: options[:force]
+      run Licensed::Commands::Cache.new(config: config), force: options[:force]
     end
 
     desc "status", "Check status of dependencies' cached licenses"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def status
-      run Licensed::Commands::Status.new(config)
+      run Licensed::Commands::Status.new(config: config)
     end
 
     desc "list", "List dependencies"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def list
-      run Licensed::Commands::List.new(config)
+      run Licensed::Commands::List.new(config: config)
     end
 
     map "-v" => :version
@@ -53,8 +53,8 @@ module Licensed
       options["config"] || Dir.pwd
     end
 
-    def run(command, *args)
-      exit command.run(*args)
+    def run(command, **args)
+      exit command.run(args)
     end
   end
 end
