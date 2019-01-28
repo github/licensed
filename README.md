@@ -50,32 +50,11 @@ For example, on macOS with Homebrew: `brew install cmake pkg-config` and on Ubun
 ## Usage
 
 - `licensed list`: Output enumerated dependencies only.
-
 - `licensed cache`: Cache licenses and metadata.
-
 - `licensed status`: Check status of dependencies' cached licenses. For example:
-
-```
-$ bundle exec licensed status
-Checking cached dependency records for licensed
-..F.F....F...
-
-Errors:
-
-* bundler.pathname-common_prefix
-  filename: /Users/jonabc/github/licensed/.licenses/bundler/pathname-common_prefix.dep.yml
-    - license needs reviewed: other
-
-* bundler.bundler
-  filename: /Users/jonabc/github/licensed/.licenses/bundler/bundler.dep.yml
-    - cached dependency record not found  
-
-* bundler.addressable
-  filename: /Users/jonabc/github/licensed/.licenses/bundler/addressable.dep.yml
-    - license needs reviewed: apache-2.0
-```
-
 - `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`
+
+See the [commands documentation](./docs/commands.md) for additional documentation, or run `licensed -h` to see all of the current available commands.
 
 ### Configuration
 
@@ -138,6 +117,12 @@ if Licensed::Shell.tool_available?('bundle')
   end
 end
 ```
+
+See the [documentation on adding new sources](./docs/adding_a_new_source.md) for more information.
+
+#### Adding Commands
+
+See the [documentation on commands](./docs/commands.md) for information about adding a new CLI command.
 
 ## Contributing
 
