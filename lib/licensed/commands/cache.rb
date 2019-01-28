@@ -21,26 +21,25 @@ module Licensed
         result
       end
 
-      # Run the command for a dependency
+      # Cache dependency record data.
       #
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency
       # dependency - An application dependency
+      # report - A report hash for the command to provide extra data for the report output.
       #
-      # Returns true
-      def run_dependency(app, source, dependency)
+      # Returns true.
+      def evaluate_dependency(app, source, dependency, report)
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
-        reporter.report_dependency(dependency) do |report|
-          cached_record = Licensed::DependencyRecord.read(filename)
-          report["cached"] = options[:force] || save_dependency_record?(dependency, cached_record)
-          if report["cached"]
-            # use the cached license value if the license text wasn't updated
-            dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
-            dependency.record.save(filename)
-          end
-
-          true
+        cached_record = Licensed::DependencyRecord.read(filename)
+        report["cached"] = options[:force] || save_dependency_record?(dependency, cached_record)
+        if report["cached"]
+          # use the cached license value if the license text wasn't updated
+          dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
+          dependency.record.save(filename)
         end
+
+        true
       end
 
       # Determine if the current dependency's record should be saved.

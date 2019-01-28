@@ -64,7 +64,21 @@ module Licensed
       #
       # Returns whether the command succeeded for the dependency
       def run_dependency(app, source, dependency)
-        raise "run_for_dependency must be implemented by a command"
+        reporter.report_dependency(dependency) do |report|
+          evaluate_dependency(app, source, dependency, report)
+        end
+      end
+
+      # Evaluate a dependency for the command.  Must be implemented by a command implementation.
+      #
+      # app - The application configuration for the dependency
+      # source - The dependency source enumerator for the dependency
+      # dependency - An application dependency
+      # report - A report hash for the command to provide extra data for the report output.
+      #
+      # Returns whether the command succeeded for the dependency
+      def evaluate_dependency(app, source, dependency, report)
+        raise "`evaluate_dependency` must be implemented by a command"
       end
     end
   end

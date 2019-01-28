@@ -8,15 +8,16 @@ module Licensed
 
       protected
 
-      # Run the command for a dependency.  List the dependency in the reporter
+      # Listing dependencies requires not extra work.
       #
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency
       # dependency - An application dependency
+      # report - A report hash for the command to provide extra data for the report output.
       #
-      # Returns true
-      def run_dependency(app, source, dependency)
-        reporter.report_dependency(dependency) { true }
+      # Returns true.
+      def evaluate_dependency(app, source, dependency, report)
+        true
       end
     end
   end

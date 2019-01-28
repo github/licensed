@@ -2,10 +2,8 @@
 class TestCommand < Licensed::Commands::Command
   protected
 
-  def run_dependency(app, source, dependency)
-    reporter.report_dependency(dependency) do |report|
-      next true unless options[:fail]
-      options[:fail] != app["name"]
-    end
+  def evaluate_dependency(app, source, dependency, report)
+    return true unless options[:fail]
+    options[:fail] != app["name"]
   end
 end
