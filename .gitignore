@@ -23,6 +23,7 @@ test/fixtures/cabal/*
 !test/fixtures/cabal/app*
 test/fixtures/git_submodule/*
 !test/fixtures/git_submodule/README
+test/fixtures/pip/venv
 
 vendor/licenses
 .licenses
