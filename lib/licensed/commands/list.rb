@@ -8,7 +8,7 @@ module Licensed
 
       protected
 
-      # Listing dependencies requires not extra work.
+      # Listing dependencies requires no extra work.
       #
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency
