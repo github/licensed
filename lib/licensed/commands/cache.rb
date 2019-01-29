@@ -1,80 +1,45 @@
 # frozen_string_literal: true
 module Licensed
   module Commands
-    class Cache
-      attr_reader :config
-      attr_reader :reporter
-      attr_reader :force
-
-      def initialize(config, reporter = Licensed::Reporters::CacheReporter.new)
-        @config = config
-        @reporter = reporter
+    class Cache < Command
+      def initialize(config:, reporter: Licensed::Reporters::CacheReporter.new)
+        super(config: config, reporter: reporter)
       end
 
-      # Cache any stale or missing license dependency records
-      #
-      # force - Set to true to for all records to be cached
-      #
-      # Returns whether the command was a success
-      def run(force: false)
-        @force = force
-        begin
-          reporter.report_run do
-            config.apps.each { |app| cache_app(app) }
-          end
-        ensure
-          @force = nil
-        end
+      protected
 
-        true
-      end
-
-      # Cache any stale or missing dependency records for an application.
+      # Run the command for an application configuration.
       # Will remove any cached records that don't match a current application
       # dependency.
       #
       # app - An application configuration
       #
-      # Returns nothing
-      def cache_app(app)
-        reporter.report_app(app) do
-          Dir.chdir app.source_path do
-            app.sources.each { |source| cache_source(app, source) }
-            clear_stale_cached_records(app)
-          end
-        end
+      # Returns whether the command succeeded for the application.
+      def run_app(app)
+        result = super
+        clear_stale_cached_records(app)
+        result
       end
 
-      # Cache any stale or missing dependency records for a dependency source
-      #
-      # app - The application configuration for the source
-      # source - A dependency source enumerator
-      #
-      # Returns nothing
-      def cache_source(app, source)
-        reporter.report_source(source) do
-          source.dependencies.each { |dependency| cache_dependency(app, source, dependency) }
-        end
-      end
-
-      # Cache any stale or missing dependency records for a dependency
+      # Cache dependency record data.
       #
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency
       # dependency - An application dependency
+      # report - A report hash for the command to provide extra data for the report output.
       #
-      # Returns nothing
-      def cache_dependency(app, source, dependency)
+      # Returns true.
+      def evaluate_dependency(app, source, dependency, report)
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
-        reporter.report_dependency(dependency) do |report|
-          cached_record = Licensed::DependencyRecord.read(filename)
-          report["cached"] = force || save_dependency_record?(dependency, cached_record)
-          if report["cached"]
-            # use the cached license value if the license text wasn't updated
-            dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
-            dependency.record.save(filename)
-          end
+        cached_record = Licensed::DependencyRecord.read(filename)
+        report["cached"] = options[:force] || save_dependency_record?(dependency, cached_record)
+        if report["cached"]
+          # use the cached license value if the license text wasn't updated
+          dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
+          dependency.record.save(filename)
         end
+
+        true
       end
 
       # Determine if the current dependency's record should be saved.

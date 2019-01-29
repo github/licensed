@@ -20,7 +20,21 @@ This section covers the `Licensed::Sources::Source#enabled?` method.  This metho
 whether `Licensed::Source::Sources#enumerate_dependencies` should be called on the current dependency source object.
 
 Determining whether dependencies should be enumerated depends on whether all the tools or files needed to find dependencies are present.
-For example, to enumerate `npm` dependencies the `npm` CLI tool must be reachable and a `package.json` file needs to exist in the licensed app's configured [`source_path`](./configuration.md#configuration-paths).
+For example, to enumerate `npm` dependencies the `npm` CLI tool must be found with `Licensed::Shell.tool_available?` and a `package.json` file needs to exist in the licensed app's configured [`source_path`](./configuration.md#configuration-paths).
+
+#### Gating functionality when required tools are not available.
+
+When adding new dependency sources, ensure that `script/bootstrap` scripting and tests are only run if the required tooling is available on the development machine.
+
+* See `script/bootstrap` for examples of gating scripting based on whether tooling executables are found.
+* Use `Licensed::Shell.tool_available?` when writing test files to gate running a test suite when tooling executables aren't available.
+```ruby
+if Licensed::Shell.tool_available?('bundle')
+  describe Licensed::Source::Bundler do
+    ...
+  end
+end
+```
 
 ## Enumerating dependencies
 

@@ -1,37 +1,23 @@
 # frozen_string_literal: true
 module Licensed
   module Commands
-    class List
-      attr_reader :config
-      attr_reader :reporter
-
-      def initialize(config, reporter = Licensed::Reporters::ListReporter.new)
-        @config = config
-        @reporter = reporter
+    class List < Command
+      def initialize(config:, reporter: Licensed::Reporters::ListReporter.new)
+        super(config: config, reporter: reporter)
       end
 
-      def run
-        reporter.report_run do
-          config.apps.each { |app| list_app_dependencies(app) }
-        end
+      protected
 
+      # Listing dependencies requires no extra work.
+      #
+      # app - The application configuration for the dependency
+      # source - The dependency source enumerator for the dependency
+      # dependency - An application dependency
+      # report - A report hash for the command to provide extra data for the report output.
+      #
+      # Returns true.
+      def evaluate_dependency(app, source, dependency, report)
         true
-      end
-
-      def list_app_dependencies(app)
-        reporter.report_app(app) do
-          Dir.chdir app.source_path do
-            app.sources.each { |source| list_source_dependencies(source) }
-          end
-        end
-      end
-
-      def list_source_dependencies(source)
-        reporter.report_source(source) do
-          source.dependencies
-                .sort_by { |dependency| dependency.name }
-                .each { |dependency| reporter.report_dependency(dependency) {} }
-        end
       end
     end
   end
