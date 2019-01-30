@@ -2,6 +2,30 @@
 module Licensed
   module Reporters
     class Reporter
+      class Report < Hash
+        attr_reader :name
+        attr_reader :target
+        def initialize(name:, target:)
+          super()
+          @name = name
+          @target = target
+        end
+
+        def reports
+          @reports ||= []
+        end
+
+        def errors
+          @errors ||= []
+        end
+
+        def all_reports
+          result = []
+          result << self
+          result.push(*reports.flat_map(&:all_reports))
+        end
+      end
+
       class ReportingError < StandardError; end;
 
       def initialize(shell = Licensed::UI::Shell.new)
@@ -13,9 +37,9 @@ module Licensed
       # data generated for this run
       #
       # Returns the result of the yielded method
-      def report_run
+      def report_run(command)
         result = nil
-        @run_report = {}
+        @run_report = Report.new(name: nil, target: command)
         begin
           result = yield @run_report
         ensure
@@ -37,11 +61,11 @@ module Licensed
         raise ReportingError.new("Cannot call report_app with active app context") unless @app_report.nil?
         raise ReportingError.new("Call report_run before report_app") if @run_report.nil?
         result = nil
-        @app_report = {}
+        @app_report = Report.new(name: app["name"], target: app)
         begin
           result = yield @app_report
         ensure
-          @run_report[app["name"]] = @app_report
+          @run_report.reports << @app_report
           @app_report = nil
         end
 
@@ -60,11 +84,11 @@ module Licensed
         raise ReportingError.new("Cannot call report_source with active source context") unless @source_report.nil?
         raise ReportingError.new("Call report_app before report_source") if @app_report.nil?
         result = nil
-        @source_report = {}
+        @source_report = Report.new(name: [@app_report.name, source.class.type].join("."), target: source)
         begin
           result = yield @source_report
         ensure
-          @app_report[source.class.type] = @source_report
+          @app_report.reports << @source_report
           @source_report = nil
         end
 
@@ -82,8 +106,8 @@ module Licensed
       def report_dependency(dependency)
         raise ReportingError.new("Call report_source before report_dependency") if @source_report.nil?
 
-        dependency_report = {}
-        @source_report[dependency.name] = dependency_report
+        dependency_report = Report.new(name: [@source_report.name, dependency.name].join("."), target: dependency)
+        @source_report.reports << dependency_report
         yield dependency_report
       end
 

@@ -32,11 +32,11 @@ module Licensed
       def evaluate_dependency(app, source, dependency, report)
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
         cached_record = Licensed::DependencyRecord.read(filename)
-        report["cached"] = options[:force] || save_dependency_record?(dependency, cached_record)
-        if report["cached"]
+        if options[:force] || save_dependency_record?(dependency, cached_record)
           # use the cached license value if the license text wasn't updated
           dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
           dependency.record.save(filename)
+          report["cached"] = true
         end
 
         true

@@ -20,11 +20,13 @@ describe Licensed::Commands::Command do
   it "runs a command for all dependencies in the configuration" do
     command.run
     command.config.apps.each do |app|
-      app_results = command.reporter.results[app["name"]]
-      assert app_results
-      source_results = app_results["test"]
-      assert source_results
-      assert source_results["dependency"]
+      app_report = command.reporter.report.reports.find { |report| report.name == app["name"] }
+      assert app_report
+
+      source_report = app_report.reports.find { |report| report.name == "#{app["name"]}.#{TestSource.type}" }
+      assert source_report
+
+      assert source_report.reports.find { |report| report.name == "#{app["name"]}.#{TestSource.type}.dependency" }
     end
   end
 

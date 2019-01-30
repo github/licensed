@@ -19,7 +19,7 @@ module Licensed
       def run(**options)
         @options = options
         begin
-          result = reporter.report_run do
+          result = reporter.report_run(self) do
             config.apps.map { |app| run_app(app) }.all?
           end
         ensure

@@ -29,9 +29,13 @@ describe Licensed::Commands::List do
           next unless enabled
 
           command.run
-          source_results = reporter.results.values.first
-          assert source_results.key?(source_type)
-          assert source_results[source_type].key?(expected_dependency)
+          app_report = reporter.report.reports.find { |app_report| app_report.target == app }
+          assert app_report
+
+          source_report = app_report.reports.find { |source_report| source_report.target == source }
+          assert source_report
+
+          assert source_report.reports.find { |dependency_report| dependency_report.name.include?(expected_dependency) }
         end
       end
     end
@@ -39,16 +43,14 @@ describe Licensed::Commands::List do
 
   it "does not include ignored dependencies" do
     command.run
-    dependencies = reporter.results.flat_map { |_, source_results| source_results.values }
-                                   .reduce(&:merge)
-    assert dependencies.key?("dependency")
+    dependencies = reporter.report.all_reports
+    assert dependencies.any? { |dependency| dependency.name == "licensed.test.dependency" }
     count = dependencies.size
 
     config.ignore("type" => "test", "name" => "dependency")
     command.run
-    dependencies = reporter.results.flat_map { |_, source_results| source_results.values }
-                                   .reduce(&:merge)
-    refute dependencies.key?("dependency")
+    dependencies = reporter.report.all_reports
+    refute dependencies.any? { |dependency| dependency.name == "licensed.test.dependency" }
     ignored_count = dependencies.size
 
     assert_equal count - 1, ignored_count
@@ -74,7 +76,7 @@ describe Licensed::Commands::List do
     it "lists dependencies for all apps" do
       command.run
       apps.each do |app|
-        assert_includes reporter.results.keys, app["name"]
+        assert reporter.report.reports.find { |report| report.name == app["name"] }
       end
     end
   end

@@ -8,30 +8,31 @@ describe Licensed::Reporters::CacheReporter do
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
   let(:dependency) { source.dependencies.first }
+  let(:command) { TestCommand.new(config: config, reporter: reporter) }
 
   describe "#report_app" do
     it "runs a block" do
       success = false
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) { success = true }
       end
       assert success
     end
 
     it "returns the result of the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         assert_equal 1, reporter.report_app(app) { 1 }
       end
     end
 
     it "provides a report hash to the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) { |report| refute_nil report }
       end
     end
 
     it "prints an informative message to the shell" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) {}
 
         assert_includes shell.messages,
@@ -47,7 +48,7 @@ describe Licensed::Reporters::CacheReporter do
   describe "#report_source" do
     it "runs a block" do
       success = false
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) { success = true }
         end
@@ -57,7 +58,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "returns the result of the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           assert_equal 1, reporter.report_source(source) { 1 }
         end
@@ -65,7 +66,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "provides a report hash to the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) { |report| refute_nil report }
         end
@@ -73,7 +74,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "prints informative messages to the shell" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) {}
           assert_includes shell.messages,
@@ -97,7 +98,7 @@ describe Licensed::Reporters::CacheReporter do
   describe "#report_dependency" do
     it "runs a block" do
       success = false
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) { success = true }
@@ -109,7 +110,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "returns the result of the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             assert_equal 1, reporter.report_dependency(dependency) { 1 }
@@ -119,7 +120,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "provides a report hash to the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) { |report| refute_nil report }
@@ -129,7 +130,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "prints an informative messages for a cached dependency to the shell" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) { |report| report["cached"] = true }
@@ -145,7 +146,7 @@ describe Licensed::Reporters::CacheReporter do
     end
 
     it "prints an informative messages for a skipped dependency to the shell" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) { |report| report["cached"] = false }
