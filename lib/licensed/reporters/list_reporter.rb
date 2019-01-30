@@ -27,7 +27,25 @@ module Licensed
         super do |report|
           shell.info "  #{source.class.type}"
           result = yield report
-          shell.confirm "  * #{report.size} #{source.class.type} dependencies"
+
+          errored_reports = report.all_reports.select { |report| report.errors.any? }.to_a
+          if errored_reports.any?
+            shell.newline
+            shell.newline
+            shell.error "  * Errors:"
+            errored_reports.each do |report|
+              display_metadata = report.map { |k, v| "#{k}: #{v}" }.join(", ")
+
+              shell.newline
+              shell.error "    * #{report.name}"
+              shell.error "    #{display_metadata}" unless display_metadata.empty?
+              report.errors.each do |error|
+               shell.error "    - #{error}"
+              end
+            end
+          else
+            shell.confirm "  * #{report.reports.size} #{source.class.type} dependencies"
+          end
 
           result
         end
@@ -41,8 +59,10 @@ module Licensed
       # Note - must be called from inside the `report_run` scope
       def report_dependency(dependency)
         super do |report|
+          result = yield report
           shell.info "    #{dependency.name} (#{dependency.version})"
-          yield report
+
+          result
         end
       end
     end

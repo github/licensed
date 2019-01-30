@@ -37,4 +37,34 @@ describe Licensed::Commands::Command do
   it "succeeds if all of the dependencies succeed the command" do
     assert command.run
   end
+
+  it "catches shell errors thrown when evaluating an app" do
+    app_name = apps.first["name"]
+    source_name = "#{app_name}.test"
+    refute command.run(raise: source_name)
+
+    report = command.reporter.report.all_reports.find { |report| report.name == app_name }
+    assert report
+    assert_includes report.errors, "command exited with status 0\n  #{source_name}"
+  end
+
+  it "catches shell errors thrown when evaluating a source" do
+    source_name = "#{apps.first["name"]}.test"
+    dependency_name = "#{source_name}.dependency"
+    refute command.run(raise: dependency_name)
+
+    report = command.reporter.report.all_reports.find { |report| report.name == source_name }
+    assert report
+    assert_includes report.errors, "command exited with status 0\n  #{dependency_name}"
+  end
+
+  it "catches shell errors thrown when evaluating a dependency" do
+    dependency_name = "#{apps.first["name"]}.test.dependency"
+    dependency_evaluation_name = "#{dependency_name}.evaluate"
+    refute command.run(raise: dependency_evaluation_name)
+
+    report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
+    assert report
+    assert_includes report.errors, "command exited with status 0\n  #{dependency_evaluation_name}"
+  end
 end

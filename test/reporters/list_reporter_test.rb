@@ -93,6 +93,39 @@ describe Licensed::Reporters::ListReporter do
         end
       end
     end
+
+    it "reports errors during the source run" do
+      reporter.report_run(command) do
+        reporter.report_app(app) do |app_report|
+          reporter.report_source(source) do |source_report|
+            source_report.errors << "source error"
+            reporter.report_dependency(dependency) do |dependency_report|
+              dependency_report.errors << "dependency error"
+            end
+          end
+        end
+
+        assert_includes shell.messages,
+                        {
+
+                           message: "    - source error",
+                           newline: true,
+                           style: :error
+                        }
+        assert_includes shell.messages,
+                        {
+                           message: "    - dependency error",
+                           newline: true,
+                           style: :error
+                        }
+        refute_includes shell.messages,
+                        {
+                           message: "  * 0 #{source.class.type} dependencies",
+                           newline: true,
+                           style: :confirm
+                        }
+      end
+    end
   end
 
   describe "#report_dependency" do
