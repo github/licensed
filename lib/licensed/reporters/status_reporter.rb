@@ -22,17 +22,16 @@ module Licensed
 
           if error_count > 0
             shell.newline
-            shell.newline
             shell.error "Errors:"
             errored_reports.each do |report|
               display_metadata = report.map { |k, v| "#{k}: #{v}" }.join(", ")
 
-              shell.newline
               shell.error "* #{report.name}"
               shell.error "  #{display_metadata}" unless display_metadata.empty?
               report.errors.each do |error|
-               shell.error "    - #{error}"
+                shell.error "    - #{error}"
               end
+              shell.newline
             end
           end
 
