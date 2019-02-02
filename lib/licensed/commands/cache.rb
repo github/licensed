@@ -17,7 +17,7 @@ module Licensed
       # Returns whether the command succeeded for the application.
       def run_app(app)
         result = super
-        clear_stale_cached_records(app)
+        clear_stale_cached_records(app) if result
         result
       end
 
