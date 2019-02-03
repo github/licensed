@@ -108,13 +108,13 @@ describe Licensed::Reporters::CacheReporter do
         assert_includes shell.messages,
                         {
 
-                           message: "    - source error",
+                           message: "      - source error",
                            newline: true,
                            style: :error
                         }
         assert_includes shell.messages,
                         {
-                           message: "    - dependency error",
+                           message: "      - dependency error",
                            newline: true,
                            style: :error
                         }

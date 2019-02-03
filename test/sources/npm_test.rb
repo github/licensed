@@ -63,7 +63,7 @@ if Licensed::Shell.tool_available?("npm")
           FileUtils.cp(File.join(fixtures, "package.json"), File.join(dir, "package.json"))
           Dir.chdir(dir) do
             error = assert_raises(Licensed::Shell::Error) { source.dependencies }
-            assert_includes error.message, "command exited with status 1"
+            assert_includes error.message, "'npm list --json --production --long' exited with status 1"
             assert_includes error.message, "npm ERR! missing: autoprefixer@"
           end
         end

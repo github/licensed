@@ -56,7 +56,7 @@ describe Licensed::Reporters::Reporter do
 
     it "stores the app report to the run report" do
       reporter.report_run(command) do |run_report|
-        reporter.report_app(app) { }
+        reporter.report_app(app) {}
         assert run_report.reports.find { |report| report.target == app }
       end
     end
@@ -113,7 +113,7 @@ describe Licensed::Reporters::Reporter do
     it "stores the source report to the app report" do
       reporter.report_run(command) do
         reporter.report_app(app) do |app_report|
-          reporter.report_source(source) { }
+          reporter.report_source(source) {}
           assert app_report.reports.find { |report| report.target == source }
 
         end
@@ -181,7 +181,7 @@ describe Licensed::Reporters::Reporter do
       reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do |source_report|
-            reporter.report_dependency(dependency) { }
+            reporter.report_dependency(dependency) {}
             assert source_report.reports.find { |report| report.target == dependency }
           end
         end

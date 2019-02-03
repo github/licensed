@@ -45,7 +45,7 @@ describe Licensed::Commands::Command do
 
     report = command.reporter.report.all_reports.find { |report| report.name == app_name }
     assert report
-    assert_includes report.errors, "command exited with status 0\n  #{source_name}"
+    assert_includes report.errors, "'app1.test' exited with status 0\n"
   end
 
   it "catches shell errors thrown when evaluating a source" do
@@ -55,7 +55,7 @@ describe Licensed::Commands::Command do
 
     report = command.reporter.report.all_reports.find { |report| report.name == source_name }
     assert report
-    assert_includes report.errors, "command exited with status 0\n  #{dependency_name}"
+    assert_includes report.errors, "'app1.test.dependency' exited with status 0\n"
   end
 
   it "catches shell errors thrown when evaluating a dependency" do
@@ -65,6 +65,6 @@ describe Licensed::Commands::Command do
 
     report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
     assert report
-    assert_includes report.errors, "command exited with status 0\n  #{dependency_evaluation_name}"
+    assert_includes report.errors, "'app1.test.dependency.evaluate' exited with status 0\n"
   end
 end
