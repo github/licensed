@@ -130,18 +130,14 @@ describe Licensed::Commands::Cache do
 
   it "does not include ignored dependencies in dependency counts" do
     generator.run
-    count = reporter.results.flat_map { |_, source_results| source_results.values }
-                            .reduce(&:merge)
-                            .size
+    count = reporter.report.all_reports.size
 
     FileUtils.mkdir_p config.cache_path.join("test")
     File.write config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}"), ""
     config.ignore "type" => "test", "name" => "dependency"
 
     generator.run
-    ignored_count = reporter.results.flat_map { |_, source_results| source_results.values }
-                                    .reduce(&:merge)
-                                    .size
+    ignored_count = reporter.report.all_reports.size
     assert_equal count - 1, ignored_count
   end
 

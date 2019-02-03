@@ -8,36 +8,38 @@ describe Licensed::Reporters::StatusReporter do
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
   let(:dependency) { source.dependencies.first }
+  let(:command) { TestCommand.new(config: config, reporter: reporter) }
 
   describe "#report_app" do
     it "runs a block" do
       success = false
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) { success = true }
       end
       assert success
     end
 
     it "returns the result of the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         assert_equal 1, reporter.report_app(app) { 1 }
       end
     end
 
     it "provides a report hash to the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) { |report| refute_nil report }
       end
     end
 
     it "prints messages about app to the shell" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) do |report|
               report["meta1"] = "data1"
               report["meta2"] = "data2"
-              report["errors"] = ["error1", "error2"]
+              report.errors << "error1"
+              report.errors << "error2"
             end
           end
         end
@@ -51,7 +53,7 @@ describe Licensed::Reporters::StatusReporter do
 
         assert_includes shell.messages,
                         {
-                           message: "* #{source.class.type}.#{dependency.name}",
+                           message: "* #{app["name"]}.#{source.class.type}.#{dependency.name}",
                            newline: true,
                            style: :error
                         }
@@ -90,7 +92,7 @@ describe Licensed::Reporters::StatusReporter do
   describe "#report_dependency" do
     it "runs a block" do
       success = false
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) { success = true }
@@ -102,7 +104,7 @@ describe Licensed::Reporters::StatusReporter do
     end
 
     it "returns the result of the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             assert_equal 1, reporter.report_dependency(dependency) { 1 }
@@ -112,7 +114,7 @@ describe Licensed::Reporters::StatusReporter do
     end
 
     it "provides a report hash to the block" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) { |report| refute_nil report }
@@ -122,10 +124,10 @@ describe Licensed::Reporters::StatusReporter do
     end
 
     it "prints an 'F' error if result has errors" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
-            reporter.report_dependency(dependency) { |report| report["errors"] = ["error"] }
+            reporter.report_dependency(dependency) { |report| report.errors << "error" }
             assert_includes shell.messages,
                             {
                                message: "F",
@@ -138,7 +140,7 @@ describe Licensed::Reporters::StatusReporter do
     end
 
     it "prints an '.' success if result does not have errors" do
-      reporter.report_run do
+      reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) {}

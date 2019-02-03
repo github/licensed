@@ -19,7 +19,7 @@ module Licensed
       def run(**options)
         @options = options
         begin
-          result = reporter.report_run do
+          result = reporter.report_run(self) do
             config.apps.map { |app| run_app(app) }.all?
           end
         ensure
@@ -37,9 +37,14 @@ module Licensed
       #
       # Returns whether the command succeeded for the application.
       def run_app(app)
-        reporter.report_app(app) do
+        reporter.report_app(app) do |report|
           Dir.chdir app.source_path do
-            app.sources.map { |source| run_source(app, source) }.all?
+            begin
+              app.sources.map { |source| run_source(app, source) }.all?
+            rescue Licensed::Shell::Error => err
+              report.errors << err.message
+              false
+            end
           end
         end
       end
@@ -51,8 +56,13 @@ module Licensed
       #
       # Returns whether the command succeeded for the dependency source enumerator
       def run_source(app, source)
-        reporter.report_source(source) do
-          source.dependencies.map { |dependency| run_dependency(app, source, dependency) }.all?
+        reporter.report_source(source) do |report|
+          begin
+            source.dependencies.map { |dependency| run_dependency(app, source, dependency) }.all?
+          rescue Licensed::Shell::Error => err
+            report.errors << err.message
+            false
+          end
         end
       end
 
@@ -65,7 +75,12 @@ module Licensed
       # Returns whether the command succeeded for the dependency
       def run_dependency(app, source, dependency)
         reporter.report_dependency(dependency) do |report|
-          evaluate_dependency(app, source, dependency, report)
+          begin
+            evaluate_dependency(app, source, dependency, report)
+          rescue Licensed::Shell::Error => err
+            report.errors << err.message
+            false
+          end
         end
       end
 

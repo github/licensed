@@ -14,34 +14,29 @@ module Licensed
 
           result = yield report
 
-          dependencies_count = report.sum { |_, dependency_reports| dependency_reports.size }
-          error_data = report.flat_map do |source_type, dependency_reports|
-            dependency_reports.reject { |_, data| data["errors"].nil? || data["errors"].empty? }
-                              .map { |name, data| data.merge("source" => source_type, "dependency" => name) }
-          end
+          all_reports = report.all_reports
+          errored_reports = all_reports.select { |report| report.errors.any? }.to_a
 
-          error_count = error_data.flat_map { |data| data["errors"] }.size
+          dependency_count = all_reports.select { |report| report.target.is_a?(Licensed::Dependency) }.size
+          error_count = errored_reports.sum { |report| report.errors.size }
+
           if error_count > 0
             shell.newline
-            shell.newline
             shell.error "Errors:"
-            error_data.each do |data|
-              display_name = [data["source"], data["dependency"]].join(".")
-              display_metadata = data.reject { |k, _| k == "errors" || k == "source" || k == "dependency" }
-                                     .map { |k, v| "#{k}: #{v}" }
-                                     .join(", ")
+            errored_reports.each do |report|
+              display_metadata = report.map { |k, v| "#{k}: #{v}" }.join(", ")
 
-              shell.newline
-              shell.error "* #{display_name}"
+              shell.error "* #{report.name}"
               shell.error "  #{display_metadata}" unless display_metadata.empty?
-              data["errors"].each do |error|
-               shell.error "    - #{error}"
+              report.errors.each do |error|
+                shell.error "    - #{error}"
               end
+              shell.newline
             end
           end
 
           shell.newline
-          shell.info "#{dependencies_count} dependencies checked, #{error_count} errors found."
+          shell.info "#{dependency_count} dependencies checked, #{error_count} errors found."
 
           result
         end
@@ -58,7 +53,7 @@ module Licensed
         super do |report|
           result = yield report
 
-          if report["errors"].nil? || report["errors"].empty?
+          if report.errors.empty?
             shell.confirm(".", false)
           else
             shell.error("F", false)

@@ -23,10 +23,14 @@ describe Licensed::Commands::Status do
   end
 
   def dependency_errors(dependency_name = "dependency")
-    source_results = reporter.results.values.first[source.class.type]
-    dependency_results = source_results[dependency_name]
-    return [] if dependency_results.nil?
-    dependency_results["errors"] || []
+    app_report = reporter.report.reports.find { |app_report| app_report.name == config["name"] }
+    assert app_report
+
+    source_report = app_report.reports.find { |source_report| source_report.target == source }
+    assert source_report
+
+    dependency_report = source_report.reports.find { |dependency_report| dependency_report.name.include?(dependency_name) }
+    dependency_report&.errors || []
   end
 
   it "warns if license is not allowed" do
@@ -112,15 +116,11 @@ describe Licensed::Commands::Status do
 
   it "does not include ignored dependencies in dependency counts" do
     verifier.run
-    count = reporter.results.flat_map { |_, source_results| source_results.values }
-                            .reduce(&:merge)
-                            .size
+    count = reporter.report.all_reports.size
 
     config.ignore "type" => "test", "name" => "dependency"
     verifier.run
-    ignored_count = reporter.results.flat_map { |_, source_results| source_results.values }
-                                    .reduce(&:merge)
-                                    .size
+    ignored_count = reporter.report.all_reports.size
 
     assert_equal count - 1, ignored_count
   end
@@ -145,7 +145,7 @@ describe Licensed::Commands::Status do
     it "verifies dependencies for all apps" do
       verifier.run
       apps.each do |app|
-        assert_includes reporter.results.keys, app["name"]
+        assert reporter.report.reports.find { |report| report.name == app["name"] }
       end
     end
   end

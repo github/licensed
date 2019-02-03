@@ -20,11 +20,13 @@ describe Licensed::Commands::Command do
   it "runs a command for all dependencies in the configuration" do
     command.run
     command.config.apps.each do |app|
-      app_results = command.reporter.results[app["name"]]
-      assert app_results
-      source_results = app_results["test"]
-      assert source_results
-      assert source_results["dependency"]
+      app_report = command.reporter.report.reports.find { |report| report.name == app["name"] }
+      assert app_report
+
+      source_report = app_report.reports.find { |report| report.name == "#{app["name"]}.#{TestSource.type}" }
+      assert source_report
+
+      assert source_report.reports.find { |report| report.name == "#{app["name"]}.#{TestSource.type}.dependency" }
     end
   end
 
@@ -34,5 +36,35 @@ describe Licensed::Commands::Command do
 
   it "succeeds if all of the dependencies succeed the command" do
     assert command.run
+  end
+
+  it "catches shell errors thrown when evaluating an app" do
+    app_name = apps.first["name"]
+    source_name = "#{app_name}.test"
+    refute command.run(raise: source_name)
+
+    report = command.reporter.report.all_reports.find { |report| report.name == app_name }
+    assert report
+    assert_includes report.errors, "'app1.test' exited with status 0\n"
+  end
+
+  it "catches shell errors thrown when evaluating a source" do
+    source_name = "#{apps.first["name"]}.test"
+    dependency_name = "#{source_name}.dependency"
+    refute command.run(raise: dependency_name)
+
+    report = command.reporter.report.all_reports.find { |report| report.name == source_name }
+    assert report
+    assert_includes report.errors, "'app1.test.dependency' exited with status 0\n"
+  end
+
+  it "catches shell errors thrown when evaluating a dependency" do
+    dependency_name = "#{apps.first["name"]}.test.dependency"
+    dependency_evaluation_name = "#{dependency_name}.evaluate"
+    refute command.run(raise: dependency_evaluation_name)
+
+    report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
+    assert report
+    assert_includes report.errors, "'app1.test.dependency.evaluate' exited with status 0\n"
   end
 end
