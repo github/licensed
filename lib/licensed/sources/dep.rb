@@ -8,28 +8,26 @@ module Licensed
         go_dep_available?
       end
 
-      def dependencies
-        @dependencies ||= begin
-          packages.map do |package|
-            package_dir = @config.pwd.join("vendor", package[:name])
-            search_root = @config.pwd.join("vendor", package[:project])
+      def enumerate_dependencies
+        packages.map do |package|
+          package_dir = @config.pwd.join("vendor", package[:name])
+          search_root = @config.pwd.join("vendor", package[:project])
 
-            unless package_dir.exist?
-              next if @config.ignored?("type" => Dep.type, "name" => package[:name])
-              raise "couldn't find package for #{package[:name]}"
-            end
-
-            Dependency.new(
-              name: package[:name],
-              version: package[:version],
-              path: package_dir.to_s,
-              search_root: search_root.to_s,
-              metadata: {
-                "type"        => Dep.type,
-                "homepage"    => "https://#{package[:name]}"
-              }
-            )
+          unless package_dir.exist?
+            next if @config.ignored?("type" => Dep.type, "name" => package[:name])
+            raise "couldn't find package for #{package[:name]}"
           end
+
+          Dependency.new(
+            name: package[:name],
+            version: package[:version],
+            path: package_dir.to_s,
+            search_root: search_root.to_s,
+            metadata: {
+              "type"        => Dep.type,
+              "homepage"    => "https://#{package[:name]}"
+            }
+          )
         end
       end
 
