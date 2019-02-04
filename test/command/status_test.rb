@@ -25,13 +25,13 @@ describe Licensed::Command::Status do
 
   it "warns if license is not allowed" do
     out, _ = capture_io { verifier.run }
-    assert_match(/license needs reviewed: mit/, out)
+    assert_match(/license needs review: mit/, out)
   end
 
   it "does not warn if license is allowed" do
     config.allow "mit"
     out, _ = capture_io { verifier.run }
-    refute_match(/license needs reviewed: mit/, out)
+    refute_match(/license needs review: mit/, out)
   end
 
   it "does not warn if dependency is ignored" do

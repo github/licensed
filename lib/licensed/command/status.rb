@@ -39,7 +39,7 @@ module Licensed
                 end
                 warnings << "missing license text" if license.license_text.empty?
                 unless allowed_or_reviewed?(app, license)
-                  warnings << "license needs reviewed: #{license["license"]}."
+                  warnings << "license needs review: #{license["license"]}."
                 end
               else
                 warnings << "cached license data missing"

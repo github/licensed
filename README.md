@@ -62,13 +62,13 @@ Checking licenses for 3 dependencies
 Warnings:
 
 .licenses/rubygem/bundler.txt:
-  - license needs reviewed: mit.
+  - license needs review: mit.
 
 .licenses/rubygem/licensee.txt:
   - cached license data missing
 
 .licenses/bower/jquery.txt:
-  - license needs reviewed: mit.
+  - license needs review: mit.
   - cached license data out of date
 
 3 dependencies checked, 3 warnings found.
