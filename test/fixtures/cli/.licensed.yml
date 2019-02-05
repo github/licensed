@@ -1,0 +1,5 @@
+name: cli-test
+ignored:
+  bundler:
+    # in CI, bundler is set up pretty wonky and isn't found at the expected location
+    - "bundler"
