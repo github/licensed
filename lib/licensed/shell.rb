@@ -3,16 +3,14 @@ require "open3"
 
 module Licensed
   module Shell
-    # Executes a command, returning its standard output on success. On failure,
-    # it raises an exception that contains the error output, unless
-    # `allow_failure` is true, in which case it returns an empty string.
+    # Executes a command, returning its standard output on success.
+    # On failure it raises an exception that contains the error output, unless
+    # `allow_failure` is true.
     def self.execute(cmd, *args, allow_failure: false, env: {})
       stdout, stderr, status = Open3.capture3(env, cmd, *args)
 
-      if status.success?
+      if status.success? || allow_failure
         stdout.strip
-      elsif allow_failure
-        ""
       else
         raise Error.new([cmd, *args], status.exitstatus, stderr)
       end
@@ -38,11 +36,11 @@ module Licensed
         super()
         @cmd = cmd
         @exitstatus = status
-        @output = stderr.to_s.strip
+        @stderr = stderr.to_s.strip
       end
 
       def message
-        extra = @output.empty?? "" : "#{@output.gsub(/^/, "        ")}"
+        extra = @stderr.empty?? "" : "#{@stderr.gsub(/^/, "        ")}"
         "'#{escape_cmd}' exited with status #{@exitstatus}\n#{extra}"
       end
 
