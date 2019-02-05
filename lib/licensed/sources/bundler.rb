@@ -166,11 +166,23 @@ module Licensed
         # `gem` must be available to run `gem specification`
         return unless Licensed::Shell.tool_available?("gem")
 
-        # use `gem specification` with a clean ENV to get gem specification YAML
-        yaml = ::Bundler.with_original_env { Licensed::Shell.execute(*ruby_command_args("gem", "specification", name)) }
-        Gem::Specification.from_yaml(yaml)
-      rescue Licensed::Shell::Error
-        # return nil
+        # use `gem specification` with a clean ENV and clean Gem.dir paths
+        # to get gem specification at the right directory
+        begin
+          ::Bundler.with_original_env do
+            ::Bundler.rubygems.clear_paths
+            yaml = Licensed::Shell.execute(*ruby_command_args("gem", "specification", name))
+            spec = Gem::Specification.from_yaml(yaml)
+            # this is horrible, but it will cache the gem_dir using the clean env
+            # so that it can be used outside of this block
+            spec.gem_dir
+            spec
+          end
+        rescue Licensed::Shell::Error
+          # return nil
+        ensure
+          ::Bundler.configure
+        end
       end
 
       # Build the bundler definition
