@@ -148,7 +148,6 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
-
       describe "with excluded groups in the configuration" do
         let(:config) { Licensed::Configuration.new("bundler" => { "without" => "exclude" }) }
 
@@ -193,6 +192,19 @@ if Licensed::Shell.tool_available?("bundle")
         fixtures = File.expand_path("../../fixtures/bundler", __FILE__)
         Dir.chdir(fixtures) do
           assert_nil source.dependencies.find { |d| d.name == "licensed" }
+        end
+      end
+
+      it "sets an error when dependencies are missing" do
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "bundler")
+          FileUtils.rm_rf(File.join(dir, "vendor"))
+          Dir.chdir(dir) do
+            dep = source.dependencies.find { |d| d.name == "semantic" }
+            assert dep
+            assert_includes dep.errors, "could not find semantic (= 1.6.0) in any sources"
+          end
         end
       end
     end
