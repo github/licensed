@@ -13,12 +13,15 @@ module Licensed
         with_configured_gopath do
           packages.map do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
+            error = package.dig("Error", "Err") if package["Error"]
             package_dir = package["Dir"]
+
             Dependency.new(
               name: import_path,
               version: package_version(package),
               path: package_dir,
               search_root: search_root(package_dir),
+              errors: Array(error),
               metadata: {
                 "type"        => Go.type,
                 "summary"     => package["Doc"],
@@ -48,25 +51,18 @@ module Licensed
       def root_package_deps
         # check for ignored packages to avoid raising errors calling `go list`
         # when ignored package is not found
-        Array(root_package["Deps"])
-          .reject { |name| @config.ignored?("type" => Go.type, "name" => name) }
-          .map { |name| package_info(name) }
+        Array(root_package["Deps"]).map { |name| package_info(name) }
       end
 
       # Returns the list of dependencies as returned by "go list -json -deps"
       # available in go 1.11
       def go_list_deps
-        @go_list_deps ||= begin
-          deps = package_info_command("-deps")
-          # the CLI command returns packages in a pretty-printed JSON format but
-          # not separated by commas. this gsub adds commas after all non-indented
-          # "}" that close root level objects.
-          # (?!\z) uses negative lookahead to not match the final "}"
-          deps.gsub!(/^}(?!\z)$/m, "},")
-          JSON.parse("[#{deps}]")
-            .reject { |pkg| @config.ignored?("type" => Go.type, "name" => pkg["ImportPath"]) }
-            .each { |pkg| raise pkg.dig("Error", "Err") if pkg["Error"] }
-        end
+        # the CLI command returns packages in a pretty-printed JSON format but
+        # not separated by commas. this gsub adds commas after all non-indented
+        # "}" that close root level objects.
+        # (?!\z) uses negative lookahead to not match the final "}"
+        deps = package_info_command("-deps").gsub(/^}(?!\z)$/m, "},")
+        JSON.parse("[#{deps}]")
       end
 
       # Returns whether the given package import path belongs to the
@@ -124,6 +120,8 @@ module Licensed
       #
       # package - package object obtained from package_info
       def search_root(package_dir)
+        return nil if package_dir.nil? || package_dir.empty?
+
         # search root choices:
         # 1. vendor folder if package is vendored
         # 2. GOPATH
@@ -160,7 +158,7 @@ module Licensed
       #
       # args - additional arguments to `go list`, e.g. Go package import path
       def package_info_command(*args)
-        Licensed::Shell.execute("go", "list", "-json", *Array(args)).strip
+        Licensed::Shell.execute("go", "list", "-e", "-json", *Array(args)).strip
       end
 
       # Returns the info for the package under test
