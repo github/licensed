@@ -16,11 +16,12 @@ class TestSource < Licensed::Sources::Source
   end
 
   def enumerate_dependencies
+    dependency_config = config["test"] || {}
     [
       Licensed::Dependency.new(
         name: @name,
         version: "1.0",
-        path: Dir.pwd,
+        path: dependency_config.fetch("path", Dir.pwd),
         metadata: {
           "type"     => TestSource.type,
           "dir"      => Dir.pwd

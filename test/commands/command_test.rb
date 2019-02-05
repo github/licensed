@@ -67,4 +67,13 @@ describe Licensed::Commands::Command do
     assert report
     assert_includes report.errors, "'app1.test.dependency.evaluate' exited with status 0\n"
   end
+
+  it "reports errors found on a dependency" do
+    dependency_name = "#{apps.first["name"]}.test.dependency"
+    configuration.apps.first["test"] = { "path" => nil }
+    refute command.run
+    report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
+    assert report
+    assert_includes report.errors, "dependency path not found"
+  end
 end
