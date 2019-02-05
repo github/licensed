@@ -7,21 +7,54 @@ module Licensed
 
     attr_reader :name
     attr_reader :version
+    attr_reader :errors
 
-    def initialize(name:, version:, path:, search_root: nil, metadata: {})
-      # enforcing absolute paths makes life much easier when determining
-      # an absolute file path in #notices
-      unless Pathname.new(path).absolute?
-        raise ArgumentError, "Dependency path #{path} must be absolute"
+    # Create a new project dependency
+    #
+    # name        - unique dependency name
+    # version     - dependency version
+    # path        - absolute file path to the dependency, to find license contents
+    # search_root - (optional) the root location to search for dependency license contents
+    # metadata    - (optional) additional dependency data to cache
+    # errors      - (optional) errors encountered when evaluating dependency
+    #
+    # Returns a new dependency object.  Dependency metadata and license contents
+    # are available if no errors are set on the dependency.
+    def initialize(name:, version:, path:, search_root: nil, metadata: {}, errors: [])
+      # check the path for default errors if no other errors
+      # were found when loading the dependency
+      if errors.empty?
+        path_error = path_error(path, search_root)
+        errors.push(path_error) if path_error
       end
 
       @name = name
       @version = version
       @metadata = metadata
+      @errors = errors
+
+      # if there are any errors, don't evaluate any dependency contents
+      return if errors.any?
+
+      # enforcing absolute paths makes life much easier when determining
+      # an absolute file path in #notices
+      if !Pathname.new(path).absolute?
+        # this is an internal error related to source implementation and
+        # should be raised, not stored to be handled by reporters
+        raise ArgumentError, "dependency path #{path} must be absolute"
+      end
+
       super(path, search_root: search_root, detect_readme: true, detect_packages: true)
     end
 
+    # Returns true if the dependency has any errors, false otherwise
+    def errors?
+      errors.any?
+    end
+
+    # Returns a record for this dependency including metadata and legal contents
     def record
+      return nil if errors?
       @record ||= DependencyRecord.new(
         metadata: license_metadata,
         licenses: license_contents,
@@ -31,13 +64,14 @@ module Licensed
 
     # Returns a string representing the dependencys license
     def license_key
-      return "none" unless license
+      return "none" if errors? || !license
       license.key
     end
 
     # Returns the license text content from all matched sources
     # except the package file, which doesn't contain license text.
     def license_contents
+      return [] if errors?
       matched_files.reject { |f| f == package_file }
                    .group_by(&:content)
                    .map { |content, files| { "sources" => content_sources(files), "text" => content } }
@@ -45,6 +79,7 @@ module Licensed
 
     # Returns legal notices found at the dependency path
     def notice_contents
+      return [] if errors?
       notice_files.sort # sorted by the path
                   .map { |file| { "sources" => content_sources(file), "text" => File.read(file).rstrip } }
                   .select { |text| text.length > 0 } # files with content only
@@ -52,7 +87,7 @@ module Licensed
 
     # Returns an array of file paths used to locate legal notices
     def notice_files
-      return [] unless dir_path.exist?
+      return [] if errors?
 
       Dir.glob(dir_path.join("*"))
          .grep(LEGAL_FILES_PATTERN)
@@ -60,6 +95,17 @@ module Licensed
     end
 
     private
+
+    def path_error(path, search_root)
+      return "dependency path not found" if path.to_s.empty?
+      return if File.exist?(path)
+      return if search_root && File.exist?(search_root)
+
+      # if the given path doesn't exist
+      # AND a search root isn't given, or the search root doesn't exist
+      # then set an error that the expected dependency path doesn't exist
+      "expected dependency path #{path} does not exist"
+    end
 
     # Returns the sources for a group of license or notice file contents
     #
