@@ -12,15 +12,14 @@ module Licensed
       end
 
       def enumerate_dependencies
-        package_ids.map do |id|
-          package = package_info(id)
-
+        packages.map do |package|
           path, search_root = package_docs_dirs(package)
           Dependency.new(
             name: package["name"],
             version: package["version"],
             path: path,
             search_root: search_root,
+            errors: Array(package["error"]),
             metadata: {
               "type"     => Cabal.type,
               "summary"  => package["synopsis"],
@@ -28,6 +27,23 @@ module Licensed
             }
           )
         end
+      end
+
+      # Returns a list of all detected packages
+      def packages
+        missing = []
+        package_ids = Set.new
+        cabal_file_dependencies.each do |target|
+          name, version = target.split(/\s/, 2)
+          package_id = cabal_package_id(name)
+          if package_id.nil?
+            missing << { "name" => name, "version" => version, "error" => "package not found" }
+          else
+            recursive_dependencies([package_id], package_ids)
+          end
+        end
+
+        package_ids.map { |id| package_info(id) }.concat(missing)
       end
 
       # Returns the packages document directory and search root directory
@@ -59,23 +75,17 @@ module Licensed
                 .gsub(/#[^?]*\z/, "")
       end
 
-      # Returns a `Set` of the package ids for all cabal dependencies
-      def package_ids
-        recursive_dependencies(cabal_file_dependency_ids)
-      end
-
       # Recursively finds the dependencies for each cabal package.
       # Returns a `Set` containing the package names for all dependencies
       def recursive_dependencies(package_names, results = Set.new)
         return [] if package_names.nil? || package_names.empty?
 
-        new_packages = Set.new(package_names) - results.to_a
+        new_packages = Set.new(package_names) - results
         return [] if new_packages.empty?
 
         results.merge new_packages
 
         dependencies = new_packages.flat_map { |n| package_dependencies(n) }
-                                   .compact
 
         return results if dependencies.empty?
 
@@ -84,23 +94,16 @@ module Licensed
 
       # Returns an array of dependency package names for the cabal package
       # given by `id`
-      def package_dependencies(id, full_id = true)
-        package_dependencies_command(id, full_id).gsub("depends:", "")
-                                                 .split
-                                                 .map(&:strip)
+      def package_dependencies(id)
+        package_dependencies_command(id).gsub("depends:", "").split.map(&:strip)
       end
 
       # Returns the output of running `ghc-pkg field depends` for a package id
       # Optionally allows for interpreting the given id as an
       # installed package id (`--ipid`)
-      def package_dependencies_command(id, full_id)
+      def package_dependencies_command(id)
         fields = %w(depends)
-
-        if full_id
-          ghc_pkg_field_command(id, fields, "--ipid")
-        else
-          ghc_pkg_field_command(id, fields)
-        end
+        ghc_pkg_field_command(id, fields, "--ipid")
       end
 
       # Returns package information as a hash for the given id
@@ -145,11 +148,7 @@ module Licensed
         path.gsub("<ghc_version>", ghc_version)
       end
 
-      # Returns a set containing the top-level dependencies found in cabal files
-      def cabal_file_dependency_ids
-        cabal_file_dependencies.map { |target| cabal_package_id(target) }.compact
-      end
-
+      # Returns a set of the top-level dependencies found in cabal files
       def cabal_file_dependencies
         @cabal_file_dependencies ||= cabal_files.each_with_object(Set.new) do |cabal_file, targets|
           content = File.read(cabal_file)
@@ -161,7 +160,7 @@ module Licensed
             # match[1] is a string of "," separated dependencies.
             # dependency packages might have a version specifier, remove them
             # to get the full id specifier for each package
-            dependencies = match[1].split(",").map { |dep| dep.strip.split(/\s/)[0] }
+            dependencies = match[1].split(",").map(&:strip)
             targets.merge(dependencies)
           end
         end

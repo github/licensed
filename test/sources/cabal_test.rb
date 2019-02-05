@@ -26,18 +26,6 @@ if Licensed::Shell.tool_available?("ghc")
       let(:local_db) { File.join(fixtures, "dist-newstyle/packagedb/ghc-<ghc_version>") }
       let(:user_db) { "~/.cabal/store/ghc-<ghc_version>/package.db" }
 
-      describe "without configured package dbs" do
-        it "does not find dependencies" do
-          Dir.chdir(fixtures) do
-            dep = nil
-            capture_subprocess_io do
-              dep = source.dependencies.detect { |d| d.name == "zlib" }
-            end
-            refute dep
-          end
-        end
-      end
-
       it "finds indirect dependencies" do
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
@@ -75,6 +63,16 @@ if Licensed::Shell.tool_available?("ghc")
         config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
         Dir.chdir(fixtures) do
           refute source.dependencies.detect { |d| d.name == "app" }
+        end
+      end
+
+      it "sets an error if a dependency isn't found" do
+        # run test without any ghc package db configuration to avoid finding
+        # dependencies
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.detect { |d| d.name == "zlib" }
+          assert dep
+          assert_includes dep.errors, "package not found"
         end
       end
     end
