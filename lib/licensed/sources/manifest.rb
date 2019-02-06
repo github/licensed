@@ -110,7 +110,7 @@ module Licensed
       def verify_configured_dependencies!
         # verify that dependencies are configured
         if configured_dependencies.empty?
-          raise "The manifest \"dependencies\" cannot be empty!"
+          raise Source::Error.new("The manifest \"dependencies\" cannot be empty!")
         end
 
         # verify all included files match a single configured dependency
@@ -128,7 +128,7 @@ module Licensed
         end
 
         errors.compact!
-        raise errors.join($/) unless errors.empty?
+        raise Source::Error.new(errors.join($/)) if errors.any?
       end
 
       # Returns the project dependencies specified from the licensed configuration

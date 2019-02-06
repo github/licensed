@@ -140,7 +140,7 @@ describe Licensed::Sources::Manifest do
       it "raises an error if the \"dependencies\" setting is empty" do
         config["manifest"]["dependencies"] = {}
 
-        err = assert_raises RuntimeError do
+        err = assert_raises Licensed::Sources::Source::Error do
           source.manifest
         end
 
@@ -153,7 +153,7 @@ describe Licensed::Sources::Manifest do
           "manifest_test_2" => "**/*"
         }
 
-        err = assert_raises RuntimeError do
+        err = assert_raises Licensed::Sources::Source::Error do
           source.manifest
         end
         assert err.message.include?("matched multiple configured dependencies: manifest_test, manifest_test_2")
@@ -164,7 +164,7 @@ describe Licensed::Sources::Manifest do
           "manifest_test" => "!**/nested/*"
         }
 
-        err = assert_raises RuntimeError do
+        err = assert_raises Licensed::Sources::Source::Error do
           source.manifest
         end
         assert err.message.include?("nested.c did not match a configured dependency")
