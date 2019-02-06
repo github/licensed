@@ -31,7 +31,8 @@ describe Licensed::Commands::Command do
   end
 
   it "fails if any of the dependencies fail the command" do
-    refute command.run(fail: "app2")
+    fail_proc = lambda { |app, source, dep| app["name"] != "app2" }
+    refute command.run(evaluate_proc: fail_proc)
   end
 
   it "succeeds if all of the dependencies succeed the command" do
@@ -39,33 +40,36 @@ describe Licensed::Commands::Command do
   end
 
   it "catches shell errors thrown when evaluating an app" do
-    app_name = apps.first["name"]
-    source_name = "#{app_name}.test"
-    refute command.run(raise: source_name)
+    proc = lambda { |app, _| raise Licensed::Shell::Error.new(["#{app["name"]}"], 0, nil) }
+    refute command.run(source_proc: proc)
 
-    report = command.reporter.report.all_reports.find { |report| report.name == app_name }
-    assert report
-    assert_includes report.errors, "'app1.test' exited with status 0\n"
+    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::AppConfiguration) }
+    refute_empty reports
+    reports.each do |report|
+      assert_includes report.errors, "'#{report.name}' exited with status 0\n"
+    end
   end
 
   it "catches shell errors thrown when evaluating a source" do
-    source_name = "#{apps.first["name"]}.test"
-    dependency_name = "#{source_name}.dependency"
-    refute command.run(raise: dependency_name)
+    proc = lambda { |app, source, _| raise Licensed::Shell::Error.new(["#{app["name"]}.#{source.class.type}"], 0, nil) }
+    refute command.run(dependency_proc: proc)
 
-    report = command.reporter.report.all_reports.find { |report| report.name == source_name }
-    assert report
-    assert_includes report.errors, "'app1.test.dependency' exited with status 0\n"
+    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::Sources::Source) }
+    refute_empty reports
+    reports.each do |report|
+      assert_includes report.errors, "'#{report.name}' exited with status 0\n"
+    end
   end
 
   it "catches shell errors thrown when evaluating a dependency" do
-    dependency_name = "#{apps.first["name"]}.test.dependency"
-    dependency_evaluation_name = "#{dependency_name}.evaluate"
-    refute command.run(raise: dependency_evaluation_name)
+    proc = lambda { |app, source, dep| raise Licensed::Shell::Error.new(["#{app["name"]}.#{source.class.type}.#{dep.name}"], 0, nil) }
+    refute command.run(evaluate_proc: proc)
 
-    report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
-    assert report
-    assert_includes report.errors, "'app1.test.dependency.evaluate' exited with status 0\n"
+    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::Dependency) }
+    refute_empty reports
+    reports.each do |report|
+      assert_includes report.errors, "'#{report.name}' exited with status 0\n"
+    end
   end
 
   it "reports errors found on a dependency" do
@@ -75,5 +79,16 @@ describe Licensed::Commands::Command do
     report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
     assert report
     assert_includes report.errors, "dependency path not found"
+  end
+
+  it "catches source errors thrown when evaluating a source" do
+    proc = lambda { |app, source, _| raise Licensed::Sources::Source::Error.new("#{app["name"]}.#{source.class.type}") }
+    refute command.run(dependency_proc: proc)
+
+    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::Sources::Source) }
+    refute_empty reports
+    reports.each do |report|
+      assert_includes report.errors, report.name
+    end
   end
 end

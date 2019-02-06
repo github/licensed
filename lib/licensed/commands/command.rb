@@ -62,6 +62,9 @@ module Licensed
           rescue Licensed::Shell::Error => err
             report.errors << err.message
             false
+          rescue Licensed::Sources::Source::Error => err
+            report.errors << err.message
+            false
           end
         end
       end
