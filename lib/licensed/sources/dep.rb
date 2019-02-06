@@ -13,11 +13,6 @@ module Licensed
           package_dir = @config.pwd.join("vendor", package[:name])
           search_root = @config.pwd.join("vendor", package[:project])
 
-          unless package_dir.exist?
-            next if @config.ignored?("type" => Dep.type, "name" => package[:name])
-            raise "couldn't find package for #{package[:name]}"
-          end
-
           Dependency.new(
             name: package[:name],
             version: package[:version],

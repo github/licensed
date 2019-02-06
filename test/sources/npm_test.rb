@@ -58,13 +58,13 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
 
-      it "raises when dependencies are missing" do
+      it "sets an error when dependencies are missing" do
         Dir.mktmpdir do |dir|
           FileUtils.cp(File.join(fixtures, "package.json"), File.join(dir, "package.json"))
           Dir.chdir(dir) do
-            error = assert_raises(Licensed::Shell::Error) { source.dependencies }
-            assert_includes error.message, "'npm list --json --production --long' exited with status 1"
-            assert_includes error.message, "npm ERR! missing: autoprefixer@"
+            dep = source.dependencies.find { |d| d.name == "autoprefixer" }
+            assert dep
+            assert_includes dep.errors, "dependency path not found"
           end
         end
       end

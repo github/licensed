@@ -75,20 +75,11 @@ describe Licensed::Sources::Dep do
         FileUtils.rm_rf fixtures
       end
 
-      it "do not raise an error if ignored" do
-        config.ignore("type" => "dep", "name" => "github.com/gorilla/context")
-        config.ignore("type" => "dep", "name" => "github.com/davecgh/go-spew/spew")
-
+      it "sets an error message" do
         Dir.chdir fixtures do
-          source.dependencies
-        end
-      end
-
-      it "raises an error" do
-        Dir.chdir fixtures do
-          assert_raises RuntimeError do
-            source.dependencies
-          end
+          dep = source.dependencies.find { |d| d.name == "github.com/gorilla/context" }
+          assert dep
+          assert dep.errors.any? { |e| e =~ /expected dependency path .* does not exist/ }
         end
       end
     end

@@ -75,6 +75,11 @@ module Licensed
       # Returns whether the command succeeded for the dependency
       def run_dependency(app, source, dependency)
         reporter.report_dependency(dependency) do |report|
+          if dependency.errors?
+            report.errors.concat(dependency.errors)
+            return false
+          end
+
           begin
             evaluate_dependency(app, source, dependency, report)
           rescue Licensed::Shell::Error => err

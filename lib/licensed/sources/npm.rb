@@ -15,7 +15,6 @@ module Licensed
       def enumerate_dependencies
         packages.map do |name, package|
           path = package["path"]
-          fail "couldn't locate #{name} under node_modules/" unless path
           Dependency.new(
             name: name,
             version: package["version"],
@@ -33,7 +32,6 @@ module Licensed
       def packages
         root_dependencies = JSON.parse(package_metadata_command)["dependencies"]
         recursive_dependencies(root_dependencies).each_with_object({}) do |(name, results), hsh|
-          next if @config.ignored?("type" => NPM.type, "name" => name)
           results.uniq! { |package| package["version"] }
           if results.size == 1
             hsh[name] = results[0]
@@ -58,13 +56,7 @@ module Licensed
 
       # Returns the output from running `npm list` to get package metadata
       def package_metadata_command
-        npm_list_command("--json", "--production", "--long")
-      end
-
-      # Executes an `npm list` command with the provided args and returns the
-      # output from stdout
-      def npm_list_command(*args)
-        Licensed::Shell.execute("npm", "list", *args)
+        Licensed::Shell.execute("npm", "list", "--json", "--production", "--long", allow_failure: true)
       end
     end
   end

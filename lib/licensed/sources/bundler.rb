@@ -7,12 +7,41 @@ end
 module Licensed
   module Sources
     class Bundler < Source
+      class MissingSpecification < Gem::BasicSpecification
+        attr_reader :name, :requirement
+        alias_method :version, :requirement
+        def initialize(name:, requirement:)
+          @name = name
+          @requirement = requirement
+        end
+
+        def dependencies
+          []
+        end
+
+        def source
+          nil
+        end
+
+        def platform; end
+        def gem_dir; end
+        def gems_dir
+          Gem.dir
+        end
+        def summary; end
+        def homepage; end
+
+        def error
+          "could not find #{name} (#{requirement}) in any sources"
+        end
+      end
+
       GEMFILES = %w{Gemfile gems.rb}.freeze
       DEFAULT_WITHOUT_GROUPS = %i{development test}
 
       def enabled?
         # running a ruby-packer-built licensed exe when ruby isn't available
-        # could lead to errors if the host ruby doesn't executable's ruby
+        # could lead to errors if the host ruby doesn't exist
         return false if ruby_packer? && !Licensed::Shell.tool_available?("ruby")
         defined?(::Bundler) && lockfile_path && lockfile_path.exist?
       end
@@ -20,10 +49,12 @@ module Licensed
       def enumerate_dependencies
         with_local_configuration do
           specs.map do |spec|
+            error = spec.error if spec.respond_to?(:error)
             Licensed::Dependency.new(
               name: spec.name,
               version: spec.version.to_s,
               path: spec.gem_dir,
+              errors: Array(error),
               metadata: {
                 "type"     => Bundler.type,
                 "summary"  => spec.summary,
@@ -69,7 +100,7 @@ module Licensed
       def specs_for_dependencies(dependencies, source)
         included_dependencies = dependencies.select { |d| include?(d, source) }
         included_dependencies.map do |dep|
-          gem_spec(dep) || raise("Unable to find a specification for #{dep.name} (#{dep.requirement}) in any sources")
+          gem_spec(dep) || MissingSpecification.new(name: dep.name, requirement: dep.requirement)
         end
       end
 
@@ -135,9 +166,23 @@ module Licensed
         # `gem` must be available to run `gem specification`
         return unless Licensed::Shell.tool_available?("gem")
 
-        # use `gem specification` with a clean ENV to get gem specification YAML
-        yaml = ::Bundler.with_original_env { Licensed::Shell.execute(*ruby_command_args("gem", "specification", name)) }
-        Gem::Specification.from_yaml(yaml)
+        # use `gem specification` with a clean ENV and clean Gem.dir paths
+        # to get gem specification at the right directory
+        begin
+          ::Bundler.with_original_env do
+            ::Bundler.rubygems.clear_paths
+            yaml = Licensed::Shell.execute(*ruby_command_args("gem", "specification", name))
+            spec = Gem::Specification.from_yaml(yaml)
+            # this is horrible, but it will cache the gem_dir using the clean env
+            # so that it can be used outside of this block
+            spec.gem_dir
+            spec
+          end
+        rescue Licensed::Shell::Error
+          # return nil
+        ensure
+          ::Bundler.configure
+        end
       end
 
       # Build the bundler definition

@@ -135,32 +135,17 @@ if Licensed::Shell.tool_available?("go")
           # fixtures location
           FileUtils.mkdir_p File.join(gopath, "src")
           FileUtils.cp_r File.expand_path("../../fixtures/go/src/test", __FILE__), fixtures
-
-          # the tests are expected to print errors from `go list` which
-          # should not be hidden during normal usage. hide that output during
-          # the test execution
-          @previous_stderr = $stderr
-          $stderr.reopen(File.new("/dev/null", "w"))
         end
 
         after do
-          $stderr.reopen(@previous_stderr)
           FileUtils.rm_rf gopath
         end
 
-        it "do not raise an error if ignored" do
-          config.ignore("type" => "go", "name" => "github.com/hashicorp/golang-lru")
-
+        it "sets the error field on a dependency" do
           Dir.chdir fixtures do
-            source.dependencies
-          end
-        end
-
-        it "raises an error" do
-          Dir.chdir fixtures do
-            assert_raises RuntimeError do
-              source.dependencies
-            end
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
+            assert dep
+            assert dep.errors.any? { |e| e =~ /cannot find package "github.com\/hashicorp\/golang-lru"/ }
           end
         end
       end
