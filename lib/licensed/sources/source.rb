@@ -9,6 +9,8 @@ module Licensed
         end
       end
 
+      class Error < StandardError; end
+
       class << self
         attr_reader :sources
         def inherited(klass)
