@@ -95,8 +95,8 @@ module Licensed
         results.merge recursive_specs(dependency_specs, results)
       end
 
-      # Returns the specs for dependencies that pass the checks in `include?`
-      # Raises an error if the specification isn't found
+      # Returns the specs for dependencies that pass the checks in `include?`.
+      # Returns a `MissingSpecification` if a gem specification isn't found.
       def specs_for_dependencies(dependencies, source)
         included_dependencies = dependencies.select { |d| include?(d, source) }
         included_dependencies.map do |dep|
@@ -104,8 +104,7 @@ module Licensed
         end
       end
 
-      # Returns a Gem::Specification for the provided gem argument.  If a
-      # Gem::Specification isn't found, an error will be raised.
+      # Returns a Gem::Specification for the provided gem argument.
       def gem_spec(dependency)
         return unless dependency
 

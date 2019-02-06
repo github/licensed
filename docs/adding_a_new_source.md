@@ -68,8 +68,26 @@ Creating a new `Licensed::Dependency` object requires name, version, and path ar
          - A short description of the dependencies purpose.
       2. homepage
          - The dependency's homepage.
+6. errors (optional)
+  - Any errors found when loading dependency information.
 
 #### Finding licenses
 
 In some cases, license content will be in a parent directory of the specified location.  For instance, this can happen with Golang packages
 that share a license file, e.g. `github.com/go/pkg/1` and `github.com/go/pkg/2` might share a license at `github.com/go/pkg`.  In this case, create a `Licensed::Dependency` with the optional `search_root` property, which denotes the root of the directory hierarchy that should be searched.  Directories will be examined in order from the given license location to the `search_root` location to prefer license files with more specificity, i.e. `github.com/go/pkg/1` will be searched before `github.com/go/pkg`.
+
+#### Handling errors when enumerating dependencies
+
+External tools have their own error handling which, if left unhandled, can cause dependency enumeration as a whole to fail either for an individual dependency source or for licensed as a whole.  These errors should be gracefully handled to allow for the best possible user experience.
+
+##### Handling errors related to a specific dependency
+
+`Licensed::Dependency#initialize` will already set errors related to `nil` or empty `path:` arguments, as well as paths that don't exist.  Additional errors can be set to a dependency using the `errors:` argument, e.g. `Licensed::Dependency.new(errors: ["error"])`.
+
+When a dependency contains errors, all errors will be reported to the user and `Licensed::Command::Command#evaluate_dependency` will be not be called.
+
+##### Handling errors related to source evaluation
+
+When an error occurs related to a specific source, raise a `Licensed::Sources::Source::Error` with an informative message.  The error will be caught and reported to the user, and further evaluation of the source will be halted.
+
+As an example, this could be useful if a source is enabled but incorrectly configured.
