@@ -94,6 +94,16 @@ if Licensed::Shell.tool_available?("pip")
           assert dep["summary"]
         end
       end
+
+      it "detects dependencies with multiple version constraints" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "boto3" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
     end
   end
 end

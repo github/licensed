@@ -7,3 +7,4 @@ tqdm<=4.30.0
 Pillow>5.4.0
 Scrapy<1.6.0
 numpy!=1.16.1
+boto3>=1.0,<=2.0
