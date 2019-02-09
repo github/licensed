@@ -1,1 +1,7 @@
+pandas
 Jinja2==2.9.6
+requests>=2.21.0
+tqdm<=4.30.0
+Pillow>5.4.0
+Scrapy<1.6.0
+numpy!=1.16.1

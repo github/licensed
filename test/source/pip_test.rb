@@ -25,9 +25,69 @@ if Licensed::Shell.tool_available?("pip")
     end
 
     describe "dependencies" do
+      it "detects dependencies without a version constraint" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "pandas" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
       it "detects dependencies with == version constraint" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d["name"] == "Jinja2" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
+      it "detects dependencies with >= version constraint" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "requests" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
+      it "detects dependencies with <= version constraint" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "tqdm" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
+      it "detects dependencies with < version constraint" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "Pillow" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
+      it "detects dependencies with > version constraint" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "Scrapy" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
+      it "detects dependencies with != version constraint" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "numpy" }
           assert dep
           assert_equal "pip", dep["type"]
           assert dep["homepage"]
