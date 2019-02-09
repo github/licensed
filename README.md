@@ -12,6 +12,12 @@ Licensed is **not** a complete open source license compliance solution. Please u
 
 Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
 
+## Migrating to 2.x
+
+Licensed 2.x is incompatible with configuration files and cached records from 1.x.  Migrating to 2.x is easy using the `licensed migrate` command.
+
+See the [migration documentation](./docs/migrating_to_newer_versions.md) for more info, or run `licensed help migrate`.
+
 ## Installation
 
 ### With a Gemfile
