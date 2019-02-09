@@ -73,7 +73,7 @@ module Licensed
 
       # Run the command for a dependency, evaluating the dependency and
       # recording results in a report.  Dependencies that were found with errors
-      # are not evaluated and add any errors to the dependency report. 
+      # are not evaluated and add any errors to the dependency report.
       #
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency
