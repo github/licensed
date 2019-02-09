@@ -35,6 +35,23 @@ module Licensed
       puts Licensed::VERSION
     end
 
+    desc "migrate", "Migrate from a previous version of licensed"
+    method_option :config, aliases: "-c", type: :string, required: true,
+      desc: "Path to licensed configuration file"
+    method_option :from, aliases: "-f", type: :string, required: true,
+      desc: "Licensed version to migrate from - #{Licensed.previous_major_versions.map { |major| "v#{major}" }.join(", ")}"
+    def migrate
+      case options["from"]
+      when "v1"
+        Licensed::Migrations::V2.migrate(options["config"], shell)
+      else
+        shell = Thor::Base.shell.new
+        shell.say "Unrecognized option from=#{options["from"]}", :red
+        CLI.command_help(shell, 'migrate')
+        exit 1
+      end
+    end
+
     # If an error occurs (e.g. a missing command or argument), exit 1.
     def self.exit_on_failure?
       true
