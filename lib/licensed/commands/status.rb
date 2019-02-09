@@ -30,7 +30,7 @@ module Licensed
         else
           report.errors << "cached dependency record out of date" if cached_record["version"] != dependency.version
           report.errors << "missing license text" if cached_record.licenses.empty?
-          report.errors << "license needs reviewed: #{cached_record["license"]}" unless allowed_or_reviewed?(app, cached_record)
+          report.errors << "license needs review: #{cached_record["license"]}" unless allowed_or_reviewed?(app, cached_record)
         end
 
         report.errors.empty?

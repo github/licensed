@@ -35,13 +35,13 @@ describe Licensed::Commands::Status do
 
   it "warns if license is not allowed" do
     verifier.run
-    assert_includes dependency_errors, "license needs reviewed: mit"
+    assert_includes dependency_errors, "license needs review: mit"
   end
 
   it "does not warn if license is allowed" do
     config.allow "mit"
     verifier.run
-    refute_includes dependency_errors, "license needs reviewed: mit"
+    refute_includes dependency_errors, "license needs review: mit"
   end
 
   it "does not warn if dependency is ignored" do

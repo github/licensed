@@ -82,7 +82,7 @@ Errors:
 
 * bundler.pathname-common_prefix
   filename: /Users/jonabc/github/licensed/.licenses/bundler/pathname-common_prefix.dep.yml
-    - license needs reviewed: other
+    - license needs review: other
 
 * bundler.bundler
   filename: /Users/jonabc/github/licensed/.licenses/bundler/bundler.dep.yml
@@ -90,7 +90,7 @@ Errors:
 
 * bundler.addressable
   filename: /Users/jonabc/github/licensed/.licenses/bundler/addressable.dep.yml
-    - license needs reviewed: apache-2.0
+    - license needs review: apache-2.0
 ```
 
 ## Creating a new reporter
