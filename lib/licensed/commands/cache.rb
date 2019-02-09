@@ -8,16 +8,18 @@ module Licensed
 
       protected
 
-      # Run the command for an application configuration.
-      # Will remove any cached records that don't match a current application
+      # Run the command for all enumerated dependencies found in a dependency source,
+      # recording results in a report.
+      # Removes any cached records that don't match a current application
       # dependency.
       #
-      # app - An application configuration
+      # app - The application configuration for the source
+      # source - A dependency source enumerator
       #
-      # Returns whether the command succeeded for the application.
-      def run_app(app)
+      # Returns whether the command succeeded for the dependency source enumerator
+      def run_source(app, source)
         result = super
-        clear_stale_cached_records(app) if result
+        clear_stale_cached_records(app, source) if result
         result
       end
 
@@ -64,13 +66,12 @@ module Licensed
       # Clean up cached files that dont match current dependencies
       #
       # app - An application configuration
+      # source - A dependency source enumerator
       #
       # Returns nothing
-      def clear_stale_cached_records(app)
-        names = app.sources.flat_map do |source|
-          source.dependencies.map { |dependency| File.join(source.class.type, dependency.name) }
-        end
-        Dir.glob(app.cache_path.join("**/*.#{DependencyRecord::EXTENSION}")).each do |file|
+      def clear_stale_cached_records(app, source)
+        names = source.dependencies.map { |dependency| File.join(source.class.type, dependency.name) }
+        Dir.glob(app.cache_path.join(source.class.type, "**/*.#{DependencyRecord::EXTENSION}")).each do |file|
           file_path = Pathname.new(file)
           relative_path = file_path.relative_path_from(app.cache_path).to_s
           FileUtils.rm(file) unless names.include?(relative_path.chomp(".#{DependencyRecord::EXTENSION}"))

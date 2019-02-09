@@ -31,7 +31,8 @@ module Licensed
 
       protected
 
-      # Run the command for an application configuration.
+      # Run the command for all enabled sources for an application configuration,
+      # recording results in a report.
       #
       # app - An application configuration
       #
@@ -40,7 +41,7 @@ module Licensed
         reporter.report_app(app) do |report|
           Dir.chdir app.source_path do
             begin
-              app.sources.map { |source| run_source(app, source) }.all?
+              app.sources.select(&:enabled?).map { |source| run_source(app, source) }.all?
             rescue Licensed::Shell::Error => err
               report.errors << err.message
               false
@@ -49,7 +50,8 @@ module Licensed
         end
       end
 
-      # Run the command for a dependency source enumerator
+      # Run the command for all enumerated dependencies found in a dependency source,
+      # recording results in a report.
       #
       # app - The application configuration for the source
       # source - A dependency source enumerator
@@ -69,7 +71,9 @@ module Licensed
         end
       end
 
-      # Run the command for a dependency
+      # Run the command for a dependency, evaluating the dependency and
+      # recording results in a report.  Dependencies that were found with errors
+      # are not evaluated and add any errors to the dependency report. 
       #
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency

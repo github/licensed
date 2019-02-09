@@ -59,7 +59,6 @@ module Licensed
       @sources ||= Licensed::Sources::Source.sources
                                             .select { |source_class| enabled?(source_class.type) }
                                             .map { |source_class| source_class.new(self) }
-                                            .select(&:enabled?)
     end
 
     # Returns whether a source type is enabled
