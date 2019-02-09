@@ -25,7 +25,7 @@ if Licensed::Shell.tool_available?("pip")
     end
 
     describe "dependencies" do
-      it "includes direct dependencies" do
+      it "detects dependencies with == version constraint" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d["name"] == "Jinja2" }
           assert dep

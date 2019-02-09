@@ -36,7 +36,7 @@ module Licensed
       # Assumes that the requirements.txt follow the format pkg=1.0.0 or pkg==1.0.0
       def parse_requirements_txt
         File.open(@config.pwd.join("requirements.txt")).map do |line|
-          p_split = line.split("=")
+          p_split = line.split("==")
           p_split[0]
         end
       end
