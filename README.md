@@ -12,11 +12,12 @@ Licensed is **not** a complete open source license compliance solution. Please u
 
 Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
 
-## Migrating to 2.x
+## Licensed v2
 
-Licensed 2.x is incompatible with configuration files and cached records from 1.x.  Migrating to 2.x is easy using the `licensed migrate` command.
+Licensed v2 includes many internal changes intended to make licensed more extensible and easier to update in the future.  While not too much has changed externally, v2 is incompatible with configuration files and cached records from previous versions.  Fortunately, migrating is easy using the `licensed migrate` command.
 
-See the [migration documentation](./docs/migrating_to_newer_versions.md) for more info, or run `licensed help migrate`.
+See [CHANGELOG.md](./CHANGELOG.md) for more details on whats changed.
+See the [migration documentation](./docs/migrating_to_newer_versions.md) for more info on migrating to v2, or run `licensed help migrate`.
 
 ## Installation
 

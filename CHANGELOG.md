@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.0.0 - 2019-02-09
+
+**This is a major release and includes breaking changes to the configuration and cached record file formats**
+
+### Added
+- New `migrate` command to automatically update configuration and cached record file formats
+- New extensible reporting infrastructure
+- New base command and source classes to abstract away implementation details
+
+### Changes
+- Cached dependency metadata files are now stored entirely as YAML, with `.dep.yml` extension
+- The Bundler dependency source is now identified in configuration files and output as `bundler` instead of `rubygem`
+- Refactored sources for better consistency between classes
+- Refactored commands for better consistency between classes
+- Command outputs have changed for better consistency
+- Updated Dependency classes for better integration with `licensee`
+
+### Fixed
+- Licensed no longer exits on errors when evaluating dependency sources or finding dependencies
+- The Bundler dependency source correctly finds the `bundler` gem as a dependency in more cases
+
 ## 1.5.2 - 2018-12-27
 
 ### Changes
@@ -112,4 +133,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/1.5.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.0.0...HEAD
