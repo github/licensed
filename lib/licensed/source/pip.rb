@@ -42,6 +42,8 @@ module Licensed
         end
       end
 
+      private
+
       # Build the list of packages from a 'requirements.txt'
       def parse_requirements_txt
         File.open(@config.pwd.join("requirements.txt")).map do |line|
