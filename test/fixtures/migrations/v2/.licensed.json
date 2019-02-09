@@ -1,0 +1,27 @@
+{
+  "name": "migration-v2",
+  "cache_path": "cache",
+  "sources": {
+    "rubygem": true
+  },
+  "reviewed": {
+    "rubygem": ["test"]
+  },
+  "ignored": {
+    "rubygem": ["test"]
+  },
+  "rubygem": {
+    "value": "test"
+  },
+  "apps": [
+    {
+      "source_path": "."
+    },
+    {
+      "source_path": ".",
+      "reviewed": {
+        "rubygem": ["test"]
+      }
+    }
+  ]
+}

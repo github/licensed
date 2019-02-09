@@ -10,7 +10,7 @@ module Licensed
         shell.info "updating bundler configuration keys"
         # replace all "rubygem" and "rubygems" configuration keys with "bundler"
         # to account for the bundler source's `type` change from `rubygem` to `bundler`
-        File.write(config_path, File.read(config_path).gsub(/rubygems?:/, "bundler:"))
+        File.write(config_path, File.read(config_path).gsub(/("?)rubygems?("?):/, "\\1bundler\\2:"))
 
         shell.info "updating cached records"
         # load the configuration to find and update cached contents
