@@ -43,7 +43,7 @@ module Licensed
     def migrate
       case options["from"]
       when "v1"
-        Licensed::Migrations::V2.migrate(options["config"], shell)
+        Licensed::Migrations::V2.migrate(options["config"])
       else
         shell = Thor::Base.shell.new
         shell.say "Unrecognized option from=#{options["from"]}", :red
