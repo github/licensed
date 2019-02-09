@@ -50,8 +50,9 @@ describe Licensed::Migrations::V2 do
       FileUtils.cp_r fixtures, tmp
       Dir.chdir(File.join(tmp, "v2")) do
         Licensed::Migrations::V2.migrate(".licensed.yml", shell)
-        cached_record = Licensed::DependencyRecord.read("cache/manifest/notices.dep.yml")
+        cached_record = Licensed::DependencyRecord.read("cache/bundler/notices.dep.yml")
         assert cached_record
+        assert "bundler", cached_record["type"]
         refute_empty cached_record.licenses
         refute_empty cached_record.notices
       end
