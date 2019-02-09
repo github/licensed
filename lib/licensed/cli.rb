@@ -47,7 +47,7 @@ module Licensed
       else
         shell = Thor::Base.shell.new
         shell.say "Unrecognized option from=#{options["from"]}", :red
-        CLI.command_help(shell, 'migrate')
+        CLI.command_help(shell, "migrate")
         exit 1
       end
     end
