@@ -6,7 +6,7 @@ module Licensed
   module Source
     class Pip
       VERSION_OPERATORS = /
-        (\w+)
+        ^(\w+)
         |(\w+)<
         |(\w+)>
         |(\w+)<=
@@ -46,11 +46,11 @@ module Licensed
 
       # Build the list of packages from a 'requirements.txt'
       def parse_requirements_txt
-        File.open(@config.pwd.join("requirements.txt")).map do |line|
+        File.open(@config.pwd.join("requirements.txt")).map { |line|
           line.strip.match(VERSION_OPERATORS) { |match|
-            match.captures.compact
-          }.first
-        end
+            match.captures.first
+          }
+        }.compact
       end
 
       def package_info(package_name)
