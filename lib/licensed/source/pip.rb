@@ -5,15 +5,8 @@ require "English"
 module Licensed
   module Source
     class Pip
-      VERSION_OPERATORS = /
-        ^(\w+)
-        |(\w+)<
-        |(\w+)>
-        |(\w+)<=
-        |(\w+)>=
-        |(\w+)==
-        |(\w+)!=
-      /x
+      VERSION_OPERATORS = %w(< > <= >= == !=).freeze
+      PACKAGE_REGEX = /^(\w+)(#{VERSION_OPERATORS.join("|")})?/
 
       def self.type
         "pip"
@@ -47,9 +40,7 @@ module Licensed
       # Build the list of packages from a 'requirements.txt'
       def parse_requirements_txt
         File.open(@config.pwd.join("requirements.txt")).map { |line|
-          line.strip.match(VERSION_OPERATORS) { |match|
-            match.captures.first
-          }
+          line.strip.match(PACKAGE_REGEX) { |match| match.captures.first }
         }.compact
       end
 
