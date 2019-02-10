@@ -95,6 +95,16 @@ if Licensed::Shell.tool_available?("pip")
         end
       end
 
+      it "detects dependencies with whitespace between the package name and version operator" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d["name"] == "botocore" }
+          assert dep
+          assert_equal "pip", dep["type"]
+          assert dep["homepage"]
+          assert dep["summary"]
+        end
+      end
+
       it "detects dependencies with multiple version constraints" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d["name"] == "boto3" }
