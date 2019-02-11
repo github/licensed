@@ -33,9 +33,10 @@ module Licensed
       private
 
       def packages_from_requirements_txt
-        File.open(@config.pwd.join("requirements.txt")).map do |line|
-          line.strip.match(PACKAGE_REGEX) { |match| match.captures.first }
-        end.compact
+        File.read(@config.pwd.join("requirements.txt"))
+            .lines
+            .map { |line| line.strip.match(PACKAGE_REGEX) { |match| match.captures.first } }
+            .compact
       end
 
       def package_info(package_name)
