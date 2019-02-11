@@ -1,4 +1,4 @@
-expected_dependency: MarkupSafe
+expected_dependency: Jinja2
 source_path: test/fixtures/pip
 python:
-  virtual_env_dir: "test/fixtures/pip/venv"
+  virtual_env_dir: test/fixtures/pip/venv
