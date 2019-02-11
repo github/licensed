@@ -22,7 +22,7 @@ module Licensed
       end
 
       def dependencies
-        @dependencies ||= parse_requirements_txt.map do |package_name|
+        @dependencies ||= packages_from_requirements_txt.map do |package_name|
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
           Dependency.new(location, {
@@ -37,8 +37,7 @@ module Licensed
 
       private
 
-      # Build the list of packages from a 'requirements.txt'
-      def parse_requirements_txt
+      def packages_from_requirements_txt
         File.open(@config.pwd.join("requirements.txt")).map do |line|
           line.strip.match(PACKAGE_REGEX) { |match| match.captures.first }
         end.compact
