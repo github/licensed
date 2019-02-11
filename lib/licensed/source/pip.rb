@@ -39,9 +39,9 @@ module Licensed
 
       # Build the list of packages from a 'requirements.txt'
       def parse_requirements_txt
-        File.open(@config.pwd.join("requirements.txt")).map { |line|
+        File.open(@config.pwd.join("requirements.txt")).map do |line|
           line.strip.match(PACKAGE_REGEX) { |match| match.captures.first }
-        }.compact
+        end.compact
       end
 
       def package_info(package_name)
