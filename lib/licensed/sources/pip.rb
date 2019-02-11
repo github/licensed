@@ -5,13 +5,16 @@ require "English"
 module Licensed
   module Sources
     class Pip < Source
+      VERSION_OPERATORS = %w(< > <= >= == !=).freeze
+      PACKAGE_REGEX = /^(\w+)(#{VERSION_OPERATORS.join("|")})?/
+
       def enabled?
         return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
         File.exist?(@config.pwd.join("requirements.txt"))
       end
 
       def enumerate_dependencies
-        parse_requirements_txt.map do |package_name|
+        packages_from_requirements_txt.map do |package_name|
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
@@ -27,13 +30,12 @@ module Licensed
         end
       end
 
-      # Build the list of packages from a 'requirements.txt'
-      # Assumes that the requirements.txt follow the format pkg=1.0.0 or pkg==1.0.0
-      def parse_requirements_txt
+      private
+
+      def packages_from_requirements_txt
         File.open(@config.pwd.join("requirements.txt")).map do |line|
-          p_split = line.split("=")
-          p_split[0]
-        end
+          line.strip.match(PACKAGE_REGEX) { |match| match.captures.first }
+        end.compact
       end
 
       def package_info(package_name)
