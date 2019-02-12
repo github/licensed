@@ -24,6 +24,7 @@ test/fixtures/cabal/*
 test/fixtures/git_submodule/*
 !test/fixtures/git_submodule/README
 test/fixtures/pip/venv
+!test/fixtures/migrations/**/*
 
 vendor/licenses
 .licenses

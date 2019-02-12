@@ -8,33 +8,48 @@ module Licensed
     desc "cache", "Cache the licenses of dependencies"
     method_option :force, type: :boolean,
       desc: "Overwrite licenses even if version has not changed."
-    method_option :offline, type: :boolean,
-      desc: "This option is deprecated and will be removed in the next major release."
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def cache
-      run Licensed::Command::Cache.new(config), force: options[:force]
+      run Licensed::Commands::Cache.new(config: config), force: options[:force]
     end
 
     desc "status", "Check status of dependencies' cached licenses"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def status
-      run Licensed::Command::Status.new(config)
+      run Licensed::Commands::Status.new(config: config)
     end
 
     desc "list", "List dependencies"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def list
-      run Licensed::Command::List.new(config)
+      run Licensed::Commands::List.new(config: config)
     end
 
     map "-v" => :version
     map "--version" => :version
     desc "version", "Show Installed Version of Licensed, [-v, --version]"
     def version
-      run Licensed::Command::Version.new
+      puts Licensed::VERSION
+    end
+
+    desc "migrate", "Migrate from a previous version of licensed"
+    method_option :config, aliases: "-c", type: :string, required: true,
+      desc: "Path to licensed configuration file"
+    method_option :from, aliases: "-f", type: :string, required: true,
+      desc: "Licensed version to migrate from - #{Licensed.previous_major_versions.map { |major| "v#{major}" }.join(", ")}"
+    def migrate
+      case options["from"]
+      when "v1"
+        Licensed::Migrations::V2.migrate(options["config"])
+      else
+        shell = Thor::Base.shell.new
+        shell.say "Unrecognized option from=#{options["from"]}", :red
+        CLI.command_help(shell, "migrate")
+        exit 1
+      end
     end
 
     # If an error occurs (e.g. a missing command or argument), exit 1.
@@ -55,9 +70,8 @@ module Licensed
       options["config"] || Dir.pwd
     end
 
-    def run(command, *args)
-      command.run(*args)
-      exit command.success?
+    def run(command, **args)
+      exit command.run(args)
     end
   end
 end

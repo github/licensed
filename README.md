@@ -12,6 +12,13 @@ Licensed is **not** a complete open source license compliance solution. Please u
 
 Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
 
+## Licensed v2
+
+Licensed v2 includes many internal changes intended to make licensed more extensible and easier to update in the future.  While not too much has changed externally, v2 is incompatible with configuration files and cached records from previous versions.  Fortunately, migrating is easy using the `licensed migrate` command.
+
+See [CHANGELOG.md](./CHANGELOG.md) for more details on whats changed.
+See the [migration documentation](./docs/migrating_to_newer_versions.md) for more info on migrating to v2, or run `licensed help migrate`.
+
 ## Installation
 
 ### With a Gemfile
@@ -50,31 +57,11 @@ For example, on macOS with Homebrew: `brew install cmake pkg-config` and on Ubun
 ## Usage
 
 - `licensed list`: Output enumerated dependencies only.
-
 - `licensed cache`: Cache licenses and metadata.
-
 - `licensed status`: Check status of dependencies' cached licenses. For example:
-
-```
-$ bundle exec licensed status
-Checking licenses for 3 dependencies
-
-Warnings:
-
-.licenses/rubygem/bundler.txt:
-  - license needs review: mit.
-
-.licenses/rubygem/licensee.txt:
-  - cached license data missing
-
-.licenses/bower/jquery.txt:
-  - license needs review: mit.
-  - cached license data out of date
-
-3 dependencies checked, 3 warnings found.
-```
-
 - `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`
+
+See the [commands documentation](./docs/commands.md) for additional documentation, or run `licensed -h` to see all of the current available commands.
 
 ### Configuration
 
@@ -93,7 +80,7 @@ See the [configuration file documentation](./docs/configuration.md) for more det
 
 Dependencies will be automatically detected for all of the following sources by default.
 1. [Bower (bower)](./docs/sources/bower.md)
-2. [Bundler (rubygem)](./docs/sources/bundler.md)
+2. [Bundler](./docs/sources/bundler.md)
 3. [Cabal (cabal)](./docs/sources/cabal.md)
 4. [Go (go)](./docs/sources/go.md)
 5. [Go Dep (dep)](./docs/sources/dep.md)
@@ -106,7 +93,7 @@ You can disable any of them in the configuration file:
 
 ```yml
 sources:
-  rubygem: false
+  bundler: false
   npm: false
   bower: false
   cabal: false
@@ -137,6 +124,12 @@ if Licensed::Shell.tool_available?('bundle')
   end
 end
 ```
+
+See the [documentation on adding new sources](./docs/adding_a_new_source.md) for more information.
+
+#### Adding Commands
+
+See the [documentation on commands](./docs/commands.md) for information about adding a new CLI command.
 
 ## Contributing
 

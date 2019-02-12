@@ -32,7 +32,7 @@ it may still determine that it can't enumerate dependencies for a project.
 ```yml
 sources:
   bower: true
-  rubygem: false
+  bundler: false
 ```
 
 `licensed` determines which sources will try to enumerate dependencies based on the following rules:
@@ -76,7 +76,7 @@ source_path: 'relative/path/to/source'
 # Sources of metadata
 sources:
   bower: true
-  rubygem: false
+  bundler: false
 
 # Dependencies with these licenses are allowed by default.
 allowed:
@@ -88,7 +88,7 @@ allowed:
 
 # These dependencies are explicitly ignored.
 ignored:
-  rubygem:
+  bundler:
     - some-internal-gem
 
   bower:
@@ -96,7 +96,7 @@ ignored:
 
 # These dependencies have been reviewed.
 reviewed:
-  rubygem:
+  bundler:
     - bcrypt-ruby
 
   bower:
@@ -122,14 +122,14 @@ Here are some examples:
 ```yml
 sources:
   go: true
-  rubygem: false
+  bundler: false
 
 ignored:
-  rubygem:
+  bundler:
     - some-internal-gem
 
 reviewed:
-  rubygem:
+  bundler:
     - bcrypt-ruby
 
 cache_path: 'path/to/cache'
@@ -137,7 +137,7 @@ apps:
   - source_path: 'path/to/app1'
   - source_path: 'path/to/app2'
     sources:
-      rubygem: true
+      bundler: true
       go: false
 ```
 
