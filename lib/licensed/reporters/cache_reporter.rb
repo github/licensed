@@ -30,14 +30,14 @@ module Licensed
           warning_reports = report.all_reports.select { |report| report.warnings.any? }.to_a
           if warning_reports.any?
             shell.newline
-            shell.warning "  * Warnings:"
+            shell.warn "  * Warnings:"
             warning_reports.each do |report|
               display_metadata = report.map { |k, v| "#{k}: #{v}" }.join(", ")
 
-              shell.warning "    * #{report.name}"
-              shell.warning "    #{display_metadata}" unless display_metadata.empty?
-              report.warning.each do |warning|
-                shell.warning "      - #{warning}"
+              shell.warn "    * #{report.name}"
+              shell.warn "    #{display_metadata}" unless display_metadata.empty?
+              report.warnings.each do |warning|
+                shell.warn "      - #{warning}"
               end
               shell.newline
             end

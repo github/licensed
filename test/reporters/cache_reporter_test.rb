@@ -94,6 +94,31 @@ describe Licensed::Reporters::CacheReporter do
       end
     end
 
+    it "reports warnings during the source run" do
+      reporter.report_run(command) do
+        reporter.report_app(app) do |app_report|
+          reporter.report_source(source) do |source_report|
+            reporter.report_dependency(dependency) do |dependency_report|
+              dependency_report.warnings << "dependency warning"
+            end
+          end
+        end
+
+        assert_includes shell.messages,
+                        {
+                           message: "      - dependency warning",
+                           newline: true,
+                           style: :warn
+                        }
+        assert_includes shell.messages,
+                        {
+                           message: "  * 1 #{source.class.type} dependencies",
+                           newline: true,
+                           style: :confirm
+                        }
+      end
+    end
+
     it "reports errors during the source run" do
       reporter.report_run(command) do
         reporter.report_app(app) do |app_report|
