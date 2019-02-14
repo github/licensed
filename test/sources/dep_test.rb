@@ -60,28 +60,5 @@ describe Licensed::Sources::Dep do
         end
       end
     end
-
-    describe "with unavailable packages" do
-      let(:root) { Dir.mktmpdir }
-      let(:fixtures) { File.join(root, "test") }
-
-      before do
-        FileUtils.mkdir_p fixtures
-        FileUtils.cp_r File.expand_path("../../fixtures/go/src/test", __FILE__), root
-        FileUtils.rm_rf File.join(fixtures, "vendor/github.com")
-      end
-
-      after do
-        FileUtils.rm_rf fixtures
-      end
-
-      it "sets an error message" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.find { |d| d.name == "github.com/gorilla/context" }
-          assert dep
-          assert dep.errors.any? { |e| e =~ /expected dependency path .* does not exist/ }
-        end
-      end
-    end
   end
 end
