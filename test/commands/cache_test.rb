@@ -141,6 +141,14 @@ describe Licensed::Commands::Cache do
     assert_equal count - 1, ignored_count
   end
 
+  it "reports a warning when a dependency doesn't exist" do
+    config.apps.first["test"] = { "path" => File.join(Dir.pwd, "non-existant") }
+    generator.run
+    report = reporter.report.all_reports.find { |r| r.name&.include?("dependency") }
+    refute_empty report.warnings
+    assert report.warnings.any? { |w| w =~ /expected dependency path .*? does not exist/ }
+  end
+
   describe "with multiple apps" do
     let(:apps) do
       [

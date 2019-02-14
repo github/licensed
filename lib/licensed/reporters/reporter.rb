@@ -19,6 +19,10 @@ module Licensed
           @errors ||= []
         end
 
+        def warnings
+          @warnings ||= []
+        end
+
         def all_reports
           result = []
           result << self

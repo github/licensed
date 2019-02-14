@@ -28,12 +28,6 @@ describe Licensed::Dependency do
         dep = Licensed::Dependency.new(name: "test", version: "1.0", path: nil)
         assert_includes dep.errors, "dependency path not found"
       end
-
-      it "sets an error if path does not exist" do
-        path = File.join(Dir.pwd, "fake-path")
-        dep = Licensed::Dependency.new(name: "test", version: "1.0", path: path)
-        assert_includes dep.errors, "expected dependency path #{path} does not exist"
-      end
     end
   end
 
