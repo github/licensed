@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.0.1 - 2019-02-14
+
+### Changes
+- Dependency paths that don't exist on the local disk are reported as warnings
+- Cache, status and list output is sorted by app name, source type and dependency name
+- Bumped `licensee` gem requirement
+
 ## 2.0.0 - 2019-02-09
 
 **This is a major release and includes breaking changes to the configuration and cached record file formats**
@@ -133,4 +140,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.0.1...HEAD
