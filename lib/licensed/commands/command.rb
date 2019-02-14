@@ -20,7 +20,9 @@ module Licensed
         @options = options
         begin
           result = reporter.report_run(self) do
-            config.apps.map { |app| run_app(app) }.all?
+            config.apps.sort_by { |app| app["name"] }
+                       .map { |app| run_app(app) }
+                       .all?
           end
         ensure
           @options = nil
@@ -41,7 +43,9 @@ module Licensed
         reporter.report_app(app) do |report|
           Dir.chdir app.source_path do
             begin
-              app.sources.select(&:enabled?).map { |source| run_source(app, source) }.all?
+              app.sources.select(&:enabled?)
+                         .sort_by { |source| source.class.type }
+                         .map { |source| run_source(app, source) }.all?
             rescue Licensed::Shell::Error => err
               report.errors << err.message
               false
@@ -60,7 +64,9 @@ module Licensed
       def run_source(app, source)
         reporter.report_source(source) do |report|
           begin
-            source.dependencies.map { |dependency| run_dependency(app, source, dependency) }.all?
+            source.dependencies.sort_by { |dependency| dependency.name }
+                               .map { |dependency| run_dependency(app, source, dependency) }
+                               .all?
           rescue Licensed::Shell::Error => err
             report.errors << err.message
             false
