@@ -28,12 +28,6 @@ describe Licensed::Dependency do
         dep = Licensed::Dependency.new(name: "test", version: "1.0", path: nil)
         assert_includes dep.errors, "dependency path not found"
       end
-
-      it "sets an error if path does not exist" do
-        path = File.join(Dir.pwd, "fake-path")
-        dep = Licensed::Dependency.new(name: "test", version: "1.0", path: path)
-        assert_includes dep.errors, "expected dependency path #{path} does not exist"
-      end
     end
   end
 
@@ -277,7 +271,7 @@ describe Licensed::Dependency do
     end
   end
 
-  describe "error" do
+  describe "error?" do
     it "returns true if a dependency has an error" do
       dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd, errors: ["error"])
       assert dep.errors?
@@ -286,6 +280,30 @@ describe Licensed::Dependency do
     it "returns false if a dependency does not have an error" do
       dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd)
       refute dep.errors?
+    end
+  end
+
+  describe "path" do
+    it "returns the configured dependency path" do
+      dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd)
+      assert_equal Dir.pwd, dep.path.to_s
+    end
+  end
+
+  describe "exist?" do
+    it "returns true if the configured dependency path exists" do
+      dep = Licensed::Dependency.new(name: "test", version: "1.0", path: Dir.pwd)
+      assert dep.exist?
+    end
+
+    it "returns true if the configured search root exists" do
+      dep = Licensed::Dependency.new(name: "test", version: "1.0", path: File.join(Dir.pwd, "non-exist"), search_root: Dir.pwd)
+      assert dep.exist?
+    end
+
+    it "returns false if neither the search root or configured path exists" do
+      dep = Licensed::Dependency.new(name: "test", version: "1.0", path: File.join(Dir.pwd, "non-exist"))
+      refute dep.exist?
     end
   end
 end

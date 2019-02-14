@@ -23,9 +23,8 @@ module Licensed
     def initialize(name:, version:, path:, search_root: nil, metadata: {}, errors: [])
       # check the path for default errors if no other errors
       # were found when loading the dependency
-      if errors.empty?
-        path_error = path_error(path, search_root)
-        errors.push(path_error) if path_error
+      if errors.empty? && path.to_s.empty?
+        errors.push("dependency path not found")
       end
 
       @name = name
@@ -45,6 +44,21 @@ module Licensed
       end
 
       super(path, search_root: search_root, detect_readme: true, detect_packages: true)
+    end
+
+    # Returns whether the dependency exists locally
+    def exist?
+      # some types of dependencies won't necessarily have a path that exists,
+      # but they can still find license contents between the given path and
+      # the search root
+      # @root is defined
+      path.exist? || File.exist?(@root)
+    end
+
+    # Returns the location of this dependency on the local disk
+    def path
+      # exposes the private method Licensee::Projects::FSProject#dir_path
+      dir_path
     end
 
     # Returns true if the dependency has any errors, false otherwise
@@ -95,17 +109,6 @@ module Licensed
     end
 
     private
-
-    def path_error(path, search_root)
-      return "dependency path not found" if path.to_s.empty?
-      return if File.exist?(path)
-      return if search_root && File.exist?(search_root)
-
-      # if the given path doesn't exist
-      # AND a search root isn't given, or the search root doesn't exist
-      # then set an error that the expected dependency path doesn't exist
-      "expected dependency path #{path} does not exist"
-    end
 
     # Returns the sources for a group of license or notice file contents
     #

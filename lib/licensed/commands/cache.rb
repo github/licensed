@@ -41,6 +41,10 @@ module Licensed
           report["cached"] = true
         end
 
+        if !dependency.exist?
+          report.warnings << "expected dependency path #{dependency.path} does not exist"
+        end
+
         true
       end
 
