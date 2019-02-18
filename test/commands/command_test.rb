@@ -74,11 +74,11 @@ describe Licensed::Commands::Command do
 
   it "reports errors found on a dependency" do
     dependency_name = "#{apps.first["name"]}.test.dependency"
-    configuration.apps.first["test"] = { "path" => nil }
+    configuration.apps.first["test"] = { errors: ["error"] }
     refute command.run
     report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
     assert report
-    assert_includes report.errors, "dependency path not found"
+    assert_includes report.errors, "error"
   end
 
   it "catches source errors thrown when evaluating a source" do

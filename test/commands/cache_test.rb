@@ -142,7 +142,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "reports a warning when a dependency doesn't exist" do
-    config.apps.first["test"] = { "path" => File.join(Dir.pwd, "non-existant") }
+    config.apps.first["test"] = { path: File.join(Dir.pwd, "non-existant") }
     generator.run
     report = reporter.report.all_reports.find { |r| r.name&.include?("dependency") }
     refute_empty report.warnings

@@ -3,8 +3,15 @@
 class TestSource < Licensed::Sources::Source
   def initialize(config, name = "dependency", metadata = {})
     super config
-    @metadata = metadata
-    @name = name
+    @dependency_config = {
+      name: name,
+      version: "1.0",
+      path: Dir.pwd,
+      metadata: {
+        "type" => TestSource.type,
+        "dir" => Dir.pwd
+      }.merge(metadata)
+    }.merge(config["test"] || {})
   end
 
   def self.type
@@ -16,17 +23,6 @@ class TestSource < Licensed::Sources::Source
   end
 
   def enumerate_dependencies
-    dependency_config = config["test"] || {}
-    [
-      Licensed::Dependency.new(
-        name: @name,
-        version: "1.0",
-        path: dependency_config.fetch("path", Dir.pwd),
-        metadata: {
-          "type"     => TestSource.type,
-          "dir"      => Dir.pwd
-        }.merge(@metadata)
-      )
-    ]
+    [Licensed::Dependency.new(**@dependency_config)]
   end
 end
