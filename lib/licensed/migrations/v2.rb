@@ -28,7 +28,9 @@ module Licensed
           end
 
           app.sources.each do |source|
-            Dir.chdir app.cache_path.join(source.class.type) do
+            cache_path = app.cache_path.join(source.class.type)
+            next unless File.exist?(cache_path)
+            Dir.chdir cache_path do
               # licensed v1 cached records were stored as .txt files with YAML frontmatter
               Dir["**/*.txt"].each do |file|
                 yaml, licenses, notices = parse_file(file)
