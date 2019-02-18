@@ -58,17 +58,6 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
 
-      it "sets an error when dependencies are missing" do
-        Dir.mktmpdir do |dir|
-          FileUtils.cp(File.join(fixtures, "package.json"), File.join(dir, "package.json"))
-          Dir.chdir(dir) do
-            dep = source.dependencies.find { |d| d.name == "autoprefixer" }
-            assert dep
-            assert_includes dep.errors, "dependency path not found"
-          end
-        end
-      end
-
       describe "with multiple instances of a dependency" do
         it "includes version in the dependency name for multiple unique versions" do
           Dir.chdir fixtures do
