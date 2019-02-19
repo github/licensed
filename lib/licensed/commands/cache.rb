@@ -32,6 +32,11 @@ module Licensed
       #
       # Returns true.
       def evaluate_dependency(app, source, dependency, report)
+        if dependency.path.empty?
+          report.errors << "dependency path not found"
+          return false
+        end
+
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
         cached_record = Licensed::DependencyRecord.read(filename)
         if options[:force] || save_dependency_record?(dependency, cached_record)

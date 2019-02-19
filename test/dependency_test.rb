@@ -19,27 +19,9 @@ describe Licensed::Dependency do
         Licensed::Dependency.new(name: "test", version: "1.0", path: ".")
       end
     end
-
-    describe "with an error" do
-      it "sets an error if path is nil or empty" do
-        dep = Licensed::Dependency.new(name: "test", version: "1.0", path: "")
-        assert_includes dep.errors, "dependency path not found"
-
-        dep = Licensed::Dependency.new(name: "test", version: "1.0", path: nil)
-        assert_includes dep.errors, "dependency path not found"
-      end
-    end
   end
 
   describe "record" do
-    describe "with a dependency error" do
-      let(:error) { "error" }
-
-      it "returns nil" do
-        mkproject { |dep| assert_nil dep.record }
-      end
-    end
-
     it "returns a Licensed::DependencyRecord object with dependency data" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
@@ -61,14 +43,6 @@ describe Licensed::Dependency do
   end
 
   describe "license_key" do
-    describe "with a dependency error" do
-      let(:error) { "error" }
-
-      it "returns none" do
-        mkproject { |dependency| assert_equal "none", dependency.license_key }
-      end
-    end
-
     it "gets license from license file" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
@@ -140,14 +114,6 @@ describe Licensed::Dependency do
   end
 
   describe "license_contents" do
-    describe "with a dependency error" do
-      let(:error) { "error" }
-
-      it "returns an empty list" do
-        mkproject { |dependency| assert_empty dependency.license_contents }
-      end
-    end
-
     it "gets license content from license file" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
@@ -232,14 +198,6 @@ describe Licensed::Dependency do
   end
 
   describe "notice_contents" do
-    describe "with a dependency error" do
-      let(:error) { "error" }
-
-      it "returns an empty list" do
-        mkproject { |dependency| assert_empty dependency.notice_contents }
-      end
-    end
-
     it "extracts legal notices" do
       mkproject do |dependency|
         File.write "AUTHORS", "authors"

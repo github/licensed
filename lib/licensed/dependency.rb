@@ -8,6 +8,7 @@ module Licensed
     attr_reader :name
     attr_reader :version
     attr_reader :errors
+    attr_reader :path
 
     # Create a new project dependency
     #
@@ -21,23 +22,16 @@ module Licensed
     # Returns a new dependency object.  Dependency metadata and license contents
     # are available if no errors are set on the dependency.
     def initialize(name:, version:, path:, search_root: nil, metadata: {}, errors: [])
-      # check the path for default errors if no other errors
-      # were found when loading the dependency
-      if errors.empty? && path.to_s.empty?
-        errors.push("dependency path not found")
-      end
-
       @name = name
       @version = version
       @metadata = metadata
       @errors = errors
-
-      # if there are any errors, don't evaluate any dependency contents
-      return if errors.any?
+      path = path.to_s
+      @path = path
 
       # enforcing absolute paths makes life much easier when determining
       # an absolute file path in #notices
-      if !Pathname.new(path).absolute?
+      if File.exist?(path) && !Pathname.new(path).absolute?
         # this is an internal error related to source implementation and
         # should be raised, not stored to be handled by reporters
         raise ArgumentError, "dependency path #{path} must be absolute"
@@ -52,13 +46,7 @@ module Licensed
       # but they can still find license contents between the given path and
       # the search root
       # @root is defined
-      path.exist? || File.exist?(@root)
-    end
-
-    # Returns the location of this dependency on the local disk
-    def path
-      # exposes the private method Licensee::Projects::FSProject#dir_path
-      dir_path
+      File.exist?(path) || File.exist?(@root)
     end
 
     # Returns true if the dependency has any errors, false otherwise
@@ -68,7 +56,6 @@ module Licensed
 
     # Returns a record for this dependency including metadata and legal contents
     def record
-      return nil if errors?
       @record ||= DependencyRecord.new(
         metadata: license_metadata,
         licenses: license_contents,
@@ -78,14 +65,13 @@ module Licensed
 
     # Returns a string representing the dependencys license
     def license_key
-      return "none" if errors? || !license
+      return "none" unless license
       license.key
     end
 
     # Returns the license text content from all matched sources
     # except the package file, which doesn't contain license text.
     def license_contents
-      return [] if errors?
       matched_files.reject { |f| f == package_file }
                    .group_by(&:content)
                    .map { |content, files| { "sources" => content_sources(files), "text" => content } }
@@ -93,7 +79,6 @@ module Licensed
 
     # Returns legal notices found at the dependency path
     def notice_contents
-      return [] if errors?
       notice_files.sort # sorted by the path
                   .map { |file| { "sources" => content_sources(file), "text" => File.read(file).rstrip } }
                   .select { |text| text.length > 0 } # files with content only
@@ -101,8 +86,6 @@ module Licensed
 
     # Returns an array of file paths used to locate legal notices
     def notice_files
-      return [] if errors?
-
       Dir.glob(dir_path.join("*"))
          .grep(LEGAL_FILES_PATTERN)
          .select { |path| File.file?(path) }

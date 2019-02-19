@@ -142,11 +142,18 @@ describe Licensed::Commands::Cache do
   end
 
   it "reports a warning when a dependency doesn't exist" do
-    config.apps.first["test"] = { "path" => File.join(Dir.pwd, "non-existant") }
+    config.apps.first["test"] = { path: File.join(Dir.pwd, "non-existant") }
     generator.run
     report = reporter.report.all_reports.find { |r| r.name&.include?("dependency") }
     refute_empty report.warnings
     assert report.warnings.any? { |w| w =~ /expected dependency path .*? does not exist/ }
+  end
+
+  it "reports an error when a dependency's path is empty" do
+    config.apps.first["test"] = { path: nil }
+    generator.run
+    report = reporter.report.all_reports.find { |r| r.name&.include?("dependency") }
+    assert_includes report.errors, "dependency path not found"
   end
 
   describe "with multiple apps" do
