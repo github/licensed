@@ -51,7 +51,7 @@ if Licensed::Shell.tool_available?("gradle")
         Dir.chdir fixtures do
           source.with_latest_licenses do
             packages = Dir.entries(File.join(fixtures, ".gradle-licenses"))
-            directory = packages.select {|p| p == "io.netty:netty-all" }
+            directory = packages.select { |p| p == "io.netty:netty-all" }
             assert_match /Apache License/, File.read(File.join(fixtures, ".gradle-licenses", directory, "LICENSE"))
           end
         end
