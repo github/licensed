@@ -179,6 +179,11 @@ module Licensed
                           .delete_if { |f| !File.exist?(f) }
       end
 
+      # Callback for updating the source tree if needed
+      def with_latest_licenses
+        yield
+      end
+
       class Dependency < Licensed::Dependency
         ANY_EXCEPT_COMMENT_CLOSE_REGEX = /(\*(?!\/)|[^\*])*/m.freeze
         HEADER_LICENSE_REGEX = /
