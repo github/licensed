@@ -8,16 +8,21 @@ require "net/http"
 module Licensed
   module Sources
     class Gradle < Source
-      def self.type
-        "gradle"
-      end
 
+      DEFAULT_CONFIGURATIONS   = ["runtime", "runtimeClasspath"]
+      GRADLE_LICENSES_PATH     = ".gradle-licenses"
+      GRADLE_LICENSES_CSV_NAME = "licenses.csv"
+
+      # Returns the configurations to include in license generation.
+      # Defaults to ["runtime", "runtimeClasspath"]
       def configurations
-        ["runtime", "runtimeClasspath"]
-      end
-
-      def initialize(config)
-        @config = config
+        @configurations ||= begin
+          if configurations = config.dig("gradle", "configurations")
+            Array(configurations)
+          else
+            DEFAULT_CONFIGURATIONS
+          end
+        end
       end
 
       def enabled?
@@ -30,7 +35,7 @@ module Licensed
           Dependency.new(
             name: name,
             version: package["version"],
-            path: File.join(@config.pwd, gradle_licenses_path, name),
+            path: File.join(@config.pwd, GRADLE_LICENSES_PATH, name),
             metadata: {
               "type"     => Gradle.type
             }
@@ -46,18 +51,10 @@ module Licensed
 
       private
 
-      def gradle_licenses_path
-        ".gradle-licenses"
-      end
-
-      def gradle_licenses_csv_name
-        "licenses.csv"
-      end
-
       def download_licenses_from_csv
-        path = File.join(@config.pwd, gradle_licenses_path)
+        path = File.join(@config.pwd, GRADLE_LICENSES_PATH)
         downloaded_licenses = {}
-        CSV.foreach(File.join(path, gradle_licenses_csv_name), headers: true) do |row|
+        CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true) do |row|
           url = row["moduleLicenseUrl"]
           artifact, _, version = row["artifact"].rpartition(":")
           file_path = File.join(path, artifact, "LICENSE")
@@ -76,7 +73,7 @@ module Licensed
         gradle_command("generateLicenseReport")
         download_licenses_from_csv
         yield
-        FileUtils.rm_rf(File.join(@config.pwd, gradle_licenses_path))
+        FileUtils.rm_rf(File.join(@config.pwd, GRADLE_LICENSES_PATH))
       end
 
       # Returns the output from running `npm list` to get package metadata
@@ -115,7 +112,7 @@ apply from: "build.gradle"
 
 licenseReport {
     configurations = configs
-    outputDir = "$projectDir/#{gradle_licenses_path}"
+    outputDir = "$projectDir/#{GRADLE_LICENSES_PATH}"
     renderers = [new CsvReportRenderer()]
     filters = [new LicenseBundleNormalizer()]
 }
