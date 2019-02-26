@@ -5,6 +5,7 @@ require "fileutils"
 
 if Licensed::Shell.tool_available?("gradle")
   describe Licensed::Sources::Gradle do
+    let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
     let(:config) { Licensed::Configuration.new }
     let(:source) { Licensed::Sources::Gradle.new(config) }
 
@@ -18,7 +19,7 @@ if Licensed::Shell.tool_available?("gradle")
         end
       end
 
-      it "is false no npm configs exist" do
+      it "is false if build.gradle does not exist" do
         Dir.chdir(Dir.tmpdir) do
           refute source.enabled?
         end
@@ -26,14 +27,13 @@ if Licensed::Shell.tool_available?("gradle")
     end
 
     describe "dependencies" do
-      let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
-
       it "includes declared dependencies" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
           assert dep
           assert_equal "gradle", dep.record["type"]
           assert_equal "4.1.33.Final", dep.version
+          # add assertion for dep.path being expected url
         end
       end
 
@@ -43,18 +43,19 @@ if Licensed::Shell.tool_available?("gradle")
         end
       end
     end
+  end
 
-    describe "update_licenses_cache" do
-      let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
+  describe Licensed::Sources::Gradle::Dependency do
+    let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
+    let(:config) { Licensed::Configuration.new }
+    let(:source) { Licensed::Sources::Gradle.new(config) }
 
-      it "downloads the project licenses" do
-        Dir.chdir fixtures do
-          source.with_latest_licenses do
-            packages = Dir.entries(File.join(fixtures, ".gradle-licenses"))
-            directory = packages.select { |p| p == "io.netty:netty-all" }
-            assert_match /Apache License/, File.read(File.join(fixtures, ".gradle-licenses", directory, "LICENSE"))
-          end
-        end
+    it "returns the dependency license" do
+      Dir.chdir fixtures do
+        dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
+        assert dep
+        assert_equal "apache-2.0", dep.license
+        assert dep.record.licenses.any? { |r| r["source"] == dep.path && r["text"] =~ /Apache License/ }
       end
     end
   end

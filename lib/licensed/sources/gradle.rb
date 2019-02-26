@@ -13,6 +13,28 @@ module Licensed
       GRADLE_LICENSES_PATH     = ".gradle-licenses"
       GRADLE_LICENSES_CSV_NAME = "licenses.csv"
 
+      class Dependency < Licensed::Dependency
+        class << self
+          # Cache and return the results of getting the license content.
+          def license(url)
+            (@licenses ||= {})[url] ||= Net::HTTP.get(uri)
+          end
+        end
+
+        # Returns whether the dependency content exists
+        def exist?
+          # shouldn't force network connections just to check if content exists
+          # only check that the path is not empty
+          !path.to_s.empty?
+        end
+
+        # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
+        def project_files
+          return [] if path.to_s.empty?
+          Array(Licensee::ProjectFiles::LicenseFile.new(self.class.license(path), path))
+        end
+      end
+
       # Returns the configurations to include in license generation.
       # Defaults to ["runtime", "runtimeClasspath"]
       def configurations
@@ -30,12 +52,12 @@ module Licensed
       end
 
       def enumerate_dependencies
-        @dependencies ||= JSON.parse(package_metadata_command).map do |package|
+        packages.map do |package|
           name = "#{package["group"]}:#{package["name"]}"
           Dependency.new(
             name: name,
             version: package["version"],
-            path: File.join(@config.pwd, GRADLE_LICENSES_PATH, name),
+            path: package["url"],
             metadata: {
               "type"     => Gradle.type
             }
@@ -45,34 +67,18 @@ module Licensed
 
       private
 
-      def download_licenses_from_csv
-        path = File.join(@config.pwd, GRADLE_LICENSES_PATH)
-        downloaded_licenses = {}
-        CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true) do |row|
-          url = row["moduleLicenseUrl"]
-          artifact, _, version = row["artifact"].rpartition(":")
-          file_path = File.join(path, artifact, "LICENSE")
-          FileUtils.mkdir_p(File.join(path, artifact))
-          if cache_path = downloaded_licenses[url]
-            FileUtils.cp(cache_path, file_path)
-          else
-            uri = URI(row["moduleLicenseUrl"])
-            File.write(file_path, Net::HTTP.get(uri))
-            downloaded_licenses[url] = file_path
-          end
-        end
-      end
-
-      def download_and_cache_licenses
+      def packages
+        metadata = JSON.parse(gradle_command("printDependencies"))
         gradle_command("generateLicenseReport")
-        download_licenses_from_csv
-        yield
-        FileUtils.rm_rf(File.join(@config.pwd, GRADLE_LICENSES_PATH))
-      end
+        path = File.join(@config.pwd, GRADLE_LICENSES_PATH)
+        CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true) do |row|
+          artifact, _, version = row["artifact"].rpartition(":")
+          package = metadata.find { |p| p["name"] == artifact && p["version"] == version }
+          next unless package
+          package["url"] = row["moduleLicenseUrl"]
+        end
 
-      # Returns the output from running `npm list` to get package metadata
-      def package_metadata_command
-        gradle_command("printDependencies")
+        metadata
       end
 
       def gradle_command(*args)
