@@ -9,9 +9,9 @@ module Licensed
   module Sources
     class Gradle < Source
 
-      DEFAULT_CONFIGURATIONS   = ["runtime", "runtimeClasspath"]
-      GRADLE_LICENSES_PATH     = ".gradle-licenses"
-      GRADLE_LICENSES_CSV_NAME = "licenses.csv"
+      DEFAULT_CONFIGURATIONS   = ["runtime", "runtimeClasspath"].freeze
+      GRADLE_LICENSES_PATH     = ".gradle-licenses".freeze
+      GRADLE_LICENSES_CSV_NAME = "licenses.csv".freeze
 
       class Dependency < Licensed::Dependency
         class << self
@@ -98,38 +98,38 @@ module Licensed
       end
 
       def gradle_file
-        <<-EOF
-plugins {
-    id "com.github.jk1.dependency-license-report" version "1.4"
-}
+        <<~EOF
+          plugins {
+              id "com.github.jk1.dependency-license-report" version "1.4"
+          }
 
-import com.github.jk1.license.render.CsvReportRenderer
-import com.github.jk1.license.filter.LicenseBundleNormalizer
+          import com.github.jk1.license.render.CsvReportRenderer
+          import com.github.jk1.license.filter.LicenseBundleNormalizer
 
-final configs = #{configurations.inspect}
+          final configs = #{configurations.inspect}
 
-apply from: "build.gradle"
+          apply from: "build.gradle"
 
-licenseReport {
-    configurations = configs
-    outputDir = "$projectDir/#{GRADLE_LICENSES_PATH}"
-    renderers = [new CsvReportRenderer()]
-    filters = [new LicenseBundleNormalizer()]
-}
+          licenseReport {
+              configurations = configs
+              outputDir = "$projectDir/#{GRADLE_LICENSES_PATH}"
+              renderers = [new CsvReportRenderer()]
+              filters = [new LicenseBundleNormalizer()]
+          }
 
-task printDependencies {
-    doLast {
-        def dependencies = []
-        configs.each {
-            configurations[it].resolvedConfiguration.resolvedArtifacts.each { artifact ->
-                def id = artifact.moduleVersion.id
-                dependencies << "  { \\"group\\": \\"${id.group}\\", \\"name\\": \\"${id.name}\\", \\"version\\": \\"${id.version}\\" }"
-            }
-        }
-        println "[\\n${dependencies.join(", ")}\\n]"
-    }
-}
-EOF
+          task printDependencies {
+              doLast {
+                  def dependencies = []
+                  configs.each {
+                      configurations[it].resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                          def id = artifact.moduleVersion.id
+                          dependencies << "  { \\"group\\": \\"${id.group}\\", \\"name\\": \\"${id.name}\\", \\"version\\": \\"${id.version}\\" }"
+                      }
+                  }
+                  println "[\\n${dependencies.join(", ")}\\n]"
+              }
+          }
+        EOF
       end
     end
   end
