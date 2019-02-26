@@ -43,12 +43,6 @@ module Licensed
         end
       end
 
-      def with_latest_licenses
-        download_and_cache_licenses do
-          yield
-        end
-      end
-
       private
 
       def download_licenses_from_csv

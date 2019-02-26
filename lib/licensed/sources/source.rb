@@ -58,11 +58,6 @@ module Licensed
         config.ignored?("type" => self.class.type, "name" => dependency.name)
       end
 
-      # Callback for updating the source tree if needed
-      def with_latest_licenses
-        yield
-      end
-
       private
 
       # Returns a cached list of dependencies
