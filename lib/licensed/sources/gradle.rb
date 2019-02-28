@@ -23,12 +23,13 @@ module Licensed
 
           # Loads and caches license report CSV data as a hash of :name-:version => :url pairs
           #
-          # configurations - The gradle configurations to generate license information for
+          # executable     - The gradle executable to run to generate the license report
+          # configurations - The gradle configurations to generate license report for
           #
           # Returns a hash of dependency identifiers to their license content URL
-          def load_csv(configurations)
+          def load_csv(executable, configurations)
             @csv ||= begin
-              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", configurations: configurations)
+              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", executable: executable, configurations: configurations)
               CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
                 name, _, version = row["artifact"].rpartition(":")
                 key = csv_key(name: name, version: version)
@@ -48,8 +49,9 @@ module Licensed
           end
         end
 
-        def initialize(name:, version:, path:, configurations:, metadata: {})
+        def initialize(name:, version:, path:, executable: ,configurations:, metadata: {})
           @configuration = configurations
+          @executable = executable
           super(name: name, version: version, path: path, metadata: metadata)
         end
 
@@ -62,7 +64,7 @@ module Licensed
 
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
-          self.class.load_csv(@configurations)
+          self.class.load_csv(@executable, @configurations)
 
           url = self.class.url_for(self)
           Array(Licensee::ProjectFiles::LicenseFile.new(self.class.license(url), url))
@@ -70,16 +72,17 @@ module Licensed
       end
 
       def enabled?
-        (Licensed::Shell.tool_available?("gradle") || File.executable?(@config.pwd.join("gradlew"))) && File.exist?(@config.pwd.join("build.gradle"))
+        !gradle_executable.to_s.empty? && File.exist?(config.pwd.join("build.gradle"))
       end
 
       def enumerate_dependencies
-        JSON.parse(gradle_command("printDependencies", configurations: configurations)).map do |package|
+        JSON.parse(gradle_command("printDependencies", executable: gradle_executable, configurations: configurations)).map do |package|
           name = "#{package["group"]}:#{package["name"]}"
           Dependency.new(
             name: name,
             version: package["version"],
             path: gradle_licenses_path,
+            executable: gradle_executable,
             configurations: configurations,
             metadata: {
               "type"     => Gradle.type
@@ -94,6 +97,15 @@ module Licensed
         @gradle_licenses_path ||= File.join(config.pwd, GRADLE_LICENSES_PATH)
       end
 
+      def gradle_executable
+        return @gradle_executable if defined?(@gradle_executable)
+        @gradle_executable = begin
+          gradlew = File.join(config.pwd, "gradlew")
+          return gradlew if File.executable?(gradlew)
+          return "gradle" if Licensed::Shell.tool_available?("gradle")
+        end
+      end
+
       # Returns the configurations to include in license generation.
       # Defaults to ["runtime", "runtimeClasspath"]
       def configurations
@@ -106,19 +118,11 @@ module Licensed
         end
       end
 
-      def self.gradle_command(*args, configurations:)
+      def self.gradle_command(*args, executable:, configurations:)
         Tempfile.create do |f|
           f.write gradle_file(configurations)
           f.close
           Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
-        end
-      end
-
-      def self.executable
-        if File.executable?(File.join(config.pwd, "gradlew"))
-          "./gradlew"
-        else
-          "gradle"
         end
       end
 
