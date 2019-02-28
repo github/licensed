@@ -16,23 +16,30 @@ module Licensed
         GRADLE_LICENSES_CSV_NAME = "licenses.csv".freeze
 
         class << self
+          # Returns a key to uniquely identify a name and version in the obtained CSV content
           def csv_key(name:, version:)
             "#{name}-#{version}"
           end
 
-          def load_csv(path, configurations)
+          # Loads and caches license report CSV data as a hash of :name-:version => :url pairs
+          #
+          # configurations - The gradle configurations to generate license information for
+          #
+          # Returns a hash of dependency identifiers to their license content URL
+          def load_csv(configurations)
             @csv ||= begin
               Licensed::Sources::Gradle.gradle_command("generateLicenseReport", configurations: configurations)
               CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
                 name, _, version = row["artifact"].rpartition(":")
-                key = csv_key(name, version)
+                key = csv_key(name: name, version: version)
                 hsh[key] = row["moduleLicenseUrl"]
               end
             end
           end
 
+          # Returns the cached url for the given dependency
           def url_for(dependency)
-            @csv[csv_key(dependency.name, dependency.version)]
+            @csv[csv_key(name: dependency.name, version: dependency.version)]
           end
 
           # Cache and return the results of getting the license content.
@@ -55,7 +62,7 @@ module Licensed
 
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
-          self.class.load_csv(path, @configurations)
+          self.class.load_csv(@configurations)
 
           url = self.class.url_for(self)
           Array(Licensee::ProjectFiles::LicenseFile.new(self.class.license(url), url))
