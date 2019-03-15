@@ -68,7 +68,7 @@ module Licensed
 
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
-          self.class.load_csv(dir_path, @executable, @configurations)
+          self.class.load_csv(path, @executable, @configurations)
 
           url = self.class.url_for(self)
           license_data = self.class.retrieve_license(url)
