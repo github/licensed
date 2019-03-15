@@ -121,7 +121,7 @@ module Licensed
 
       def self.gradle_command(*args, path:, executable:, configurations:)
         Dir.chdir(path) do
-          Tempfile.open(["license-", ".gradle"], path) do |f|
+          Tempfile.create(["license-", ".gradle"], path) do |f|
             f.write gradle_file(configurations)
             f.close
             Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
