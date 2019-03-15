@@ -4,6 +4,7 @@ require "csv"
 require "uri"
 require "json"
 require "net/http"
+require 'fileutils'
 
 module Licensed
   module Sources
@@ -29,12 +30,15 @@ module Licensed
           # Returns a hash of dependency identifiers to their license content URL
           def load_csv(path, executable, configurations)
             @csv ||= begin
-              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", path: Pathname.new(path).parent, executable: executable, configurations: configurations)
-              CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
+              gradle_licenses_dir = File.join(path, GRADLE_LICENSES_PATH)
+              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", path: path, executable: executable, configurations: configurations)
+              CSV.foreach(File.join(gradle_licenses_dir, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
                 name, _, version = row["artifact"].rpartition(":")
                 key = csv_key(name: name, version: version)
                 hsh[key] = row["moduleLicenseUrl"]
               end
+            ensure
+              FileUtils.rm_rf(gradle_licenses_dir)
             end
           end
 
@@ -52,7 +56,6 @@ module Licensed
         def initialize(name:, version:, path:, executable:, configurations:, metadata: {})
           @configurations = configurations
           @executable = executable
-          @path = path
           super(name: name, version: version, path: path, metadata: metadata)
         end
 
@@ -65,7 +68,7 @@ module Licensed
 
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
-          self.class.load_csv(@path, @executable, @configurations)
+          self.class.load_csv(dir_path, @executable, @configurations)
 
           url = self.class.url_for(self)
           license_data = self.class.retrieve_license(url)
@@ -83,7 +86,7 @@ module Licensed
           Dependency.new(
             name: name,
             version: package["version"],
-            path: gradle_licenses_path,
+            path: config.pwd,
             executable: gradle_executable,
             configurations: configurations,
             metadata: {
@@ -94,10 +97,6 @@ module Licensed
       end
 
       private
-
-      def gradle_licenses_path
-        @gradle_licenses_path ||= File.join(config.pwd, GRADLE_LICENSES_PATH)
-      end
 
       def gradle_executable
         return @gradle_executable if defined?(@gradle_executable)
@@ -123,14 +122,14 @@ module Licensed
       def self.gradle_command(*args, path:, executable:, configurations:)
         Dir.chdir(path) do
           Tempfile.open(["license-", ".gradle"], path) do |f|
-            f.write gradle_file(path, configurations)
+            f.write gradle_file(configurations)
             f.close
             Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
           end
         end
       end
 
-      def self.gradle_file(path, configurations)
+      def self.gradle_file(configurations)
         <<~EOF
           plugins {
               id "com.github.jk1.dependency-license-report" version "1.4"

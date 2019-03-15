@@ -52,6 +52,16 @@ describe Licensed::Sources::Gradle do
         refute source.dependencies.detect { |d| d.name == "org.junit.jupiter:junit-jupiter" }
       end
     end
+
+    it "cleans up grade licenses csv content" do
+      Dir.chdir fixtures do
+        dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
+        # load the dependency record which creates temp license-*.gradle files
+        dep.record
+
+        refute Dir.glob(Pathname.pwd.join("license-*.gradle").to_path).any?
+      end
+    end
   end
 end
 
@@ -69,6 +79,16 @@ describe Licensed::Sources::Gradle::Dependency do
       license = dep.record.licenses.find { |l| l["text"] =~ /Apache License/ }
       assert license
       assert_equal "https://www.apache.org/licenses/LICENSE-2.0", license["sources"]
+    end
+  end
+
+  it "cleans up grade licenses csv content" do
+    Dir.chdir fixtures do
+      dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
+      # load the dependency record, pulling license files
+      dep.record
+
+      refute Pathname.pwd.join(Licensed::Sources::Gradle::GRADLE_LICENSES_PATH).exist?
     end
   end
 end
