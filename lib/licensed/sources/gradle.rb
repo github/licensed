@@ -4,7 +4,7 @@ require "csv"
 require "uri"
 require "json"
 require "net/http"
-require 'fileutils'
+require "fileutils"
 
 module Licensed
   module Sources
