@@ -27,9 +27,9 @@ module Licensed
           # configurations - The gradle configurations to generate license report for
           #
           # Returns a hash of dependency identifiers to their license content URL
-          def load_csv(executable, configurations)
+          def load_csv(path, executable, configurations)
             @csv ||= begin
-              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", executable: executable, configurations: configurations)
+              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", path: Pathname.new(path).parent, executable: executable, configurations: configurations)
               CSV.foreach(File.join(path, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
                 name, _, version = row["artifact"].rpartition(":")
                 key = csv_key(name: name, version: version)
@@ -44,14 +44,15 @@ module Licensed
           end
 
           # Cache and return the results of getting the license content.
-          def license(url)
-            (@licenses ||= {})[url] ||= Net::HTTP.get(uri)
+          def retrieve_license(url)
+            (@licenses ||= {})[url] ||= Net::HTTP.get(URI(url))
           end
         end
 
-        def initialize(name:, version:, path:, executable: ,configurations:, metadata: {})
-          @configuration = configurations
+        def initialize(name:, version:, path:, executable:, configurations:, metadata: {})
+          @configurations = configurations
           @executable = executable
+          @path = path
           super(name: name, version: version, path: path, metadata: metadata)
         end
 
@@ -64,10 +65,16 @@ module Licensed
 
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
-          self.class.load_csv(@executable, @configurations)
+          self.class.load_csv(@path, @executable, @configurations)
 
           url = self.class.url_for(self)
-          Array(Licensee::ProjectFiles::LicenseFile.new(self.class.license(url), url))
+          license_data = self.class.retrieve_license(url)
+
+          FileUtils.mkdir_p(File.join(@path, name))
+          file = File.join(@path, name, "LICENSE")
+          File.write(file, license_data)
+          file_parts = { dir: File.dirname(file), name: File.basename(file) }
+          Array(Licensee::ProjectFiles::LicenseFile.new(license_data, file_parts))
         end
       end
 
@@ -76,7 +83,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        JSON.parse(gradle_command("printDependencies", executable: gradle_executable, configurations: configurations)).map do |package|
+        JSON.parse(self.class.gradle_command("printDependencies", path: config.pwd, executable: gradle_executable, configurations: configurations)).map do |package|
           name = "#{package["group"]}:#{package["name"]}"
           Dependency.new(
             name: name,
@@ -102,7 +109,7 @@ module Licensed
         @gradle_executable = begin
           gradlew = File.join(config.pwd, "gradlew")
           return gradlew if File.executable?(gradlew)
-          return "gradle" if Licensed::Shell.tool_available?("gradle")
+          "gradle" if Licensed::Shell.tool_available?("gradle")
         end
       end
 
@@ -118,15 +125,17 @@ module Licensed
         end
       end
 
-      def self.gradle_command(*args, executable:, configurations:)
-        Tempfile.create do |f|
-          f.write gradle_file(configurations)
-          f.close
-          Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
+      def self.gradle_command(*args, path:, executable:, configurations:)
+        Dir.chdir(path) do
+          Tempfile.open(["license-", ".gradle"], path) do |f|
+            f.write gradle_file(path, configurations)
+            f.close
+            Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
+          end
         end
       end
 
-      def self.gradle_file(configurations)
+      def self.gradle_file(path, configurations)
         <<~EOF
           plugins {
               id "com.github.jk1.dependency-license-report" version "1.4"

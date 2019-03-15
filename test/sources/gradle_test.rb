@@ -54,8 +54,8 @@ if Licensed::Shell.tool_available?("gradle")
       Dir.chdir fixtures do
         dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
         assert dep
-        assert_equal "apache-2.0", dep.license
-        assert dep.record.licenses.any? { |r| r["source"] == dep.path && r["text"] =~ /Apache License/ }
+        assert_equal "apache-2.0", dep.license.key
+        assert dep.record.licenses.any? { |r| r["text"] =~ /Apache License/ }
       end
     end
   end
