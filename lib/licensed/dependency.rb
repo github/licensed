@@ -74,47 +74,45 @@ module Licensed
     def license_contents
       matched_files.reject { |f| f == package_file }
                    .group_by(&:content)
-                   .map { |content, files| { "sources" => content_sources(files), "text" => content } }
+                   .map { |content, files| { "sources" => license_content_sources(files), "text" => content } }
     end
 
     # Returns legal notices found at the dependency path
     def notice_contents
-      notice_files.sort # sorted by the path
-                  .map { |file| { "sources" => content_sources(file), "text" => File.read(file).rstrip } }
-                  .select { |text| text.length > 0 } # files with content only
-    end
-
-    # Returns an array of file paths used to locate legal notices
-    def notice_files
       Dir.glob(dir_path.join("*"))
          .grep(LEGAL_FILES_PATTERN)
          .select { |path| File.file?(path) }
+         .sort # sorted by the path
+         .map { |path| { "sources" => normalize_source_path(path), "text" => File.read(path).rstrip } }
+         .select { |notice| notice["text"].length > 0 } # files with content only
     end
 
     private
 
-    # Returns the sources for a group of license or notice file contents
+    # Returns the sources for a group of license file contents
     #
     # Sources are returned as a single string with sources separated by ", "
-    def content_sources(files)
+    def license_content_sources(files)
       paths = Array(files).map do |file|
-        path = if file.is_a?(Licensee::ProjectFiles::ProjectFile)
-          dir_path.join(file[:dir], file[:name])
-        else
-          Pathname.new(file).expand_path(dir_path)
-        end
+        next file[:uri] if file[:uri]
 
-        if path.fnmatch?(dir_path.join("**").to_path)
-          # files under the dependency path return the relative path to the file
-          path.relative_path_from(dir_path).to_path
-        else
-          # otherwise return the source_path as the immediate parent folder name
-          # joined with the file name
-          path.dirname.basename.join(path.basename).to_path
-        end
+        path = dir_path.join(file[:dir], file[:name])
+        normalize_source_path(path)
       end
 
       paths.join(", ")
+    end
+
+    def normalize_source_path(path)
+      path = Pathname.new(path) unless path.is_a?(Pathname)
+      if path.fnmatch?(dir_path.join("**").to_path)
+        # files under the dependency path return the relative path to the file
+        path.relative_path_from(dir_path).to_path
+      else
+        # otherwise return the source_path as the immediate parent folder name
+        # joined with the file name
+        path.dirname.basename.join(path.basename).to_path
+      end
     end
 
     # Returns the metadata that represents this dependency.  This metadata

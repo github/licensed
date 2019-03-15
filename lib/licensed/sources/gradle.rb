@@ -69,12 +69,7 @@ module Licensed
 
           url = self.class.url_for(self)
           license_data = self.class.retrieve_license(url)
-
-          FileUtils.mkdir_p(File.join(@path, name))
-          file = File.join(@path, name, "LICENSE")
-          File.write(file, license_data)
-          file_parts = { dir: File.dirname(file), name: File.basename(file) }
-          Array(Licensee::ProjectFiles::LicenseFile.new(license_data, file_parts))
+          Array(Licensee::ProjectFiles::LicenseFile.new(license_data, { uri: url }))
         end
       end
 

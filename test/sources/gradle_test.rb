@@ -65,7 +65,10 @@ describe Licensed::Sources::Gradle::Dependency do
       dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
       assert dep
       assert_equal "apache-2.0", dep.license.key
-      assert dep.record.licenses.any? { |r| r["text"] =~ /Apache License/ }
+
+      license = dep.record.licenses.find { |l| l["text"] =~ /Apache License/ }
+      assert license
+      assert_equal "https://www.apache.org/licenses/LICENSE-2.0", license["sources"]
     end
   end
 end
