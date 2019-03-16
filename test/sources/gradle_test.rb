@@ -9,21 +9,6 @@ describe Licensed::Sources::Gradle do
   let(:source) { Licensed::Sources::Gradle.new(config) }
 
   describe "enabled?" do
-    it "is false if neither gradlew or gradle are available" do
-      begin
-        path, ENV["PATH"] = ENV["PATH"], nil
-
-        Dir.mktmpdir do |dir|
-          Dir.chdir(dir) do
-            File.write "build.gradle", ""
-            refute source.enabled?
-          end
-        end
-      ensure
-        ENV["PATH"] = path
-      end
-    end
-
     it "is true if build.gradle exists and gradle is available" do
       Dir.chdir(fixtures) do
         assert source.enabled?
