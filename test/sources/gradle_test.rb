@@ -76,4 +76,16 @@ describe Licensed::Sources::Gradle::Dependency do
       refute Pathname.pwd.join(Licensed::Sources::Gradle::GRADLE_LICENSES_PATH).exist?
     end
   end
+
+  it "does not make any network requests when accessing non-license data" do
+    Licensed::Sources::Gradle::Dependency.expects(:retrieve_license).never
+    Licensed::Sources::Gradle::Dependency.expects(:load_csv).never
+
+    Dir.chdir fixtures do
+      dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
+      # accessing non-license dependency data does not make network requests
+      dep.name
+      dep.version
+    end
+  end
 end
