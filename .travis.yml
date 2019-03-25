@@ -93,5 +93,10 @@ matrix:
       script: ./script/test git_submodule
       env: NAME="git_submodule"
 
+    - language: java
+      before_script: ./test/fixtures/gradle/gradlew --quiet --version
+      script: ./script/test gradle
+      env: NAME="gradle"
+
 notifications:
   disable: true

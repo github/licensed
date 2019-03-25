@@ -79,13 +79,11 @@ module Licensed
       #
       # Returns nothing
       def clear_stale_cached_records(app, source)
-        source.with_latest_licenses do
-          names = source.dependencies.map { |dependency| File.join(source.class.type, dependency.name) }
-          Dir.glob(app.cache_path.join(source.class.type, "**/*.#{DependencyRecord::EXTENSION}")).each do |file|
-            file_path = Pathname.new(file)
-            relative_path = file_path.relative_path_from(app.cache_path).to_s
-            FileUtils.rm(file) unless names.include?(relative_path.chomp(".#{DependencyRecord::EXTENSION}"))
-          end
+        names = source.dependencies.map { |dependency| File.join(source.class.type, dependency.name) }
+        Dir.glob(app.cache_path.join(source.class.type, "**/*.#{DependencyRecord::EXTENSION}")).each do |file|
+          file_path = Pathname.new(file)
+          relative_path = file_path.relative_path_from(app.cache_path).to_s
+          FileUtils.rm(file) unless names.include?(relative_path.chomp(".#{DependencyRecord::EXTENSION}"))
         end
       end
     end
