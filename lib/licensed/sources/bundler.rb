@@ -36,6 +36,34 @@ module Licensed
         end
       end
 
+      class Dependency < Licensed::Dependency
+        attr_reader :loaded_from
+
+        def initialize(name:, version:, path:, loaded_from:, errors: [], metadata: {})
+          @loaded_from = loaded_from
+          super name: name, version: version, path: path, errors: errors, metadata: metadata
+        end
+
+        # Load a package manager file from the base Licensee::Projects::FsProject
+        # or from a gem specification file.
+        def package_file
+          super || spec_file
+        end
+
+        private
+
+        # Find a package manager file from the given bundler specification's
+        # `loaded_from` if available.
+        def spec_file
+          return @spec_file if defined?(@spec_file)
+          return @spec_file = nil unless loaded_from && File.exist?(loaded_from)
+          @spec_file = begin
+            file = { name: File.basename(loaded_from), dir: File.dirname(loaded_from) }
+            Licensee::ProjectFiles::PackageManagerFile.new(File.read(loaded_from), file)
+          end
+        end
+      end
+
       GEMFILES = %w{Gemfile gems.rb}.freeze
       DEFAULT_WITHOUT_GROUPS = %i{development test}
 
@@ -50,10 +78,11 @@ module Licensed
         with_local_configuration do
           specs.map do |spec|
             error = spec.error if spec.respond_to?(:error)
-            Licensed::Dependency.new(
+            Dependency.new(
               name: spec.name,
               version: spec.version.to_s,
               path: spec.gem_dir,
+              loaded_from: spec.loaded_from,
               errors: Array(error),
               metadata: {
                 "type"     => Bundler.type,

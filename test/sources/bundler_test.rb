@@ -213,7 +213,7 @@ if Licensed::Shell.tool_available?("bundle")
           dep = source.dependencies.find { |d| d.name == "aws-sdk-core" }
           assert dep
           assert_equal "3.39.0", dep.version
-          refute_equal "none", dep.license_key
+          assert_equal "apache-2.0", dep.license_key
         end
       end
     end
