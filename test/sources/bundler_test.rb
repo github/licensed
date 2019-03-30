@@ -207,6 +207,15 @@ if Licensed::Shell.tool_available?("bundle")
           end
         end
       end
+
+      it "finds license metadata when gems are shipped without a gemspec" do
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.find { |d| d.name == "aws-sdk-core" }
+          assert dep
+          assert_equal "3.39.0", dep.version
+          assert_equal "apache-2.0", dep.license_key
+        end
+      end
     end
 
     describe "bundler_exe" do
