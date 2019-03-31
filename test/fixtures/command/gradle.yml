@@ -1,0 +1,3 @@
+expected_dependency: io.netty:netty-all
+source_path: test/fixtures/gradle
+cache_path: test/fixtures/gradle/.licenses
