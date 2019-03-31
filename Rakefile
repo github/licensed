@@ -44,11 +44,7 @@ namespace :test do
       t.description = "Run #{source} tests"
       t.libs << "test"
       t.libs << "lib"
-
-      # use negative lookahead to exclude all source tests except
-      # the tests for `source`
-      t.test_files = FileList["test/**/*_test.rb"].exclude(/test\/sources\/(?!#{source}).*?_test.rb/,
-                                                           "test/fixtures/**/*_test.rb")
+      t.test_files = FileList["test/commands/*_test.rb", "test/sources/#{source}_test.rb"]
     end
   end
 end
