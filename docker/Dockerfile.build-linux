@@ -9,3 +9,4 @@ RUN curl -L http://enclose.io/rubyc/rubyc-linux-x64.gz | gunzip > /usr/local/bin
 
 ENV CPPFLAGS="-P"
 ENV RUBYC="/usr/local/bin/rubyc"
+ENV LANG=C.UTF-8
