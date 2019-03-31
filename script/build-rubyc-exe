@@ -34,25 +34,44 @@ if [ ! -f "$RUBYC" ]; then
 fi
 
 BUILD_DEST="$(mktemp -d)"
-trap "rm -rf $BUILD_DEST" EXIT
+trap "rm -rf $BUILD_DEST; rm -rf $BASE_DIR/.licenses" EXIT
 
 if [ -n "$VERSION" ]; then
+  # if a version is given, check out the repo at the version
   CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
   git checkout "$VERSION"
   trap "rm -rf $BUILD_DEST; git checkout $CURRENT_BRANCH" EXIT
 else
+  # if a version is not provided, get an identifier from the current HEAD
   VERSION="$(git rev-parse --abbrev-ref HEAD)"
 fi
 
-PACKAGE_DEST="$BASE_DIR/pkg"
+PACKAGE_DEST="$BASE_DIR/pkg/$VERSION"
 mkdir -p "$PACKAGE_DEST"
 
 PLATFORM="$(uname -s | tr '[:upper:]' '[:lower:]')"
 TARGET="licensed-$VERSION-$PLATFORM-x64.tar.gz"
 
+# build the licensed rubyc executable
 "$RUBYC" --clean-tmpdir -o "$BUILD_DEST/licensed" "$BASE_DIR/exe/licensed"
-
 chmod +x $BUILD_DEST/licensed
-tar -C "$BUILD_DEST" -czf "$PACKAGE_DEST/$TARGET" "./licensed"
+
+# cache license metadata
+(
+  cd $BASE_DIR
+  script/bootstrap
+  rm -rf $BASE_DIR/.licenses
+  bundle exec exe/licensed cache
+)
+
+# copy all metadata to build destination
+mkdir -p "$BUILD_DEST/meta"
+cp -R "$BASE_DIR/vendor/ruby" "$BUILD_DEST/meta"
+cp -R "$BASE_DIR/.licenses" "$BUILD_DEST/meta"
+cp "$BASE_DIR/LICENSE" "$BUILD_DEST/meta"
+cp "$BASE_DIR/README.md" "$BUILD_DEST/meta"
+
+# create release archive
+tar -C "$BUILD_DEST" -czf "$PACKAGE_DEST/$TARGET" .
 
 echo "licensed built to $PACKAGE_DEST/$TARGET"
