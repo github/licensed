@@ -2,8 +2,9 @@
 require "test_helper"
 
 describe Licensed::Commands::Cache do
+  let(:cache_path) { Dir.mktmpdir }
   let(:reporter) { TestReporter.new }
-  let(:config) { Licensed::Configuration.new }
+  let(:config) { Licensed::Configuration.new("cache_path" => cache_path) }
   let(:source) { TestSource.new(config) }
   let(:generator) { Licensed::Commands::Cache.new(config: config, reporter: reporter) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
@@ -181,7 +182,7 @@ describe Licensed::Commands::Cache do
   end
 
   describe "with app.source_path" do
-    let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
+    let(:config) { Licensed::Configuration.new("source_path" => fixtures, "cache_path" => cache_path) }
 
     it "changes the current directory to app.source_path while running" do
       generator.run
@@ -190,7 +191,7 @@ describe Licensed::Commands::Cache do
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency") }
+    let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency", "cache_path" => cache_path) }
 
     it "caches metadata at the given file path" do
       generator.run

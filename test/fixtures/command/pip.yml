@@ -1,4 +1,5 @@
 expected_dependency: Jinja2
 source_path: test/fixtures/pip
+cache_path: test/fixtures/pip/.licenses
 python:
   virtual_env_dir: test/fixtures/pip/venv

@@ -1,2 +1,3 @@
 expected_dependency: autoprefixer
 source_path: test/fixtures/npm
+cache_path: test/fixtures/npm/.licenses

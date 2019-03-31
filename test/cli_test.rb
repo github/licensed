@@ -16,8 +16,12 @@ describe "licensed" do
     end
 
     it "exits 1 when a config file isn't found" do
-      _, _, status = Open3.capture3 "bundle exec exe/licensed cache"
-      refute status.success?
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          _, _, status = Open3.capture3 "bundle exec exe/licensed cache"
+          refute status.success?
+        end
+      end
     end
 
     it "accepts a path to a config file" do
@@ -36,8 +40,12 @@ describe "licensed" do
     end
 
     it "exits 1 when a config file isn't found" do
-      _, _, status = Open3.capture3 "bundle exec exe/licensed status"
-      refute status.success?
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          _, _, status = Open3.capture3 "bundle exec exe/licensed status"
+          refute status.success?
+        end
+      end
     end
 
     it "accepts a path to a config file" do
@@ -56,8 +64,12 @@ describe "licensed" do
     end
 
     it "exits 1 when a config file isn't found" do
-      _, _, status = Open3.capture3 "bundle exec exe/licensed list"
-      refute status.success?
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          _, _, status = Open3.capture3 "bundle exec exe/licensed list"
+          refute status.success?
+        end
+      end
     end
 
     it "accepts a path to a config file" do
