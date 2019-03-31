@@ -66,7 +66,8 @@ chmod +x $BUILD_DEST/licensed
 
 # copy all metadata to build destination
 mkdir -p "$BUILD_DEST/meta"
-cp -R "$BASE_DIR/vendor/ruby" "$BUILD_DEST/meta"
+mkdir -p "$BUILD_DEST/meta/ruby"
+curl -o "$BUILD_DEST/meta/ruby/license.txt" "https://www.ruby-lang.org/en/about/license.txt"
 cp -R "$BASE_DIR/.licenses" "$BUILD_DEST/meta"
 cp "$BASE_DIR/LICENSE" "$BUILD_DEST/meta"
 cp "$BASE_DIR/README.md" "$BUILD_DEST/meta"
