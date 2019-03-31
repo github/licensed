@@ -1,2 +1,3 @@
 expected_dependency: semantic
 source_path: test/fixtures/bundler
+cache_path: test/fixtures/bundler/.licenses

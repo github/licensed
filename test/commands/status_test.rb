@@ -2,8 +2,9 @@
 require "test_helper"
 
 describe Licensed::Commands::Status do
+  let(:cache_path) { Dir.mktmpdir }
   let(:reporter) { TestReporter.new }
-  let(:config) { Licensed::Configuration.new }
+  let(:config) { Licensed::Configuration.new("cache_path" => cache_path) }
   let(:source) { TestSource.new(config) }
   let(:verifier) { Licensed::Commands::Status.new(config: config, reporter: reporter) }
 
@@ -152,7 +153,7 @@ describe Licensed::Commands::Status do
 
   describe "with app.source_path" do
     let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
-    let(:config) { Licensed::Configuration.new("source_path" => fixtures) }
+    let(:config) { Licensed::Configuration.new("source_path" => fixtures, "cache_path" => cache_path) }
 
     it "changes the current directory to app.source_path while running" do
       verifier.run
@@ -161,7 +162,7 @@ describe Licensed::Commands::Status do
   end
 
   describe "with explicit dependency file path" do
-    let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency") }
+    let(:source) { TestSource.new(config, "dependency/path", "name" => "dependency", "cache_path" => cache_path) }
 
     it "verifies content at explicit path" do
       filename = config.cache_path.join("test/dependency/path.#{Licensed::DependencyRecord::EXTENSION}")

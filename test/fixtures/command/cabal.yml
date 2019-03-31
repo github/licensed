@@ -1,5 +1,6 @@
 expected_dependency: zlib
 source_path: test/fixtures/cabal
+cache_path: test/fixtures/cabal/.licenses
 cabal:
   ghc_package_db:
     - global
