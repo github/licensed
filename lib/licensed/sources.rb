@@ -11,5 +11,6 @@ module Licensed
     require "licensed/sources/manifest"
     require "licensed/sources/npm"
     require "licensed/sources/pip"
+    require "licensed/sources/gradle"
   end
 end

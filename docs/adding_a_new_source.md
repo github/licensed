@@ -71,6 +71,17 @@ Creating a new `Licensed::Dependency` object requires name, version, and path ar
 6. errors (optional)
   - Any errors found when loading dependency information.
 
+##### Creating specialized Dependency objects
+
+`Licensed::Dependency` objects inherit from `Licensee::Projects::FsProject` and can override or extend the default `Licensee` behavior to find files for a dependency.
+
+If a dependency source requires customized logic when finding or loading license or legal content, the source should define and use a `Licensed::Dependency` subclass to implement the required logic.
+
+For examples of this see:
+
+- [Manifest::Dependency](../../lib/licensed/sources/manifest.rb) which finds license text from C-style comments
+- [Gradle::Dependency](../../lib/licensed/sources/gradle.rb) which loads license text from a URI
+
 #### Finding licenses
 
 In some cases, license content will be in a parent directory of the specified location.  For instance, this can happen with Golang packages
