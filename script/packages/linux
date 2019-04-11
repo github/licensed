@@ -27,21 +27,23 @@ build_linux_docker() {
     -v "$BASE_DIR":/var/licensed \
     -w /var/licensed \
     "$IMAGE" \
-    "script/build-rubyc-exe"
+    "script/packages/build"
 }
 
 build_linux_local() {
   sudo apt-get update && \
        apt-get install -y --no-install-recommends cmake make gcc pkg-config squashfs-tools curl bison git
 
-  if [ ! -f "$BASE_DIR/bin/rubyc-linux" ]; then
-    mkdir -p "$BASE_DIR/bin"
-    curl -L http://enclose.io/rubyc/rubyc-linux-x64.gz | gunzip > "$BASE_DIR/bin/rubyc-linux"
-    chmod +x "$BASE_DIR/bin/rubyc-linux"
+  RUBYC="$BASE_DIR/bin/rubyc-linux"
+  if [ ! -f "$RUBYC" ]; then
+    mkdir -p "$(dirname "$RUBYC")"
+    curl -L http://enclose.io/rubyc/rubyc-linux-x64.gz | gunzip > "$RUBYC"
+    chmod +x "$RUBYC"
   fi
 
   export CPPFLAGS="-P"
-  RUBYC="$BASE_DIR/bin/rubyc-linux" "$BASE_DIR"/script/build-rubyc-exe
+  export RUBYC
+  "$BASE_DIR"/script/packages/build
 }
 
 if [[ "$(uname -s)" != "Linux" ]]; then
