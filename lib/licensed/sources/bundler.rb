@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "delegate"
 begin
   require "bundler"
 rescue LoadError
@@ -33,6 +34,15 @@ module Licensed
 
         def error
           "could not find #{name} (#{requirement}) in any sources"
+        end
+      end
+
+      class BundlerSpecification < ::SimpleDelegator
+        def gem_dir
+          dir = super
+          return dir if File.exist?(dir)
+
+          File.join(Gem.dir, "gems", full_name)
         end
       end
 
@@ -141,7 +151,7 @@ module Licensed
         spec = definition.resolve.find { |s| s.satisfies?(dependency) }
 
         # a nil spec should be rare, generally only seen from bundler
-        return bundle_exec_gem_spec(dependency.name) if spec.nil?
+        return matching_spec(dependency) || bundle_exec_gem_spec(dependency.name) if spec.nil?
 
         # try to find a non-lazy specification that matches `spec`
         # spec.source.specs gives access to specifications with more
@@ -208,6 +218,21 @@ module Licensed
           end
         rescue Licensed::Shell::Error
           # return nil
+        ensure
+          ::Bundler.configure
+        end
+      end
+
+      # Loads a dependency specification using rubygems' built-in
+      # `Dependency#matching_specs` and `Dependency#to_spec`, from the original
+      # gem environment
+      def matching_spec(dependency)
+        begin
+          ::Bundler.with_original_env do
+            ::Bundler.rubygems.clear_paths
+            return unless dependency.matching_specs(true).any?
+            BundlerSpecification.new(dependency.to_spec)
+          end
         ensure
           ::Bundler.configure
         end

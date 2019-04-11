@@ -22,14 +22,16 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 BASE_DIR="$(cd "$(dirname $0)/../.." && pwd)"
+RUBYC="$BASE_DIR/bin/rubyc-darwin"
 
 brew update
 brew list "squashfs" &>/dev/null || brew install "squashfs"
 
-if [ ! -f "$BASE_DIR/bin/rubyc-darwin" ]; then
-  mkdir -p "$BASE_DIR/bin"
-  curl -L http://enclose.io/rubyc/rubyc-darwin-x64.gz | gunzip > "$BASE_DIR/bin/rubyc-darwin"
-  chmod +x "$BASE_DIR/bin/rubyc-darwin"
+if [ ! -f "$RUBYC" ]; then
+  mkdir -p "$(dirname "$RUBYC")"
+  curl -L http://enclose.io/rubyc/rubyc-darwin-x64.gz | gunzip > "$RUBYC"
+  chmod +x "$RUBYC"
 fi
 
-RUBYC="$BASE_DIR/bin/rubyc-darwin" "$BASE_DIR"/script/build-rubyc-exe
+export RUBYC
+"$BASE_DIR"/script/packages/build
