@@ -6,7 +6,7 @@
 #/
 #/ Builds a distributable package for licensed for a given RUBYC compiler and licensed VERSION.
 #/ Packages are of the form licensed-$VERSION-$PLATFORM-x64.tar.gz and contain a `./licensed` executable
-#/ Built Packages are placed in the <root>/pkg directory.
+#/ Built Packages are placed in the <root>/pkg/$VERSION directory.
 #/
 #/ OPTIONS:
 #/   <RUBYC>           The path to a rubyc compiler that should be used to compile the target executable
@@ -15,7 +15,7 @@
 #/ EXAMPLES:
 #/
 #/   Builds a package for version 1.1.0 using a local rubyc compiler
-#/     $ build RUBYC="./rubyc-darwin" VERSION="1.1.0"
+#/     $ script/packages/build RUBYC="./rubyc-darwin" VERSION="1.1.0"
 #/
 
 set -euo pipefail
@@ -34,12 +34,17 @@ BUILD_DIR="$(mktemp -d)"
 COPY_DIR="$(mktemp -d)"
 trap "rm -rf $BUILD_DIR; rm -rf $COPY_DIR" EXIT
 
-rsync -rv --exclude="test/" --exclude=".licenses/" --exclude="vendor/" --exclude="Gemfile.lock" --exclude="pkg/" $BASE_DIR/ $COPY_DIR
+# copy the repo to a separate directory.  determining license metadata
+# will require a clean environment with no Gemfile.lock.  using a work location
+# is preferred to messing with a development repository
+rsync -r --exclude="test/" --exclude=".licenses/" --exclude="vendor/" --exclude="Gemfile.lock" --exclude="pkg/" $BASE_DIR/ $COPY_DIR
 cd $COPY_DIR
 
 # ensure repo is at $VERSION and build executable, restoring the repo to previous
-# state after build
+# state after build.
 (
+  # run in a subshell for ease of returning to the current branch after building
+  # the executable
   CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
   if [[ "$VERSION" != "$CURRENT_BRANCH" ]]; then
     git checkout "$VERSION"
@@ -57,10 +62,16 @@ mkdir -p "$BUILD_DIR/meta"
 # include dependency license data in package; run bundle update in temp work dir
 # and then run licensed on itself in that directory to grab license data
 # NOTE: this does not produce accurate license information if any licensed
-# depends on any platform-specific gems
+# depends on any platform-specific gems.
 (
+  # run in a subshell so that `unset BUNDLER_VERSION` is contained.  the ENV var
+  # is required to successfully build a distributable executable on
+  # dockerized linux
   unset BUNDLER_VERSION
 
+  # determining dependency license data needs to be done from a clean environment
+  # without previous dependencies or a Gemfile.lock so as to pull in the latest
+  # bundler version, which is what the distributed executable uses
   script/bootstrap
   bundle exec exe/licensed cache
   cp -R "$COPY_DIR/.licenses" "$BUILD_DIR/meta"
