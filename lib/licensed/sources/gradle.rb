@@ -66,18 +66,14 @@ module Licensed
           !path.to_s.empty?
         end
 
-
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
           self.class.load_csv(path, @executable, @configurations)
-
           url = self.class.url_for(self)
-          if(url.nil?)
-            license_data = +"empty liceense"
-            url = +"no url found"
-          else
-            license_data = self.class.retrieve_license(url)
-          end
+
+          return [] if url.nil?
+
+          license_data = self.class.retrieve_license(url)
 
           Array(Licensee::ProjectFiles::LicenseFile.new(license_data, { uri: url }))
         end
@@ -126,16 +122,9 @@ module Licensed
         end
       end
 
-      def self.should_add_gradle_license_report_plugins_block?(gradle_build_file)
-        !/dependency-license-report/.match(gradle_build_file)
-      end
+      def self.add_gradle_license_report_plugins_block(gradle_build_file)
 
-      def self.build_gradle_contains_plugins_block?(gradle_build_file)
-        /plugins/.match(gradle_build_file)
-      end
-
-      def self.add_gradle_license_report_plugins_block?(gradle_build_file)
-        if(Licensed::Sources::Gradle.build_gradle_contains_plugins_block?(gradle_build_file))
+        if gradle_build_file.include? "plugins"
           gradle_build_file.gsub(/(?<=plugins)\s+{/, " { id 'com.github.jk1.dependency-license-report' version '1.6'")
         else
 
@@ -145,8 +134,9 @@ module Licensed
 
       def self.gradle_command(*args, path:, executable:, configurations:)
         gradle_build_file = File.read("build.gradle")
-        if(Licensed::Sources::Gradle.should_add_gradle_license_report_plugins_block?(gradle_build_file))
-          gradle_build_file = Licensed::Sources::Gradle.add_gradle_license_report_plugins_block?(gradle_build_file)
+
+        if !gradle_build_file.include? "dependency-license-report"
+          gradle_build_file = Licensed::Sources::Gradle.add_gradle_license_report_plugins_block(gradle_build_file)
         end
 
         Dir.chdir(path) do
