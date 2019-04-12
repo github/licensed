@@ -69,9 +69,12 @@ module Licensed
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
           self.class.load_csv(path, @executable, @configurations)
-
           url = self.class.url_for(self)
+
+          return [] if url.nil?
+
           license_data = self.class.retrieve_license(url)
+
           Array(Licensee::ProjectFiles::LicenseFile.new(license_data, { uri: url }))
         end
       end
@@ -119,9 +122,26 @@ module Licensed
         end
       end
 
+      def self.add_gradle_license_report_plugins_block(gradle_build_file)
+
+        if gradle_build_file.include? "plugins"
+          gradle_build_file.gsub(/(?<=plugins)\s+{/, " { id 'com.github.jk1.dependency-license-report' version '1.6'")
+        else
+
+          gradle_build_file = " plugins { id 'com.github.jk1.dependency-license-report' version '1.6' }" + gradle_build_file
+        end
+      end
+
       def self.gradle_command(*args, path:, executable:, configurations:)
+        gradle_build_file = File.read("build.gradle")
+
+        if !gradle_build_file.include? "dependency-license-report"
+          gradle_build_file = Licensed::Sources::Gradle.add_gradle_license_report_plugins_block(gradle_build_file)
+        end
+
         Dir.chdir(path) do
           Tempfile.create(["license-", ".gradle"], path) do |f|
+            f.write(gradle_build_file)
             f.write gradle_file(configurations)
             f.close
             Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
@@ -131,16 +151,11 @@ module Licensed
 
       def self.gradle_file(configurations)
         <<~EOF
-          plugins {
-              id "com.github.jk1.dependency-license-report" version "1.4"
-          }
 
           import com.github.jk1.license.render.CsvReportRenderer
           import com.github.jk1.license.filter.LicenseBundleNormalizer
 
           final configs = #{configurations.inspect}
-
-          apply from: "build.gradle"
 
           licenseReport {
               configurations = configs
