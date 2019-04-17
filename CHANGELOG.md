@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.1.0 - 2019-04-16
+
+### Added
+- New Gradle dependency source enumerator (:tada: @dbussink https://github.com/github/licensed/pull/150, @jandersson-svt https://github.com/github/licensed/pull/159)
+- Metadata added to distributed packages (https://github.com/github/licensed/pull/160)
+
+### Changes
+- Bundler dependency source loads license key from a gem's cached gemspec file as a fallback (https://github.com/github/licensed/pull/154)
+- Licensed will only raise errors on an empty dependency path when caching records (https://github.com/github/licensed/pull/149)
+
+### Fixed
+- Migrating to v2 will no longer crash trying to migrate cached records that don't exist (https://github.com/github/licensed/pull/148)
+- Reported warnings will no longer crash licensed when caching records (https://github.com/github/licensed/pull/147)
+
 ## 2.0.1 - 2019-02-14
 
 ### Changes
