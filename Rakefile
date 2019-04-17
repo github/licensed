@@ -57,6 +57,7 @@ end
 
 packages_search = File.expand_path("script/packages/*", __dir__)
 platforms = Dir[packages_search].map { |f| File.basename(f, ".*") }
+                                .reject { |f| f == "build" }
 
 namespace :package do
   platforms.each do |platform|
