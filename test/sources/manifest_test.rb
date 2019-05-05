@@ -83,6 +83,23 @@ describe Licensed::Sources::Manifest do
       assert dep
       refute_empty dep.record.notices
     end
+
+    it "uses the git commit SHA as the version if configured" do
+      config["version_strategy"] = Licensed::Sources::ContentVersioning::GIT
+      dep = source.dependencies.detect { |d| d.name == "version_test" }
+      assert_equal source.git_version(source.packages["version_test"]), dep.version
+    end
+
+    it "uses the git commit SHA as the version if not configured" do
+      dep = source.dependencies.detect { |d| d.name == "version_test" }
+      assert_equal source.git_version(source.packages["version_test"]), dep.version
+    end
+
+    it "uses the file contents hash as the version if configured" do
+      config["version_strategy"] = Licensed::Sources::ContentVersioning::CONTENTS
+      dep = source.dependencies.detect { |d| d.name == "version_test" }
+      assert_equal source.contents_hash(source.packages["version_test"]), dep.version
+    end
   end
 
   describe "manifest" do
