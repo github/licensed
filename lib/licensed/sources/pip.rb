@@ -35,6 +35,7 @@ module Licensed
       def packages_from_requirements_txt
         File.read(@config.pwd.join("requirements.txt"))
             .lines
+            .reject { |line| line.include?("://") }
             .map { |line| line.strip.match(PACKAGE_REGEX) { |match| match.captures.first } }
             .compact
       end
