@@ -9,3 +9,4 @@ Scrapy<1.6.0
 numpy!=1.16.1
 botocore == 1.12.91
 boto3>=1.0,<=2.0
+lazy-object-proxy==1.4.0

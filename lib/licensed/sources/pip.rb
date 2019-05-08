@@ -6,7 +6,7 @@ module Licensed
   module Sources
     class Pip < Source
       VERSION_OPERATORS = %w(< > <= >= == !=).freeze
-      PACKAGE_REGEX = /^(\w+)(#{VERSION_OPERATORS.join("|")})?/
+      PACKAGE_REGEX = /^([\w-]+)(#{VERSION_OPERATORS.join("|")})?/
 
       def enabled?
         return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
@@ -16,7 +16,7 @@ module Licensed
       def enumerate_dependencies
         packages_from_requirements_txt.map do |package_name|
           package = package_info(package_name)
-          location = File.join(package["Location"], package["Name"] +  "-" + package["Version"] + ".dist-info")
+          location = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
             name: package["Name"],
             version: package["Version"],
@@ -35,6 +35,7 @@ module Licensed
       def packages_from_requirements_txt
         File.read(@config.pwd.join("requirements.txt"))
             .lines
+            .reject { |line| line.include?("://") }
             .map { |line| line.strip.match(PACKAGE_REGEX) { |match| match.captures.first } }
             .compact
       end
