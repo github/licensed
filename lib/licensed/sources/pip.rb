@@ -16,7 +16,7 @@ module Licensed
       def enumerate_dependencies
         packages_from_requirements_txt.map do |package_name|
           package = package_info(package_name)
-          location = File.join(package["Location"], package["Name"].sub("-", "_") +  "-" + package["Version"] + ".dist-info")
+          location = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
             name: package["Name"],
             version: package["Version"],
