@@ -145,3 +145,18 @@ manifest:
   licenses:
     package: path/to/LICENSE
 ```
+
+### License content versioning
+
+The manifest source supports multiple versioning strategies to determine if cached dependency metadata is stale.  A version strategy is chosen based on the current app configuration.
+
+1. Git commit SHA - This strategy uses the latest Git commit SHA available for the package's import path directory as the version.  This is the default strategy used if not otherwise configured.
+   - :warning: The latest Git commit won't capture any changes that are committed alongside a cached file update.  Make sure to update cached files after all other changes are committed.
+
+   ```yaml
+   version_strategy: git # or leave this key unset
+   ```
+2. Contents hash - This strategy uses a hash of the files in the package's import path directory as the version.
+   ```yaml
+   version_strategy: contents
+   ```

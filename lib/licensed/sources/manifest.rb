@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 require "pathname/common_prefix"
+require "licensed/sources/helpers/content_versioning"
 
 module Licensed
   module Sources
     class Manifest < Source
+      include Licensed::Sources::ContentVersioning
+
       def enabled?
         File.exist?(manifest_path) || generate_manifest?
       end
@@ -12,7 +15,7 @@ module Licensed
         packages.map do |package_name, sources|
           Licensed::Sources::Manifest::Dependency.new(
             name: package_name,
-            version: package_version(sources),
+            version: contents_version(*sources),
             path: configured_license_path(package_name) || sources_license_path(sources),
             sources: sources,
             metadata: {
@@ -21,15 +24,6 @@ module Licensed
             }
           )
         end
-      end
-
-      # Returns the latest git SHA available from `sources`
-      def package_version(sources)
-        return if sources.nil? || sources.empty?
-
-        sources.map { |s| Licensed::Git.version(s) }
-               .compact
-               .max_by { |sha| Licensed::Git.commit_date(sha) }
       end
 
       # Returns the license path for a package specified in the configuration.

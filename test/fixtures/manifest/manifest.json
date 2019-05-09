@@ -7,5 +7,6 @@
   "test/fixtures/manifest/multiple_license_headers/source.c": "bsd3_multi_header_license",
   "test/fixtures/manifest/multiple_license_headers/source_2.c": "bsd3_multi_header_license",
   "test/fixtures/manifest/with_license_file/source.c": "mit_license_file",
-  "test/fixtures/manifest/with_notices/source.c": "notices"
+  "test/fixtures/manifest/with_notices/source.c": "notices",
+  "test/fixtures/manifest/version/test.c": "version_test"
 }

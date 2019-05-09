@@ -170,19 +170,18 @@ if Licensed::Shell.tool_available?("go")
         end
 
         describe "without go module information" do
-          it "is nil when git is unavailable" do
+          it "is the latest git SHA of the package directory when configured" do
             Dir.chdir fixtures do
-              Licensed::Git.stub(:available?, false) do
-                dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-                assert_nil dep.version
-              end
+              dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+              assert_equal source.git_version([dep.path]), dep.version
             end
           end
 
-          it "is the latest git SHA of the package directory" do
+          it "is the hash of all contents in the package directory when configured" do
+            config["version_strategy"] = Licensed::Sources::ContentVersioning::CONTENTS
             Dir.chdir fixtures do
               dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-              assert_match(/[a-f0-9]{40}/, dep.version)
+              assert_equal source.contents_hash(Dir["#{dep.path}/*"]), dep.version
             end
           end
         end

@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 require "json"
 require "pathname"
+require "licensed/sources/helpers/content_versioning"
 
 module Licensed
   module Sources
     class Go < Source
+      include Licensed::Sources::ContentVersioning
+
       def enabled?
         Licensed::Shell.tool_available?("go") && go_source?
       end
@@ -102,7 +105,19 @@ module Licensed
         # find most recent git SHA for a package, or nil if SHA is
         # not available
         Dir.chdir package_directory do
-          Licensed::Git.version(".")
+          contents_version *contents_version_arguments
+        end
+      end
+
+      # Determines the arguments to pass to contents_version based on which
+      # version strategy is selected
+      #
+      # Returns an array of arguments to pass to contents version
+      def contents_version_arguments
+        if version_strategy == Licensed::Sources::ContentVersioning::GIT
+          ["."]
+        else
+          Dir["*"]
         end
       end
 
