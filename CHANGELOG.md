@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.2.0 - 2019-05-11
+
+### Added
+- Content hash versioning strategy for go and manifest sources (https://github.com/github/licensed/pull/164)
+
+### Fixed
+- Python source handles urls and package names with "-" in requirements.txt (:tada: @krzysztof-pawlik-gat https://github.com/github/licensed/pull/165)
+
 ## 2.1.0 - 2019-04-16
 
 ### Added
@@ -154,4 +162,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.0.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.2.0...HEAD
