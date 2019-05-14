@@ -83,11 +83,15 @@ module Licensed
          .grep(LEGAL_FILES_PATTERN)
          .select { |path| File.file?(path) }
          .sort # sorted by the path
-         .map { |path| { "sources" => normalize_source_path(path), "text" => File.read(path).rstrip } }
+         .map { |path| { "sources" => normalize_source_path(path), "text" => read_file_with_encoding_check(path) } }
          .select { |notice| notice["text"].length > 0 } # files with content only
     end
 
     private
+
+    def read_file_with_encoding_check(file_path)
+      File.read(file_path).encode("UTF-16", invalid: :replace, replace: "?").encode("UTF-8").rstrip
+    end
 
     # Returns the sources for a group of license file contents
     #
