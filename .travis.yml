@@ -73,16 +73,14 @@ matrix:
 
     # python 2.7 tests
     - language: python
-      python:
-        - "2.7"
+      python: 2.7
       before_script: ./script/source-setup/pip
       script: ./script/test pip
       env: NAME="pip"
 
     # python 3.6 tests
     - language: python
-      python:
-        - "3.6"
+      python: 3.6
       before_script: ./script/source-setup/pip
       script: ./script/test pip
       env: NAME="pip"
