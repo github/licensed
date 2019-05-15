@@ -30,6 +30,7 @@ if Licensed::Shell.tool_available?("pipenv")
           dep = source.dependencies.detect { |d| d.name == "pylint" }
           assert dep
           assert_equal "pipenv", dep.record["type"]
+          assert_equal "2.3.1", dep.version
           assert dep.record["homepage"]
           assert dep.record["summary"]
         end
@@ -40,6 +41,7 @@ if Licensed::Shell.tool_available?("pipenv")
           dep = source.dependencies.detect { |d| d.name == "isort" }
           assert dep
           assert_equal "pipenv", dep.record["type"]
+          assert /^4\..*$/.match dep.version
           assert dep.record["homepage"]
           assert dep.record["summary"]
         end
@@ -50,6 +52,7 @@ if Licensed::Shell.tool_available?("pipenv")
           dep = source.dependencies.detect { |d| d.name == "lazy-object-proxy" }
           assert dep
           assert_equal "pipenv", dep.record["type"]
+          assert dep.version
           assert dep.record["homepage"]
           assert dep.record["summary"]
         end
