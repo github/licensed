@@ -227,6 +227,21 @@ describe Licensed::Dependency do
                         { "sources" => "LEGAL", "text" => "legal" }
       end
     end
+
+    it "handles invlaid encodings in legal notices" do
+      mkproject do |dependency|
+        File.write "AUTHORS", [0x20, 0x42, 0x3f, 0x63, 0x6b].pack("ccccc")
+        File.write "NOTICE", "notice"
+        File.write "LEGAL", "legal"
+
+        assert_includes dependency.notice_contents,
+                        { "sources" => "AUTHORS", "text" => " B?ck" }
+        assert_includes dependency.notice_contents,
+                        { "sources" => "NOTICE", "text" => "notice" }
+        assert_includes dependency.notice_contents,
+                        { "sources" => "LEGAL", "text" => "legal" }
+      end
+    end
   end
 
   describe "error?" do

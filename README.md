@@ -87,7 +87,8 @@ Dependencies will be automatically detected for all of the following sources by 
 6. [Manifest lists (manifests)](./docs/sources/manifests.md)
 7. [NPM (npm)](./docs/sources/npm.md)
 8. [Pip (pip)](./docs/sources/pip.md)
-9. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
+9. [Pipenv (pipenv)](./docs/sources/pipenv.md)
+10. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
 
 You can disable any of them in the configuration file:
 
