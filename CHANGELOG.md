@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.3.0 - 2019-05-19
+
+### Added
+- New Pipenv dependency source enumerator (:tada: @krzysztof-pawlik-gat https://github.com/github/licensed/pull/167)
+
 ## 2.2.0 - 2019-05-11
 
 ### Added
@@ -162,4 +167,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.2.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.3.0...HEAD
