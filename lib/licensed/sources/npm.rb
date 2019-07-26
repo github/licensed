@@ -13,7 +13,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        packages.map do |name, package|
+        packages.reject { |_, pkg| pkg["path"].nil? }.map do |name, package|
           path = package["path"]
           Dependency.new(
             name: name,
