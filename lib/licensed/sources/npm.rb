@@ -13,7 +13,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        packages.reject { |_, pkg| pkg["path"].nil? }.map do |name, package|
+        packages.map do |name, package|
           path = package["path"]
           Dependency.new(
             name: name,
@@ -48,6 +48,7 @@ module Licensed
       # package name to it's metadata
       def recursive_dependencies(dependencies, result = {})
         dependencies.each do |name, dependency|
+          next unless dependency["missing"].nil?
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
