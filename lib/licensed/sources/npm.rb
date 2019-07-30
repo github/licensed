@@ -47,8 +47,9 @@ module Licensed
       # Recursively parse dependency JSON data.  Returns a hash mapping the
       # package name to it's metadata
       def recursive_dependencies(dependencies, result = {})
+        yarn_lock_present = File.exist?(@config.pwd.join("yarn.lock"))
         dependencies.each do |name, dependency|
-          next unless dependency["missing"].nil?
+          next if yarn_lock_present && dependency["missing"]
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
