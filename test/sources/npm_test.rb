@@ -80,5 +80,16 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
     end
+
+    describe "missing dependencies" do
+      let(:fixtures) { File.expand_path("../../fixtures/npm-missing", __FILE__) }
+
+      it "handles missing dependencies" do
+        Dir.chdir fixtures do
+          assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+          refute source.dependencies.detect { |dep| dep.name == "glob" }
+        end
+      end
+    end
   end
 end

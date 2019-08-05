@@ -15,3 +15,16 @@ if [ "$1" == "-f" ]; then
 fi
 
 npm install
+
+# setup test fixtures with missing dependencies
+mkdir -p "${BASE_PATH}/test/fixtures/npm-missing"
+cd "${BASE_PATH}/test/fixtures/npm-missing"
+cp ../npm/package.json .
+
+if [ "${1}" == "-f" ]; then
+  find . -not -regex "\.*" -and -not -name "package\.json" -print0 | xargs -0 rm -rf
+fi
+
+npm install
+rm -rf node_modules/glob
+touch yarn.lock
