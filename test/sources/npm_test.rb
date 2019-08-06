@@ -88,9 +88,8 @@ if Licensed::Shell.tool_available?("npm")
         Dir.chdir fixtures do
           File.unlink("yarn.lock") if File.exist? "yarn.lock"
 
-          local_source = Licensed::Sources::NPM.new(config) # Avoid cached status of yarn.lock
-          assert local_source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-          assert local_source.dependencies.detect { |dep| dep.name == "glob" }
+          assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+          assert source.dependencies.detect { |dep| dep.name == "glob" }
         end
       end
 
@@ -98,9 +97,8 @@ if Licensed::Shell.tool_available?("npm")
         Dir.chdir fixtures do
           File.write("yarn.lock", "") unless File.exist? "yarn.lock"
 
-          local_source = Licensed::Sources::NPM.new(config) # Avoid cached status of yarn.lock
-          assert local_source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-          refute local_source.dependencies.detect { |dep| dep.name == "glob" }
+          assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+          refute source.dependencies.detect { |dep| dep.name == "glob" }
         end
       end
     end
