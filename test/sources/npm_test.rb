@@ -81,13 +81,26 @@ if Licensed::Shell.tool_available?("npm")
       end
     end
 
-    describe "missing dependencies" do
-      let(:fixtures) { File.expand_path("../../fixtures/npm-missing", __FILE__) }
+    describe "missing dependencies (glob is missing package)" do
+      let(:fixtures) { File.expand_path("../../fixtures/npm/missing-dependencies", __FILE__) }
 
-      it "handles missing dependencies" do
+      it "includes missing dependencies when yarn.lock is present" do
         Dir.chdir fixtures do
-          assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-          refute source.dependencies.detect { |dep| dep.name == "glob" }
+          File.unlink("yarn.lock") if File.exist? "yarn.lock"
+
+          local_source = Licensed::Sources::NPM.new(config) # Avoid cached status of yarn.lock
+          assert local_source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+          assert local_source.dependencies.detect { |dep| dep.name == "glob" }
+        end
+      end
+
+      it "excludes missing dependencies when yarn.lock is present" do
+        Dir.chdir fixtures do
+          File.write("yarn.lock", "") unless File.exist? "yarn.lock"
+
+          local_source = Licensed::Sources::NPM.new(config) # Avoid cached status of yarn.lock
+          assert local_source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+          refute local_source.dependencies.detect { |dep| dep.name == "glob" }
         end
       end
     end
