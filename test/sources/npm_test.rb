@@ -6,6 +6,7 @@ require "fileutils"
 if Licensed::Shell.tool_available?("npm")
   describe Licensed::Sources::NPM do
     let(:config) { Licensed::Configuration.new }
+    let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
     let(:source) { Licensed::Sources::NPM.new(config) }
 
     describe "enabled?" do
@@ -26,8 +27,6 @@ if Licensed::Shell.tool_available?("npm")
     end
 
     describe "dependencies" do
-      let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
-
       it "includes declared dependencies" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "autoprefixer" }
@@ -82,23 +81,30 @@ if Licensed::Shell.tool_available?("npm")
     end
 
     describe "missing dependencies (glob is missing package)" do
-      let(:fixtures) { File.expand_path("../../fixtures/npm/missing-dependencies", __FILE__) }
+      it "includes missing dependencies when yarn.lock is missing" do
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "npm")
+          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
 
-      it "includes missing dependencies when yarn.lock is present" do
-        Dir.chdir fixtures do
-          File.unlink("yarn.lock") if File.exist? "yarn.lock"
-
-          assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-          assert source.dependencies.detect { |dep| dep.name == "glob" }
+          Dir.chdir dir do
+            assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+            assert source.dependencies.detect { |dep| dep.name == "glob" }
+          end
         end
       end
 
       it "excludes missing dependencies when yarn.lock is present" do
-        Dir.chdir fixtures do
-          File.write("yarn.lock", "") unless File.exist? "yarn.lock"
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "npm")
+          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
+          File.write(File.join(dir, "yarn.lock"), "")
 
-          assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-          refute source.dependencies.detect { |dep| dep.name == "glob" }
+          Dir.chdir dir do
+            assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
+            refute source.dependencies.detect { |dep| dep.name == "glob" }
+          end
         end
       end
     end

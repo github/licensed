@@ -15,9 +15,3 @@ if [ "$1" == "-f" ]; then
 fi
 
 npm install
-
-# setup test fixtures with missing dependencies
-mkdir -p missing-dependencies
-cp -R node_modules package* missing-dependencies/
-
-rm -rf missing-dependencies/node_modules/glob

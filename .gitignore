@@ -15,7 +15,6 @@ test/fixtures/bundler/Gemfile.lock
 test/fixtures/bower/bower_components
 test/fixtures/npm/node_modules
 test/fixtures/npm/package-lock.json
-test/fixtures/npm/missing-dependencies
 test/fixtures/go/src/*
 test/fixtures/go/pkg
 !test/fixtures/go/src/test
