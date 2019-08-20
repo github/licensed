@@ -212,8 +212,9 @@ module Licensed
             yaml = Licensed::Shell.execute(*ruby_command_args("gem", "specification", name))
             spec = Gem::Specification.from_yaml(yaml)
             # this is horrible, but it will cache the gem_dir using the clean env
-            # so that it can be used outside of this block
-            spec.gem_dir
+            # so that it can be used outside of this block when running from
+            # the ruby packer executable environment
+            spec.gem_dir if ruby_packer?
             spec
           end
         rescue Licensed::Shell::Error
