@@ -251,19 +251,22 @@ if Licensed::Shell.tool_available?("bundle")
     describe "bundle_exec_gem_spec" do
       it "gets a gem specification for a version" do
         Dir.chdir(fixtures) do
-          assert source.bundle_exec_gem_spec("semantic", "1.6.0")
+          version = source.dependencies.find { |d| d.name == "bundler" }.version
+          assert source.bundle_exec_gem_spec("bundler", version)
         end
       end
 
       it "gets a gem specification for a requirement" do
         Dir.chdir(fixtures) do
-          assert source.bundle_exec_gem_spec("semantic", Gem::Requirement.new("> 1.5.0", "< 2.0"))
+          version = source.dependencies.find { |d| d.name == "bundler" }.version
+          assert source.bundle_exec_gem_spec("bundler", Gem::Requirement.new(">= #{version}"))
         end
       end
 
       it "returns nil if a gem specification isn't found" do
         Dir.chdir(fixtures) do
-          refute source.bundle_exec_gem_spec("semantic", "2.0")
+          version = source.dependencies.find { |d| d.name == "bundler" }.version
+          refute source.bundle_exec_gem_spec("bundler", version.to_f - 1)
         end
       end
     end
