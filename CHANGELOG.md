@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.3.1 - 2019-08-20
+
+### Changed
+- Using the npm source with yarn, "missing" dependencies are no longer considered errors (:tada: @krzysztof-pawlik-gat https://github.com/github/licensed/pull/170)
+- The bundler source now calls `gem specification` with dependency version requirements (https://github.com/github/licensed/pull/173)
+
 ## 2.3.0 - 2019-05-19
 
 ### Added
@@ -167,4 +173,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.3.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.3.1...HEAD
