@@ -151,7 +151,7 @@ module Licensed
         spec = definition.resolve.find { |s| s.satisfies?(dependency) }
 
         # a nil spec should be rare, generally only seen from bundler
-        return matching_spec(dependency) || bundle_exec_gem_spec(dependency.name) if spec.nil?
+        return matching_spec(dependency) || bundle_exec_gem_spec(dependency.name, dependency.requirement) if spec.nil?
 
         # try to find a non-lazy specification that matches `spec`
         # spec.source.specs gives access to specifications with more
@@ -166,7 +166,7 @@ module Licensed
 
         # if the specification file doesn't exist, get the specification using
         # the bundler and gem CLI
-        bundle_exec_gem_spec(dependency.name)
+        bundle_exec_gem_spec(dependency.name, dependency.requirement)
       end
 
       # Returns whether a dependency should be included in the final
@@ -200,7 +200,7 @@ module Licensed
 
       # Load a gem specification from the YAML returned from `gem specification`
       # This is a last resort when licensed can't obtain a specification from other means
-      def bundle_exec_gem_spec(name)
+      def bundle_exec_gem_spec(name, requirement)
         # `gem` must be available to run `gem specification`
         return unless Licensed::Shell.tool_available?("gem")
 
@@ -209,11 +209,12 @@ module Licensed
         begin
           ::Bundler.with_original_env do
             ::Bundler.rubygems.clear_paths
-            yaml = Licensed::Shell.execute(*ruby_command_args("gem", "specification", name))
+            yaml = Licensed::Shell.execute(*ruby_command_args("gem", "specification", name, "-v", requirement.to_s))
             spec = Gem::Specification.from_yaml(yaml)
             # this is horrible, but it will cache the gem_dir using the clean env
-            # so that it can be used outside of this block
-            spec.gem_dir
+            # so that it can be used outside of this block when running from
+            # the ruby packer executable environment
+            spec.gem_dir if ruby_packer?
             spec
           end
         rescue Licensed::Shell::Error
