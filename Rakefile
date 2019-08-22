@@ -54,7 +54,7 @@ namespace :test do
     end
   end
 
-  Rake::TestTask.new(:core => "test:core:env") do |t|
+  Rake::TestTask.new(core: "test:core:env") do |t|
     t.description = "Run non-source tests"
     t.libs << "test"
     t.libs << "lib"
