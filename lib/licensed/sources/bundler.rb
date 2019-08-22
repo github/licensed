@@ -247,7 +247,16 @@ module Licensed
       # Returns the bundle definition groups, removing "without" groups,
       # and including "with" groups
       def groups
-        definition.groups - Array(::Bundler.settings[:without]) + Array(::Bundler.settings[:with]) - exclude_groups
+        @groups ||= definition.groups - bundler_setting_array(:without) + bundler_setting_array(:with) - exclude_groups
+      end
+
+      # Returns a bundler setting as an array.
+      # Depending on the version of bundler, array values are either returned as
+      # a raw string ("a:b:c") or as an array ([:a, :b, :c])
+      def bundler_setting_array(key)
+        setting = ::Bundler.settings[key]
+        setting = setting.split(":").map(&:to_sym) if setting.is_a?(String)
+        Array(setting)
       end
 
       # Returns any groups to exclude specified from both licensed configuration
