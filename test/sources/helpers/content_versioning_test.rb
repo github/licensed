@@ -59,8 +59,17 @@ describe Licensed::Sources::ContentVersioning do
     end
 
     it "handles files not tracked by git" do
-      Dir.chdir File.expand_path("../../../bin", fixtures) do
-        assert_nil helper.git_version(Dir["*"])
+      dir = File.expand_path("../../../bin", fixtures)
+      tmp = File.join(dir, "tmp")
+
+      begin
+        Dir.mkdir dir unless File.exist?(dir)
+        FileUtils.touch tmp
+        Dir.chdir dir do
+          assert_nil helper.git_version(Dir["*"])
+        end
+      ensure
+        File.unlink(tmp) if tmp && File.exist?(tmp)
       end
     end
 

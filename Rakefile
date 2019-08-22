@@ -47,6 +47,20 @@ namespace :test do
       t.test_files = FileList["test/commands/*_test.rb", "test/sources/#{source}_test.rb"]
     end
   end
+
+  namespace :core do
+    task :env do
+      ENV["SOURCE"] = ""
+    end
+  end
+
+  Rake::TestTask.new(core: "test:core:env") do |t|
+    t.description = "Run non-source tests"
+    t.libs << "test"
+    t.libs << "lib"
+    t.test_files = FileList["test/**/*_test.rb"].exclude("test/fixtures/**/*_test.rb")
+                                                .exclude("test/sources/*_test.rb")
+  end
 end
 
 Rake::TestTask.new(:test) do |t|
