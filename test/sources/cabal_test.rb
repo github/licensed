@@ -67,8 +67,8 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "sets an error if a dependency isn't found" do
-        # run test without any ghc package db configuration to avoid finding
-        # dependencies
+        # include only the user database, avoiding using the global cache
+        config["cabal"] = { "ghc_package_db" => ["user"] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep

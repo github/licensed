@@ -131,8 +131,7 @@ module Licensed
       # Returns an array of ghc package DB locations as specified in the app
       # configuration
       def package_db_args
-        return [] unless @config["cabal"]
-        Array(@config["cabal"]["ghc_package_db"]).map do |path|
+        @package_db_args ||= Array(@config.dig("cabal", "ghc_package_db")).map do |path|
           next "--#{path}" if %w(global user).include?(path)
           path = realized_ghc_package_path(path)
           path = File.expand_path(path, @config.root)
