@@ -27,7 +27,7 @@ if Licensed::Shell.tool_available?("pip")
     describe "dependencies" do
       it "detects dependencies without a version constraint" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "pandas" }
+          dep = source.dependencies.detect { |d| d.name == "scapy" }
           assert dep
           assert_equal "pip", dep.record["type"]
           assert dep.record["homepage"]

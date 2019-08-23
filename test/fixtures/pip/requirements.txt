@@ -1,6 +1,6 @@
 # This comment should be ignored
 --index-url https://pypi.org/simple
-pandas
+scapy
 Jinja2==2.9.6
 requests>=2.21.0
 tqdm<=4.30.0
