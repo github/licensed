@@ -1,0 +1,205 @@
+name: Test
+
+on: push
+
+jobs:
+  bower:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        version: 8
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/bower
+    - name: Run tests
+      run: script/test bower
+
+  bundler:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        bundler: [ '~> 1.15.0', '~> 1.16.0', '~> 1.17.0', '~> 2.0.0' ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Set up Bundler
+      run: |
+        yes | gem uninstall bundler --all
+        gem install bundler -v "${{ matrix.bundler }}"
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/bundler
+    - name: Run tests
+      run: script/test bundler
+
+  cabal:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/cabal
+    - name: Run tests
+      run: script/test cabal
+
+  core:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ 2.4.x, 2.5.x, 2.6.x ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: ${{matrix.ruby}}
+    - name: Set up Bundler
+      run: gem install bundler
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Build and lint
+      run: bundle exec rake rubocop build
+    - name: Core functionality tests
+      run: script/test core
+
+  dep:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.10.x
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/go
+    - name: Run tests
+      run: script/test dep
+
+  go:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.7.x', '1.10.x', '1.11.1' ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/go
+    - name: Run tests
+      run: script/test go
+
+  npm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: [ 8, 10, 12 ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        version: ${{ matrix.node_version }}
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/npm
+    - name: Run tests
+      run: script/test npm
+
+  gradle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Gradle version
+      run: test/fixtures/gradle/gradlew --quiet --version
+    - name: Run tests
+      run: script/test gradle
+
+  pip:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [ '2.x', '3.x' ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+        architecture: x64
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Install virtualenv
+      run: pip install virtualenv
+    - name: Set up fixtures
+      run: script/source-setup/pip
+    - name: Run tests
+      run: script/test pip
+
+  pipenv:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+        architecture: x64
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Set up fixtures
+      run: script/source-setup/pipenv
+    - name: Run tests
+      run: script/test pipenv
