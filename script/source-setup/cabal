@@ -14,4 +14,5 @@ if [ "$1" == "-f" ]; then
   find . -not -regex "\.*" -and -not -path "*app*" -print0 | xargs -0 rm -rf
 fi
 
+cabal update
 cabal new-build
