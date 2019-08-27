@@ -26,6 +26,7 @@ RUBYC="$BASE_DIR/bin/rubyc-darwin"
 
 brew update
 brew list "squashfs" &>/dev/null || brew install "squashfs"
+brew list "pkg-config" &>/dev/null || brew install "pkg-config"
 
 if [ ! -f "$RUBYC" ]; then
   mkdir -p "$(dirname "$RUBYC")"
