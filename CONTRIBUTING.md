@@ -52,6 +52,10 @@ If you are the current maintainer of this gem:
    3. Test behavior locally, branch deploy, whatever needs to happen
 9. Merge github/licensed PR
 10. Tag and push: `git tag x.xx.xx; git push --tags`
+
+The following steps will happen automatically from a GitHub Actions workflow
+after pushing a new tag. In case that fails, the following steps can be performed manually
+
 11. Push to rubygems.org -- `gem push licensed-x.xx.xx.gem`
 12. Build packages for new tag: `VERSION=x.xx.xx bundle exec rake package`
 13. Create release for new tag at github/licensed.
