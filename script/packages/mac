@@ -29,7 +29,7 @@ brew list "squashfs" &>/dev/null || brew install "squashfs"
 
 if [ ! -f "$RUBYC" ]; then
   mkdir -p "$(dirname "$RUBYC")"
-  curl -L http://enclose.io/rubyc/rubyc-darwin-x64.gz | gunzip > "$RUBYC"
+  curl -L https://github.com/kontena/ruby-packer/releases/download/2.6.0-0.6.0/rubyc-2.6.0-0.6.0-osx-amd64.gz | gunzip > "$RUBYC"
   chmod +x "$RUBYC"
 fi
 

@@ -4,7 +4,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends cmake make gcc pkg-config squashfs-tools git curl bison rsync \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L http://enclose.io/rubyc/rubyc-linux-x64.gz | gunzip > /usr/local/bin/rubyc \
+RUN curl -L https://github.com/kontena/ruby-packer/releases/download/2.6.0-0.6.0/rubyc-2.6.0-0.6.0-linux-amd64.gz | gunzip > /usr/local/bin/rubyc \
     && chmod +x /usr/local/bin/rubyc
 
 RUN gem update --system && gem update bundler

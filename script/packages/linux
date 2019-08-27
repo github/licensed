@@ -37,7 +37,7 @@ build_linux_local() {
   RUBYC="$BASE_DIR/bin/rubyc-linux"
   if [ ! -f "$RUBYC" ]; then
     mkdir -p "$(dirname "$RUBYC")"
-    curl -L http://enclose.io/rubyc/rubyc-linux-x64.gz | gunzip > "$RUBYC"
+    curl -L https://github.com/kontena/ruby-packer/releases/download/2.6.0-0.6.0/rubyc-2.6.0-0.6.0-linux-amd64.gz | gunzip > "$RUBYC"
     chmod +x "$RUBYC"
   fi
 
