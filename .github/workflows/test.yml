@@ -2,7 +2,10 @@ name: Test
 
 on: 
   push:
-    tags: !*
+    branches:
+    - *
+    tags:
+    - !*
 
 jobs:
   bower:
