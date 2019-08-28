@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.3.2
+2019-08-26
+
+### Fixed
+- Bundler with/without array settings are properly handled for bundler 1.15.x
+
 ## 2.3.1
 2019-08-20
 
@@ -202,4 +208,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.3.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.3.2...HEAD
