@@ -1,11 +1,18 @@
-name: Release
+name: Create release
 
-on: [release]
+on: create
 
 jobs:
-  publish:
-    name: Build + Publish Gem
+  tag_filter:
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/bin/filter@master
+      with:
+        args: 'tag'
+
+  package_linux:
+    runs-on: ubuntu-latest
+    needs: tag_filter
 
     steps:
     - uses: actions/checkout@master
@@ -14,17 +21,88 @@ jobs:
       with:
         version: 2.6.x
 
-    - name: Publish to GPR
-      run: |
-        mkdir -p $HOME/.gem
-        touch $HOME/.gem/credentials
-        chmod 0600 $HOME/.gem/credentials
-        printf -- "---\n:github: Bearer ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-        gem build *.gemspec
-        gem push --KEY github --host https://rubygems.pkg.github.com/${OWNER} *.gem
+    - name: Build package
+      run: script/packages/linux
       env:
-        GEM_HOST_API_KEY: ${{secrets.GPR_AUTH_TOKEN}}
-        OWNER: github
+        VERSION: ${{github.event.ref}}
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}-linux-x64.tar.gz
+        path: pkg/${{github.event.ref}}/licensed-${{github.event.ref}}-linux-x64.tar.gz
+
+  package_mac:
+    runs-on: macOS-latest
+    needs: tag_filter
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+
+    - name: Build package
+      run: script/packages/mac
+      env:
+        VERSION: ${{github.event.ref}}
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}-darwin-x64.tar.gz
+        path: pkg/${{github.event.ref}}/licensed-${{github.event.ref}}-darwin-x64.tar.gz
+        
+  build_gem:
+    runs-on: ubuntu-latest
+    needs: tag_filter
+    
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    
+    - name: Build gem
+      run: gem build *.gemspec
+    
+    - uses: actions/upload-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}.gem
+        path: pkg/licensed-${{github.event.ref}}.gem
+  
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [package_linux, package_mac, build_gem]
+    steps:
+    - uses: actions/checkout@master
+    - uses: Roang-zero1/github-create-release-action@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
+        VERSION_REGEX: "^[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+"
+
+  upload_packages:
+    runs-on: ubuntu-latest
+    needs: [create_release]
+
+    steps:
+    - uses: actions/download-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}-linux-x64.tar.gz
+    - uses: actions/download-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}-darwin-x64.tar.gz
+
+    - name: Publish to GitHub Release
+      uses: Roang-zero1/github-upload-release-artifacts-action@v2.0.0
+      with:
+        args: licensed-${{github.event.ref}}-linux-x64.tar.gz licensed-${{github.event.ref}}-darwin-x64.tar.gz
+      env:
+        GITHUB_TOKEN: ${{secrets.API_AUTH_TOKEN}}
+
+    - uses: actions/download-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}.gem
 
     - name: Publish to RubyGems
       run: |
@@ -32,53 +110,6 @@ jobs:
         touch $HOME/.gem/credentials
         chmod 0600 $HOME/.gem/credentials
         printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-        gem build *.gemspec
         gem push *.gem
       env:
         GEM_HOST_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
-  
-  package_linux:
-    name: Build + Publish Linux Standalone
-    runs_on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@master
-    - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
-      with:
-        version: 2.6.x
-    
-    - name: Build package
-      run: script/packages/linux
-      env:
-        VERSION: ${{github.ref}}
-      
-    - name: Upload package
-      uses: JasonEtco/upload-to-release@master
-      with:
-        args: pkg/${{github.ref}}/licensed-${{github.ref}}-linux-x64.tar.gz application/gzip
-      env:
-        GITHUB_TOKEN: ${{secrets.API_AUTH_TOKEN}}
-
-  package_mac:
-    name: Build + Publish Mac Standalone
-    runs_on: macOS-latest
-    
-    steps:
-    - uses: actions/checkout@master
-    - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
-      with:
-        version: 2.6.x
-        
-    - name: Build package
-      run: script/packages/mac
-      env:
-        VERSION: ${{github.ref}}
-    
-    - name: Upload package
-      uses: JasonEtco/upload-to-release@master
-      with:
-        args: pkg/${{github.ref}}/licensed-${{github.ref}}-darwin-x64.tar.gz application/gzip
-      env:
-        GITHUB_TOKEN: ${{secrets.API_AUTH_TOKEN}}
