@@ -10,19 +10,9 @@ jobs:
       with:
         args: 'tag'
 
-  create_release:
-    runs-on: ubuntu-latest
-    needs: tag_filter
-    steps:
-    - uses: actions/checkout@master
-    - uses: Roang-zero1/github-create-release-action@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
-        VERSION_REGEX: "^[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+"
-
   package_linux:
     runs-on: ubuntu-latest
-    needs: create_release
+    needs: tag_filter
 
     steps:
     - uses: actions/checkout@master
@@ -43,7 +33,7 @@ jobs:
 
   package_mac:
     runs-on: macOS-latest
-    needs: create_release
+    needs: tag_filter
 
     steps:
     - uses: actions/checkout@master
@@ -61,10 +51,39 @@ jobs:
       with:
         name: licensed-${{github.event.ref}}-darwin-x64.tar.gz
         path: pkg/${{github.event.ref}}/licensed-${{github.event.ref}}-darwin-x64.tar.gz
+        
+  build_gem:
+    runs-on: ubuntu-latest
+    needs: tag_filter
+    
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    
+    - name: Build gem
+      run: gem build *.gemspec
+    
+    - uses: actions/upload-artifact@master
+      with:
+        name: licensed-${{github.event.ref}}.gem
+        path: pkg/licensed-${{github.event.ref}}.gem
+  
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [package_linux, package_mac, build_gem]
+    steps:
+    - uses: actions/checkout@master
+    - uses: Roang-zero1/github-create-release-action@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
+        VERSION_REGEX: "^[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+"
 
   upload_packages:
     runs-on: ubuntu-latest
-    needs: [package_linux, package_mac]
+    needs: [create_release]
 
     steps:
     - uses: actions/download-artifact@master
@@ -74,22 +93,16 @@ jobs:
       with:
         name: licensed-${{github.event.ref}}-darwin-x64.tar.gz
 
-    - uses: Roang-zero1/github-upload-release-artifacts-action@v2.0.0
+    - name: Publish to GitHub Release
+      uses: Roang-zero1/github-upload-release-artifacts-action@v2.0.0
       with:
         args: licensed-${{github.event.ref}}-linux-x64.tar.gz licensed-${{github.event.ref}}-darwin-x64.tar.gz
       env:
         GITHUB_TOKEN: ${{secrets.API_AUTH_TOKEN}}
 
-  publish_gem:
-    runs-on: ubuntu-latest
-    needs: [upload_packages]
-
-    steps:
-    - uses: actions/checkout@master
-    - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+    - uses: actions/download-artifact@master
       with:
-        version: 2.6.x
+        name: licensed-${{github.event.ref}}.gem
 
     - name: Publish to RubyGems
       run: |
@@ -97,7 +110,6 @@ jobs:
         touch $HOME/.gem/credentials
         chmod 0600 $HOME/.gem/credentials
         printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-        gem build *.gemspec
         gem push *.gem
       env:
         GEM_HOST_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
