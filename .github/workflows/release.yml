@@ -69,7 +69,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: licensed-${{github.event.ref}}.gem
-        path: pkg/licensed-${{github.event.ref}}.gem
+        path: licensed-${{github.event.ref}}.gem
   
   create_release:
     runs-on: ubuntu-latest
