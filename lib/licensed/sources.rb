@@ -5,6 +5,7 @@ module Licensed
     require "licensed/sources/bower"
     require "licensed/sources/bundler"
     require "licensed/sources/cabal"
+    require "licensed/sources/composer"
     require "licensed/sources/dep"
     require "licensed/sources/git_submodule"
     require "licensed/sources/go"
