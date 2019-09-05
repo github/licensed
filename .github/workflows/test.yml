@@ -208,3 +208,25 @@ jobs:
       run: script/source-setup/pipenv
     - name: Run tests
       run: script/test pipenv
+
+  composer:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '5.6', '7.1', '7.2', '7.3' ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup php
+      uses: nanasess/setup-php@v1.0.2
+      with:
+        php-version: ${{ matrix.php }}
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/composer
+    - name: Run tests
+      run: script/test composer
