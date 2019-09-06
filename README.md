@@ -79,16 +79,17 @@ See the [configuration file documentation](./docs/configuration.md) for more det
 ### Sources
 
 Dependencies will be automatically detected for all of the following sources by default.
-1. [Bower (bower)](./docs/sources/bower.md)
-2. [Bundler](./docs/sources/bundler.md)
-3. [Cabal (cabal)](./docs/sources/cabal.md)
-4. [Go (go)](./docs/sources/go.md)
-5. [Go Dep (dep)](./docs/sources/dep.md)
-6. [Manifest lists (manifests)](./docs/sources/manifests.md)
-7. [NPM (npm)](./docs/sources/npm.md)
-8. [Pip (pip)](./docs/sources/pip.md)
-9. [Pipenv (pipenv)](./docs/sources/pipenv.md)
-10. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
+1. [Bower](./docs/sources/bower.md)
+1. [Bundler](./docs/sources/bundler.md)
+1. [Cabal](./docs/sources/cabal.md)
+1. [Composer](./docs/sources/composer.md)
+1. [Go](./docs/sources/go.md)
+1. [Go Dep (dep)](./docs/sources/dep.md)
+1. [Manifest lists (manifests)](./docs/sources/manifests.md)
+1. [NPM](./docs/sources/npm.md)
+1. [Pip](./docs/sources/pip.md)
+1. [Pipenv](./docs/sources/pipenv.md)
+1. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
 
 You can disable any of them in the configuration file:
 
