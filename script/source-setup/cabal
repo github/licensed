@@ -15,4 +15,4 @@ if [ "$1" == "-f" ]; then
 fi
 
 cabal update
-cabal new-build
+cabal new-build || cabal install

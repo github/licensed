@@ -24,10 +24,9 @@ if Licensed::Shell.tool_available?("ghc")
 
     describe "dependencies" do
       let(:local_db) { File.join(fixtures, "dist-newstyle/packagedb/ghc-<ghc_version>") }
-      let(:user_db) { "~/.cabal/store/ghc-<ghc_version>/package.db" }
 
       it "finds indirect dependencies" do
-        config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "bytestring" }
           assert dep
@@ -38,7 +37,7 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "finds direct dependencies" do
-        config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep
@@ -49,7 +48,7 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "finds dependencies for executables" do
-        config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "Glob" }
           assert dep
@@ -60,15 +59,15 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "does not include the target project" do
-        config["cabal"] = { "ghc_package_db" => ["global", user_db, local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
         Dir.chdir(fixtures) do
           refute source.dependencies.detect { |d| d.name == "app" }
         end
       end
 
       it "sets an error if a dependency isn't found" do
-        # include only the user database, avoiding using the global cache
-        config["cabal"] = { "ghc_package_db" => ["user"] }
+        # look in a location that doesn't contain any packages
+        config["cabal"] = { "ghc_package_db" => [Dir.pwd] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep
