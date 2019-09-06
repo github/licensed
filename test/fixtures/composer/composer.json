@@ -1,0 +1,8 @@
+{
+  "require": {
+    "monolog/monolog": "1.24.0"
+  },
+  "require-dev": {
+    "phpunit/php-file-iterator": "1.4.5"
+  }
+}
