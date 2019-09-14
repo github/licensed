@@ -8,7 +8,7 @@ Licensed is **not** a complete open source license compliance solution. Please u
 
 ## Current Status
 
-[![Build Status](https://travis-ci.org/github/licensed.svg?branch=master)](https://travis-ci.org/github/licensed)
+![Build status](https://github.com/github/licensed/workflows/test/badge.svg)
 
 Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
 
