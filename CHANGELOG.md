@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.4.0
+2019-09-15
+
+### Added
+- Composer source for PHP (https://github.com/github/licensed/pull/182)
+
 ## 2.3.2
 2019-08-26
 
@@ -208,4 +214,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.3.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.4.0...HEAD
