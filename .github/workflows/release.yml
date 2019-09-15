@@ -28,7 +28,7 @@ jobs:
 
     - uses: actions/upload-artifact@master
       with:
-        name: licensed-${{github.event.ref}}-linux-x64.tar.gz
+        name: ${{github.event.ref}}-linux
         path: pkg/${{github.event.ref}}/licensed-${{github.event.ref}}-linux-x64.tar.gz
 
   package_mac:
@@ -49,28 +49,28 @@ jobs:
 
     - uses: actions/upload-artifact@master
       with:
-        name: licensed-${{github.event.ref}}-darwin-x64.tar.gz
+        name: ${{github.event.ref}}-darwin
         path: pkg/${{github.event.ref}}/licensed-${{github.event.ref}}-darwin-x64.tar.gz
-        
+
   build_gem:
     runs-on: ubuntu-latest
     needs: tag_filter
-    
+
     steps:
     - uses: actions/checkout@master
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
         version: 2.6.x
-    
+
     - name: Build gem
       run: gem build *.gemspec
-    
+
     - uses: actions/upload-artifact@master
       with:
-        name: licensed-${{github.event.ref}}.gem
+        name: ${{github.event.ref}}-gem
         path: licensed-${{github.event.ref}}.gem
-  
+
   create_release:
     runs-on: ubuntu-latest
     needs: [package_linux, package_mac, build_gem]
@@ -86,31 +86,32 @@ jobs:
     needs: [create_release]
 
     steps:
-    - name: Download linux package
-      uses: actions/download-artifact@master
-      with:
-        name: licensed-${{github.event.ref}}-linux-x64.tar.gz
-    - name: Download macOS package
-      uses: actions/download-artifact@master
-      with:
-        name: licensed-${{github.event.ref}}-darwin-x64.tar.gz
-
-    - name: Publish packages to GitHub Release
-      uses: Roang-zero1/github-upload-release-artifacts-action@v2.0.0
-      with:
-        args: licensed-${{github.event.ref}}-linux-x64.tar.gz licensed-${{github.event.ref}}-darwin-x64.tar.gz
-      env:
-        GITHUB_TOKEN: ${{secrets.API_AUTH_TOKEN}}
-
-    - name: Download gem
-      uses: actions/download-artifact@master
-      with:
-        name: licensed-${{github.event.ref}}.gem
-        
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
         version: 2.6.x
+
+    - name: Download linux package
+      uses: actions/download-artifact@master
+      with:
+        name: ${{github.event.ref}}-linux
+
+    - name: Download macOS package
+      uses: actions/download-artifact@master
+      with:
+        name: ${{github.event.ref}}-darwin
+
+    - name: Download gem
+      uses: actions/download-artifact@master
+      with:
+        name: ${{github.event.ref}}-gem
+
+    - name: Publish packages to GitHub Release
+      uses: Roang-zero1/github-upload-release-artifacts-action@v2.0.0
+      with:
+        args: ${{github.event.ref}}-linux ${{github.event.ref}}-darwin
+      env:
+        GITHUB_TOKEN: ${{secrets.API_AUTH_TOKEN}}
 
     - name: Publish gem to RubyGems
       run: |
@@ -118,6 +119,7 @@ jobs:
         touch $HOME/.gem/credentials
         chmod 0600 $HOME/.gem/credentials
         printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-        gem push *.gem
+        gem push "$GEM"
       env:
         GEM_HOST_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
+        GEM: ${{github.event.ref}}-gem/*.gem
