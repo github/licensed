@@ -35,6 +35,15 @@ module Licensed
       puts Licensed::VERSION
     end
 
+    desc "env", "Output licensed environment configuration"
+    method_option :format, aliases: "-f", enum: ["yaml", "json"], default: "yaml",
+      desc: "Output format"
+    method_option :config, aliases: "-c", type: :string,
+      desc: "Path to licensed configuration file"
+    def env
+      run Licensed::Commands::Environment.new(config: config), format: options[:format]
+    end
+
     desc "migrate", "Migrate from a previous version of licensed"
     method_option :config, aliases: "-c", type: :string, required: true,
       desc: "Path to licensed configuration file"

@@ -28,6 +28,12 @@ A dependency will fail the status checks if:
 3. The cached record doesn't contain any license text
 4. The cached record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration.
 
+## `env`
+
+Prints the runtime environment used by licensed after loading a configuration file.  By default the output is in YAML format, but can be output in JSON using the `--json` flag.
+
+The output will not be equivalent to configuration input.  For example, all paths will be
+
 ## `version`
 
 Displays the current licensed version.
@@ -41,7 +47,7 @@ Licensed commands inherit and override the [`Licensed::Sources::Command`](../lib
 #### Required method overrides
 1. `Licensed::Commands::Command#evaluate_dependency`
    - Runs a command execution on an application dependency.
-   
+
 The `evaluate_dependency` method should contain the specific command logic.  This method has access to the application configuration, dependency source enumerator and dependency currently being evaluated as well as a reporting hash to contain information about the command execution.
 
 #### Optional method overrides
