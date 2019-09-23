@@ -4,8 +4,13 @@ require "yaml"
 module Licensed
   module Commands
     class Status < Command
-      def initialize(config:, reporter: Licensed::Reporters::StatusReporter.new)
-        super(config: config, reporter: reporter)
+      # Create a reporter to use during a command run
+      #
+      # options - The options the command was run with
+      #
+      # Returns a Licensed::Reporters::StatusReporter
+      def create_reporter(options)
+        Licensed::Reporters::StatusReporter.new
       end
 
       protected

@@ -5,7 +5,7 @@ describe Licensed::Commands::List do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new }
   let(:source) { TestSource.new(config) }
-  let(:command) { Licensed::Commands::List.new(config: config, reporter: reporter) }
+  let(:command) { Licensed::Commands::List.new(config: config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
@@ -13,6 +13,8 @@ describe Licensed::Commands::List do
       app.sources.clear
       app.sources << source
     end
+
+    Spy.on(command, :create_reporter).and_return(reporter)
   end
 
   each_source do |source_class|

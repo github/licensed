@@ -6,9 +6,8 @@ module Licensed
       attr_reader :reporter
       attr_reader :options
 
-      def initialize(config:, reporter:)
+      def initialize(config:)
         @config = config
-        @reporter = reporter
       end
 
       # Run the command
@@ -18,6 +17,7 @@ module Licensed
       # Returns whether the command was a success
       def run(**options)
         @options = options
+        @reporter = create_reporter(options)
         begin
           result = reporter.report_run(self) do
             config.apps.sort_by { |app| app["name"] }
@@ -26,9 +26,19 @@ module Licensed
           end
         ensure
           @options = nil
+          @reporter = nil
         end
 
         result
+      end
+
+      # Create a reporter to use during a command run
+      #
+      # options - The options the command was run with
+      #
+      # Raises an error
+      def create_reporter(options)
+        raise "`create_reporter` must be implemented by commands"
       end
 
       protected

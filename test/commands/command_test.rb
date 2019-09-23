@@ -15,7 +15,7 @@ describe Licensed::Commands::Command do
     ]
   }
   let(:configuration) { Licensed::Configuration.new("apps" => apps, "sources" => { "test" => true }) }
-  let(:command) { TestCommand.new(config: configuration, reporter: TestReporter.new) }
+  let(:command) { TestCommand.new(config: configuration) }
 
   it "runs a command for all dependencies in the configuration" do
     command.run

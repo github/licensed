@@ -1,5 +1,18 @@
 # frozen_string_literal: true
 class TestCommand < Licensed::Commands::Command
+  def initialize(config:, reporter: TestReporter.new)
+    super(config: config)
+    @test_reporter = reporter
+  end
+
+  def reporter
+    @test_reporter
+  end
+
+  def create_reporter(options)
+    @test_reporter
+  end
+
   protected
 
   def run_source(app, source)
