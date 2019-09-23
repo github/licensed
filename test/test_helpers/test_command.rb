@@ -13,16 +13,32 @@ class TestCommand < Licensed::Commands::Command
     @test_reporter
   end
 
+  def run(**options)
+    super do |report|
+      report["extra"] = true
+    end
+  end
+
   protected
+
+  def run_app(app)
+    super do |report|
+      report["extra"] = true
+    end
+  end
 
   def run_source(app, source)
     return options[:source_proc].call(app, source) if options[:source_proc]
-    super
+    super do |report|
+      report["extra"] = true
+    end
   end
 
   def run_dependency(app, source, dependency)
     return options[:dependency_proc].call(app, source, dependency) if options[:dependency_proc]
-    super
+    super do |report|
+      report["extra"] = true
+    end
   end
 
   def evaluate_dependency(app, source, dependency, report)

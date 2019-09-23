@@ -91,4 +91,20 @@ describe Licensed::Commands::Command do
       assert_includes report.errors, report.name
     end
   end
+
+  it "allows implementations to add extra data to reports with a yielded block" do
+    command.run
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Commands::Command) }
+    assert_equal true, report["extra"]
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::AppConfiguration) }
+    assert_equal true, report["extra"]
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Sources::Source) }
+    assert_equal true, report["extra"]
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Dependency) }
+    assert_equal true, report["extra"]
+  end
 end

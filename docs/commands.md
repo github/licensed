@@ -59,23 +59,14 @@ The following methods break apart the different levels of command execution.  Ea
 
 As an example, `Licensed::Commands::Command#run_app` calls `Reporter#report_app` to wrap every call to `Licensed::Commands::Command#run_source`.
 
-##### Overriding optional methods
+##### Specifying additional report data
 
-The `run` methods can be overridden to provide additional reporting data or functionality.  Overriding a method should call the original method with a block for the additional logic.
+The `run` methods can be overridden and pass a block to `super` to provide additional reporting data or functionality.
 
 ```ruby
 def run_app(app)
   super do |report|
-    result = yield report
-    
-    # do other thing
-    call_additional_functionality(app)
-    
-    # add reporting information
-    report["result"] = result
-    
-    # return the result
-    result
+    report["my_app_data"] = true
   end
 end
 ```
