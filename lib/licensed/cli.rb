@@ -36,7 +36,7 @@ module Licensed
     end
 
     desc "env", "Output licensed environment configuration"
-    method_option :format, aliases: "-f", enum: ["yaml", "json"], default: "yaml",
+    method_option :format, enum: ["yaml", "json"], default: "yaml",
       desc: "Output format"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
