@@ -201,10 +201,8 @@ describe Licensed::Reporters::Reporter::Report do
 
   describe "#to_h" do
     it "includes hash data" do
-      report.merge!(
-        key1: "value1",
-        "key2" => "value2"
-      )
+      report[:key1] = "value1"
+      report["key2"] = "value2"
 
       output = report.to_h
       assert_equal "value1", output[:key1]
