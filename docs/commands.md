@@ -25,8 +25,9 @@ The status command finds all dependencies and checks whether each dependency has
 A dependency will fail the status checks if:
 1. No cached record is found
 2. The cached record's version is different than the current dependency's version
-3. The cached record doesn't contain any license text
+3. The cached record's `licenses` data is empty
 4. The cached record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration.
+   - If `license: other` is specified and all of the `licenses` entries match an `allowed` license a failure will not be logged
 
 ## `version`
 
@@ -41,7 +42,7 @@ Licensed commands inherit and override the [`Licensed::Sources::Command`](../lib
 #### Required method overrides
 1. `Licensed::Commands::Command#evaluate_dependency`
    - Runs a command execution on an application dependency.
-   
+
 The `evaluate_dependency` method should contain the specific command logic.  This method has access to the application configuration, dependency source enumerator and dependency currently being evaluated as well as a reporting hash to contain information about the command execution.
 
 #### Optional method overrides
@@ -67,13 +68,13 @@ The `run` methods can be overridden to provide additional reporting data or func
 def run_app(app)
   super do |report|
     result = yield report
-    
+
     # do other thing
     call_additional_functionality(app)
-    
+
     # add reporting information
     report["result"] = result
-    
+
     # return the result
     result
   end
