@@ -5,5 +5,6 @@ module Licensed
     require "licensed/commands/cache"
     require "licensed/commands/status"
     require "licensed/commands/list"
+    require "licensed/commands/environment"
   end
 end

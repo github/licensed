@@ -6,7 +6,7 @@ describe Licensed::Commands::Status do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new("cache_path" => cache_path) }
   let(:source) { TestSource.new(config) }
-  let(:verifier) { Licensed::Commands::Status.new(config: config, reporter: reporter) }
+  let(:verifier) { Licensed::Commands::Status.new(config: config) }
 
   before do
     config.apps.each do |app|
@@ -14,7 +14,11 @@ describe Licensed::Commands::Status do
       app.sources << source
     end
 
-    Licensed::Commands::Cache.new(config: config.dup, reporter: reporter).run(force: true)
+    Spy.on(verifier, :create_reporter).and_return(reporter)
+
+    generator = Licensed::Commands::Cache.new(config: config.dup)
+    Spy.on(generator, :create_reporter).and_return(TestReporter.new)
+    generator.run(force: true)
   end
 
   after do

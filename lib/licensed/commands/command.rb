@@ -6,9 +6,8 @@ module Licensed
       attr_reader :reporter
       attr_reader :options
 
-      def initialize(config:, reporter:)
+      def initialize(config:)
         @config = config
-        @reporter = reporter
       end
 
       # Run the command
@@ -18,17 +17,31 @@ module Licensed
       # Returns whether the command was a success
       def run(**options)
         @options = options
+        @reporter = create_reporter(options)
         begin
-          result = reporter.report_run(self) do
+          result = reporter.report_run(self) do |report|
+            # allow additional report data to be given by commands
+            yield report if block_given?
+
             config.apps.sort_by { |app| app["name"] }
                        .map { |app| run_app(app) }
                        .all?
           end
         ensure
           @options = nil
+          @reporter = nil
         end
 
         result
+      end
+
+      # Create a reporter to use during a command run
+      #
+      # options - The options the command was run with
+      #
+      # Raises an error
+      def create_reporter(options)
+        raise "`create_reporter` must be implemented by commands"
       end
 
       protected
@@ -43,6 +56,9 @@ module Licensed
         reporter.report_app(app) do |report|
           Dir.chdir app.source_path do
             begin
+              # allow additional report data to be given by commands
+              yield report if block_given?
+
               app.sources.select(&:enabled?)
                          .sort_by { |source| source.class.type }
                          .map { |source| run_source(app, source) }.all?
@@ -64,6 +80,9 @@ module Licensed
       def run_source(app, source)
         reporter.report_source(source) do |report|
           begin
+            # allow additional report data to be given by commands
+            yield report if block_given?
+
             source.dependencies.sort_by { |dependency| dependency.name }
                                .map { |dependency| run_dependency(app, source, dependency) }
                                .all?
@@ -94,6 +113,9 @@ module Licensed
           end
 
           begin
+            # allow additional report data to be given by commands
+            yield report if block_given?
+
             evaluate_dependency(app, source, dependency, report)
           rescue Licensed::Shell::Error => err
             report.errors << err.message

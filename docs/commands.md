@@ -29,6 +29,12 @@ A dependency will fail the status checks if:
 4. The cached record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration.
    - If `license: other` is specified and all of the `licenses` entries match an `allowed` license a failure will not be logged
 
+## `env`
+
+Prints the runtime environment used by licensed after loading a configuration file.  By default the output is in YAML format, but can be output in JSON using the `--json` flag.
+
+The output will not be equivalent to configuration input.  For example, all paths will be
+
 ## `version`
 
 Displays the current licensed version.
@@ -60,23 +66,14 @@ The following methods break apart the different levels of command execution.  Ea
 
 As an example, `Licensed::Commands::Command#run_app` calls `Reporter#report_app` to wrap every call to `Licensed::Commands::Command#run_source`.
 
-##### Overriding optional methods
+##### Specifying additional report data
 
-The `run` methods can be overridden to provide additional reporting data or functionality.  Overriding a method should call the original method with a block for the additional logic.
+The `run` methods can be overridden and pass a block to `super` to provide additional reporting data or functionality.
 
 ```ruby
 def run_app(app)
   super do |report|
-    result = yield report
-
-    # do other thing
-    call_additional_functionality(app)
-
-    # add reporting information
-    report["result"] = result
-
-    # return the result
-    result
+    report["my_app_data"] = true
   end
 end
 ```
