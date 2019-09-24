@@ -48,21 +48,6 @@ module Licensed
       )
     end
 
-    # Normalizes cached license content to a hash with license text stored in
-    # the "text" field
-    #
-    # content - content
-    def self.normalize_license_content(content)
-      return content if content.is_a?(Hash)
-
-      { "text" => content }
-    end
-
-    def self.license_output(license)
-      return license["text"] if ["text"] == license.keys
-      license
-    end
-
     def_delegators :@metadata, :[], :[]=
     attr_reader :licenses
     attr_reader :notices
