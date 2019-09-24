@@ -2,8 +2,13 @@
 module Licensed
   module Commands
     class Cache < Command
-      def initialize(config:, reporter: Licensed::Reporters::CacheReporter.new)
-        super(config: config, reporter: reporter)
+      # Create a reporter to use during a command run
+      #
+      # options - The options the command was run with
+      #
+      # Raises a Licensed::Reporters::CacheReporter
+      def create_reporter(options)
+        Licensed::Reporters::CacheReporter.new
       end
 
       protected

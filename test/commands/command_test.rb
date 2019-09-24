@@ -15,7 +15,7 @@ describe Licensed::Commands::Command do
     ]
   }
   let(:configuration) { Licensed::Configuration.new("apps" => apps, "sources" => { "test" => true }) }
-  let(:command) { TestCommand.new(config: configuration, reporter: TestReporter.new) }
+  let(:command) { TestCommand.new(config: configuration) }
 
   it "runs a command for all dependencies in the configuration" do
     command.run
@@ -90,5 +90,21 @@ describe Licensed::Commands::Command do
     reports.each do |report|
       assert_includes report.errors, report.name
     end
+  end
+
+  it "allows implementations to add extra data to reports with a yielded block" do
+    command.run
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Commands::Command) }
+    assert_equal true, report["extra"]
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::AppConfiguration) }
+    assert_equal true, report["extra"]
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Sources::Source) }
+    assert_equal true, report["extra"]
+
+    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Dependency) }
+    assert_equal true, report["extra"]
   end
 end

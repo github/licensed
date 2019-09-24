@@ -6,7 +6,7 @@ describe Licensed::Commands::Cache do
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new("cache_path" => cache_path) }
   let(:source) { TestSource.new(config) }
-  let(:generator) { Licensed::Commands::Cache.new(config: config, reporter: reporter) }
+  let(:generator) { Licensed::Commands::Cache.new(config: config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   before do
@@ -14,6 +14,8 @@ describe Licensed::Commands::Cache do
       app.sources.clear
       app.sources << source
     end
+
+    Spy.on(generator, :create_reporter).and_return(reporter)
   end
 
   after do

@@ -2,8 +2,13 @@
 module Licensed
   module Commands
     class List < Command
-      def initialize(config:, reporter: Licensed::Reporters::ListReporter.new)
-        super(config: config, reporter: reporter)
+      # Create a reporter to use during a command run
+      #
+      # options - The options the command was run with
+      #
+      # Returns a Licensed::Reporters::ListReporter
+      def create_reporter(options)
+        Licensed::Reporters::ListReporter.new
       end
 
       protected
