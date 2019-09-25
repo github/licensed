@@ -29,8 +29,9 @@ describe Licensed::Dependency do
         assert_equal "mit", dependency.record["license"]
         assert_equal "test", dependency.record["name"]
         assert_equal "1.0", dependency.version
-        assert_includes dependency.record.licenses,
-                        { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
+        license = dependency.record.licenses.find { |l| l.sources == ["LICENSE"] }
+        assert license
+        assert_equal Licensee::License.find("mit").text, license.text
         assert_includes dependency.record.notices,
                         { "sources" => "AUTHORS", "text" => "author" }
       end

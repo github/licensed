@@ -5,6 +5,28 @@ require "licensee"
 
 module Licensed
   class DependencyRecord
+    class License
+      attr_reader :text, :sources
+      def initialize(content)
+        @sources = []
+
+        if content.is_a?(String)
+          @text = content.to_s
+        elsif content.respond_to?(:[])
+          @sources.concat content["sources"].to_s.split(", ")
+          @text = content["text"]
+        end
+      end
+
+      def to_cache
+        return text if sources.empty?
+        {
+          "sources" => sources.join(", "),
+          "text" => text
+        }
+      end
+    end
+
     include Licensee::ContentHelper
     extend Forwardable
 
@@ -36,7 +58,7 @@ module Licensed
     # notices - a string, or array of strings, representing the content of each legal notice
     # metadata - a Hash of the metadata for the package
     def initialize(licenses: [], notices: [], metadata: {})
-      @licenses = [licenses].flatten.compact
+      @licenses = [licenses].flatten.compact.map { |l| DependencyRecord::License.new(l) }
       @notices = [notices].flatten.compact
       @metadata = metadata
     end
@@ -46,7 +68,7 @@ module Licensed
     # filename - The destination file to save record contents at
     def save(filename)
       data_to_save = @metadata.merge({
-        "licenses" => licenses,
+        "licenses" => licenses.map(&:to_cache),
         "notices" => notices
       })
 
@@ -58,13 +80,7 @@ module Licensed
     # `Licensee::CotentHelper`
     def content
       return if licenses.nil? || licenses.empty?
-      licenses.map do |license|
-        if license.is_a?(String)
-          license
-        elsif license.respond_to?(:[])
-          license["text"]
-        end
-      end.join
+      licenses.map(&:text).compact.join
     end
 
     # Returns whether two records match based on their contents

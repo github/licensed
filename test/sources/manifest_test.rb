@@ -49,8 +49,9 @@ describe Licensed::Sources::Manifest do
       assert_equal "mit", dep.record["license"]
 
       license_path = File.join(config.root, config.dig("manifest", "licenses", "manifest_test"))
-      assert_includes dep.record.licenses,
-                      { "sources" => "LICENSE", "text" => File.read(license_path) }
+      license = dep.record.licenses.find { |l| l.sources == ["LICENSE"] }
+      assert license
+      assert_equal File.read(license_path), license.text
     end
 
     it "prefers licenses from license files" do
@@ -67,8 +68,8 @@ describe Licensed::Sources::Manifest do
       assert_equal 1, dep.record.licenses.size
 
       _, sources = source.packages.detect { |name, _| name == "bsd3_single_header_license" }
-      assert_equal sources.map { |s| File.basename(s) }.join(", "),
-                   dep.record.licenses.first["sources"]
+      assert_equal sources.map { |s| File.basename(s) },
+                   dep.record.licenses.first.sources
     end
 
     it "detects unique license content from multiple headers" do

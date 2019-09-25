@@ -79,8 +79,8 @@ module Licensed
     end
 
     # Is the license of the dependency allowed?
-    def allowed?(dependency)
-      Array(self["allowed"]).include?(dependency["license"])
+    def allowed?(license)
+      Array(self["allowed"]).include?(license)
     end
 
     # Ignore a dependency

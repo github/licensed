@@ -177,4 +177,75 @@ describe Licensed::Commands::Status do
       assert_includes dependency_errors("dependency/path"), "missing license text"
     end
   end
+
+  describe "with multiple cached license notices" do
+    let(:bsd_3) { Licensed::DependencyRecord::License.new(Licensee::License.find("bsd-3-clause").to_s) }
+    let(:mit) { Licensed::DependencyRecord::License.new(Licensee::License.find("mit").to_s) }
+    let(:agpl_3) { Licensed::DependencyRecord::License.new(Licensee::License.find("agpl-3.0").to_s) }
+    let(:readme_mit) { Licensed::DependencyRecord::License.new("## License:\n\nMIT") }
+    let(:record_file) { config.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}") }
+    let(:record) { Licensed::DependencyRecord.read(record_file) }
+
+    before do
+      config.allow("mit")
+      config.allow("bsd-3-clause")
+
+      record.licenses.clear
+    end
+
+    it "does not warn if the top level license field is allowed" do
+      # licenses contains an unapproved license notice (agpl-3.0), but should not be checked
+      # because the top level license field is allowed
+      record.licenses.push(mit, agpl_3)
+      record["license"] = "mit"
+      record.save(record_file)
+
+      verifier.run
+      assert dependency_errors.empty?
+    end
+
+    it "warns if the top level license field is not allowed and not 'other'" do
+      record.licenses.push(mit, bsd_3)
+      # both record license texts are approved, but licensed should only check
+      # them when the record's top level license field is set to other
+      record["license"] = "agpl-3.0"
+      record.save(record_file)
+
+      verifier.run
+      assert_includes dependency_errors, "license needs review: agpl-3.0"
+    end
+
+    it "warns if any of the license notices is not allowed" do
+      # licenses contains an unapproved license notice (agpl-3.0),
+      # and will be checked because the top level license field is set to other
+      record.licenses.push(mit, agpl_3)
+      record["license"] = "other"
+      record.save(record_file)
+
+      verifier.run
+      assert_includes dependency_errors, "license needs review: other"
+    end
+
+    it "does not warn if all of the license notices are allowed" do
+      # licenses contains only approved values, which pass status checks
+      # when the top level license field is set to other
+      record.licenses.push(mit, bsd_3)
+      record["license"] = "other"
+      record.save(record_file)
+
+      verifier.run
+      assert dependency_errors.empty?
+    end
+
+    it "parses readme contents as well as license text" do
+      # licenses includes content that will be matched as part of a README file,
+      # but not as part of a LICENSE file
+      record.licenses.push(readme_mit, bsd_3)
+      record["license"] = "other"
+      record.save(record_file)
+
+      verifier.run
+      assert dependency_errors.empty?
+    end
+  end
 end

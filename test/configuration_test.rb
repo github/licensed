@@ -91,9 +91,9 @@ describe Licensed::Configuration do
 
   describe "allow" do
     it "marks the license as allowed" do
-      refute config.allowed?(@package)
+      refute config.allowed?("mit")
       config.allow "mit"
-      assert config.allowed?(@package)
+      assert config.allowed?("mit")
     end
   end
 

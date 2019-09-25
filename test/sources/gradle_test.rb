@@ -61,9 +61,9 @@ describe Licensed::Sources::Gradle::Dependency do
       assert dep
       assert_equal "apache-2.0", dep.license.key
 
-      license = dep.record.licenses.find { |l| l["text"] =~ /Apache License/ }
+      license = dep.record.licenses.find { |l| l.text =~ /Apache License/ }
       assert license
-      assert_equal "https://www.apache.org/licenses/LICENSE-2.0", license["sources"]
+      assert_equal ["https://www.apache.org/licenses/LICENSE-2.0"], license.sources
     end
   end
 

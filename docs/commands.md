@@ -25,8 +25,9 @@ The status command finds all dependencies and checks whether each dependency has
 A dependency will fail the status checks if:
 1. No cached record is found
 2. The cached record's version is different than the current dependency's version
-3. The cached record doesn't contain any license text
+3. The cached record's `licenses` data is empty
 4. The cached record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration.
+   - If `license: other` is specified and all of the `licenses` entries match an `allowed` license a failure will not be logged
 
 ## `env`
 

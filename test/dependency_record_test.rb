@@ -25,7 +25,7 @@ describe Licensed::DependencyRecord do
 
       content = Licensed::DependencyRecord.read(@filename)
       assert_equal "test", content["name"]
-      assert_equal ["license1", "license2"], content.licenses
+      assert_equal ["license1", "license2"], content.licenses.map(&:text)
       assert_equal ["notice", "author"], content.notices
     end
   end

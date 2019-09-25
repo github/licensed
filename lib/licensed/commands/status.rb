@@ -35,19 +35,51 @@ module Licensed
         else
           report.errors << "cached dependency record out of date" if cached_record["version"] != dependency.version
           report.errors << "missing license text" if cached_record.licenses.empty?
-          report.errors << "license needs review: #{cached_record["license"]}" unless allowed_or_reviewed?(app, cached_record)
+          report.errors << "license needs review: #{cached_record["license"]}" if license_needs_review?(app, cached_record)
         end
 
         report.errors.empty?
       end
 
-      def allowed_or_reviewed?(app, dependency)
-        app.allowed?(dependency) || app.reviewed?(dependency)
+      # Returns true if a cached record needs further review based on the
+      # record's license(s) and the app's configuration
+      def license_needs_review?(app, cached_record)
+        # review is not needed if the record is set as reviewed
+        return false if app.reviewed?(cached_record)
+        # review is not needed if the top level license is allowed
+        return false if app.allowed?(cached_record["license"])
+
+        # the remaining checks are meant to allow records marked as "other"
+        # that have multiple licenses, all of which are allowed
+
+        # review is needed for non-"other" licenses
+        return true unless cached_record["license"] == "other"
+
+        licenses = cached_record.licenses.map { |license| license_from_text(license.text) }
+
+        # review is needed when there is only one license notice
+        # this is a performance optimization for the single license case
+        return true unless licenses.length > 1
+
+        # review is needed if any license notices don't represent an allowed license
+        licenses.any? { |license| !app.allowed?(license) }
       end
 
       def cached_record(filename)
         return nil unless File.exist?(filename)
         DependencyRecord.read(filename)
+      end
+
+      # Returns a license key based on the content from a cached records `licenses`
+      # entry content
+      def license_from_text(text)
+        licenses = [
+          Licensee::ProjectFiles::LicenseFile.new(text).license&.key,
+          Licensee::ProjectFiles::ReadmeFile.new(text).license&.key,
+          "other"
+        ].compact
+
+        licenses.sort_by { |license| license != "other" ? 0 : 1 }.first
       end
     end
   end
