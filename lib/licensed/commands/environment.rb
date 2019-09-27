@@ -37,11 +37,11 @@ module Licensed
 
       def create_reporter(options)
         case options[:format]
-          when "json"
-            Licensed::Reporters::JsonReporter.new
-          else
-            Licensed::Reporters::YamlReporter.new
-          end
+        when "json"
+          Licensed::Reporters::JsonReporter.new
+        else
+          Licensed::Reporters::YamlReporter.new
+        end
       end
 
       protected
