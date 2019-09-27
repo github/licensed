@@ -10,38 +10,38 @@ module Licensed
           @config = config
         end
 
+        def enabled_source_types
+          config.sources.select { |s| s.enabled? }.map { |s| s.class.type }
+        end
+
         def to_h
-          out = config.to_h.merge(
-            # override data for any calculated properties
-            "cache_path" => config.cache_path.to_s,
-            "source_path" => config.source_path.to_s,
-            "sources" => config.sources.map { |s| s.class.type },
+          {
+            "name" => config["name"],
+            "source_path" => config.source_path,
+            "cache_path" => config.cache_path,
+            "sources" => enabled_source_types,
+            "allowed" => config["allowed"],
+            "ignored" => config["ignored"],
+            "reviewed" => config["reviewed"],
             "version_strategy" => self.version_strategy
-          )
-
-          # don't report sub-apps
-          out.delete("apps")
-          # root is provided as a key on the top-level object
-          out.delete("root")
-
-          out
+          }
         end
       end
 
       def run(**options)
         super do |report|
-          report["root"] = config.root.to_s
+          report["root"] = config.root
           report["git_repo"] = Licensed::Git.git_repo?
         end
       end
 
       def create_reporter(options)
         case options[:format]
-          when "json"
-            Licensed::Reporters::JsonReporter.new
-          else
-            Licensed::Reporters::YamlReporter.new
-          end
+        when "json"
+          Licensed::Reporters::JsonReporter.new
+        else
+          Licensed::Reporters::YamlReporter.new
+        end
       end
 
       protected
