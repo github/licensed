@@ -28,7 +28,7 @@ describe Licensed::Commands::Environment do
       command.run
 
       report = reporter.report
-      assert_equal config.root.to_s, report["root"]
+      assert_equal config.root, report["root"]
       assert_equal Licensed::Git.git_repo?, report["git_repo"]
     end
 

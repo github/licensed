@@ -40,6 +40,47 @@ describe Licensed::Reporters::JsonReporter do
                          style: :info
                       }
     end
+
+    it "sanitizes data to print using primitive types" do
+      reporter.report_run(command) do |report|
+        report[:key] = :value
+        report[:path] = Pathname.pwd
+        report[:hash] = {
+          array: [1, :symbol, true, false],
+          hash: {
+            key: :value
+          }
+        }
+        report[:array] = [
+          { key: :value },
+          [1, :symbol, true, false],
+          :symbol
+        ]
+      end
+
+      expected_object = {
+        "key" => "value",
+        "path" => Pathname.pwd.to_s,
+        "hash" => {
+          "array" => [1, "symbol", true, false],
+          "hash" => {
+            "key" => "value"
+          }
+        },
+        "array" => [
+          { "key" => "value" },
+          [1, "symbol", true, false],
+          "symbol"
+        ]
+      }
+
+      assert_includes shell.messages,
+                      {
+                         message: expected_object.to_yaml,
+                         newline: true,
+                         style: :info
+                      }
+    end
   end
 
   describe "#report_app" do

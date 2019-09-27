@@ -13,8 +13,8 @@ module Licensed
         def to_h
           out = config.to_h.merge(
             # override data for any calculated properties
-            "cache_path" => config.cache_path.to_s,
-            "source_path" => config.source_path.to_s,
+            "cache_path" => config.cache_path,
+            "source_path" => config.source_path,
             "sources" => config.sources.map { |s| s.class.type },
             "version_strategy" => self.version_strategy
           )
@@ -30,7 +30,7 @@ module Licensed
 
       def run(**options)
         super do |report|
-          report["root"] = config.root.to_s
+          report["root"] = config.root
           report["git_repo"] = Licensed::Git.git_repo?
         end
       end
