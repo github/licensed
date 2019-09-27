@@ -10,21 +10,21 @@ module Licensed
           @config = config
         end
 
+        def enabled_source_types
+          config.sources.select { |s| s.enabled? }.map { |s| s.class.type }
+        end
+
         def to_h
-          out = config.to_h.merge(
-            # override data for any calculated properties
-            "cache_path" => config.cache_path,
+          {
+            "name" => config["name"],
             "source_path" => config.source_path,
-            "sources" => config.sources.map { |s| s.class.type },
+            "cache_path" => config.cache_path,
+            "sources" => enabled_source_types,
+            "allowed" => config["allowed"],
+            "ignored" => config["ignored"],
+            "reviewed" => config["reviewed"],
             "version_strategy" => self.version_strategy
-          )
-
-          # don't report sub-apps
-          out.delete("apps")
-          # root is provided as a key on the top-level object
-          out.delete("root")
-
-          out
+          }
         end
       end
 
