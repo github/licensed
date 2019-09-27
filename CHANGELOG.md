@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.5.0
+2019-09-26
+
+### Added
+- `env` command to output application environment configuration (https://github.com/github/licensed/pull/187, https://github.com/github/licensed/pull/191)
+
+### Changed
+- `status` command will pass if multiple allowed licenses are found (https://github.com/github/licensed/pull/188)
+
 ## 2.4.0
 2019-09-15
 
@@ -214,4 +223,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.4.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.5.0...HEAD
