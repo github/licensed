@@ -119,7 +119,7 @@ jobs:
         touch $HOME/.gem/credentials
         chmod 0600 $HOME/.gem/credentials
         printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-        gem push "$GEM"
+        gem push $GEM
       env:
         GEM_HOST_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
         GEM: ${{github.event.ref}}-gem/*.gem
