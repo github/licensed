@@ -317,7 +317,7 @@ module Licensed
             @scanner.skip(WS_PATTERN)
             name
           else
-            error("keyword #{name.inspect} not an atom", after_name)
+            error("keyword #{name.inspect} is not an atom", after_name)
           end
         end
 
