@@ -90,6 +90,7 @@ Dependencies will be automatically detected for all of the following sources by 
 1. [Pip](./docs/sources/pip.md)
 1. [Pipenv](./docs/sources/pipenv.md)
 1. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
+1. [Mix](./docs/sources/mix.md)
 
 You can disable any of them in the configuration file:
 
