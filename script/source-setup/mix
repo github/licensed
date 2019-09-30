@@ -16,4 +16,4 @@ if [ "$1" == "-f" ]; then
   mix clean || true
 fi
 
-# mix do deps.get, deps.compile
+mix deps.get
