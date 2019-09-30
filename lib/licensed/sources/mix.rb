@@ -7,17 +7,13 @@ module Licensed
 
       LOCKFILE = "mix.lock"
 
+      # Returns whether a mix.lock is present
       def enabled?
-        File.exists?(LOCKFILE) && mix?
+        File.exists?(LOCKFILE)
       end
 
       def enumerate_dependencies
         parsed_dependencies
-      end
-
-      # Returns whether the mix CLI tool is available
-      def mix?
-        @mix ||= Licensed::Shell.tool_available?("mix")
       end
 
       private
