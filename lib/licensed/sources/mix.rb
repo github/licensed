@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "strscan"
 
 module Licensed
   module Sources
@@ -9,117 +8,52 @@ module Licensed
 
       # Returns whether a mix.lock is present
       def enabled?
-        File.exists?(config.pwd.join(LOCKFILE))
+        File.exists?(lockfile_path)
       end
 
       def enumerate_dependencies
-        find_packages.map do |name, lock_info|
-          convert_package_to_dependency(name, lock_info)
+        find_packages.map do |package|
+          convert_package_to_dependency(package)
         end
       end
 
       private
 
-      # Returns the parsed mix.lock information as a Hash.
+      # Returns the parsed mix.lock information as an Array of Hash objects.
       def find_packages
-        contents = File.read(config.pwd.join(LOCKFILE))
-        LockfileParser.run(contents)
+        LockfileParser.read(lockfile_path)
+      end
+
+      # Returns the absolute path to the mix.lock as a Pathname.
+      def lockfile_path
+        config.pwd.join(LOCKFILE)
       end
 
       # Converts a raw package representation to a dependency.
       #
-      # name      - The name of the package as a String.
-      # lock_info - The parsed lockfile data for the package as an Array.
+      # name - The name of the package as a String.
+      # pkg  - The parsed package data as a Hash.
       #
-      # Returns a Dependency, or raises an ArgumentError if unsuccessful.
-      def convert_package_to_dependency(name, lock_info)
-        package_type = lock_info.first
-        case package_type
-        when "git"
-          git_dependency(name, lock_info)
-        when "hex"
-          hex_dependency(name, lock_info)
-        else
-          raise ArgumentError, "Unknown package type in mix.lock: #{package_type}"
-        end
-      end
-
-      # Generate a Dependency for a Git-based package type.
-      #
-      # name      - The name of the package as a String.
-      # lock_info - The parsed lockfile data for the package as an Array.
-      #
-      # Returns a Dependency (possibly with error information).
-      def git_dependency(name, lock_info)
-        # Example: {:git, "https://example.com/path/to/repo.git", "A-SHA-HERE", []},
-        path, errors = check_dep_path(name)
-        if lock_info.length == 4
-          Dependency.new(
-            name: name,
-            version: lock_info[2],
-            path: path,
-            metadata: {
-              "type" => self.class.type,
-              "scm" => "git",
-              "repo" => lock_info[1]
-            },
-            errors: errors
-          )
-        else
-          Dependency.new(
-            name: name,
-            path: path,
-            errors: errors << "unknown mix.lock format",
-            metadata: {
-              "type" => self.class.type,
-              "scm" => "git"
-            }
-          )
-        end
-      end
-
-      # Generate a Dependency for a Hex-based package type.
-      #
-      # name      - The name of the package as a String.
-      # lock_info - The parsed lockfile data for the package as an Array.
-      #
-      # Returns a Dependency (possibly with error information).
-      def hex_dependency(name, lock_info)
-        # Example: {:hex, :pkgname, "1.2.3", "A-DIGEST-HERE", [:mix], [], "hexpm"}
-        path, errors = check_dep_path(name)
-        if lock_info.length == 7
-          Dependency.new(
-            name: name,
-            version: lock_info[2],
-            path: path,
-            metadata: {
-              "type" => self.class.type,
-              "scm" => "hex",
-              "repo" => lock_info.last
-            },
-            errors: errors
-          )
-        else
-          Dependency.new(
-            name: name,
-            path: path,
-            errors: errors << "unknown mix.lock format",
-            metadata: {
-              "type" => self.class.type,
-              "scm" => "hex"
-            }
-          )
-        end
+      # Returns a Dependency.
+      def convert_package_to_dependency(pkg)
+        path, errors = check_dep_path(pkg)
+        Dependency.new(
+          name: pkg[:name],
+          version: pkg[:version],
+          path: path,
+          metadata: pkg[:metadata].merge("type" => self.class.type),
+          errors: errors + Array(pkg[:error])
+        )
       end
 
       # Check that the package has been installed in deps/.
       #
-      # name - The name of the package as a String.
+      # pkg - The package information as a Hash
       #
-      # Returns an Array with two members; the path as a String
-      # and a possible Array of errors.
-      def check_dep_path(name)
-        path = dep_path(name)
+      # Returns an Array with two members; the path as a String and an Array of
+      # any errors.
+      def check_dep_path(pkg)
+        path = dep_path(pkg[:name])
         if File.directory?(path)
           return [path, []]
         else
@@ -131,263 +65,111 @@ module Licensed
       #
       # name - The name of the package dependency as a String.
       #
-      # Returns a String.
+      # Returns a Pathname.
       def dep_path(name)
         config.pwd.join("deps", name)
       end
 
       class LockfileParser
+
         class ParseError < RuntimeError; end
 
-        WS_PATTERN = /\s*/
-        ATOM_CONTENTS_PATTERN = /[A-Za-z][A-Za-z_.0-9]+/
-        SEP_PATTERN = /,\s*/
+        # Top-level pattern extracting the name and Mix.SCM type
+        LINE_PATTERN = /
+          \A                 # At the beginning of input
+          \s*                # after any number of spaces
+          "(?<name>.*?)"     # capture the contents of a double-quoted string as the name
+          :\s*\{             # then skipping a colon, any number of spaces, and an opening brace,
+          :(?<scm>hex|git)   # capture the contents of a Elixir atom as the scm
+          ,\s*               # and, skipping a comma and any number of spaces,
+          (?<contents>.*)    # capture the rest of input as the contents.
+        /x
+
+        # Patterns to extract the version and repo information for each Mix.SCM type.
+        SCM_PATTERN = {
+          # The Hex Package Manager
+          "hex" => /
+            \A                # At the beginning of input
+            :[a-zA-Z0-9_]+    # after an Elixir atom,
+            ,\s*              # and skipping a comma and any number of spaces,
+            "(?<version>.*?)" # capture the contents of a double-quoted string as the version,
+            .*                # and later
+            "(?<repo>.*?)"    # capture the contents of a double-quoted string as the repo
+            \},?\s*\Z         # right before the final closing brace.
+          /x,
+
+          # Git
+          "git" => /
+            \A                # At the beginning of input
+            "(?<repo>.*?)"    # capture the contents of a double-quoted string as the repo
+            ,\s*              # and, skipping a comma and any number of spaces,
+            "(?<version>.*?)" # capture the contents of a second double-quoted string as the version.
+          /x
+        }
 
         # Parses a mix.lock to extract raw package information.
         #
-        # lock - The mix.lock file contents as a String.
+        # path - The path to the mix.lock as a Pathname or String.
         #
-        # Returns a Hash of package names to lockfile info, or raises a
-        # ParseError if unsuccessful.
-        def self.run(lock)
-          new(lock).result
+        # Returns an Array of Hash package entries, or raises a ParserError if
+        # unsuccessful.
+        def self.read(path)
+          lines = File.readlines(path)
+          new(lines).result
         end
 
-        def initialize(lock)
-          @lock = lock
-          @scanner = StringScanner.new(lock)
+        def initialize(lines)
+          @lines = lines
         end
 
-        # Builds the parser result.
+        # Parses the input lines.
         #
-        # Returns a memoized Hash of package names to lockfile info, or raises a
-        # ParseError if unsuccessful.
+        # Returns an Array of Hash package entries, or raises a ParseError if
+        # unsuccessful.
         def result
-          @result ||= parse_toplevel
+          # Ignore the first and last lines of the file (the beginning and
+          # ending of the enclosing map).
+          @lines[1..-2].map do |line|
+            parse_line(line)
+          end
         end
 
         private
 
-        # Parses the toplevel structure in the lockfile.
+        # Parse a line from the mix.lock file.
         #
-        # Returns a Hash of package names to lockfile info, or
-        # raises a ParseError if unsuccessful.
-        def parse_toplevel
-          start = @scanner.pos
-          if @scanner.scan(/%\{/)
-            data = {}
-            loop do
-              char = @scanner.peek(1)
-              case char
-              when "}"
-                @scanner.pos += 1
-                break
-              when "" # EOS
-                error("unterminated map", @scanner.pos)
-              else
-                @scanner.skip(WS_PATTERN)
-                key = parse_quoted_string
-                if key && @scanner.scan(/:\s+/)
-                  tuple = parse_tuple
-                  data[key] = tuple
-                  @scanner.skip(SEP_PATTERN)
-                end
-              end
-            end
-            data
-          else
-            raise ParseError, "invalid mix.lock"
-          end
-        end
-
-        # Parses a tuple from the current position.
+        # line - A line of input as a String.
         #
-        # Returns a String (with quotes removed), or raises a ParseError if unsuccessful.
-        def parse_quoted_string
-          start = @scanner.pos
-          if @scanner.scan(/"/)
-            result = @scanner.scan_until(/"/)
-            unless result
-              raise ParseError, "quoted string not terminated (start at #{start})"
-            end
-            result.chop
-          else
-            error("expected quoted string", start)
-          end
-        end
-
-        # Parses a tuple from the current position.
-        #
-        # Returns an Array, or raises a ParseError if unsuccessful.
-        def parse_tuple
-          start = @scanner.pos
-          if @scanner.scan(/\{/)
-            data = []
-            loop do
-              case @scanner.peek(1)
-              when "}"
-                @scanner.pos += 1
-                break
-              when "" # EOS
-                raise ParseError, "tuple not terminated (start at #{start})"
-              else
-                data << parse_value(:tuple)
-              end
-              @scanner.skip(SEP_PATTERN)
-            end
-            data
-          else
-            error("expected tuple", start)
-          end
-        end
-
-        # Parses an atom from the current position.
-        #
-        # Returns a String, or raises a ParseError if unsuccessful.
-        def parse_atom
-          start = @scanner.pos
-          if @scanner.scan(/:/)
-            @scanner.scan(ATOM_CONTENTS_PATTERN)
-          else
-            error("expected atom", start)
-          end
-        end
-
-        # Parses a list from the current position.
-        #
-        # Returns an Array, or raises a ParseError if unsuccessful.
-        def parse_list
-          start = @scanner.pos
-          if @scanner.scan(/\[/)
-            data = []
-            loop do
-              char = @scanner.peek(1)
-              case @scanner.peek(1)
-              when "]"
-                @scanner.pos += 1
-                break
-              when "" # EOS
-                raise ParseError, "list not terminated (start at #{start})"
-              else
-                data << parse_value(:list)
-              end
-              @scanner.skip(SEP_PATTERN)
-            end
-            # Deal with the edge case where a non-open keyword list is wrapped
-            # in an extra list.
-            if data.length == 1 && data.first.is_a?(Array)
-              data = data.first
-            end
-            data
-          else
-            error("expected list", start)
-          end
-        end
-
-        # Parses a keyword list from the current position.
-        #
-        # Returns a Hash (with String keys).
-        def parse_keyword_list
-          data = {}
-          loop do
-            name = parse_keyword_name
-            value = parse_value(:keyword_list)
-            data[name] = value
-            unless @scanner.peek(1) == ","
-              break
-            end
-            @scanner.skip(SEP_PATTERN)
-          end
-          data
-        end
-
-        # Parses a keyword list from the current position.
-        #
-        # Returns a String or raises a ParseError if unsuccessful.
-        def parse_keyword_name
-          before_name = @scanner.pos
-          name = @scanner.scan(ATOM_CONTENTS_PATTERN)
-          unless name
-            error("expected keyword", before_name)
-          end
-
-          after_name = @scanner.pos
-          if @scanner.scan(/:/)
-            @scanner.skip(WS_PATTERN)
-            name
-          else
-            error("keyword #{name.inspect} is not an atom", after_name)
-          end
-        end
-
-        # Parses atoms, quoted strings, keyword lists, lists, and tuples from
-        # the current position.
-        #
-        # context - The surrounding context of the value as a Symbol, used to
-        #           deal with edge cases around parsing keyword lists.
-        #
-        # Returns a String or raises a ParseError if unsuccessful.
-        def parse_value(context)
-          start = @scanner.pos
-          char = @scanner.peek(1)
-          case char
-          when ":"
-            parse_atom
-          when "'", "\""
-            parse_quoted_string
-          when /[a-z]/
-            if context == :keyword_list
-              # Open keyword lists can't be nested, this should be true, false, or
-              # nil.
-              parse_special_atom
+        # Returns a Hash package entry, or raises a ParserError if unsuccessful.
+        def parse_line(line)
+          match = LINE_PATTERN.match(line)
+          if match
+            data = SCM_PATTERN[match[:scm]].match(match[:contents])
+            if data
+              package_entry(match, data)
             else
-              parse_keyword_list
+              raise ParseError, "Could not extract #{match[:scm]} data from mix.lock line: #{line}"
             end
-          when /\[/
-            parse_list
-          when /\{/
-            parse_tuple
           else
-            error("unknown value", start)
+            raise ParseError, "Unknown mix.lock line format: #{line}"
           end
         end
 
-        # Parse special atoms true, false, and nil.
+        # Format the package information.
         #
-        # Returns true, false, or nil (or raises a ParseError if none of these
-        # could be parsed).
-        def parse_special_atom
-          start = @scanner.pos
-          case @scanner.scan(/true|false|nil/)
-          when "true"
-            true
-          when "false"
-            false
-          when "nil"
-            nil
-          else
-            error("expected true, false, or nil", start)
-          end
-        end
-
-        # Raise a ParseError with position and subsequent input.
+        # match - A MatchData containing name and scm information.
+        # data  - A MatchData containing version and repo information.
         #
-        # message  - the error message as a String.
-        # position - the parser byte position to report as an Integer.
-        def error(message, position)
-          raise ParseError, error_message(message, position)
-        end
-
-        # Format an error message with position and subsequent input.
-        #
-        # text     - the text that will serve as the prefix for the exception
-        #            message, as a String.
-        # position - the parser byte position to report as an Integer.
-        #
-        # Returns a String.
-        def error_message(text, position)
-          preview = @lock[position, 10]
-          "#{text} at position #{position} near #{preview.inspect}"
+        # Returns a Hash representing the package.
+        def package_entry(match, data)
+          {
+            name: match[:name],
+            version: data[:version],
+            metadata: {
+              "scm" => match[:scm],
+              "repo" => data[:repo]
+            }
+          }
         end
       end
     end

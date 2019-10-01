@@ -15,3 +15,7 @@ mix deps.get
 This will create your `mix.lock` lockfile if needed.
 
 Be sure to re-run this command whenever your `mix.exs` dependencies change to update your lockfile and dependency sources.
+
+## Limitations
+
+Because `mix deps.get` does not generate `mix.lock` entries for `:path` dependencies (nor are they stored in `deps/`), license information is not extracted from them.
