@@ -13,17 +13,12 @@ module Licensed
       end
 
       def enumerate_dependencies
-        parsed_dependencies
-      end
-
-      private
-
-      # Returns a memoized Array of Dependency instances.
-      def parsed_dependencies
         find_packages.map do |name, lock_info|
           convert_package_to_dependency(name, lock_info)
         end
       end
+
+      private
 
       # Returns the parsed mix.lock information as a Hash.
       def find_packages
