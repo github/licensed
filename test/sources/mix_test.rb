@@ -30,7 +30,8 @@ if Licensed::Shell.tool_available?("mix")
           assert dep
           assert_equal path, dep.path
           assert_equal "1.3.1", dep.version
-          assert_equal "hex", dep.record["type"]
+          assert_equal "mix", dep.record["type"]
+          assert_equal "hex", dep.record["scm"]
           assert_equal "hexpm", dep.record["repo"]
         end
       end
@@ -42,7 +43,8 @@ if Licensed::Shell.tool_available?("mix")
           assert dep
           assert_equal path, dep.path
           assert_equal "1.4.10", dep.version
-          assert_equal "hex", dep.record["type"]
+          assert_equal "mix", dep.record["type"]
+          assert_equal "hex", dep.record["scm"]
           assert_equal "hexpm", dep.record["repo"]
         end
       end

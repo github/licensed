@@ -9,7 +9,7 @@ module Licensed
 
       # Returns whether a mix.lock is present
       def enabled?
-        File.exists?(LOCKFILE)
+        File.exists?(config.pwd.join(LOCKFILE))
       end
 
       def enumerate_dependencies
@@ -20,15 +20,15 @@ module Licensed
 
       # Returns a memoized Array of Dependency instances.
       def parsed_dependencies
-        @parsed_dependencies ||= find_packages.map do |name, lock_info|
+        find_packages.map do |name, lock_info|
           convert_package_to_dependency(name, lock_info)
         end
       end
 
       # Returns the parsed mix.lock information as a Hash.
       def find_packages
-        lockfile = File.read(LOCKFILE)
-        LockfileParser.run(lockfile)
+        contents = File.read(config.pwd.join(LOCKFILE))
+        LockfileParser.run(contents)
       end
 
       # Converts a raw package representation to a dependency.
@@ -64,7 +64,8 @@ module Licensed
             version: lock_info[2],
             path: path,
             metadata: {
-              "type" => "git",
+              "type" => self.class.type,
+              "scm" => "git",
               "repo" => lock_info[1]
             },
             errors: errors
@@ -75,7 +76,8 @@ module Licensed
             path: path,
             errors: errors << "unknown mix.lock format",
             metadata: {
-              "type" => "git"
+              "type" => self.class.type,
+              "scm" => "git"
             }
           )
         end
@@ -96,7 +98,8 @@ module Licensed
             version: lock_info[2],
             path: path,
             metadata: {
-              "type" => "hex",
+              "type" => self.class.type,
+              "scm" => "hex",
               "repo" => lock_info.last
             },
             errors: errors
@@ -107,7 +110,8 @@ module Licensed
             path: path,
             errors: errors << "unknown mix.lock format",
             metadata: {
-              "type" => "hex"
+              "type" => self.class.type,
+              "scm" => "hex"
             }
           )
         end
@@ -134,7 +138,7 @@ module Licensed
       #
       # Returns a String.
       def dep_path(name)
-        File.absolute_path(File.join(".", "deps", name))
+        config.pwd.join("deps", name)
       end
 
       class LockfileParser
