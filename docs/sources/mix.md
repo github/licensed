@@ -19,3 +19,5 @@ Be sure to re-run this command whenever your `mix.exs` dependencies change to up
 ## Limitations
 
 Because `mix deps.get` does not generate `mix.lock` entries for `:path` dependencies (nor are they stored in `deps/`), license information is not extracted from them.
+
+If you need to extract license information from dependencies from another local directory (that is a Git repository), consider using a `:git` dependency with a file path in your `mix.exs`.
