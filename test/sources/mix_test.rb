@@ -71,5 +71,57 @@ if Licensed::Shell.tool_available?("mix")
         end
       end
     end
+
+    describe "lockfile parser" do
+      describe "with an invalid lockfile" do
+        let(:lockfile) { %Q(%{\n"bad": {"entry"}\n}) }
+
+        it "raises a Licensed::Sources::Source::Error" do
+          assert_raises Licensed::Sources::Source::Error do
+            parse_lockfile_contents(lockfile)
+          end
+        end
+      end
+
+      describe "with a valid hex line" do
+        let(:lockfile) { %Q(%{\n"foo": {:hex, :foo, "1.2.3", "30ce04ab3175b6ad0bdce0035cba77bba68b813d523d1aac73d9781b4d193cf8", [:mix], [], "hexpm"},\n}) }
+
+        it "returns an entry for a valid package" do
+          expectation = [
+            {
+              :name => "foo",
+              :version => "1.2.3",
+              :metadata => {"scm" => "hex", "repo" => "hexpm"}
+            }
+          ]
+          assert_equal expectation, parse_lockfile_contents(lockfile)
+        end
+      end
+
+      describe "with a invalid hex line" do
+        let(:lockfile) { %Q(%{\n"absinthe": {:hex, 1, 2},\n}) }
+
+        it "returns an entry for an invalid package" do
+          expectation = [
+            {
+              :name => "absinthe",
+              :version => nil,
+              :metadata => {"scm" => "hex"},
+              :error => "Could not extract data from mix.lock line: \"absinthe\": {:hex, 1, 2},\n"
+            }
+          ]
+          assert_equal expectation, parse_lockfile_contents(lockfile)
+        end
+      end
+    end
+
+    # Utility to parse the contents of a lockfile.
+    #
+    # contents - The contents of the mix.lock as a String.
+    #
+    # Returns the result of Licensed::Sources::Mix::LockfileParser#result.
+    def parse_lockfile_contents(contents)
+      Licensed::Sources::Mix::LockfileParser.new(contents.lines).result
+    end
   end
 end

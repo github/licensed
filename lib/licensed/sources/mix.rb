@@ -146,22 +146,22 @@ module Licensed
           if match
             data = SCM_PATTERN[match[:scm]].match(match[:contents])
             if data
-              package_entry(match, data)
+              valid_package_entry(match, data)
             else
-              raise ParseError, "Could not extract #{match[:scm]} data from mix.lock line: #{line}"
+              invalid_package_entry(match, line)
             end
           else
-            raise ParseError, "Unknown mix.lock line format: #{line}"
+            raise Licensed::Sources::Source::Error, "Unknown mix.lock line format: #{line}"
           end
         end
 
-        # Format the package information.
+        # Format a valid package entry.
         #
         # match - A MatchData containing name and scm information.
         # data  - A MatchData containing version and repo information.
         #
         # Returns a Hash representing the package.
-        def package_entry(match, data)
+        def valid_package_entry(match, data)
           {
             name: match[:name],
             version: data[:version],
@@ -169,6 +169,23 @@ module Licensed
               "scm" => match[:scm],
               "repo" => data[:repo]
             }
+          }
+        end
+
+        # Format an invalid package entry.
+        #
+        # match - A MatchData containing name and scm information.
+        # line  - The line from mix.lock that could not be parsed, as a String.
+        #
+        # Returns a Hash representing the package, with error information.
+        def invalid_package_entry(match, line)
+          {
+            name: match[:name],
+            version: nil,
+            metadata: {
+              "scm" => match[:scm]
+            },
+            error: "Could not extract data from mix.lock line: #{line}"
           }
         end
       end
