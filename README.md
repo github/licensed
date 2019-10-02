@@ -16,7 +16,7 @@ Licensed is in active development and currently used at GitHub.  See the [open i
 
 Licensed v2 includes many internal changes intended to make licensed more extensible and easier to update in the future.  While not too much has changed externally, v2 is incompatible with configuration files and cached records from previous versions.  Fortunately, migrating is easy using the `licensed migrate` command.
 
-See [CHANGELOG.md](./CHANGELOG.md) for more details on whats changed.
+See [CHANGELOG.md](./CHANGELOG.md) for more details on what's changed.
 See the [migration documentation](./docs/migrating_to_newer_versions.md) for more info on migrating to v2, or run `licensed help migrate`.
 
 ## Installation
@@ -50,7 +50,7 @@ For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/loc
 
 #### Dependencies
 
-Licensed uses the the `libgit2` bindings for Ruby provided by `rugged`. `rugged` has its own dependencies - `cmake` and `pkg-config` - which you may need to install before you can install Licensed.
+Licensed uses the `libgit2` bindings for Ruby provided by `rugged`. `rugged` has its own dependencies - `cmake` and `pkg-config` - which you may need to install before you can install Licensed.
 
 For example, on macOS with Homebrew: `brew install cmake pkg-config` and on Ubuntu: `apt-get install cmake pkg-config`.
 
