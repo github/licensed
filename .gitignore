@@ -28,6 +28,9 @@ test/fixtures/pipenv/Pipfile.lock
 !test/fixtures/migrations/**/*
 test/fixtures/composer/**/*
 !test/fixtures/composer/composer.json
+test/fixtures/mix/_build
+test/fixtures/mix/deps
+test/fixtures/mix/mix.lock
 
 vendor/licenses
 .licenses

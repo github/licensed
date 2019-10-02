@@ -1,6 +1,6 @@
 name: Test
 
-on: 
+on:
   push:
     branches:
     - "*"
@@ -230,3 +230,26 @@ jobs:
       run: script/source-setup/composer
     - name: Run tests
       run: script/test composer
+
+  mix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: [21.x, 22.x]
+        elixir: [1.8.x, 1.9.x]
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-elixir@v1.0.0
+      with:
+        otp-version: ${{matrix.otp}}
+        elixir-version: ${{matrix.elixir}}
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/mix
+    - name: Run tests
+      run: script/test mix
