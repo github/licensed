@@ -87,6 +87,7 @@ allowed:
   - cc0-1.0
 
 # These dependencies are explicitly ignored.
+# They shouldn't be cached at all, and will not have cached metadata written to the repo.
 ignored:
   bundler:
     - some-internal-gem
@@ -95,6 +96,7 @@ ignored:
     - some-internal-package
 
 # These dependencies have been reviewed.
+# They need to be cached and checked, but do not have a license found that matches the allowed configured licenses.
 reviewed:
   bundler:
     - bcrypt-ruby
