@@ -51,12 +51,21 @@ jobs:
 
   cabal:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ghc: [ '8.2.2', '8.6.5' ]
+        cabal: [ '2.0', '3.0' ]
     steps:
     - uses: actions/checkout@master
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
         version: 2.6.x
+    - name: Setup Haskell
+      uses: actions/setup-haskell@v1
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        cabal-version: ${{ matrix.cabal }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
