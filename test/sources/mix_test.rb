@@ -89,9 +89,9 @@ if Licensed::Shell.tool_available?("mix")
         it "returns an entry for a valid package" do
           expectation = [
             {
-              :name => "foo",
-              :version => "1.2.3",
-              :metadata => {"scm" => "hex", "repo" => "hexpm"}
+              name: "foo",
+              version: "1.2.3",
+              metadata: {"scm" => "hex", "repo" => "hexpm"}
             }
           ]
           assert_equal expectation, parse_lockfile_contents(lockfile)
@@ -104,10 +104,10 @@ if Licensed::Shell.tool_available?("mix")
         it "returns an entry for an invalid package" do
           expectation = [
             {
-              :name => "absinthe",
-              :version => nil,
-              :metadata => {"scm" => "hex"},
-              :error => "Could not extract data from mix.lock line: \"absinthe\": {:hex, 1, 2},\n"
+              name: "absinthe",
+              version: nil,
+              metadata: {"scm" => "hex"},
+              error: "Could not extract data from mix.lock line: \"absinthe\": {:hex, 1, 2},\n"
             }
           ]
           assert_equal expectation, parse_lockfile_contents(lockfile)
