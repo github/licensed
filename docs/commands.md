@@ -18,6 +18,8 @@ Dependency records will be saved if:
 
 After the cache command is run, any cached records that don't match up to a current application dependency will be deleted.
 
+Do `bundle plugin install bundler-licensed` to automatically run `licensed cache` after running `bundle install` or `bundle update` commands.
+
 ## `status`
 
 The status command finds all dependencies and checks whether each dependency has a valid cached record.
