@@ -63,6 +63,10 @@ For example, on macOS with Homebrew: `brew install cmake pkg-config` and on Ubun
 
 See the [commands documentation](./docs/commands.md) for additional documentation, or run `licensed -h` to see all of the current available commands.
 
+### Automation
+
+The [bundler-licensed plugin](https://github.com/sergey-alekseev/bundler-licensed) runs `licensed cache` automatically when using `bundler`.  See the linked repo for usage and details.
+
 ### Configuration
 
 All commands, except `version`, accept a `-c|--config` option to specify a path to a configuration file or directory.
