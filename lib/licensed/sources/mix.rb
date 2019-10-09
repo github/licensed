@@ -8,7 +8,7 @@ module Licensed
 
       # Returns whether a mix.lock is present
       def enabled?
-        File.exists?(lockfile_path)
+        File.exist?(lockfile_path)
       end
 
       def enumerate_dependencies

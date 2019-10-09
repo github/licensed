@@ -9,11 +9,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      .
-  build-depends:       zlib == 0.6.2
+  build-depends:       fused-effects == 0.4.0.0
   default-language:    Haskell2010
 
 executable app
   hs-source-dirs:      app
   main-is:             Main.hs
-  build-depends:       base, Glob == 0.9.2
+  build-depends:       base, semilattices == 0.0.0.4
   default-language:    Haskell2010
