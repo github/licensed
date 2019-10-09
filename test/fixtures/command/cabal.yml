@@ -1,4 +1,4 @@
-expected_dependency: zlib
+expected_dependency: fused-effects
 source_path: test/fixtures/cabal
 cache_path: test/fixtures/cabal/.licenses
 cabal:

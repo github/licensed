@@ -40,10 +40,10 @@ if Licensed::Shell.tool_available?("ghc")
       it "finds direct dependencies" do
         config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "zlib" }
+          dep = source.dependencies.detect { |d| d.name == "fused-effects" }
           assert dep
           assert_equal "cabal", dep.record["type"]
-          assert_equal "0.6.2", dep.version
+          assert_equal "0.5.0.1", dep.version
           assert dep.record["summary"]
         end
       end
@@ -51,10 +51,10 @@ if Licensed::Shell.tool_available?("ghc")
       it "finds dependencies for executables" do
         config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "Glob" }
+          dep = source.dependencies.detect { |d| d.name == "semilattices" }
           assert dep
           assert_equal "cabal", dep.record["type"]
-          assert_equal "0.9.2", dep.version
+          assert_equal "0.0.0.4", dep.version
           assert dep.record["summary"]
         end
       end
@@ -70,7 +70,7 @@ if Licensed::Shell.tool_available?("ghc")
         # look in a location that doesn't contain any packages
         config["cabal"] = { "ghc_package_db" => [Dir.pwd] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "zlib" }
+          dep = source.dependencies.detect { |d| d.name == "fused-effects" }
           assert dep
           assert_includes dep.errors, "package not found"
         end
