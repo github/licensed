@@ -23,10 +23,11 @@ if Licensed::Shell.tool_available?("ghc")
     end
 
     describe "dependencies" do
+      let(:cabal_db) { "~/.cabal/store/ghc-<ghc_version>/package.db" }
       let(:local_db) { File.join(fixtures, "dist-newstyle/packagedb/ghc-<ghc_version>") }
 
       it "finds indirect dependencies" do
-        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "bytestring" }
           assert dep
@@ -37,7 +38,7 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "finds direct dependencies" do
-        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "zlib" }
           assert dep
@@ -48,7 +49,7 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "finds dependencies for executables" do
-        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "Glob" }
           assert dep
@@ -59,7 +60,7 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "does not include the target project" do
-        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db] }
+        config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
           refute source.dependencies.detect { |d| d.name == "app" }
         end
