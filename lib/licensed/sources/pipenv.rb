@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "parallel"
+
 module Licensed
   module Sources
     class Pipenv < Source
@@ -8,7 +10,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        pakages_from_pipfile_lock.map do |package_name|
+        Parallel.map(pakages_from_pipfile_lock, in_threads: Parallel.processor_count) do |package_name|
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
