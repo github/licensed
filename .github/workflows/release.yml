@@ -18,7 +18,7 @@ jobs:
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
 
     - name: Build package
       run: script/packages/linux
@@ -39,7 +39,7 @@ jobs:
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
 
     - name: Build package
       run: script/packages/mac
@@ -60,7 +60,7 @@ jobs:
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
 
     - name: Build gem
       run: gem build *.gemspec
@@ -88,7 +88,7 @@ jobs:
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
 
     - name: Download linux package
       uses: actions/download-artifact@master
