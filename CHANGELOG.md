@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.6.0
+2019-10-22
+
+### Added
+- Mix source for Elixir (:tada: @bruce https://github.com/github/licensed/pull/195)
+
 ## 2.5.0
 2019-09-26
 
@@ -223,4 +229,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.5.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.6.0...HEAD
