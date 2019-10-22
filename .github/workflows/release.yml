@@ -5,7 +5,7 @@ on: create
 jobs:
   tag_filter:
     runs-on: ubuntu-latest
-    if: startsWith('refs/tags/', github.ref)
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - run: exit 0
 
