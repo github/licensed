@@ -1,13 +1,17 @@
 name: Create release
 
-on:
-  push:
-    tags:
-      - '*'
+on: create
 
 jobs:
+  tag_filter:
+    runs-on: ubuntu-latest
+    if: startsWith('refs/tags/', github.ref)
+    steps:
+      - run: exit 0
+
   package_linux:
     runs-on: ubuntu-latest
+    needs: tag_filter
 
     steps:
     - uses: actions/checkout@master
@@ -28,6 +32,7 @@ jobs:
 
   package_mac:
     runs-on: macOS-latest
+    needs: tag_filter
 
     steps:
     - uses: actions/checkout@master
@@ -48,6 +53,7 @@ jobs:
 
   build_gem:
     runs-on: ubuntu-latest
+    needs: tag_filter
 
     steps:
     - uses: actions/checkout@master
