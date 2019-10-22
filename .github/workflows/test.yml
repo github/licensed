@@ -15,11 +15,11 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v1
       with:
-        version: 8
+        node-version: 8
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -37,7 +37,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Set up Bundler
       run: |
         yes | gem uninstall bundler --all
@@ -60,7 +60,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Setup Haskell
       uses: actions/setup-haskell@v1
       with:
@@ -83,7 +83,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: ${{matrix.ruby}}
+        ruby-version: ${{matrix.ruby}}
     - name: Set up Bundler
       run: gem install bundler
     - name: Bootstrap
@@ -104,7 +104,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -126,7 +126,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -144,11 +144,11 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v1
       with:
-        version: ${{ matrix.node_version }}
+        node-version: ${{ matrix.node_version }}
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -163,7 +163,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Gradle version
@@ -186,7 +186,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Install virtualenv
@@ -208,7 +208,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Install pipenv
@@ -232,7 +232,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -255,7 +255,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
-        version: 2.6.x
+        ruby-version: 2.6.x
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
