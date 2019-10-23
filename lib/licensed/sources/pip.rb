@@ -1,6 +1,8 @@
 # frozen_string_literal: true
-require "json"
+
 require "English"
+require "json"
+require "parallel"
 
 module Licensed
   module Sources
@@ -14,7 +16,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        packages_from_requirements_txt.map do |package_name|
+        Parallel.map(packages_from_requirements_txt, in_threads: Parallel.processor_count) do |package_name|
           package = package_info(package_name)
           location = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
