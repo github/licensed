@@ -9,11 +9,11 @@ module Licensed
       end
 
       def enabled?
-        Licensed::Shell.tool_available?("npm") && File.exist?(@config.pwd.join("package.json"))
+        Licensed::Shell.tool_available?("npm") && File.exist?(config.pwd.join("package.json"))
       end
 
       def enumerate_dependencies
-        @yarn_lock_present = File.exist?(@config.pwd.join("yarn.lock"))
+        @yarn_lock_present = File.exist?(config.pwd.join("yarn.lock"))
         packages.map do |name, package|
           path = package["path"]
           Dependency.new(

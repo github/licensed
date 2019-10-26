@@ -196,12 +196,12 @@ module Licensed
       def gopath
         return @gopath if defined?(@gopath)
 
-        path = @config.dig("go", "GOPATH")
+        path = config.dig("go", "GOPATH")
         @gopath = if path.nil? || path.empty?
                     ENV["GOPATH"]
                   else
                     root = begin
-                             @config.root
+                             config.root
                            rescue Licensed::Shell::Error
                              Pathname.pwd
                            end

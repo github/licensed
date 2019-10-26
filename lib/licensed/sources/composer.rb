@@ -49,12 +49,12 @@ module Licensed
       end
 
       def composer_application_path
-        setting = @config.dig("composer", "application_path") || DEFAULT_COMPOSER_APPLICATON_PATH
-        File.expand_path(setting, @config.pwd)
+        setting = config.dig("composer", "application_path") || DEFAULT_COMPOSER_APPLICATON_PATH
+        File.expand_path(setting, config.pwd)
       end
 
       def composer_lock
-        @config.pwd.join("composer.lock")
+        config.pwd.join("composer.lock")
       end
     end
   end
