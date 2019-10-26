@@ -29,7 +29,8 @@ if Licensed::Shell.tool_available?("mix")
           path = File.absolute_path(File.join(".", "deps", "mime"))
           assert dep
           assert_equal path, dep.path
-          assert_equal "1.3.1", dep.version
+          # mime requirement from plug is `~> 1.0`
+          assert Gem::Requirement.new("~> 1.0").satisfied_by?(Gem::Version.new(dep.version))
           assert_equal "mix", dep.record["type"]
           # Mix-specific values
           assert_equal "hex", dep.record["scm"]

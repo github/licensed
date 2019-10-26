@@ -41,7 +41,8 @@ if Licensed::Shell.tool_available?("pipenv")
           dep = source.dependencies.detect { |d| d.name == "isort" }
           assert dep
           assert_equal "pipenv", dep.record["type"]
-          assert /^4\..*$/.match dep.version
+          # pylint requires isort <5,>=4.2.5
+          assert Gem::Requirement.new("<5", ">=4.2.5").satisfied_by?(Gem::Version.new(dep.version))
           assert dep.record["homepage"]
           assert dep.record["summary"]
         end
