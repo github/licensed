@@ -13,7 +13,6 @@ module Licensed
       end
 
       def enumerate_dependencies
-        @yarn_lock_present = File.exist?(config.pwd.join("yarn.lock"))
         packages.map do |name, package|
           path = package["path"]
           Dependency.new(
@@ -49,7 +48,7 @@ module Licensed
       # package name to it's metadata
       def recursive_dependencies(dependencies, result = {})
         dependencies.each do |name, dependency|
-          next if @yarn_lock_present && dependency["missing"]
+          next if yarn_lock_present && dependency["missing"]
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
@@ -59,6 +58,11 @@ module Licensed
       # Returns the output from running `npm list` to get package metadata
       def package_metadata_command
         Licensed::Shell.execute("npm", "list", "--json", "--production", "--long", allow_failure: true)
+      end
+
+      # Returns true if a yarn.lock file exists in the current directory
+      def yarn_lock_present
+        @yarn_lock_present ||= File.exist?(config.pwd.join("yarn.lock"))
       end
     end
   end
