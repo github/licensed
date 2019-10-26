@@ -43,7 +43,7 @@ module Licensed
           end
         end
 
-        package_ids.map { |id| package_info(id) }.concat(missing)
+        Parallel.map(package_ids) { |id| package_info(id) }.concat(missing)
       end
 
       # Returns the packages document directory and search root directory
@@ -85,7 +85,7 @@ module Licensed
 
         results.merge new_packages
 
-        dependencies = new_packages.flat_map { |n| package_dependencies(n) }
+        dependencies = Parallel.map(new_packages, &method(:package_dependencies)).flatten
 
         return results if dependencies.empty?
 

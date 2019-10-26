@@ -54,7 +54,7 @@ module Licensed
       def root_package_deps
         # check for ignored packages to avoid raising errors calling `go list`
         # when ignored package is not found
-        Array(root_package["Deps"]).map { |name| package_info(name) }
+        Parallel.map(Array(root_package["Deps"])) { |name| package_info(name) }
       end
 
       # Returns the list of dependencies as returned by "go list -json -deps"
