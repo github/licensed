@@ -262,3 +262,16 @@ jobs:
       run: script/source-setup/mix
     - name: Run tests
       run: script/test mix
+
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Run tests
+      run: script/test manifest
