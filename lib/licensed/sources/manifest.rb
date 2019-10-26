@@ -12,7 +12,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        packages.map do |package_name, sources|
+        Parallel.map(packages) do |package_name, sources|
           Licensed::Sources::Manifest::Dependency.new(
             name: package_name,
             version: contents_version(*sources),
@@ -79,15 +79,15 @@ module Licensed
 
       # Returns the manifest location for the app
       def manifest_path
-        path = @config.dig("manifest", "path")
-        return @config.root.join(path) if path
+        path = config.dig("manifest", "path")
+        return config.root.join(path) if path
 
-        @config.cache_path.join("manifest.json")
+        config.cache_path.join("manifest.json")
       end
 
       # Returns whether a manifest should be generated automatically
       def generate_manifest?
-        !File.exist?(manifest_path) && !@config.dig("manifest", "dependencies").nil?
+        !File.exist?(manifest_path) && !config.dig("manifest", "dependencies").nil?
       end
 
       # Returns a manifest of files generated automatically based on patterns
@@ -128,7 +128,7 @@ module Licensed
       # Returns the project dependencies specified from the licensed configuration
       def configured_dependencies
         @configured_dependencies ||= begin
-          dependencies = @config.dig("manifest", "dependencies")&.dup || {}
+          dependencies = config.dig("manifest", "dependencies")&.dup || {}
 
           dependencies.each do |name, patterns|
             # map glob pattern(s) listed for the dependency to a listing
@@ -142,7 +142,7 @@ module Licensed
 
       # Returns the set of project files that are included in dependency evaluation
       def included_files
-        @sources ||= all_files - files_from_pattern_list(@config.dig("manifest", "exclude"))
+        @sources ||= all_files - files_from_pattern_list(config.dig("manifest", "exclude"))
       end
 
       # Finds and returns all files in the project that match
@@ -151,7 +151,7 @@ module Licensed
         return Set.new if patterns.nil? || patterns.empty?
 
         # evaluate all patterns from the project root
-        Dir.chdir @config.root do
+        Dir.chdir config.root do
           Array(patterns).reduce(Set.new) do |files, pattern|
             if pattern.start_with?("!")
               # if the pattern is an exclusion, remove all matching files
