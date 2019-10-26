@@ -14,7 +14,7 @@ module Licensed
 
       def enumerate_dependencies
         with_configured_gopath do
-          packages.map do |package|
+          Parallel.map(packages) do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
             error = package.dig("Error", "Err") if package["Error"]
             package_dir = package["Dir"]
@@ -54,7 +54,7 @@ module Licensed
       def root_package_deps
         # check for ignored packages to avoid raising errors calling `go list`
         # when ignored package is not found
-        Array(root_package["Deps"]).map { |name| package_info(name) }
+        Parallel.map(Array(root_package["Deps"])) { |name| package_info(name) }
       end
 
       # Returns the list of dependencies as returned by "go list -json -deps"
@@ -104,20 +104,18 @@ module Licensed
 
         # find most recent git SHA for a package, or nil if SHA is
         # not available
-        Dir.chdir package_directory do
-          contents_version *contents_version_arguments
-        end
+        contents_version *contents_version_arguments(package_directory)
       end
 
       # Determines the arguments to pass to contents_version based on which
       # version strategy is selected
       #
       # Returns an array of arguments to pass to contents version
-      def contents_version_arguments
+      def contents_version_arguments(package_directory)
         if version_strategy == Licensed::Sources::ContentVersioning::GIT
-          ["."]
+          [package_directory]
         else
-          Dir["*"]
+          Dir[File.join(package_directory, "*")]
         end
       end
 
