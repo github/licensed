@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.6.1
+2019-10-26
+
+### Changed
+- Performance improvements during dependency enumeration (:tada: @krzysztof-pawlik-gat https://github.com/github/licensed/pull/204, https://github.com/github/licensed/pull/207) (https://github.com/github/licensed/pull/210)
+
 ## 2.6.0
 2019-10-22
 
@@ -229,4 +235,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.6.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.6.1...HEAD
