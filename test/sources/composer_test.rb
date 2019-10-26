@@ -57,7 +57,8 @@ if Licensed::Shell.tool_available?("php")
           dep = source.dependencies.detect { |dep| dep.name == "psr/log" }
           assert dep
           assert_equal "composer", dep.record["type"]
-          assert_equal "1.1.0", dep.version
+          # psr/log requirement for monolog/monolog is `~1.0`
+          assert Gem::Requirement.new("~> 1.0").satisfied_by?(Gem::Version.new(dep.version))
           assert dep.record["homepage"]
           assert dep.record["summary"]
           assert dep.path
