@@ -12,7 +12,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        packages.map do |package|
+        Parallel.map(packages) do |package|
           Dependency.new(
             name: package["name"],
             version: package["version"],
