@@ -6,7 +6,7 @@ module Licensed
   module Sources
     class Pipenv < Source
       def enabled?
-        Licensed::Shell.tool_available?("pipenv") && File.exist?(@config.pwd.join("Pipfile.lock"))
+        Licensed::Shell.tool_available?("pipenv") && File.exist?(config.pwd.join("Pipfile.lock"))
       end
 
       def enumerate_dependencies

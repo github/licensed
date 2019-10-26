@@ -52,7 +52,7 @@ module Licensed
         unless package["haddock-html"]
           # default to a local vendor directory if haddock-html property
           # isn't available
-          return [File.join(@config.pwd, "vendor", package["name"]), nil]
+          return [File.join(config.pwd, "vendor", package["name"]), nil]
         end
 
         html_dir = package["haddock-html"]
@@ -131,10 +131,10 @@ module Licensed
       # Returns an array of ghc package DB locations as specified in the app
       # configuration
       def package_db_args
-        @package_db_args ||= Array(@config.dig("cabal", "ghc_package_db")).map do |path|
+        @package_db_args ||= Array(config.dig("cabal", "ghc_package_db")).map do |path|
           next "--#{path}" if %w(global user).include?(path)
           path = realized_ghc_package_path(path)
-          path = File.expand_path(path, @config.root)
+          path = File.expand_path(path, config.root)
 
           next unless File.exist?(path)
           "--package-db=#{path}"
@@ -196,14 +196,14 @@ module Licensed
 
       # Returns the targets to search for `build-depends` in a cabal file
       def cabal_file_targets
-        targets = Array(@config.dig("cabal", "cabal_file_targets"))
+        targets = Array(config.dig("cabal", "cabal_file_targets"))
         targets.push(*DEFAULT_TARGETS) if targets.empty?
         targets
       end
 
       # Returns an array of the local directory cabal package files
       def cabal_files
-        @cabal_files ||= Dir.glob(File.join(@config.pwd, "*.cabal"))
+        @cabal_files ||= Dir.glob(File.join(config.pwd, "*.cabal"))
       end
 
       # Returns the ghc cli tool version

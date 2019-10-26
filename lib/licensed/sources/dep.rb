@@ -10,8 +10,8 @@ module Licensed
 
       def enumerate_dependencies
         packages.map do |package|
-          package_dir = @config.pwd.join("vendor", package[:name])
-          search_root = @config.pwd.join("vendor", package[:project])
+          package_dir = config.pwd.join("vendor", package[:name])
+          search_root = config.pwd.join("vendor", package[:project])
 
           Dependency.new(
             name: package[:name],
@@ -52,7 +52,7 @@ module Licensed
       end
 
       def gopkg_lock_path
-        @config.pwd.join("Gopkg.lock")
+        config.pwd.join("Gopkg.lock")
       end
 
       # Returns a list of go standard packages

@@ -5,7 +5,7 @@ module Licensed
   module Sources
     class Bower < Source
       def enabled?
-        [@config.pwd.join(".bowerrc"), @config.pwd.join("bower.json")].any? do |path|
+        [config.pwd.join(".bowerrc"), config.pwd.join("bower.json")].any? do |path|
           File.exist?(path)
         end
       end
@@ -30,7 +30,7 @@ module Licensed
       # Returns a parsed ".bowerrc" configuration, or an empty hash if not found
       def bower_config
         @bower_config ||= begin
-          path = @config.pwd.join(".bowerrc")
+          path = config.pwd.join(".bowerrc")
           path.exist? ? JSON.parse(path.read) : {}
         end
       end
@@ -38,7 +38,7 @@ module Licensed
       # Returns the expected path to bower components.
       # Note this does not validate that the returned path is valid
       def bower_path
-        pwd = bower_config["cwd"] ? Pathname.new(bower_config["cwd"]).expand_path : @config.pwd
+        pwd = bower_config["cwd"] ? Pathname.new(bower_config["cwd"]).expand_path : config.pwd
         pwd.join bower_config["directory"] || "bower_components"
       end
     end

@@ -20,7 +20,7 @@ module Licensed
         git_submodules_command.lines.map do |line|
           displaypath, toplevel, version, homepage = line.strip.split
           name = File.basename(displaypath)
-          submodule_path = if toplevel == @config.pwd.to_s
+          submodule_path = if toplevel == config.pwd.to_s
             name
           else
             parent = File.basename(toplevel)
@@ -31,7 +31,7 @@ module Licensed
           Licensed::Dependency.new(
             name: submodule_path,
             version: version,
-            path: @config.pwd.join(displaypath),
+            path: config.pwd.join(displaypath),
             metadata: {
               "type" => self.class.type,
               "name" => name,
@@ -50,7 +50,7 @@ module Licensed
       end
 
       def gitmodules_path
-        @config.pwd.join(".gitmodules")
+        config.pwd.join(".gitmodules")
       end
     end
   end

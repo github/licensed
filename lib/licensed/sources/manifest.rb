@@ -28,10 +28,10 @@ module Licensed
 
       # Returns the license path for a package specified in the configuration.
       def configured_license_path(package_name)
-        license_path = @config.dig("manifest", "licenses", package_name)
+        license_path = config.dig("manifest", "licenses", package_name)
         return unless license_path
 
-        license_path = @config.root.join(license_path)
+        license_path = config.root.join(license_path)
         return unless license_path.exist?
         license_path
       end
@@ -46,7 +46,7 @@ module Licensed
           # don't allow the workspace root to be used as common prefix
           # the project this is run for should be excluded from the manifest,
           # or ignored in the config.  any license in the root should be ignored.
-          return common_prefix if common_prefix != @config.root
+          return common_prefix if common_prefix != config.root
         end
 
         # use the first (or only) sources directory to find license information
@@ -61,7 +61,7 @@ module Licensed
         manifest.each_with_object({}) do |(src, package_name), hsh|
           next if src.nil? || src.empty?
           hsh[package_name] ||= []
-          hsh[package_name] << File.join(@config.root, src)
+          hsh[package_name] << File.join(config.root, src)
         end
       end
 
