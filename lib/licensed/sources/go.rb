@@ -14,7 +14,7 @@ module Licensed
 
       def enumerate_dependencies
         with_configured_gopath do
-          Parallel.map(packages) do |package|
+          packages.map do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
             error = package.dig("Error", "Err") if package["Error"]
             package_dir = package["Dir"]
@@ -104,18 +104,20 @@ module Licensed
 
         # find most recent git SHA for a package, or nil if SHA is
         # not available
-        contents_version *contents_version_arguments(package_directory)
+        Dir.chdir package_directory do
+          contents_version *contents_version_arguments
+        end
       end
 
       # Determines the arguments to pass to contents_version based on which
       # version strategy is selected
       #
       # Returns an array of arguments to pass to contents version
-      def contents_version_arguments(package_directory)
+      def contents_version_arguments
         if version_strategy == Licensed::Sources::ContentVersioning::GIT
-          [package_directory]
+          ["."]
         else
-          Dir[File.join(package_directory, "*")]
+          Dir["*"]
         end
       end
 
