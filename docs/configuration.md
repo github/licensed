@@ -95,6 +95,10 @@ ignored:
   bower:
     - some-internal-package
 
+  # Wildcards (*) are only supported in the `ignored` section.
+  npm:
+    - @company/*
+
 # These dependencies have been reviewed.
 # They need to be cached and checked, but do not have a license found that matches the allowed configured licenses.
 reviewed:

@@ -59,6 +59,16 @@ describe Licensed::Commands::Status do
     assert dependency_errors.empty?
   end
 
+  it "does not warn if dependency is ignored with a wildcard" do
+    verifier.run
+    assert dependency_errors.any?
+
+    config.ignore "type" => "test", "name" => "dep*"
+    verifier.run
+
+    assert dependency_errors.empty?
+  end
+
   it "does not warn if dependency is reviewed" do
     verifier.run
     assert dependency_errors.any?

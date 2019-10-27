@@ -75,7 +75,7 @@ module Licensed
 
     # Is the given dependency ignored?
     def ignored?(dependency)
-      Array(self["ignored"][dependency["type"]]).include?(dependency["name"])
+      ignored_matchers(dependency["type"]).include?(dependency["name"])
     end
 
     # Is the license of the dependency allowed?
@@ -85,6 +85,7 @@ module Licensed
 
     # Ignore a dependency
     def ignore(dependency)
+      @ignored_matchers = nil # clear cache
       (self["ignored"][dependency["type"]] ||= []) << dependency["name"]
     end
 
@@ -99,6 +100,11 @@ module Licensed
     end
 
     private
+
+    def ignored_matchers(type)
+      @ignored_matchers ||= {}
+      @ignored_matchers[type] ||= Matchers::List.new(self["ignored"][type])
+    end
 
     def defaults_for(options, inherited_options)
       name = options["name"] || File.basename(options["source_path"])
