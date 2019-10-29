@@ -103,7 +103,7 @@ module Licensed
 
     def ignored_matchers(type)
       @ignored_matchers ||= {}
-      @ignored_matchers[type] ||= MatchersList.new(self["ignored"][type])
+      @ignored_matchers[type] ||= WildcardsList.new(self["ignored"][type])
     end
 
     def defaults_for(options, inherited_options)
