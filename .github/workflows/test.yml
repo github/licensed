@@ -24,7 +24,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -51,7 +51,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -80,7 +80,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - uses: actions/cache@preview
       with:
         path: test/fixtures/cabal/dist-newstyle
@@ -109,7 +109,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-${{ matrix.ruby }}-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Build and lint
@@ -133,7 +133,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -160,7 +160,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -187,7 +187,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -206,7 +206,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Gradle version
@@ -234,7 +234,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Install virtualenv
@@ -261,7 +261,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Install pipenv
@@ -290,7 +290,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -318,7 +318,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -338,7 +338,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('Gemfile.lock') }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Run tests
