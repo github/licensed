@@ -84,7 +84,7 @@ jobs:
     - uses: actions/cache@preview
       with:
         path: test/fixtures/cabal/dist-newstyle
-        key: ${{ runner.os }}-fixtures-cabal-${{ matrix.ghc }}-${{ matrix.cabal }}-${{ hashFiles('test/fixtures/cabal/app.cabal') }}
+        key: ${{ runner.os }}-fixtures-cabal-${{ matrix.ghc }}-${{ matrix.cabal }}-${{ hashFiles(format('{0}{1}', github.workspace, '/test/fixtures/cabal/app.cabal') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -203,6 +203,7 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6.x
+    - run: bundle lock
     - uses: actions/cache@preview
       with:
         path: vendor/gems
