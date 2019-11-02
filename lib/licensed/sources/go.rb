@@ -206,17 +206,12 @@ module Licensed
       def gopath
         return @gopath if defined?(@gopath)
 
-        path = config.dig("go", "GOPATH")
-        @gopath = if path.nil? || path.empty?
-                    ENV["GOPATH"]
-                  else
-                    root = begin
-                             config.root
-                           rescue Licensed::Shell::Error
-                             Pathname.pwd
-                           end
-                    File.expand_path(path, root)
-                  end
+        @gopath = begin
+          path = config.dig("go", "GOPATH")
+          return File.expand_path(path, config.root) unless path.to_s.empty?
+          return ENV["GOPATH"] if ENV["GOPATH"]
+          Licensed::Shell.execute("go", "env", "GOPATH")
+        end
       end
 
       # Returns the current version of go available, as a Gem::Version
