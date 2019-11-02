@@ -74,14 +74,23 @@ module Licensed
       # package - package to check as part of the go standard library
       def go_std_package?(package)
         return false unless package
+
+        # return true if package self-identifies
         return true if package["Standard"]
 
         import_path = package["ImportPath"]
         return false unless import_path
 
+        # true if go standard packages includes the import path as given
+        return true if go_std_packages.include?(import_path)
+
+        # additional checks are only for vendored dependencies - return false
+        # if package isn't vendored
+        return false unless vendored_path?(import_path)
+
         # modify the import path to look like the import path `go list` returns for vendored std packages
-        std_vendor_import_path = import_path.sub(%r{^#{root_package["ImportPath"]}/vendor/golang.org}, "vendor/golang_org")
-        go_std_packages.include?(import_path) || go_std_packages.include?(std_vendor_import_path)
+        vendor_path = import_path.sub("#{root_package["ImportPath"]}/", "")
+        go_std_packages.include?(vendor_path) || go_std_packages.include?(vendor_path.sub("golang.org", "golang_org"))
       end
 
       # Returns whether the package is local to the current project
@@ -150,7 +159,8 @@ module Licensed
       #
       # path - Package path to test
       def vendored_path?(path)
-        path && path.include?("vendor/")
+        return false if path.nil?
+        path.start_with?(root_package["ImportPath"]) && path.include?("vendor/")
       end
 
       # Returns the import path parameter without the vendor component
