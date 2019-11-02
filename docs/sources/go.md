@@ -40,3 +40,13 @@ The go source supports multiple versioning strategies to determine if cached dep
    ```yaml
    version_strategy: contents
    ```
+
+#### Go modules support
+
+The go source fully supports go modules, provided that the calling environment has been configured to use go modules.
+
+The go source can be configured to support vendored go modules
+```yaml
+go:
+  mod: vendor
+```

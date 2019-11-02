@@ -59,11 +59,14 @@ module Licensed
       # Returns the list of dependencies as returned by "go list -json -deps"
       # available in go 1.11
       def go_list_deps
+        args = ["-deps"]
+        args << "-mod=vendor" if config.dig("go", "mod") == "vendor"
+
         # the CLI command returns packages in a pretty-printed JSON format but
         # not separated by commas. this gsub adds commas after all non-indented
         # "}" that close root level objects.
         # (?!\z) uses negative lookahead to not match the final "}"
-        deps = package_info_command("-deps").gsub(/^}(?!\z)$/m, "},")
+        deps = package_info_command(*args).gsub(/^}(?!\z)$/m, "},")
         JSON.parse("[#{deps}]")
       end
 

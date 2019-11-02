@@ -171,17 +171,19 @@ if Licensed::Shell.tool_available?("go")
         describe "with go module information" do
           let(:fixtures) { File.join(gopath, "src/modules_test") }
 
-          it "is the module version" do
+          before do
             skip unless source.go_version >= Gem::Version.new("1.11.0")
+            ENV["GO111MODULE"] = "on"
+          end
 
-            begin
-              ENV["GO111MODULE"] = "on"
-              Dir.chdir fixtures do
-                dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-                assert_equal "v1.1.1", dep.version
-              end
-            ensure
-              ENV["GO111MODULE"] = nil
+          after do
+            ENV["GO111MODULE"] = nil
+          end
+
+          it "is the module version" do
+            Dir.chdir fixtures do
+              dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+              assert_equal "v1.1.1", dep.version
             end
           end
         end
@@ -199,6 +201,33 @@ if Licensed::Shell.tool_available?("go")
             Dir.chdir fixtures do
               dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
               assert_equal source.contents_hash(Dir["#{dep.path}/*"]), dep.version
+            end
+          end
+        end
+      end
+
+      describe "with vendored go modules" do
+        let(:fixtures) { File.join(gopath, "src/modules_test") }
+
+        before do
+          skip unless source.go_version >= Gem::Version.new("1.11.0")
+
+          ENV["GO111MODULE"] = "on"
+          Dir.chdir fixtures do
+            Licensed::Shell.execute("go", "mod", "vendor")
+          end
+        end
+
+        after do
+          ENV["GO111MODULE"] = nil
+          FileUtils.rm_rf(File.join(fixtures, "vendor"))
+        end
+
+        it "is the module version" do
+          config["go"] = { "mod" => "vendor" }
+          Dir.chdir fixtures do
+            source.dependencies.each do |dep|
+              assert dep.path.include?("vendor/")
             end
           end
         end
