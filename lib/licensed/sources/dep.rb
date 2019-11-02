@@ -20,7 +20,7 @@ module Licensed
             search_root: search_root.to_s,
             metadata: {
               "type"        => Dep.type,
-              "homepage"    => "https://#{package[:name]}"
+              "homepage"    => homepage(package[:name])
             }
           )
         end
@@ -38,6 +38,12 @@ module Licensed
                             .reject { |import_path| go_std_package?(import_path) }
                             .map { |import_path| { name: import_path, version: project[:revision], project: project[:name] } }
         end
+      end
+
+      # Returns the godoc.org page for a package.
+      def homepage(import_path)
+        return unless import_path
+        "https://godoc.org/#{import_path}"
       end
 
       # Returns whether the package is part of the go std list.  Replaces

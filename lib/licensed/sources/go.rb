@@ -130,14 +130,10 @@ module Licensed
         end
       end
 
-      # Returns the homepage for a package import_path.  Assumes that the
-      # import path itself is a url domain and path
+      # Returns the godoc.org page for a package.
       def homepage(import_path)
         return unless import_path
-
-        # hacky but generally works due to go packages looking like
-        # "github.com/..." or "golang.org/..."
-        "https://#{import_path}"
+        "https://godoc.org/#{import_path}"
       end
 
       # Returns the root directory to search for a package license
