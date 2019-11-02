@@ -17,13 +17,12 @@ module Licensed
           packages.map do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
             error = package.dig("Error", "Err") if package["Error"]
-            package_dir = package["Dir"]
 
             Dependency.new(
               name: import_path,
               version: package_version(package),
-              path: package_dir,
-              search_root: search_root(package_dir),
+              path: package["Dir"],
+              search_root: search_root(package),
               errors: Array(error),
               metadata: {
                 "type"        => Go.type,
@@ -139,15 +138,20 @@ module Licensed
       # Returns the root directory to search for a package license
       #
       # package - package object obtained from package_info
-      def search_root(package_dir)
-        return nil if package_dir.nil? || package_dir.empty?
+      def search_root(package)
+        return if package.nil?
 
         # search root choices:
-        # 1. vendor folder if package is vendored
-        # 2. GOPATH
-        # 3. nil (no search up directory hierarchy)
-        return package_dir.match("^(.*/vendor)/.*$")[1] if vendored_path?(package_dir)
-        gopath
+        # 1. module directory if using go modules
+        # 2. vendor folder if package is vendored
+        # 3. package root value if available
+        # 4. GOPATH if the package directory is under the gopath
+        # 5. nil
+        return package.dig("Module", "Dir") if package["Module"]
+        return package["Dir"].match("^(.*/vendor)/.*$")[1] if vendored_path?(package["Dir"])
+        return package["Root"] if package["Root"]
+        return gopath if package["Dir"]&.start_with?(gopath)
+        nil
       end
 
       # Returns whether a package is vendored or not based on the package

@@ -187,5 +187,44 @@ if Licensed::Shell.tool_available?("go")
         end
       end
     end
+
+    describe "search_root" do
+      it "is nil for nil input" do
+        assert_nil source.search_root(nil)
+      end
+
+      it "is the package module directory if available" do
+        package = {
+          "Module" => { "Dir" => "test" }
+        }
+        assert_equal "test", source.search_root(package)
+      end
+
+      it "is the vendor folder if the package is vendored" do
+        source.stubs(:vendored_path?).returns(true)
+        package = { "Dir" => "test/vendor/package/path" }
+        assert_equal "test/vendor", source.search_root(package)
+      end
+
+      it "is package['Root'] is given" do
+        package = {
+          "Dir" => "test/path",
+          "Root" => "test"
+        }
+        assert_equal "test", source.search_root(package)
+      end
+
+      it "is the available gopath value if gopath directory is an ancestor of the package" do
+        source.stubs(:gopath).returns("test")
+        package = { "Dir" => "test/path" }
+        assert_equal "test", source.search_root(package)
+      end
+
+      it "is nil if a search root cannot be found" do
+        source.stubs(:gopath).returns("/go")
+        package = { "Dir" => "test/path" }
+        assert_nil source.search_root(package)
+      end
+    end
   end
 end
