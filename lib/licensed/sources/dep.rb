@@ -20,7 +20,7 @@ module Licensed
             search_root: search_root.to_s,
             metadata: {
               "type"        => Dep.type,
-              "homepage"    => "https://#{package[:name]}"
+              "homepage"    => homepage(package[:name])
             }
           )
         end
@@ -40,10 +40,17 @@ module Licensed
         end
       end
 
+      # Returns the godoc.org page for a package.
+      def homepage(import_path)
+        return unless import_path
+        "https://godoc.org/#{import_path}"
+      end
+
       # Returns whether the package is part of the go std list.  Replaces
       # "golang.org" with "golang_org" to match packages listed in `go list std`
       # as "vendor/golang_org/*" but are vendored as "vendor/golang.org/*"
       def go_std_package?(import_path)
+        return true if go_std_packages.include? "vendor/#{import_path}"
         go_std_packages.include? "vendor/#{import_path.sub(/^golang.org/, "golang_org")}"
       end
 

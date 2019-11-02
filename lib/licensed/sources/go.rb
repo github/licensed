@@ -17,13 +17,12 @@ module Licensed
           packages.map do |package|
             import_path = non_vendored_import_path(package["ImportPath"])
             error = package.dig("Error", "Err") if package["Error"]
-            package_dir = package["Dir"]
 
             Dependency.new(
               name: import_path,
               version: package_version(package),
-              path: package_dir,
-              search_root: search_root(package_dir),
+              path: package["Dir"],
+              search_root: search_root(package),
               errors: Array(error),
               metadata: {
                 "type"        => Go.type,
@@ -60,11 +59,14 @@ module Licensed
       # Returns the list of dependencies as returned by "go list -json -deps"
       # available in go 1.11
       def go_list_deps
+        args = ["-deps"]
+        args << "-mod=vendor" if config.dig("go", "mod") == "vendor"
+
         # the CLI command returns packages in a pretty-printed JSON format but
         # not separated by commas. this gsub adds commas after all non-indented
         # "}" that close root level objects.
         # (?!\z) uses negative lookahead to not match the final "}"
-        deps = package_info_command("-deps").gsub(/^}(?!\z)$/m, "},")
+        deps = package_info_command(*args).gsub(/^}(?!\z)$/m, "},")
         JSON.parse("[#{deps}]")
       end
 
@@ -74,14 +76,23 @@ module Licensed
       # package - package to check as part of the go standard library
       def go_std_package?(package)
         return false unless package
+
+        # return true if package self-identifies
         return true if package["Standard"]
 
         import_path = package["ImportPath"]
         return false unless import_path
 
+        # true if go standard packages includes the import path as given
+        return true if go_std_packages.include?(import_path)
+
+        # additional checks are only for vendored dependencies - return false
+        # if package isn't vendored
+        return false unless vendored_path?(import_path)
+
         # modify the import path to look like the import path `go list` returns for vendored std packages
-        std_vendor_import_path = import_path.sub(%r{^#{root_package["ImportPath"]}/vendor/golang.org}, "vendor/golang_org")
-        go_std_packages.include?(import_path) || go_std_packages.include?(std_vendor_import_path)
+        vendor_path = import_path.sub("#{root_package["ImportPath"]}/", "")
+        go_std_packages.include?(vendor_path) || go_std_packages.include?(vendor_path.sub("golang.org", "golang_org"))
       end
 
       # Returns whether the package is local to the current project
@@ -121,28 +132,29 @@ module Licensed
         end
       end
 
-      # Returns the homepage for a package import_path.  Assumes that the
-      # import path itself is a url domain and path
+      # Returns the godoc.org page for a package.
       def homepage(import_path)
         return unless import_path
-
-        # hacky but generally works due to go packages looking like
-        # "github.com/..." or "golang.org/..."
-        "https://#{import_path}"
+        "https://godoc.org/#{import_path}"
       end
 
       # Returns the root directory to search for a package license
       #
       # package - package object obtained from package_info
-      def search_root(package_dir)
-        return nil if package_dir.nil? || package_dir.empty?
+      def search_root(package)
+        return if package.nil?
 
         # search root choices:
-        # 1. vendor folder if package is vendored
-        # 2. GOPATH
-        # 3. nil (no search up directory hierarchy)
-        return package_dir.match("^(.*/vendor)/.*$")[1] if vendored_path?(package_dir)
-        gopath
+        # 1. module directory if using go modules
+        # 2. vendor folder if package is vendored
+        # 3. package root value if available
+        # 4. GOPATH if the package directory is under the gopath
+        # 5. nil
+        return package.dig("Module", "Dir") if package["Module"]
+        return package["Dir"].match("^(.*/vendor)/.*$")[1] if vendored_path?(package["Dir"])
+        return package["Root"] if package["Root"]
+        return gopath if package["Dir"]&.start_with?(gopath)
+        nil
       end
 
       # Returns whether a package is vendored or not based on the package
@@ -150,7 +162,8 @@ module Licensed
       #
       # path - Package path to test
       def vendored_path?(path)
-        path && path.include?("vendor/")
+        return false if path.nil?
+        path.start_with?(root_package["ImportPath"]) && path.include?("vendor/")
       end
 
       # Returns the import path parameter without the vendor component
@@ -196,17 +209,12 @@ module Licensed
       def gopath
         return @gopath if defined?(@gopath)
 
-        path = config.dig("go", "GOPATH")
-        @gopath = if path.nil? || path.empty?
-                    ENV["GOPATH"]
-                  else
-                    root = begin
-                             config.root
-                           rescue Licensed::Shell::Error
-                             Pathname.pwd
-                           end
-                    File.expand_path(path, root)
-                  end
+        @gopath = begin
+          path = config.dig("go", "GOPATH")
+          return File.expand_path(path, config.root) unless path.to_s.empty?
+          return ENV["GOPATH"] if ENV["GOPATH"]
+          Licensed::Shell.execute("go", "env", "GOPATH")
+        end
       end
 
       # Returns the current version of go available, as a Gem::Version
