@@ -85,6 +85,7 @@ module Licensed
 
         # true if go standard packages includes the import path as given
         return true if go_std_packages.include?(import_path)
+        return true if go_std_packages.include?("vendor/#{import_path}")
 
         # additional checks are only for vendored dependencies - return false
         # if package isn't vendored

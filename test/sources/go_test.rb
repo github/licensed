@@ -325,6 +325,11 @@ if Licensed::Shell.tool_available?("go")
         assert source.go_std_package?(package)
       end
 
+      it "returns true if the import path with 'vendor/' matches `go list std`" do
+        package = { "ImportPath" => "package/3" }
+        assert source.go_std_package?(package)
+      end
+
       it "returns false if vendored import path does't match 'go list std'" do
         package = { "ImportPath" => "#{root_package_import_path}/vendor/package/5" }
         refute source.go_std_package?(package)
