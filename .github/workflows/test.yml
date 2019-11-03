@@ -81,16 +81,39 @@ jobs:
       with:
         path: vendor/gems
         key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
-    - uses: actions/cache@preview
-      with:
-        path: test/fixtures/cabal/dist-newstyle
-        key: ${{ runner.os }}-fixtures-cabal-${{ matrix.ghc }}-${{ matrix.cabal }}-${{ hashFiles(format('{0}{1}', github.workspace, '/test/fixtures/cabal/app.cabal')) }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/cabal
     - name: Run tests
       run: script/test cabal
+
+  composer:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '5.6', '7.1', '7.2', '7.3' ]
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup php
+      uses: nanasess/setup-php@v1.0.2
+      with:
+        php-version: ${{ matrix.php }}
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - run: bundle lock
+    - uses: actions/cache@preview
+      with:
+        path: vendor/gems
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/composer
+    - name: Run tests
+      run: script/test composer
 
   core:
     runs-on: ubuntu-latest
@@ -168,6 +191,72 @@ jobs:
     - name: Run tests
       run: script/test go
 
+  gradle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - run: bundle lock
+    - uses: actions/cache@preview
+      with:
+        path: vendor/gems
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Gradle version
+      run: test/fixtures/gradle/gradlew --quiet --version
+    - name: Run tests
+      run: script/test gradle
+
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - run: bundle lock
+    - uses: actions/cache@preview
+      with:
+        path: vendor/gems
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Run tests
+      run: script/test manifest
+
+  mix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: [21.x, 22.x]
+        elixir: [1.8.x, 1.9.x]
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-elixir@v1.0.0
+      with:
+        otp-version: ${{matrix.otp}}
+        elixir-version: ${{matrix.elixir}}
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - run: bundle lock
+    - uses: actions/cache@preview
+      with:
+        path: vendor/gems
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/mix
+    - name: Run tests
+      run: script/test mix
+
   npm:
     runs-on: ubuntu-latest
     strategy:
@@ -194,26 +283,6 @@ jobs:
       run: script/source-setup/npm
     - name: Run tests
       run: script/test npm
-
-  gradle:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Set up Ruby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: 2.6.x
-    - run: bundle lock
-    - uses: actions/cache@preview
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
-    - name: Bootstrap
-      run: script/bootstrap
-    - name: Gradle version
-      run: test/fixtures/gradle/gradlew --quiet --version
-    - name: Run tests
-      run: script/test gradle
 
   pip:
     runs-on: ubuntu-latest
@@ -271,76 +340,3 @@ jobs:
       run: script/source-setup/pipenv
     - name: Run tests
       run: script/test pipenv
-
-  composer:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [ '5.6', '7.1', '7.2', '7.3' ]
-    steps:
-    - uses: actions/checkout@master
-    - name: Setup php
-      uses: nanasess/setup-php@v1.0.2
-      with:
-        php-version: ${{ matrix.php }}
-    - name: Set up Ruby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: 2.6.x
-    - run: bundle lock
-    - uses: actions/cache@preview
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
-    - name: Bootstrap
-      run: script/bootstrap
-    - name: Set up fixtures
-      run: script/source-setup/composer
-    - name: Run tests
-      run: script/test composer
-
-  mix:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        otp: [21.x, 22.x]
-        elixir: [1.8.x, 1.9.x]
-    steps:
-    - uses: actions/checkout@master
-    - uses: actions/setup-elixir@v1.0.0
-      with:
-        otp-version: ${{matrix.otp}}
-        elixir-version: ${{matrix.elixir}}
-    - name: Set up Ruby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: 2.6.x
-    - run: bundle lock
-    - uses: actions/cache@preview
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
-    - name: Bootstrap
-      run: script/bootstrap
-    - name: Set up fixtures
-      run: script/source-setup/mix
-    - name: Run tests
-      run: script/test mix
-
-  manifest:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Set up Ruby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: 2.6.x
-    - run: bundle lock
-    - uses: actions/cache@preview
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
-    - name: Bootstrap
-      run: script/bootstrap
-    - name: Run tests
-      run: script/test manifest
