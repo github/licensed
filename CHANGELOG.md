@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.6.2
+2019-11-03
+
+### Changed
+- A number of improvements to the go dependency enumerator
+  - use `go env GOPATH` as a default if no other GOPATH is found
+  - better compatibility with go modules when finding license content
+  - better compatibility with vendored go modules
+  - use a packages godoc.org page as it's homepage
+  - better checks for standard packages, reducing the amount of cached content
+
 ## 2.6.1
 2019-10-26
 
@@ -235,4 +246,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.6.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.6.2...HEAD
