@@ -272,5 +272,68 @@ if Licensed::Shell.tool_available?("go")
         assert_nil source.search_root(package)
       end
     end
+
+    describe "go_std_package?" do
+      let(:root_package_import_path) { "test" }
+
+      before do
+        source.stubs(:root_package).returns("ImportPath" => root_package_import_path)
+        source.stubs(:go_std_packages).returns([
+          "package/1",
+          "package/2",
+          "vendor/package/3",
+          "vendor/golang_org/package/4"
+        ])
+      end
+
+      it "returns false for a nil package" do
+        refute source.go_std_package?(nil)
+      end
+
+      it "returns true if package self-identifies as standard" do
+        package = { "Standard" => true }
+        assert source.go_std_package?(package)
+      end
+
+      it "returns false unless the package contains an import path" do
+        package = {}
+        refute source.go_std_package?(package)
+      end
+
+      it "returns true if the import path matches 'go list std'" do
+        package = { "ImportPath" => "package/1" }
+        assert source.go_std_package?(package)
+      end
+
+      it "returns false for unvendored import paths not matching 'go list std'" do
+        package = { "ImportPath" => "package/no_match" }
+        refute source.go_std_package?(package)
+      end
+
+      it "returns true if the vendored import path matches 'go list std'" do
+        package = { "ImportPath" => "#{root_package_import_path}/vendor/package/3" }
+        assert source.go_std_package?(package)
+      end
+
+      it "returns true if the underscore vendored import path matches 'go list std'" do
+        package = { "ImportPath" => "#{root_package_import_path}/vendor/golang.org/package/4" }
+        assert source.go_std_package?(package)
+      end
+
+      it "returns true if the vendored import path without 'vendor/' matches 'go list std'" do
+        package = { "ImportPath" => "#{root_package_import_path}/vendor/package/2" }
+        assert source.go_std_package?(package)
+      end
+
+      it "returns true if the import path with 'vendor/' matches `go list std`" do
+        package = { "ImportPath" => "package/3" }
+        assert source.go_std_package?(package)
+      end
+
+      it "returns false if vendored import path does't match 'go list std'" do
+        package = { "ImportPath" => "#{root_package_import_path}/vendor/package/5" }
+        refute source.go_std_package?(package)
+      end
+    end
   end
 end
