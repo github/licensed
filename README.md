@@ -21,6 +21,18 @@ See the [migration documentation](./docs/migrating_to_newer_versions.md) for mor
 
 ## Installation
 
+### Dependencies
+
+Licensed uses the `libgit2` bindings for Ruby provided by `rugged`. `rugged` requires `cmake` and `pkg-config` which you may need to install before you can install Licensed.
+   
+   >  Ubuntu 
+    
+    sudo apt-get install cmake pkg-config
+    
+   >  OS X 
+       
+    brew install cmake pkg-config
+
 ### With a Gemfile
 
 Add this line to your application's Gemfile:
@@ -47,12 +59,6 @@ $ ./licensed list
 ```
 
 For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/local/bin`.
-
-#### Dependencies
-
-Licensed uses the `libgit2` bindings for Ruby provided by `rugged`. `rugged` has its own dependencies - `cmake` and `pkg-config` - which you may need to install before you can install Licensed.
-
-For example, on macOS with Homebrew: `brew install cmake pkg-config` and on Ubuntu: `apt-get install cmake pkg-config`.
 
 ## Usage
 
