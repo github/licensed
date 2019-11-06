@@ -23,7 +23,7 @@ See the [migration documentation](./docs/migrating_to_newer_versions.md) for mor
 
 ### Dependencies
 
-Install `cmake` and `pkg-config` dut to Licensed uses the `libgit2` bindings for Ruby provided by `rugged` which use these dependencies
+Licensed uses the `libgit2` bindings for Ruby provided by `rugged`. `rugged` requires `cmake` and `pkg-config` which you may need to install before you can install Licensed.
    
    >  Ubuntu 
     
