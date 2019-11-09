@@ -57,11 +57,9 @@ describe Licensed::Configuration do
       assert_equal Pathname.pwd.join(".licenses"), config.cache_path
     end
 
-    it "raises an error if a default config file is not found" do
+    it "returns empty sourses hash without default config file" do
       Dir.mktmpdir do |dir|
-        assert_raises ::Licensed::Configuration::LoadError do
-          Licensed::Configuration.load_from(dir)
-        end
+        assert_equal Licensed::Configuration.load_from(dir)["sources"], {}
       end
     end
 
