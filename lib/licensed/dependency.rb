@@ -72,9 +72,12 @@ module Licensed
     # Returns the license text content from all matched sources
     # except the package file, which doesn't contain license text.
     def license_contents
-      matched_files.reject { |f| f == package_file }
-                   .group_by(&:content)
-                   .map { |content, files| { "sources" => license_content_sources(files), "text" => content } }
+      files = matched_files.reject { |f| f == package_file }
+                           .group_by(&:content)
+                           .map { |content, files| { "sources" => license_content_sources(files), "text" => content } }
+
+      files << generated_license_contents if files.empty?
+      files.compact
     end
 
     # Returns legal notices found at the dependency path
@@ -132,6 +135,26 @@ module Licensed
         # overrides all other values
         "license" => license_key
       })
+    end
+
+    # Returns a generated license content source and text for the dependency's
+    # license if it exists and is not "other"
+    def generated_license_contents
+      return unless license
+      return if license.key == "other"
+
+      # strip copyright clauses and any extra newlines
+      # many package managers don't provide enough information to
+      # autogenerate a copyright clause
+      text = license.text.lines
+                         .reject { |l| l =~ Licensee::Matchers::Copyright::REGEX }
+                         .join
+                         .gsub(/\n\n\n/, "\n\n")
+
+      {
+        "sources" => "Auto-generated #{license.spdx_id} license text",
+        "text" => text
+      }
     end
   end
 end

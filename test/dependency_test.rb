@@ -123,10 +123,46 @@ describe Licensed::Dependency do
       end
     end
 
-    it "does not get license content from package manager file" do
+    it "autogenerates license content if explicit content is not found" do
       mkproject do |dependency|
         File.write "project.gemspec", "s.license = 'mit'"
+
+        contents = dependency.license_contents.first
+        assert contents
+        assert_match /auto-generated/i, contents["sources"]
+        refute_match /copyright \(c\)/i, contents["text"]
+
+        file = Licensee::ProjectFiles::LicenseFile.new(contents["text"])
+        assert_equal "mit", file.license&.key
+      end
+    end
+
+    it "does not autogenerate license content for 'other' license key" do
+      mkproject do |dependency|
+        File.write "project.gemspec", "s.license = 'other'"
+
         assert_empty dependency.license_contents
+      end
+    end
+
+    it "does not autogenerate license content for licenses unknown to Licensee" do
+      mkproject do |dependency|
+        File.write "project.gemspec", "s.license = 'nit'"
+
+        assert_empty dependency.license_contents
+      end
+    end
+
+    it "does not autogenerate license content if license is not found" do
+      mkproject do |dependency|
+        assert_empty dependency.license_contents
+      end
+    end
+
+    it "does not autogenerate license content if explicit content is set" do
+      mkproject do |dependency|
+        File.write "LICENSE", Licensee::License.find("mit").text
+        refute dependency.license_contents.any? { |c| c["sources"] =~ /auto-generated/i }
       end
     end
 
