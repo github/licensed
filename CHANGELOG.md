@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.7.0
+2019-11-10
+
+### Added
+- License text is automatically generated for known licenses when not otherwise available (https://github.com/github/licensed/pull/223)
+
+### Changed
+- Ignoring dependencies uses glob pattern matching (https://github.com/github/licensed/pull/225)
+
 ## 2.6.2
 2019-11-03
 
@@ -246,4 +255,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.6.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.7.0...HEAD
