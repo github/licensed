@@ -5,9 +5,6 @@ describe Licensed::Configuration do
   let(:config) { Licensed::Configuration.new }
   let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
 
-  before do
-    @package = {"type" => "bundler", "name" => "bundler", "license" => "mit"}
-  end
 
   it "accepts a license directory path option" do
     config["cache_path"] = "path"
@@ -74,18 +71,72 @@ describe Licensed::Configuration do
   end
 
   describe "ignore" do
+    let(:package) { { "type" => "bundler", "name" => "bundler" } }
+
     it "marks the dependency as ignored" do
-      refute config.ignored?(@package)
-      config.ignore @package
-      assert config.ignored?(@package)
+      refute config.ignored?(package)
+      config.ignore package
+      assert config.ignored?(package)
+    end
+
+    describe "with glob patterns" do
+      let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package" } }
+
+      it "does not match trailing ** to multiple path segments" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "github.com/github/**")
+        refute config.ignored?(package)
+      end
+
+      it "matches internal ** to multiple path segments" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "github.com/**/package")
+        assert config.ignored?(package)
+      end
+
+      it "matches trailing * to single path segment" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "github.com/github/licensed/*")
+        assert config.ignored?(package)
+      end
+
+      it "maches internal * to single path segment" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "github.com/*/licensed/package")
+        assert config.ignored?(package)
+      end
+
+      it "matches multiple globstars in a pattern" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "**/licensed/*")
+        assert config.ignored?(package)
+      end
+
+      it "does not match * to multiple path segments" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "github.com/github/*")
+        refute config.ignored?(package)
+      end
+
+      it "is case insensitive" do
+        refute config.ignored?(package)
+        config.ignore package.merge("name" => "GITHUB.com/github/**")
+        refute config.ignored?(package)
+      end
+    end
+
+    it "works with glob patterns" do
+      refute config.ignored?(package)
     end
   end
 
   describe "review" do
+    let(:package) { { "type" => "bundler", "name" => "bundler" } }
+
     it "marks the dependency as reviewed" do
-      refute config.reviewed?(@package)
-      config.review @package
-      assert config.reviewed?(@package)
+      refute config.reviewed?(package)
+      config.review package
+      assert config.reviewed?(package)
     end
   end
 

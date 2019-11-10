@@ -75,7 +75,9 @@ module Licensed
 
     # Is the given dependency ignored?
     def ignored?(dependency)
-      Array(self["ignored"][dependency["type"]]).include?(dependency["name"])
+      Array(self["ignored"][dependency["type"]]).any? do |pattern|
+        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
+      end
     end
 
     # Is the license of the dependency allowed?

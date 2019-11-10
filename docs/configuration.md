@@ -95,6 +95,12 @@ ignored:
   bower:
     - some-internal-package
 
+  go:
+    # ignore all go packages from import paths starting with github.com/internal-package
+    # see the `File.fnmatch?` documentation for details on how patterns are matched.
+    # comparisons use the FNM_CASEFOLD and FNM_PATHNAME flags
+    - github.com/internal-package/**/*
+
 # These dependencies have been reviewed.
 # They need to be cached and checked, but do not have a license found that matches the allowed configured licenses.
 reviewed:
