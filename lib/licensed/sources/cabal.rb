@@ -109,10 +109,7 @@ module Licensed
       # Returns package information as a hash for the given id
       def package_info(id)
         info = package_info_command(id).strip
-        if info.empty?
-          name, _, version = id.rpartition("-")
-          return missing_package(name, version)
-        end
+        return missing_package(id) if info.empty?
 
         info.lines.each_with_object({}) do |line, info|
           key, value = line.split(":", 2).map(&:strip)
