@@ -77,8 +77,8 @@ if Licensed::Shell.tool_available?("ghc")
       end
 
       it "sets an error if an indirect dependency isn't found" do
-        # look in a location that doesn't contain any packages
-        config["cabal"] = { "ghc_package_db" => [cabal_db, local_db] }
+        # look in locations that don't contain the package
+        config["cabal"] = { "ghc_package_db" => [local_db, cabal_db, "user"] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "bytestring" }
           assert dep
