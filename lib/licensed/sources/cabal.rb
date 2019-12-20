@@ -48,6 +48,8 @@ module Licensed
       # Returns the packages document directory and search root directory
       # as an array
       def package_docs_dirs(package)
+        return [nil, nil] if package.nil? || package.empty?
+
         unless package["haddock-html"]
           # default to a local vendor directory if haddock-html property
           # isn't available
