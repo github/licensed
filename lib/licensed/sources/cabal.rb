@@ -79,18 +79,17 @@ module Licensed
       # Recursively finds the dependencies for each cabal package.
       # Returns a `Set` containing the package names for all dependencies
       def recursive_dependencies(package_names, results = Set.new)
-        return [] if package_names.nil? || package_names.empty?
+        return results if package_names.nil? || package_names.empty?
 
         new_packages = Set.new(package_names) - results
-        return [] if new_packages.empty?
+        return results if new_packages.empty?
 
         results.merge new_packages
 
         dependencies = Parallel.map(new_packages, &method(:package_dependencies)).flatten
 
-        return results if dependencies.empty?
-
-        results.merge recursive_dependencies(dependencies, results)
+        recursive_dependencies(dependencies, results)
+        results
       end
 
       # Returns an array of dependency package names for the cabal package
