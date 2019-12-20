@@ -31,19 +31,18 @@ module Licensed
 
       # Returns a list of all detected packages
       def packages
-        missing = []
         package_ids = Set.new
         cabal_file_dependencies.each do |target|
-          name, version = target.split(/\s/, 2)
+          name = target.split(/\s/)[0]
           package_id = cabal_package_id(name)
           if package_id.nil?
-            missing << { "name" => name, "version" => version, "error" => "package not found" }
+            package_ids << target
           else
             recursive_dependencies([package_id], package_ids)
           end
         end
 
-        Parallel.map(package_ids) { |id| package_info(id) }.concat(missing)
+        Parallel.map(package_ids) { |id| package_info(id) }
       end
 
       # Returns the packages document directory and search root directory
@@ -108,7 +107,13 @@ module Licensed
 
       # Returns package information as a hash for the given id
       def package_info(id)
-        package_info_command(id).lines.each_with_object({}) do |line, info|
+        info = package_info_command(id).strip
+        if info.empty?
+          name, _, version = id.rpartition("-")
+          return missing_package(name, version)
+        end
+
+        info.lines.each_with_object({}) do |line, info|
           key, value = line.split(":", 2).map(&:strip)
           next unless key && value
 
@@ -215,6 +220,17 @@ module Licensed
       # Returns whether the ghc cli tool is available
       def ghc?
         @ghc ||= Licensed::Shell.tool_available?("ghc")
+      end
+
+      # Returns a package info structure with an error set
+      def missing_package(id)
+        name, version = if id.index(/\s/).nil?
+          id.split("-", 2)
+        else
+          id.split(/\s/, 2)
+        end
+
+        { "name" => name, "version" => version, "error" => "package not found" }
       end
     end
   end
