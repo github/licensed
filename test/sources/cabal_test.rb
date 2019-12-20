@@ -66,11 +66,21 @@ if Licensed::Shell.tool_available?("ghc")
         end
       end
 
-      it "sets an error if a dependency isn't found" do
+      it "sets an error if a direct dependency isn't found" do
         # look in a location that doesn't contain any packages
         config["cabal"] = { "ghc_package_db" => [Dir.pwd] }
         Dir.chdir(fixtures) do
           dep = source.dependencies.detect { |d| d.name == "fused-effects" }
+          assert dep
+          assert_includes dep.errors, "package not found"
+        end
+      end
+
+      it "sets an error if an indirect dependency isn't found" do
+        # look in a location that doesn't contain any packages
+        config["cabal"] = { "ghc_package_db" => [cabal_db, local_db] }
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.detect { |d| d.name == "bytestring" }
           assert dep
           assert_includes dep.errors, "package not found"
         end
