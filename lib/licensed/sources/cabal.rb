@@ -222,10 +222,10 @@ module Licensed
 
       # Returns a package info structure with an error set
       def missing_package(id)
-        name, version = if id.index(/\s/).nil?
-          id.split("-", 2)
+        name, _, version = if id.index(/\s/).nil?
+          id.rpartition("-") # e.g. to match the right-most dash from ipid fused-effects-1.0.0.0
         else
-          id.split(/\s/, 2)
+          id.partition(/\s/) # e.g. to match the left-most space from constraint fused-effects > 1.0.0.0
         end
 
         { "name" => name, "version" => version, "error" => "package not found" }
