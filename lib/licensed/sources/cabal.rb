@@ -31,24 +31,25 @@ module Licensed
 
       # Returns a list of all detected packages
       def packages
-        missing = []
         package_ids = Set.new
         cabal_file_dependencies.each do |target|
-          name, version = target.split(/\s/, 2)
+          name = target.split(/\s/)[0]
           package_id = cabal_package_id(name)
           if package_id.nil?
-            missing << { "name" => name, "version" => version, "error" => "package not found" }
+            package_ids << target
           else
             recursive_dependencies([package_id], package_ids)
           end
         end
 
-        Parallel.map(package_ids) { |id| package_info(id) }.concat(missing)
+        Parallel.map(package_ids) { |id| package_info(id) }
       end
 
       # Returns the packages document directory and search root directory
       # as an array
       def package_docs_dirs(package)
+        return [nil, nil] if package.nil? || package.empty?
+
         unless package["haddock-html"]
           # default to a local vendor directory if haddock-html property
           # isn't available
@@ -78,18 +79,17 @@ module Licensed
       # Recursively finds the dependencies for each cabal package.
       # Returns a `Set` containing the package names for all dependencies
       def recursive_dependencies(package_names, results = Set.new)
-        return [] if package_names.nil? || package_names.empty?
+        return results if package_names.nil? || package_names.empty?
 
         new_packages = Set.new(package_names) - results
-        return [] if new_packages.empty?
+        return results if new_packages.empty?
 
         results.merge new_packages
 
         dependencies = Parallel.map(new_packages, &method(:package_dependencies)).flatten
 
-        return results if dependencies.empty?
-
-        results.merge recursive_dependencies(dependencies, results)
+        recursive_dependencies(dependencies, results)
+        results
       end
 
       # Returns an array of dependency package names for the cabal package
@@ -108,7 +108,10 @@ module Licensed
 
       # Returns package information as a hash for the given id
       def package_info(id)
-        package_info_command(id).lines.each_with_object({}) do |line, info|
+        info = package_info_command(id).strip
+        return missing_package(id) if info.empty?
+
+        info.lines.each_with_object({}) do |line, info|
           key, value = line.split(":", 2).map(&:strip)
           next unless key && value
 
@@ -215,6 +218,17 @@ module Licensed
       # Returns whether the ghc cli tool is available
       def ghc?
         @ghc ||= Licensed::Shell.tool_available?("ghc")
+      end
+
+      # Returns a package info structure with an error set
+      def missing_package(id)
+        name, _, version = if id.index(/\s/).nil?
+          id.rpartition("-") # e.g. to match the right-most dash from ipid fused-effects-1.0.0.0
+        else
+          id.partition(/\s/) # e.g. to match the left-most space from constraint fused-effects > 1.0.0.0
+        end
+
+        { "name" => name, "version" => version, "error" => "package not found" }
       end
     end
   end
