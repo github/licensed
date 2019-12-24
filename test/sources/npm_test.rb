@@ -20,8 +20,10 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       it "is false no npm configs exist" do
-        Dir.chdir(Dir.tmpdir) do
-          refute source.enabled?
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            refute source.enabled?
+          end
         end
       end
     end
@@ -38,7 +40,7 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
 
-      it "includes transient dependencies" do
+      it "includes indirect dependencies" do
         Dir.chdir fixtures do
           assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
         end
@@ -67,7 +69,7 @@ if Licensed::Shell.tool_available?("npm")
       describe "with multiple instances of a dependency" do
         it "includes version in the dependency name for multiple unique versions" do
           Dir.chdir fixtures do
-            graceful_fs_dependencies = source.dependencies.select { |dep| dep.name == /graceful-fs/ }
+            graceful_fs_dependencies = source.dependencies.select { |dep| dep.name == "graceful-fs" }
             assert_empty graceful_fs_dependencies
 
             graceful_fs_dependencies = source.dependencies.select { |dep| dep.name =~ /graceful-fs/ }
