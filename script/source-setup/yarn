@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+if [ -z "$(which yarn)" ]; then
+  echo "A local yarn installation is required for yarn development." >&2
+  exit 127
+fi
+
+# setup test fixtures
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd $BASE_PATH/test/fixtures/yarn
+
+if [ "$1" == "-f" ]; then
+  find . -not -regex "\.*" -and -not -name "package\.json" -print0 | xargs -0 rm -rf
+fi
+
+yarn install
