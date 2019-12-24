@@ -15,5 +15,6 @@ module Licensed
     require "licensed/sources/pipenv"
     require "licensed/sources/gradle"
     require "licensed/sources/mix"
+    require "licensed/sources/yarn"
   end
 end
