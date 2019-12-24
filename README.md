@@ -25,11 +25,11 @@ See the [migration documentation](./docs/migrating_to_newer_versions.md) for mor
 
 Licensed uses the `libgit2` bindings for Ruby provided by `rugged`. `rugged` requires `cmake` and `pkg-config` which you may need to install before you can install Licensed.
    
-   >  Ubuntu 
+   >  Ubuntu
     
     sudo apt-get install cmake pkg-config
     
-   >  OS X 
+   >  OS X
        
     brew install cmake pkg-config
 
@@ -110,6 +110,7 @@ Dependencies will be automatically detected for all of the following sources by 
 1. [Pipenv](./docs/sources/pipenv.md)
 1. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
 1. [Mix](./docs/sources/mix.md)
+1. [Yarn](./docs/sources/yarn.md)
 
 You can disable any of them in the configuration file:
 
