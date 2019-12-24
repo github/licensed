@@ -44,9 +44,16 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
 
-      it "does not include dev dependencies" do
+      it "does not include dev dependencies by default" do
         Dir.chdir fixtures do
           refute source.dependencies.detect { |dep| dep.name == "string.prototype.startswith" }
+        end
+      end
+
+      it "includes dev dependencies if configured" do
+        Dir.chdir fixtures do
+          config["npm"] = { "production_only" => false }
+          assert source.dependencies.detect { |dep| dep.name == "string.prototype.startswith" }
         end
       end
 

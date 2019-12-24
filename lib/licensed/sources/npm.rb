@@ -57,12 +57,19 @@ module Licensed
 
       # Returns the output from running `npm list` to get package metadata
       def package_metadata_command
-        Licensed::Shell.execute("npm", "list", "--json", "--production", "--long", allow_failure: true)
+        args = %w(--json --long)
+        args << "--production" unless include_non_production?
+        Licensed::Shell.execute("npm", "list", *args, allow_failure: true)
       end
 
       # Returns true if a yarn.lock file exists in the current directory
       def yarn_lock_present
         @yarn_lock_present ||= File.exist?(config.pwd.join("yarn.lock"))
+      end
+
+      # Returns whether to include non production dependencies based on the licensed configuration settings
+      def include_non_production?
+        config.dig("npm", "production_only") == false
       end
     end
   end
