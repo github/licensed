@@ -1,0 +1,3 @@
+expected_dependency: autoprefixer
+source_path: test/fixtures/yarn
+cache_path: test/fixtures/yarn/.licenses
