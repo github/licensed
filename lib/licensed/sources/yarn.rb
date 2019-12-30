@@ -44,7 +44,12 @@ module Licensed
           end
         end
 
-        Parallel.map(all_dependencies) { |name, dep| [name, package_info(dep)] }.to_h
+        # yarn info is a slow operation - run it in parallel for all dependencies.
+        # afterwards parse and merge the returned data serially, JSON.parse
+        # might not be thread safe
+        Parallel.map(all_dependencies) { |name, dep| [name, dep, yarn_info_command(dep["id"])] }
+                .map { |(name, dep, info)| [name, merge_yarn_info(dep, info)] }
+                .to_h
       end
 
       # Recursively parse dependency JSON data.  Returns a hash mapping the
@@ -86,20 +91,22 @@ module Licensed
         Licensed::Shell.execute("yarn", "list", *args, allow_failure: true)
       end
 
-      # Returns extended information for the package
-      def package_info(package)
-        info = package_info_command(package["id"])
-        return package if info.nil? || info.empty?
+      # Returns a combination of tree data from `yarn list` and results of
+      # the ouput from `yarn info`
+      def merge_yarn_info(tree_data, yarn_info)
+        return tree_data if yarn_info.nil?
 
-        info = JSON.parse(info)["data"]
-        package.merge(
-          "description" => info["description"],
-          "homepage" => info["homepage"]
-        )
+        yarn_info = yarn_info.lines
+                             .map(&:strip)
+                             .map(&JSON.method(:parse))
+                             .find { |json| json["type"] == "inspect" }
+        return tree_data if yarn_info.nil?
+
+        tree_data.merge(yarn_info["data"])
       end
 
       # Returns the output from running `yarn info` to get package info
-      def package_info_command(id)
+      def yarn_info_command(id)
         Licensed::Shell.execute("yarn", "info", "-s", "--json", id, allow_failure: true)
       end
 
