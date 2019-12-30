@@ -26,15 +26,18 @@ module Licensed
         end
       end
 
+      # Finds packages that the current project relies on
       def packages
-        root_dependencies = JSON.parse(yarn_list_command)["data"]["trees"]
-        root_path = config.pwd
+        return [] if yarn_package_tree.nil?
         all_dependencies = {}
-        recursive_dependencies(root_path, root_dependencies).each do |name, results|
+        recursive_dependencies(config.pwd, yarn_package_tree).each do |name, results|
           results.uniq! { |package| package["version"] }
           if results.size == 1
+            # if there is only one package for a name, reference it by name
             all_dependencies[name] = results[0]
           else
+            # if there is more than one package for a name, reference each by
+            # "<name>-<version>"
             results.each do |package|
               all_dependencies[package["id"].sub("@", "-")] = package
             end
@@ -61,6 +64,19 @@ module Licensed
           recursive_dependencies(dependency_path, dependency["children"], result)
         end
         result
+      end
+
+      # Finds and returns the yarn package tree listing from `yarn list` output
+      def yarn_package_tree
+        return @yarn_package_tree if defined?(@yarn_package_tree)
+        @yarn_package_tree = begin
+          # parse all lines of output to json and find one that is "type": "tree"
+          tree = yarn_list_command.lines
+                                  .map(&:strip)
+                                  .map(&JSON.method(:parse))
+                                  .find { |json| json["type"] == "tree" }
+          tree&.dig("data", "trees")
+        end
       end
 
       # Returns the output from running `yarn list` to get project dependencies

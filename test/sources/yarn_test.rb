@@ -101,5 +101,15 @@ if Licensed::Shell.tool_available?("yarn")
         end
       end
     end
+
+    describe "packages" do
+      it "returns an empty list if no packages are found" do
+        Dir.mktmpdir do |dir|
+          Dir.chdir dir do
+            assert_empty source.packages
+          end
+        end
+      end
+    end
   end
 end
