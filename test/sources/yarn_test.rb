@@ -51,6 +51,16 @@ if Licensed::Shell.tool_available?("yarn")
         end
       end
 
+      it "handles scoped dependency names" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "@github/query-selector" }
+          assert dep
+          assert_equal "1.0.3", dep.version
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
+        end
+      end
+
       it "includes indirect dependencies" do
         Dir.chdir fixtures do
           assert source.dependencies.detect { |dep| dep.name == "autoprefixer-core" }

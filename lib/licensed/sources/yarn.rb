@@ -39,7 +39,7 @@ module Licensed
             # if there is more than one package for a name, reference each by
             # "<name>-<version>"
             results.each do |package|
-              all_dependencies[package["id"].sub("@", "-")] = package
+              all_dependencies["#{name}-#{package["version"]}"] = package
             end
           end
         end
@@ -57,7 +57,7 @@ module Licensed
       def recursive_dependencies(path, dependencies, result = {})
         dependencies.each do |dependency|
           next if dependency["shadow"]
-          name, version = dependency["name"].split("@")
+          name, _, version = dependency["name"].rpartition("@")
 
           dependency_path = path.join("node_modules", name)
           (result[name] ||= []) << {
