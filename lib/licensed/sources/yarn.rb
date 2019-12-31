@@ -5,7 +5,7 @@ module Licensed
   module Sources
     class Yarn < Source
       def enabled?
-        return unless Licensed::Shell.tool_available?("yarn") && Licensed::Shell.tool_available?("npm")
+        return unless Licensed::Shell.tool_available?("yarn")
 
         config.pwd.join("package.json").exist? && config.pwd.join("yarn.lock").exist?
       end
@@ -56,6 +56,8 @@ module Licensed
       # package name to it's metadata
       def recursive_dependencies(path, dependencies, result = {})
         dependencies.each do |dependency|
+          # "shadow" indicate a dependency requirement only, not a
+          # resolved package identifier
           next if dependency["shadow"]
           name, _, version = dependency["name"].rpartition("@")
 
