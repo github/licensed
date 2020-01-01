@@ -85,6 +85,7 @@ allowed:
   - bsd-2-clause
   - bsd-3-clause
   - cc0-1.0
+  - isc
 
 # These dependencies are explicitly ignored.
 # They shouldn't be cached at all, and will not have cached metadata written to the repo.
