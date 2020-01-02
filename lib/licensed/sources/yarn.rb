@@ -5,7 +5,7 @@ module Licensed
   module Sources
     class Yarn < Source
       def enabled?
-        return unless Licensed::Shell.tool_available?("yarn") && Licensed::Shell.tool_available?("npm")
+        return unless Licensed::Shell.tool_available?("yarn")
 
         config.pwd.join("package.json").exist? && config.pwd.join("yarn.lock").exist?
       end
@@ -26,30 +26,40 @@ module Licensed
         end
       end
 
+      # Finds packages that the current project relies on
       def packages
-        root_dependencies = JSON.parse(yarn_list_command)["data"]["trees"]
-        root_path = config.pwd
+        return [] if yarn_package_tree.nil?
         all_dependencies = {}
-        recursive_dependencies(root_path, root_dependencies).each do |name, results|
+        recursive_dependencies(config.pwd, yarn_package_tree).each do |name, results|
           results.uniq! { |package| package["version"] }
           if results.size == 1
+            # if there is only one package for a name, reference it by name
             all_dependencies[name] = results[0]
           else
+            # if there is more than one package for a name, reference each by
+            # "<name>-<version>"
             results.each do |package|
-              all_dependencies[package["id"].sub("@", "-")] = package
+              all_dependencies["#{name}-#{package["version"]}"] = package
             end
           end
         end
 
-        Parallel.map(all_dependencies) { |name, dep| [name, package_info(dep)] }.to_h
+        # yarn info is a slow operation - run it in parallel for all dependencies.
+        # afterwards parse and merge the returned data serially, JSON.parse
+        # might not be thread safe
+        Parallel.map(all_dependencies) { |name, dep| [name, dep, yarn_info_command(dep["id"])] }
+                .map { |(name, dep, info)| [name, merge_yarn_info(dep, info)] }
+                .to_h
       end
 
       # Recursively parse dependency JSON data.  Returns a hash mapping the
       # package name to it's metadata
       def recursive_dependencies(path, dependencies, result = {})
         dependencies.each do |dependency|
+          # "shadow" indicate a dependency requirement only, not a
+          # resolved package identifier
           next if dependency["shadow"]
-          name, version = dependency["name"].split("@")
+          name, _, version = dependency["name"].rpartition("@")
 
           dependency_path = path.join("node_modules", name)
           (result[name] ||= []) << {
@@ -63,6 +73,19 @@ module Licensed
         result
       end
 
+      # Finds and returns the yarn package tree listing from `yarn list` output
+      def yarn_package_tree
+        return @yarn_package_tree if defined?(@yarn_package_tree)
+        @yarn_package_tree = begin
+          # parse all lines of output to json and find one that is "type": "tree"
+          tree = yarn_list_command.lines
+                                  .map(&:strip)
+                                  .map(&JSON.method(:parse))
+                                  .find { |json| json["type"] == "tree" }
+          tree&.dig("data", "trees")
+        end
+      end
+
       # Returns the output from running `yarn list` to get project dependencies
       def yarn_list_command
         args = %w(--json -s --no-progress)
@@ -70,20 +93,22 @@ module Licensed
         Licensed::Shell.execute("yarn", "list", *args, allow_failure: true)
       end
 
-      # Returns extended information for the package
-      def package_info(package)
-        info = package_info_command(package["id"])
-        return package if info.nil? || info.empty?
+      # Returns a combination of tree data from `yarn list` and results of
+      # the ouput from `yarn info`
+      def merge_yarn_info(tree_data, yarn_info)
+        return tree_data if yarn_info.nil?
 
-        info = JSON.parse(info)["data"]
-        package.merge(
-          "description" => info["description"],
-          "homepage" => info["homepage"]
-        )
+        yarn_info = yarn_info.lines
+                             .map(&:strip)
+                             .map(&JSON.method(:parse))
+                             .find { |json| json["type"] == "inspect" }
+        return tree_data if yarn_info.nil?
+
+        tree_data.merge(yarn_info["data"])
       end
 
       # Returns the output from running `yarn info` to get package info
-      def package_info_command(id)
+      def yarn_info_command(id)
         Licensed::Shell.execute("yarn", "info", "-s", "--json", id, allow_failure: true)
       end
 
