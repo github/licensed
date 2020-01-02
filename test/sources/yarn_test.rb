@@ -47,7 +47,6 @@ if Licensed::Shell.tool_available?("yarn")
           assert_equal "yarn", dep.record["type"]
           assert_equal "5.2.0", dep.version
           assert dep.record["homepage"]
-          assert dep.record["summary"]
         end
       end
 
@@ -57,7 +56,6 @@ if Licensed::Shell.tool_available?("yarn")
           assert dep
           assert_equal "1.0.3", dep.version
           assert dep.record["homepage"]
-          assert dep.record["summary"]
         end
       end
 

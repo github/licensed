@@ -4,6 +4,13 @@ require "json"
 module Licensed
   module Sources
     class Yarn < Source
+      # `yarn licenses list --json` returns data in a table format with header
+      # ordering specified in the output.  Look for these specific headers and use
+      # their indices to get data from the table body
+      YARN_NAME_HEAD = "Name".freeze
+      YARN_VERSION_HEAD = "Version".freeze
+      YARN_URL_HEAD = "URL".freeze
+
       def enabled?
         return unless Licensed::Shell.tool_available?("yarn")
 
@@ -19,8 +26,7 @@ module Licensed
             metadata: {
               "type"     => Yarn.type,
               "name"     => package["name"],
-              "summary"  => package["description"],
-              "homepage" => package["homepage"]
+              "homepage" => dependency_urls[package["id"]]
             }
           )
         end
@@ -44,12 +50,7 @@ module Licensed
           end
         end
 
-        # yarn info is a slow operation - run it in parallel for all dependencies.
-        # afterwards parse and merge the returned data serially, JSON.parse
-        # might not be thread safe
-        Parallel.map(all_dependencies) { |name, dep| [name, dep, yarn_info_command(dep["id"])] }
-                .map { |(name, dep, info)| [name, merge_yarn_info(dep, info)] }
-                .to_h
+        all_dependencies
       end
 
       # Recursively parse dependency JSON data.  Returns a hash mapping the
@@ -61,6 +62,7 @@ module Licensed
           next if dependency["shadow"]
           name, _, version = dependency["name"].rpartition("@")
 
+          # the dependency should be found under the parent's "node_modules" path
           dependency_path = path.join("node_modules", name)
           (result[name] ||= []) << {
             "id" => dependency["name"],
@@ -86,6 +88,33 @@ module Licensed
         end
       end
 
+      # Returns a mapping of unique dependency identifiers to urls
+      def dependency_urls
+        @dependency_urls ||= begin
+          table = yarn_licenses_command.lines
+                                       .map(&:strip)
+                                       .map(&JSON.method(:parse))
+                                       .find { |json| json["type"] == "table" }
+          return [] if table.nil?
+
+          head = table.dig("data", "head")
+          return [] if head.nil?
+
+          name_index = head.index YARN_NAME_HEAD
+          version_index = head.index YARN_VERSION_HEAD
+          url_index = head.index YARN_URL_HEAD
+          return [] if name_index.nil? || version_index.nil? || url_index.nil?
+
+          body = table.dig("data", "body")
+          return [] if body.nil?
+
+          body.each_with_object({}) do |row, hsh|
+            id = "#{row[name_index]}@#{row[version_index]}"
+            hsh[id] = row[url_index]
+          end
+        end
+      end
+
       # Returns the output from running `yarn list` to get project dependencies
       def yarn_list_command
         args = %w(--json -s --no-progress)
@@ -93,23 +122,11 @@ module Licensed
         Licensed::Shell.execute("yarn", "list", *args, allow_failure: true)
       end
 
-      # Returns a combination of tree data from `yarn list` and results of
-      # the ouput from `yarn info`
-      def merge_yarn_info(tree_data, yarn_info)
-        return tree_data if yarn_info.nil?
-
-        yarn_info = yarn_info.lines
-                             .map(&:strip)
-                             .map(&JSON.method(:parse))
-                             .find { |json| json["type"] == "inspect" }
-        return tree_data if yarn_info.nil?
-
-        tree_data.merge(yarn_info["data"])
-      end
-
-      # Returns the output from running `yarn info` to get package info
-      def yarn_info_command(id)
-        Licensed::Shell.execute("yarn", "info", "-s", "--json", id, allow_failure: true)
+      # Returns the output from running `yarn licenses list` to get project urls
+      def yarn_licenses_command
+        args = %w(--json -s --no-progress)
+        args << "--production" unless include_non_production?
+        Licensed::Shell.execute("yarn", "licenses", "list", *args, allow_failure: true)
       end
 
       # Returns whether to include non production dependencies based on the licensed configuration settings
