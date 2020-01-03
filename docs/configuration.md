@@ -64,7 +64,7 @@ name: 'My application'
 # If not set, defaults to a git repository root
 root: 'relative/path/from/configuration/file/directory'
 
-# Path is relative to configuration root
+# Path is relative to configuration root and specifies where cached metadata will be stored.
 # If not set, defaults to '.licenses'
 cache_path: 'relative/path/to/cache'
 
@@ -78,7 +78,9 @@ sources:
   bower: true
   bundler: false
 
-# Dependencies with these licenses are allowed by default.
+# Dependencies with these licenses are allowed and will not raise errors or warnings.
+# This list does not have a default value and is required for `licensed status`
+# to succeed.
 allowed:
   - mit
   - apache-2.0
@@ -87,8 +89,12 @@ allowed:
   - cc0-1.0
   - isc
 
-# These dependencies are explicitly ignored.
-# They shouldn't be cached at all, and will not have cached metadata written to the repo.
+# These dependencies are ignored during enumeration.
+# They will not be cached, and will not raise errors or warnings.
+# This configuration is intended to be used for dependencies that don't need to
+# be included for compliance purposes, such as other projects owned by the current
+# project's owner, internal dependencies, and dependencies that aren't shipped with
+# the project like test frameworks.
 ignored:
   bundler:
     - some-internal-gem
@@ -102,8 +108,10 @@ ignored:
     # comparisons use the FNM_CASEFOLD and FNM_PATHNAME flags
     - github.com/internal-package/**/*
 
-# These dependencies have been reviewed.
-# They need to be cached and checked, but do not have a license found that matches the allowed configured licenses.
+# These dependencies have licenses not on the `allowed` list and have been reviewed.
+# They will be cached and checked, but will not raise errors or warnings for a
+# non-allowed license.  Dependencies on this list will still raise errors if
+# license text cannot be found for the dependency.
 reviewed:
   bundler:
     - bcrypt-ruby
