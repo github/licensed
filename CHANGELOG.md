@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.8.0
+2020-01-03
+
+### Added
+- Yarn source (https://github.com/github/licensed/pull/232, https://github.com/github/licensed/pull/233, https://github.com/github/licensed/pull/236)
+- NPM source has a new option to include non-production dependencies (https://github.com/github/licensed/pull/231)
+
+### Fixed
+- Cabal source will no longer crash if packages aren't found (https://github.com/github/licensed/pull/230)
+
 ## 2.7.0
 2019-11-10
 
@@ -255,4 +265,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.7.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.8.0...HEAD
