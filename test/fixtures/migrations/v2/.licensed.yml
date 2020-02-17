@@ -1,5 +1,4 @@
 name: migration-v2
-cache_path: cache
 
 sources:
   rubygem: true
@@ -17,7 +16,9 @@ rubygem:
 
 apps:
   - source_path: "."
+    cache_path: cache
   - source_path: "."
+    cache_path: cache
     reviewed:
       rubygem: # to verify that individual app configurations are updated as well
         - test
