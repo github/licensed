@@ -11,7 +11,9 @@ module Licensed
       # or nil if not in a git repository.
       def repository_root
         return unless available?
-        Licensed::Shell.execute("git", "rev-parse", "--show-toplevel", allow_failure: true)
+        root = Licensed::Shell.execute("git", "rev-parse", "--show-toplevel", allow_failure: true)
+        return nil if root.empty?
+        root
       end
 
       # Returns true if a git repository is found, false otherwise
