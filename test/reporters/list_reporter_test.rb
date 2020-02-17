@@ -4,11 +4,10 @@ require "test_helper"
 describe Licensed::Reporters::ListReporter do
   let(:shell) { TestShell.new }
   let(:reporter) { Licensed::Reporters::ListReporter.new(shell) }
-  let(:app) { { "name" => "app" } }
-  let(:config) { Licensed::Configuration.new }
-  let(:source) { TestSource.new(config) }
+  let(:app) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
+  let(:source) { TestSource.new(app) }
   let(:dependency) { source.dependencies.first }
-  let(:command) { TestCommand.new(config: config, reporter: reporter) }
+  let(:command) { TestCommand.new(config: nil, reporter: reporter) }
 
   describe "#report_app" do
     it "runs a block" do
