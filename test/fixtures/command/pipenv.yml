@@ -1,0 +1,7 @@
+expected_dependency: pylint
+source_path: test/fixtures/pipenv
+cache_path: test/fixtures/pipenv/.licenses
+python:
+  virtual_env_dir: test/fixtures/pip/venv
+sources:
+  pipenv: true

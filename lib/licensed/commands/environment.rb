@@ -23,14 +23,14 @@ module Licensed
             "allowed" => config["allowed"],
             "ignored" => config["ignored"],
             "reviewed" => config["reviewed"],
-            "version_strategy" => self.version_strategy
+            "version_strategy" => self.version_strategy,
+            "root" => config.root
           }
         end
       end
 
       def run(**options)
         super do |report|
-          report["root"] = config.root
           report["git_repo"] = Licensed::Git.git_repo?
         end
       end

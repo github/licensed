@@ -1,3 +1,5 @@
 expected_dependency: jquery
 source_path: test/fixtures/bower
 cache_path: test/fixtures/bower/.licenses
+sources:
+  bower: true

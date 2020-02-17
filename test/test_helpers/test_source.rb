@@ -24,7 +24,7 @@ class TestSource < Licensed::Sources::Source
         "type" => TestSource.type,
         "dir" => Dir.pwd
       }.merge(@metadata)
-    }.merge(config["test"] || {})
+    }.merge(config[self.class.type] || {})
     [Licensed::Dependency.new(**dependency_config)]
   end
 end

@@ -6,3 +6,6 @@ go:
 apps:
   - source_path: test/fixtures/go/src/test
   - source_path: test/fixtures/go
+
+sources:
+  go: true
