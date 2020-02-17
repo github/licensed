@@ -6,10 +6,6 @@ describe Licensed::Configuration do
   let(:app) { config.apps.first }
   let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
 
-  it "sets a default cache_path" do
-    assert_equal Pathname.pwd.join(".licenses"), app.cache_path
-  end
-
   describe "load_from" do
     let(:config) { Licensed::Configuration.load_from(load_path) }
 
@@ -112,36 +108,6 @@ describe Licensed::Configuration do
       it "overrides default options" do
         assert_equal "override", config.apps[0]["override"]
       end
-
-      it "uses a default name" do
-        apps[0].delete("name")
-        assert_equal "licensed", config.apps[0]["name"]
-      end
-
-      it "uses a default cache path" do
-        apps[0].delete("cache_path")
-        assert_equal config.apps[0].root.join(".licenses/app1"),
-                     config.apps[0].cache_path
-      end
-
-      it "appends the app name to an inherited cache path" do
-        apps[0].delete("cache_path")
-        config = Licensed::Configuration.new("apps" => apps,
-                                             "cache_path" => "vendor/cache")
-        assert_equal config.apps[0].root.join("vendor/cache/app1"),
-                     config.apps[0].cache_path
-      end
-
-      it "does not append the app name to an explicit cache path" do
-        refute config.apps[0].cache_path.to_s.end_with? config.apps[0]["name"]
-      end
-
-      it "raises an error if source_path is not set on an app" do
-        apps[0].delete("source_path")
-        assert_raises ::Licensed::Configuration::LoadError do
-          Licensed::Configuration.new("apps" => apps)
-        end
-      end
     end
   end
 end
@@ -149,6 +115,37 @@ end
 describe Licensed::AppConfiguration do
   let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
+
+  it "raises an error if source_path is not set" do
+    assert_raises ::Licensed::Configuration::LoadError do
+      Licensed::AppConfiguration.new
+    end
+  end
+
+  it "uses a default name" do
+    assert_equal "licensed", config["name"]
+  end
+
+  it "sets a default cache path with the app name if not configured" do
+    assert_equal config.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, config["name"]),
+                 config.cache_path
+  end
+
+  it "appends the app name to an inherited cache path" do
+    config = Licensed::AppConfiguration.new(
+      { "source_path" => Dir.pwd },
+      { "cache_path" => "vendor/cache" }
+    )
+    assert_equal config.root.join("vendor/cache", config["name"]), config.cache_path
+  end
+
+  it "does not append the app name to an explicit cache path" do
+    config = Licensed::AppConfiguration.new(
+      { "source_path" => Dir.pwd, "cache_path" => "vendor/cache" }
+    )
+    assert_equal config.root.join("vendor/cache"), config.cache_path
+    refute config.cache_path.to_s.end_with? config["name"]
+  end
 
   describe "ignore" do
     let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package" } }
