@@ -5,7 +5,7 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("pip")
   describe Licensed::Sources::Pip do
     let (:fixtures)  { File.expand_path("../../fixtures/pip", __FILE__) }
-    let (:config)   { Licensed::AppConfiguration.new({ "sourcepath" => Dir.pwd, "python" => {"virtual_env_dir" => "test/fixtures/pip/venv" } }) }
+    let (:config)   { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd, "python" => {"virtual_env_dir" => "test/fixtures/pip/venv" } }) }
     let (:source)   { Licensed::Sources::Pip.new(config) }
 
     describe "enabled?" do
