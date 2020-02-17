@@ -5,7 +5,7 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("pipenv")
   describe Licensed::Sources::Pipenv do
     let (:fixtures) { File.expand_path("../../fixtures/pipenv", __FILE__) }
-    let (:config)   { Licensed::Configuration.new }
+    let (:config)   { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let (:source)   { Licensed::Sources::Pipenv.new(config) }
 
     describe "enabled?" do

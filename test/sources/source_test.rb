@@ -4,7 +4,7 @@ require "tmpdir"
 require "fileutils"
 
 describe Licensed::Sources::Source do
-  let(:config) { Licensed::Configuration.new }
+  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { TestSource.new(config) }
 
   describe "dependencies" do

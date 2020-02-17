@@ -5,7 +5,7 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("bower")
   describe Licensed::Sources::Bower do
     let(:fixtures) { File.expand_path("../../fixtures/bower", __FILE__) }
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:source) { Licensed::Sources::Bower.new(config) }
 
     describe "enabled?" do

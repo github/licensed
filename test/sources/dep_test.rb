@@ -4,7 +4,7 @@ require "tmpdir"
 
 describe Licensed::Sources::Dep do
   let(:fixtures) { File.expand_path("../../fixtures/go/src/test", __FILE__) }
-  let(:config) { Licensed::Configuration.new("dep" => { "allow_ignored" => true }) }
+  let(:config) { Licensed::AppConfiguration.new({ "dep" => { "allow_ignored" => true }, "source_path" => Dir.pwd }) }
   let(:source) { Licensed::Sources::Dep.new(config) }
 
   describe "enabled?" do

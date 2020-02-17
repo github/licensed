@@ -6,7 +6,7 @@ if Licensed::Shell.tool_available?("go")
   describe Licensed::Sources::Go do
     let(:gopath) { File.expand_path("../../fixtures/go", __FILE__) }
     let(:fixtures) { File.join(gopath, "src/test") }
-    let(:config) { Licensed::Configuration.new("go" => { "GOPATH" => gopath }) }
+    let(:config) { Licensed::AppConfiguration.new({ "go" => { "GOPATH" => gopath }, "source_path" => Dir.pwd }) }
     let(:source) { Licensed::Sources::Go.new(config) }
 
     describe "enabled?" do

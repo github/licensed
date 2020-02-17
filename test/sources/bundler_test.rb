@@ -5,7 +5,8 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("bundle")
   describe Licensed::Sources::Bundler do
     let(:fixtures) { File.expand_path("../../fixtures/bundler", __FILE__) }
-    let(:config) { Licensed::Configuration.new }
+    let(:source_config) { Hash.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }, "bundler" => source_config) }
     let(:source) { Licensed::Sources::Bundler.new(config) }
 
     before do
@@ -139,7 +140,7 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       describe "when bundler is not explicitly listed as a dependency" do
-        let(:config) { Licensed::Configuration.new("bundler" => { "without" => "bundler" }) }
+        let(:source_config) { { "without" => "bundler" } }
 
         it "does not include bundler as a dependency" do
           Dir.chdir(fixtures) do
@@ -149,7 +150,7 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       describe "with excluded groups in the configuration" do
-        let(:config) { Licensed::Configuration.new("bundler" => { "without" => "exclude" }) }
+        let(:source_config) { { "without" => "exclude" } }
 
         it "ignores gems in the excluded groups" do
           Dir.chdir(fixtures) do
@@ -219,6 +220,7 @@ if Licensed::Shell.tool_available?("bundle")
     end
 
     describe "bundler_exe" do
+
       it "returns bundle if not configured" do
         assert_equal "bundle", source.bundler_exe
       end

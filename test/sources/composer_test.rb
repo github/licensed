@@ -5,7 +5,7 @@ require "fileutils"
 
 if Licensed::Shell.tool_available?("php")
   describe Licensed::Sources::Composer do
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:fixtures) { File.expand_path("../../fixtures/composer", __FILE__) }
     let(:source) { Licensed::Sources::Composer.new(config) }
 

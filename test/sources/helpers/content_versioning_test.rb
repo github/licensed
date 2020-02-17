@@ -3,7 +3,7 @@ require "test_helper"
 
 describe Licensed::Sources::ContentVersioning do
   let(:fixtures) { File.expand_path("../../../fixtures/command", __FILE__) }
-  let(:config) { Licensed::Configuration.new }
+  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:helper) do
     obj = mock.extend Licensed::Sources::ContentVersioning
     obj.stubs(:config).returns(config)
