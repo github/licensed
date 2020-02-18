@@ -5,7 +5,7 @@ require "fileutils"
 
 if Licensed::Shell.tool_available?("npm")
   describe Licensed::Sources::NPM do
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
     let(:source) { Licensed::Sources::NPM.new(config) }
 

@@ -5,7 +5,7 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("mix")
   describe Licensed::Sources::Mix do
     let(:fixtures) { File.expand_path("../../fixtures/mix", __FILE__) }
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:source) { Licensed::Sources::Mix.new(config) }
 
     describe "enabled?" do

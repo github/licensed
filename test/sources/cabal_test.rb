@@ -5,7 +5,7 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("ghc")
   describe Licensed::Sources::Cabal do
     let(:fixtures) { File.expand_path("../../fixtures/cabal", __FILE__) }
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:source) { Licensed::Sources::Cabal.new(config) }
 
     describe "enabled?" do

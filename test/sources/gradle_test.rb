@@ -5,7 +5,7 @@ require "fileutils"
 
 describe Licensed::Sources::Gradle do
   let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
-  let(:config) { Licensed::Configuration.new }
+  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { Licensed::Sources::Gradle.new(config) }
 
   describe "enabled?" do
@@ -52,7 +52,7 @@ end
 
 describe Licensed::Sources::Gradle::Dependency do
   let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
-  let(:config) { Licensed::Configuration.new }
+  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { Licensed::Sources::Gradle.new(config) }
 
   it "returns the dependency license" do

@@ -74,8 +74,8 @@ describe Licensed::Commands::Command do
 
   it "reports errors found on a dependency" do
     dependency_name = "#{apps.first["name"]}.test.dependency"
-    configuration.apps.first["test"] = { errors: ["error"] }
-    refute command.run
+    proc = lambda { |app, source, dep| dep.errors << "error" }
+    refute command.run(dependency_proc: proc)
     report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
     assert report
     assert_includes report.errors, "error"

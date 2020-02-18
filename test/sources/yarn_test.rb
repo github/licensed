@@ -5,7 +5,7 @@ require "fileutils"
 
 if Licensed::Shell.tool_available?("yarn")
   describe Licensed::Sources::Yarn do
-    let(:config) { Licensed::Configuration.new }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:fixtures) { File.expand_path("../../fixtures/yarn", __FILE__) }
     let(:source) { Licensed::Sources::Yarn.new(config) }
 

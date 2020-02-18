@@ -4,7 +4,8 @@ require "tmpdir"
 
 describe Licensed::Sources::Manifest do
   let(:fixtures) { File.expand_path("../../fixtures/manifest", __FILE__) }
-  let(:config) { Licensed::Configuration.new("cache_path" => fixtures) }
+  let(:source_config) { Hash.new }
+  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd, "cache_path" => fixtures, "manifest" => source_config }) }
   let(:source) { Licensed::Sources::Manifest.new(config) }
 
   describe "enabled?" do
@@ -121,7 +122,8 @@ describe Licensed::Sources::Manifest do
     end
 
     describe "from a generated manifest" do
-      let(:manifest_config) do
+      let(:fixtures) { File.expand_path("../../fixtures/manifest/generated_manifest", __FILE__) }
+      let(:source_config) do
         {
           # exclude all files that aren't in the generated manifest test folder
           "exclude" => [
@@ -130,10 +132,9 @@ describe Licensed::Sources::Manifest do
           ]
         }
       end
-      let(:config) { Licensed::Configuration.new("manifest" => manifest_config) }
 
       it "excludes files matching patterns in the \"exclude\" setting" do
-        config["manifest"]["dependencies"] = {
+        source_config["dependencies"] = {
           "manifest_test" => "**/*"
         }
         manifest = source.manifest
@@ -141,7 +142,7 @@ describe Licensed::Sources::Manifest do
       end
 
       it "matches files to dependencies using glob patterns" do
-        config["manifest"]["dependencies"] = {
+        source_config["dependencies"] = {
           "manifest_test" => ["**/*", "!**/nested/*"],
           "nested" => "**/nested/*"
         }
@@ -156,7 +157,7 @@ describe Licensed::Sources::Manifest do
       end
 
       it "raises an error if the \"dependencies\" setting is empty" do
-        config["manifest"]["dependencies"] = {}
+        source_config["dependencies"] = {}
 
         err = assert_raises Licensed::Sources::Source::Error do
           source.manifest
@@ -166,7 +167,7 @@ describe Licensed::Sources::Manifest do
       end
 
       it "raises an error if any files match multiple dependencies" do
-        config["manifest"]["dependencies"] = {
+        source_config["dependencies"] = {
           "manifest_test" => "**/*",
           "manifest_test_2" => "**/*"
         }
@@ -178,7 +179,7 @@ describe Licensed::Sources::Manifest do
       end
 
       it "raises an error if any files do not match any dependencies" do
-        config["manifest"]["dependencies"] = {
+        source_config["dependencies"] = {
           "manifest_test" => "!**/nested/*"
         }
 

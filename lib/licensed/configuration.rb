@@ -4,40 +4,39 @@ require "pathname"
 module Licensed
   class AppConfiguration < Hash
     DEFAULT_CACHE_PATH = ".licenses".freeze
-    DEFAULT_CONFIG_FILES = [
-      ".licensed.yml".freeze,
-      ".licensed.yaml".freeze,
-      ".licensed.json".freeze
-    ].freeze
+
+    # Returns the root for a configuration in following order of precendence:
+    # 1. explicitly configured "root" property
+    # 2. a found git repository root
+    # 3. the current directory
+    def self.root_for(configuration)
+      configuration["root"] || Licensed::Git.repository_root || Dir.pwd
+    end
 
     def initialize(options = {}, inherited_options = {})
       super()
 
       # update order:
       # 1. anything inherited from root config
-      # 2. app defaults
-      # 3. explicitly configured app settings
+      # 2. explicitly configured app settings
       update(inherited_options)
-      update(defaults_for(options, inherited_options))
       update(options)
+      verify_arg "source_path"
 
       self["sources"] ||= {}
       self["reviewed"] ||= {}
       self["ignored"] ||= {}
       self["allowed"] ||= []
-
-      # default the root to the git repository root,
-      # or the current directory if no other options are available
-      self["root"] ||= Licensed::Git.repository_root || Dir.pwd
-
-      verify_arg "source_path"
-      verify_arg "cache_path"
+      self["root"] = AppConfiguration.root_for(self)
+      # defaults to the directory name of the source path if not set
+      self["name"] ||= File.basename(self["source_path"])
+      # setting the cache path might need a valid app name
+      self["cache_path"] = detect_cache_path(options, inherited_options)
     end
 
     # Returns the path to the workspace root as a Pathname.
-    # Defaults to Licensed::Git.repository_root if not explicitly set
     def root
-      Pathname.new(self["root"])
+      @root ||= Pathname.new(self["root"])
     end
 
     # Returns the path to the app cache directory as a Pathname
@@ -102,13 +101,15 @@ module Licensed
 
     private
 
-    def defaults_for(options, inherited_options)
-      name = options["name"] || File.basename(options["source_path"])
+    # Returns the cache path for the application based on:
+    # 1. An explicitly set cache path for the application, if set
+    # 2. An inherited root cache path joined with the app name
+    # 3. The default cache path joined with the app name
+    def detect_cache_path(options, inherited_options)
+      return options["cache_path"] unless options["cache_path"].to_s.empty?
+
       cache_path = inherited_options["cache_path"] || DEFAULT_CACHE_PATH
-      {
-        "name" => name,
-        "cache_path" => File.join(cache_path, name)
-      }
+      File.join(cache_path, self["name"])
     end
 
     def verify_arg(property)
@@ -118,8 +119,17 @@ module Licensed
     end
   end
 
-  class Configuration < AppConfiguration
+  class Configuration
+    DEFAULT_CONFIG_FILES = [
+      ".licensed.yml".freeze,
+      ".licensed.yaml".freeze,
+      ".licensed.json".freeze
+    ].freeze
+
     class LoadError < StandardError; end
+
+    # An array of the applications in this licensed configuration.
+    attr_reader :apps
 
     # Loads and returns a Licensed::Configuration object from the given path.
     # The path can be relative or absolute, and can point at a file or directory.
@@ -133,17 +143,8 @@ module Licensed
 
     def initialize(options = {})
       apps = options.delete("apps") || []
-      super(default_options.merge(options))
-
-      self["apps"] = apps.map { |app| AppConfiguration.new(app, options) }
-    end
-
-    # Returns an array of the applications for this licensed configuration.
-    # If the configuration did not explicitly configure any applications,
-    # return self as an application configuration.
-    def apps
-      return [self] if self["apps"].empty?
-      self["apps"]
+      apps << default_options.merge(options) if apps.empty?
+      @apps = apps.map { |app| AppConfiguration.new(app, options) }
     end
 
     private
@@ -198,7 +199,7 @@ module Licensed
       # manually set a cache path without additional name
       {
         "source_path" => Dir.pwd,
-        "cache_path" => DEFAULT_CACHE_PATH
+        "cache_path" => AppConfiguration::DEFAULT_CACHE_PATH
       }
     end
   end

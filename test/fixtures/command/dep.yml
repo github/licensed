@@ -3,3 +3,5 @@ source_path: test/fixtures/go/src/test
 cache_path: test/fixtures/go/.licenses
 dep:
   allow_ignored: true
+sources:
+  dep: true

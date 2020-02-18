@@ -28,14 +28,14 @@ class TestCommand < Licensed::Commands::Command
   end
 
   def run_source(app, source)
-    return options[:source_proc].call(app, source) if options[:source_proc]
+    options[:source_proc].call(app, source) if options[:source_proc]
     super do |report|
       report["extra"] = true
     end
   end
 
   def run_dependency(app, source, dependency)
-    return options[:dependency_proc].call(app, source, dependency) if options[:dependency_proc]
+    options[:dependency_proc].call(app, source, dependency) if options[:dependency_proc]
     super do |report|
       report["extra"] = true
     end
