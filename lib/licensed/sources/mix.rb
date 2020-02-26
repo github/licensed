@@ -93,8 +93,12 @@ module Licensed
             :[a-zA-Z0-9_]+    # after an Elixir atom,
             ,\s*              # and skipping a comma and any number of spaces,
             "(?<version>.*?)" # capture the contents of a double-quoted string as the version,
-            .*                # and later
+            .*?\],\s*         # and later
             "(?<repo>.*?)"    # capture the contents of a double-quoted string as the repo
+            (?:
+              ,\s*            # a comma
+              "[a-f0-9]{64}"  # a digest
+            )?
             \},?\s*\Z         # right before the final closing brace.
           /x,
 
