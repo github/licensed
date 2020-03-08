@@ -2,12 +2,13 @@
 require "test_helper"
 
 describe Licensed::Configuration do
-  let(:config) { Licensed::Configuration.new }
-  let(:app) { config.apps.first }
+  let(:options) { { } }
+  let(:config) { Licensed::Configuration.new(options) }
   let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
 
   describe "load_from" do
     let(:config) { Licensed::Configuration.load_from(load_path) }
+    let(:app) { config.apps.first }
 
     describe "a relative directory path" do
       let(:load_path) { Pathname.new(fixtures).relative_path_from(Pathname.pwd) }
@@ -64,49 +65,97 @@ describe Licensed::Configuration do
   end
 
   describe "apps" do
+    let(:apps) do
+      [
+        {
+          "name" => "app1",
+          "override" => "override",
+          "cache_path" => "app1/vendor/licenses",
+          "source_path" => File.expand_path("../../", __FILE__)
+        },
+        {
+          "name" => "app2",
+          "cache_path" => "app2/vendor/licenses",
+          "source_path" => File.expand_path("../../", __FILE__)
+        }
+      ]
+    end
+    let(:options) { { "apps" => apps } }
+    let(:config) { Licensed::Configuration.new(options) }
+
     it "returns a default app if apps not specified in configuration" do
+      options.delete "apps"
       assert_equal 1, config.apps.size
+      app = config.apps.first
       assert_equal Pathname.pwd, app.source_path
       assert_equal app.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH),
                    app.cache_path
       assert_equal File.basename(Dir.pwd), app["name"]
     end
 
-    describe "from configuration options" do
-      let(:apps) do
-        [
-          {
-            "name" => "app1",
-            "override" => "override",
-            "cache_path" => "app1/vendor/licenses",
-            "source_path" => File.expand_path("../../", __FILE__)
-          },
-          {
-            "name" => "app2",
-            "cache_path" => "app2/vendor/licenses",
-            "source_path" => File.expand_path("../../", __FILE__)
-          }
-        ]
+    it "expands source_path patterns in default app" do
+      options.delete "apps"
+      options["source_path"] = File.expand_path("../fixtures/*", __FILE__)
+      expected_source_paths = Dir.glob(options["source_path"]).select { |p| File.directory?(p) }
+      expected_source_paths.each do |source_path|
+        app = config.apps.find { |app| app["source_path"] == source_path }
+        assert app
+        dir_name = File.basename(source_path)
+        assert_equal app.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, dir_name),
+                     app.cache_path
+        assert_equal dir_name, app["name"]
       end
-      let(:config) do
-        Licensed::Configuration.new("apps" => apps,
-                                    "override" => "default",
-                                    "default" => "default")
-      end
+    end
 
-      it "returns apps from configuration" do
-        assert_equal 2, config.apps.size
-        assert_equal "app1", config.apps[0]["name"]
-        assert_equal "app2", config.apps[1]["name"]
-      end
+    it "returns configured apps" do
+      assert_equal 2, config.apps.size
+      assert_equal "app1", config.apps[0]["name"]
+      assert_equal "app2", config.apps[1]["name"]
+    end
 
-      it "includes default options" do
-        assert_equal "default", config.apps[0]["default"]
-        assert_equal "default", config.apps[1]["default"]
+    it "includes default options" do
+      options["default"] = "default"
+      config.apps.each do |app|
+        assert_equal "default", app["default"]
       end
+    end
 
-      it "overrides default options" do
-        assert_equal "override", config.apps[0]["override"]
+    it "can override default options" do
+      options["default"] = "default"
+      apps[0]["default"] = "override"
+      assert_equal "override", config.apps[0]["default"]
+    end
+
+    it "expands patterns in configured apps" do
+      apps.clear
+      apps << { "source_path" => File.expand_path("../fixtures/*", __FILE__) }
+      expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
+      expected_source_paths.each do |source_path|
+        app = config.apps.find { |app| app["source_path"] == source_path }
+        assert app
+        dir_name = File.basename(source_path)
+        assert_equal app.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, dir_name),
+                     app.cache_path
+        assert_equal dir_name, app["name"]
+      end
+    end
+
+    it "assigns uniqueness to explicitly configured values" do
+      cache_path = ".test_licenses"
+      name = "test"
+      apps.clear
+      apps << {
+        "source_path" => File.expand_path("../fixtures/*", __FILE__),
+        "cache_path" => cache_path,
+        "name" => name
+      }
+      expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
+      expected_source_paths.each do |source_path|
+        app = config.apps.find { |app| app["source_path"] == source_path }
+        assert app
+        dir_name = File.basename(source_path)
+        assert_equal app.root.join(cache_path, dir_name), app.cache_path
+        assert_equal "#{name}-#{dir_name}", app["name"]
       end
     end
   end
