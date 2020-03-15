@@ -87,6 +87,7 @@ module Licensed
         # true if go standard packages includes the import path as given
         return true if go_std_packages.include?(import_path)
         return true if go_std_packages.include?("vendor/#{import_path}")
+        return true if go_std_packages.include?(import_path.sub("golang.org", "internal"))
 
         # additional checks are only for vendored dependencies - return false
         # if package isn't vendored
@@ -96,6 +97,7 @@ module Licensed
         # return true if any of the go standard packages matches against
         # the non-vendored import path
         return true if go_std_packages.include?(non_vendored_import_path)
+        return true if go_std_packages.include?(non_vendored_import_path.sub("golang.org", "internal"))
 
         # modify the import path to look like the import path `go list` returns for vendored std packages
         vendor_path = import_path.sub("#{root_package["ImportPath"]}/", "")
