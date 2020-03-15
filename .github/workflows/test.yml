@@ -170,7 +170,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.7.x', '1.10.x', '1.11.1' ]
+        go: [ '1.7.x', '1.10.x', '1.11.x', '1.12.x', '1.13.x', '1.14.x' ]
     steps:
     - uses: actions/checkout@master
     - name: Setup go
@@ -342,7 +342,7 @@ jobs:
       run: script/source-setup/pipenv
     - name: Run tests
       run: script/test pipenv
-      
+
   yarn:
     runs-on: ubuntu-latest
     strategy:
