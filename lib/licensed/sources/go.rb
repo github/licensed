@@ -155,8 +155,9 @@ module Licensed
         # 3. package root value if available
         # 4. GOPATH if the package directory is under the gopath
         # 5. nil
-        return package.dig("Module", "Dir") if package["Module"]
         return package["Dir"].match("^(.*/vendor)/.*$")[1] if vendored_path?(package["Dir"])
+        module_dir = package.dig("Module", "Dir")
+        return module_dir if module_dir
         return package["Root"] if package["Root"]
         return gopath if package["Dir"]&.start_with?(gopath)
         nil
