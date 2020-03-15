@@ -15,7 +15,8 @@ module Licensed
       def enumerate_dependencies
         with_configured_gopath do
           packages.map do |package|
-            import_path = non_vendored_import_path(package["ImportPath"])
+            import_path = non_vendored_path(package["ImportPath"], root_package["ImportPath"])
+            import_path ||= package["ImportPath"]
             error = package.dig("Error", "Err") if package["Error"]
 
             Dependency.new(
@@ -89,11 +90,12 @@ module Licensed
 
         # additional checks are only for vendored dependencies - return false
         # if package isn't vendored
-        return false unless vendored_path?(import_path)
+        non_vendored_import_path = non_vendored_path(import_path, root_package["ImportPath"])
+        return false unless non_vendored_import_path
 
         # return true if any of the go standard packages matches against
         # the non-vendored import path
-        return true if go_std_packages.include?(non_vendored_import_path(import_path))
+        return true if go_std_packages.include?(non_vendored_import_path)
 
         # modify the import path to look like the import path `go list` returns for vendored std packages
         vendor_path = import_path.sub("#{root_package["ImportPath"]}/", "")
@@ -104,7 +106,7 @@ module Licensed
       def local_package?(package)
         return false unless package && package["ImportPath"]
         import_path = package["ImportPath"]
-        import_path.start_with?(root_package["ImportPath"]) && !vendored_path?(import_path)
+        import_path.start_with?(root_package["ImportPath"]) && !import_path.include?("vendor/")
       end
 
       # Returns the version for a given package
@@ -150,35 +152,37 @@ module Licensed
         return if package.nil?
 
         # search root choices:
-        # 1. module directory if using go modules
+        # 1. module directory if using go modules and directory is available
         # 2. vendor folder if package is vendored
         # 3. package root value if available
         # 4. GOPATH if the package directory is under the gopath
         # 5. nil
-        return package["Dir"].match("^(.*/vendor)/.*$")[1] if vendored_path?(package["Dir"])
         module_dir = package.dig("Module", "Dir")
         return module_dir if module_dir
+        return package["Dir"].match("^(.*/vendor)/.*$")[1] if vendored_path?(package["Dir"], config.root)
         return package["Root"] if package["Root"]
         return gopath if package["Dir"]&.start_with?(gopath)
         nil
       end
 
-      # Returns whether a package is vendored or not based on the package
-      # import_path
+      # Returns whether a package is vendored or not based on a base path and
+      # whether the path contains a vendor component
       #
       # path - Package path to test
-      def vendored_path?(path)
-        return false if path.nil?
-        path.start_with?(root_package["ImportPath"]) && path.include?("vendor/")
+      # base - The base path that the input must start with
+      def vendored_path?(path, base)
+        return false if path.nil? || base.nil?
+        path.start_with?(base.to_s) && path.include?("vendor/")
       end
 
-      # Returns the import path parameter without the vendor component
+      # Returns the path parameter without the vendor component if one is found
       #
-      # import_path - Package import path with vendor component
-      def non_vendored_import_path(import_path)
-        return unless import_path
-        return import_path unless vendored_path?(import_path)
-        import_path.split("vendor/")[1]
+      # path - Package path with vendor component
+      # base - The base path that the input must start with
+      def non_vendored_path(path, base)
+        return unless path
+        return unless vendored_path?(path, base)
+        path.split("vendor/")[1]
       end
 
       # Returns a hash of information about the package with a given import path
