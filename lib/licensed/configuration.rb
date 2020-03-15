@@ -144,10 +144,34 @@ module Licensed
     def initialize(options = {})
       apps = options.delete("apps") || []
       apps << default_options.merge(options) if apps.empty?
+      apps = apps.flat_map { |app| self.class.expand_app_source_path(app) }
       @apps = apps.map { |app| AppConfiguration.new(app, options) }
     end
 
     private
+
+    def self.expand_app_source_path(app_config)
+      return app_config if app_config["source_path"].to_s.empty?
+
+      source_path = File.expand_path(app_config["source_path"], AppConfiguration.root_for(app_config))
+      expanded_source_paths = Dir.glob(source_path).select { |p| File.directory?(p) }
+      # return the original configuration if glob didn't result in multiple paths
+      return app_config if expanded_source_paths.size <= 1
+
+      # map the expanded paths to new application configurations
+      expanded_source_paths.map do |path|
+        config = app_config.merge("source_path" => path)
+
+        # update configured values for name and cache_path for uniqueness.
+        # this is only needed when values are explicitly set, AppConfiguration
+        # will handle configurations that don't have these explicitly set
+        dir_name = File.basename(path)
+        config["name"] = "#{config["name"]}-#{dir_name}" if config["name"]
+        config["cache_path"] = File.join(config["cache_path"], dir_name) if config["cache_path"]
+
+        config
+      end
+    end
 
     # Find a default configuration file in the given directory.
     # File preference is given by the order of elements in DEFAULT_CONFIG_FILES

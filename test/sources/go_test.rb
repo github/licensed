@@ -247,12 +247,11 @@ if Licensed::Shell.tool_available?("go")
       end
 
       it "is the vendor folder if the package is vendored" do
-        source.stubs(:vendored_path?).returns(true)
-        package = { "Dir" => "test/vendor/package/path" }
-        assert_equal "test/vendor", source.search_root(package)
+        package = { "Dir" => "#{config.root}/vendor/package/path" }
+        assert_equal "#{config.root}/vendor", source.search_root(package)
       end
 
-      it "is package['Root'] is given" do
+      it "is package['Root'] if given" do
         package = {
           "Dir" => "test/path",
           "Root" => "test"
