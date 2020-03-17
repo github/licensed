@@ -45,6 +45,24 @@ describe Licensed::Commands::Status do
     end
   end
 
+  it "warns if license text changed and needs re-review" do
+    config.apps.each do |app|
+      path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+      record = Licensed::DependencyRecord.read(path)
+      record["review_changed_license"] = true
+      record.save(path)
+    end
+
+    verifier.run
+    config.apps.each do |app|
+      app.sources.each do |source|
+        assert_includes \
+          dependency_errors(app, source),
+          "license text has changed and needs re-review. if the new text is ok, remove the `review_changed_license` flag from the cached record"
+      end
+    end
+  end
+
   it "does not warn if license is allowed" do
     config.apps.each do |app|
       app.allow "mit"

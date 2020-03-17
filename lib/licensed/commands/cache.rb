@@ -45,8 +45,15 @@ module Licensed
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
         cached_record = Licensed::DependencyRecord.read(filename)
         if options[:force] || save_dependency_record?(dependency, cached_record)
-          # use the cached license value if the license text wasn't updated
-          dependency.record["license"] = cached_record["license"] if dependency.record.matches?(cached_record)
+          if dependency.record.matches?(cached_record)
+            # use the cached license value if the license text wasn't updated
+            dependency.record["license"] = cached_record["license"]
+          elsif cached_record && app.reviewed?(dependency.record)
+            # if the license text changed and the dependency is set as reviewed
+            # force a re-review of the dependency
+            dependency.record["review_changed_license"] = true
+          end
+
           dependency.record.save(filename)
           report["cached"] = true
         end

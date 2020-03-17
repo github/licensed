@@ -92,6 +92,30 @@ describe Licensed::Commands::Cache do
     end
   end
 
+  it "requires re-review after license text changes" do
+    generator.run
+
+    config.apps.each do |app|
+      path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+      record = Licensed::DependencyRecord.read(path)
+      record.licenses.clear
+      record["version"] = "0.0"
+      record.save(path)
+
+      # set the app reviewed to trigger the need for re-review
+      app.review(record)
+    end
+
+    generator.run
+
+    config.apps.each do |app|
+      path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+      record = Licensed::DependencyRecord.read(path)
+      assert_equal true, record["review_changed_license"]
+      refute_equal "0.0", record["version"]
+    end
+  end
+
   it "does not reuse nil record version" do
     generator.run
 
