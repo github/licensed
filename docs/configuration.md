@@ -19,6 +19,22 @@ If a root path is not specified, it will default to using the following, in orde
 1. the root of the local git repository, if run inside a git repository
 2. the current directory
 
+### Source path glob patterns
+
+The `source_path` property can use a glob path to share configuration properties across multiple application entrypoints.
+
+For example, there is a common pattern in go projects to include multiple executable entrypoints under folders in `cmd`.  Using a glob pattern allows users to avoid manually configuring and maintaining multiple licensed application `source_path`s.  Using a glob pattern will also ensure that any new entrypoints matching the pattern are automatically picked up by licensed commands as they are added.
+
+```yml
+sources:
+  go: true
+
+# treat all directories under `cmd` as separate apps
+source_path: cmd/*
+```
+
+Glob patterns are syntactic sugar for, and provide the same functionality as, manually specifying multiple `source_path` values. See the instructions on [specifying multiple apps](./#specifying-multiple-apps) below for additional considerations when using multiple apps.
+
 ## Restricting sources
 
 The `sources` configuration property specifies which sources `licensed` will use to enumerate dependencies.

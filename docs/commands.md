@@ -28,6 +28,8 @@ A dependency will fail the status checks if:
 3. The cached record's `licenses` data is empty
 4. The cached record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration.
    - If `license: other` is specified and all of the `licenses` entries match an `allowed` license a failure will not be logged
+5. The cached record is flagged for re-review.
+   - This occurs when the record's license text has changed since the record was reviewed.
 
 ## `env`
 
