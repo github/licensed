@@ -2,4 +2,5 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-bundle install --path vendor/gems
+bundle config set path 'vendor/gems'
+bundle install
