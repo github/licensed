@@ -6,17 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.9.1
+2020-03-24
+
+### Changed
+- relaxed gem version restrictions on Thor (:tada: @eileencodes https://github.com/github/licensed/pull/254)
+
 ## 2.9.0
 2020-03-19
 
-## Added
+### Added
 - Source paths use glob pattern matching (https://github.com/github/licensed/pull/245)
 
-## Fixed
+### Fixed
 - Mix source supports updates to mix.lock format (:tada: @bruce https://github.com/github/licensed/pull/242)
 - Go source supports `go list` format changes in go 1.14 (https://github.com/github/licensed/pull/247)
 
-## Changed
+### Changed
 - `licensed cache` will flag dependencies for re-review when license text changes (https://github.com/github/licensed/pull/248)
 - `licensed status` will raise errors on dependencies that need re-review (https://github.com/github/licensed/pull/248)
 - `licensee` minimum version bumped to 9.13.1 (https://github.com/github/licensed/pull/251)
@@ -280,4 +286,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.9.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.9.1...HEAD
