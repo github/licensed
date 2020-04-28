@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.9.2
+2020-04-28
+
+### Changed
+- `licensee` minimum version bumped to 9.13.2 (https://github.com/github/licensed/pull/256)
+
 ## 2.9.1
 2020-03-24
 
@@ -286,4 +292,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.9.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.9.2...HEAD
