@@ -47,6 +47,9 @@ module Licensed
 
       def initialize(shell = Licensed::UI::Shell.new)
         @shell = shell
+        @run_report = nil
+        @app_report = nil
+        @source_report = nil
       end
 
       # Generate a report for a licensed command execution

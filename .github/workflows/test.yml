@@ -11,7 +11,7 @@ jobs:
   bower:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup node
       uses: actions/setup-node@v1
       with:
@@ -23,10 +23,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -40,7 +40,7 @@ jobs:
       matrix:
         bundler: [ '~> 1.15.0', '~> 1.16.0', '~> 1.17.0', '~> 2.0.0' ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
@@ -50,10 +50,10 @@ jobs:
         yes | gem uninstall bundler --all
         gem install bundler -v "${{ matrix.bundler }}"
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -68,7 +68,7 @@ jobs:
         ghc: [ '8.2.2', '8.6.5' ]
         cabal: [ '2.0', '3.0' ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
@@ -79,10 +79,10 @@ jobs:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -96,7 +96,7 @@ jobs:
       matrix:
         php: [ '5.6', '7.1', '7.2', '7.3' ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup php
       uses: nanasess/setup-php@v1.0.2
       with:
@@ -106,10 +106,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -123,7 +123,7 @@ jobs:
       matrix:
         ruby: [ 2.4.x, 2.5.x, 2.6.x ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
@@ -131,10 +131,10 @@ jobs:
     - name: Set up Bundler
       run: gem install bundler
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-${{ matrix.ruby }}-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Build and lint
@@ -145,7 +145,7 @@ jobs:
   dep:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup go
       uses: actions/setup-go@v1
       with:
@@ -155,10 +155,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -172,7 +172,7 @@ jobs:
       matrix:
         go: [ '1.7.x', '1.10.x', '1.11.x', '1.12.x', '1.13.x', '1.14.x' ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup go
       uses: actions/setup-go@v1
       with:
@@ -182,10 +182,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -196,16 +196,16 @@ jobs:
   gradle:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Gradle version
@@ -216,16 +216,16 @@ jobs:
   manifest:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Run tests
@@ -238,7 +238,7 @@ jobs:
         otp: [21.x, 22.x]
         elixir: [1.8.x, 1.9.x]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - uses: actions/setup-elixir@v1.0.0
       with:
         otp-version: ${{matrix.otp}}
@@ -248,10 +248,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -265,7 +265,7 @@ jobs:
       matrix:
         node_version: [ 8, 10, 12 ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup node
       uses: actions/setup-node@v1
       with:
@@ -275,10 +275,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
@@ -292,7 +292,7 @@ jobs:
       matrix:
         python: [ '2.x', '3.x' ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup python
       uses: actions/setup-python@v1
       with:
@@ -303,10 +303,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Install virtualenv
@@ -319,7 +319,7 @@ jobs:
   pipenv:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup python
       uses: actions/setup-python@v1
       with:
@@ -330,10 +330,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Install pipenv
@@ -350,7 +350,7 @@ jobs:
         # not using 1.0.0 because it doesn't support `yarn list --production`
         yarn_version: [ 1.4.0, latest ]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Setup node
       uses: actions/setup-node@v1
       with:
@@ -364,10 +364,10 @@ jobs:
       with:
         ruby-version: 2.6.x
     - run: bundle lock
-    - uses: actions/cache@preview
+    - uses: actions/cache@v1
       with:
         path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
