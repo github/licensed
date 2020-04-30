@@ -125,7 +125,7 @@ module Licensed
         # find most recent git SHA for a package, or nil if SHA is
         # not available
         Dir.chdir package_directory do
-          contents_version *contents_version_arguments
+          contents_version(*contents_version_arguments)
         end
       end
 
