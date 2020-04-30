@@ -102,14 +102,15 @@ Dependencies will be automatically detected for all of the following sources by 
 1. [Bundler](./docs/sources/bundler.md)
 1. [Cabal](./docs/sources/cabal.md)
 1. [Composer](./docs/sources/composer.md)
+1. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
 1. [Go](./docs/sources/go.md)
 1. [Go Dep (dep)](./docs/sources/dep.md)
+1. [Gradle](./docs/sources/gradle.md)
 1. [Manifest lists (manifests)](./docs/sources/manifests.md)
+1. [Mix](./docs/sources/mix.md)
 1. [NPM](./docs/sources/npm.md)
 1. [Pip](./docs/sources/pip.md)
 1. [Pipenv](./docs/sources/pipenv.md)
-1. [Git Submodules (git_submodule)](./docs/sources/git_submodule.md)
-1. [Mix](./docs/sources/mix.md)
 1. [Yarn](./docs/sources/yarn.md)
 
 You can disable any of them in the configuration file:
