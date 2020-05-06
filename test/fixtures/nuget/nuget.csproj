@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Has a license expression, LICENSE.md, and licenseUrl-->
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+
+    <!-- Has a EULA-agreement.txt file (and also a bogus licenseUrl) -->
+    <PackageReference Include="Microsoft.Azure.Kusto.Data" Version="8.0.7" />
+    
+    <!-- Has only a licenseUrl to https://opensource.org/licenses/mit which we should interpret offline -->
+    <PackageReference Include="Handlebars.Net" Version="1.10.1" />
+
+    <!-- Has only a licenseUrl to http://www.apache.org/licenses/LICENSE-2.0 which we should interpret offline -->
+    <PackageReference Include="Serilog" Version="2.5.0" />
+
+    <!-- Has only a licenseUrl to https://github.com/benaadams/Ben.Demystifier/blob/master/LICENSE which we should convert to a "raw" URL and fetch -->
+    <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
+  </ItemGroup>
+</Project>

@@ -109,6 +109,7 @@ Dependencies will be automatically detected for all of the following sources by 
 1. [Manifest lists (manifests)](./docs/sources/manifests.md)
 1. [Mix](./docs/sources/mix.md)
 1. [NPM](./docs/sources/npm.md)
+1. [NuGet](./docs/sources/nuget.md)
 1. [Pip](./docs/sources/pip.md)
 1. [Pipenv](./docs/sources/pipenv.md)
 1. [Yarn](./docs/sources/yarn.md)

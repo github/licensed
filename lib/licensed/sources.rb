@@ -11,6 +11,7 @@ module Licensed
     require "licensed/sources/go"
     require "licensed/sources/manifest"
     require "licensed/sources/npm"
+    require "licensed/sources/nuget"
     require "licensed/sources/pip"
     require "licensed/sources/pipenv"
     require "licensed/sources/gradle"
