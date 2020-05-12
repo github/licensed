@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "json"
+require "reverse_markdown"
 
 module Licensed
   module Sources
@@ -10,70 +11,14 @@ module Licensed
         "nuget"
       end
 
-      # Match nuspec license expressions like <license type="expression">MIT</license>
-      class NuspecLicenseExpressionMatcher < Licensee::Matchers::Package
-        LICENSE_EXPRESSION_REGEX = /
-          <license\s*type\s*=\s*\"\s*expression\s*\"\s*>\s*([a-z\-0-9\.]+)\s*<\/license>
-        /ix.freeze
-
-        def license_property
-          return @license_property if defined?(@license_property)
-          match = @file.content.match LICENSE_EXPRESSION_REGEX
-          if match && match[1]
-            @license_property = match[1].downcase
-          end
-        end
-      end
-
-      class NuspecFile < Licensee::ProjectFiles::ProjectFile
-        def possible_matchers
-          [NuspecLicenseExpressionMatcher]
-        end
-      end
-
-      # A pseudo-license file where the license is already known (e.g. inferred from a URL)
-      class KnownLicenseFile < Licensee::ProjectFiles::ProjectFile
-        def initialize(license, metadata)
-          super(license.content, metadata)
-          @license = license
-        end
-
-        def license
-          return @license
-        end
-
-        def confidence
-          100
-        end
-      end
-
       class NuGetDependency < Licensed::Dependency
         LICENSE_FILE_REGEX = /<license\s*type\s*=\s*\"\s*file\s*\"\s*>\s*(.*)\s*<\/license>/ix.freeze
         LICENSE_URL_REGEX = /<licenseUrl>\s*(.*)\s*<\/licenseUrl>/ix.freeze
+        PROJECT_URL_REGEX = /<projectUrl>\s*(.*)\s*<\/projectUrl>/ix.freeze
 
-        def license
-          # By default, multiple of the same/similar licenses (e.g. a package with LICENSE.txt, license, and licenseUrl)
-          # will incorrectly result in an "other" license.
-
-          # Treat license expressions as most trustworthy, then local licenses, then remote licenses, then any license files
-          return @license if defined? @license
-          return @license = package_file.license if package_file && package_file.license
-          return @license = nuspec_local_license_file.license if nuspec_local_license_file && nuspec_local_license_file.license
-          return @license = nuspec_remote_license_file.license if nuspec_remote_license_file && nuspec_remote_license_file.license
-          super
-        end
-
-        def package_name
-          return unless @metadata
-          @metadata["name"]
-        end
-
-        def package_file
-          @package_file ||= NuspecFile.new(nuspec_contents, nuspec_path)
-        end
-
-        def project_files
-          @project_files ||= [license_files, readme_file, package_file, nuspec_local_license_file, nuspec_remote_license_file].flatten.compact
+        def initialize(name:, version:, path:, search_root: nil, metadata: {}, errors: [])
+          super(name: name, version: version, path: path, search_root: search_root, metadata: metadata, errors: errors)
+          @metadata["homepage"] = project_url if project_url
         end
 
         def nuspec_path
@@ -86,19 +31,40 @@ module Licensed
           @nuspec_contents ||= File.read(nuspec_path)
         end
 
+        def project_url
+          return unless nuspec_contents
+          @project_url ||= begin
+            match = nuspec_contents.match PROJECT_URL_REGEX
+            match[1] if match && match[1]
+          end
+        end
+
+        def project_files
+          @nuget_project_files ||= begin
+            files = [super(), nuspec_local_license_file].flatten.compact
+
+            # Only download licenseUrl if no recognized license was found locally
+            if files.none? { |file| file.license && file.license.key != "other" }
+              files.push(nuspec_remote_license_file)
+            end
+            files.compact
+          end
+        end
+
         # Look for a <license type="file"> element in the nuspec that points to an
         # on-disk license file (which licensee may not find due to a non-standard filename)
         def nuspec_local_license_file
           return @nuspec_local_license_file if defined?(@nuspec_local_license_file)
           return unless nuspec_contents
 
-          match = @nuspec_contents.match LICENSE_FILE_REGEX
-          if match && match[1]
-            license_path = File.join(File.dirname(nuspec_path), match[1])
-            return unless File.exist?(license_path)
-            license_data = File.read(license_path)
-            @nuspec_local_license_file = Licensee::ProjectFiles::LicenseFile.new(license_data, license_path)
-          end
+          match = nuspec_contents.match LICENSE_FILE_REGEX
+          return unless match && match[1]
+
+          license_path = File.join(File.dirname(nuspec_path), match[1])
+          return unless File.exist?(license_path)
+
+          license_data = File.read(license_path)
+          @nuspec_local_license_file = Licensee::ProjectFiles::LicenseFile.new(license_data, license_path)
         end
 
         # Look for a <licenseUrl> element in the nuspec that either is known to contain a license identifier
@@ -108,59 +74,69 @@ module Licensed
           return unless nuspec_contents
 
           match = nuspec_contents.match LICENSE_URL_REGEX
-          if match && match[1]
-            url = original_url = match[1]
+          return unless match && match[1]
 
-            # Skip downloading if the URL contains a license identifier itself
-            if known_license = inspect_url_for_license(url)
-              return @nuspec_remote_license_file = KnownLicenseFile.new(known_license, { uri: url })
+          # Attempt to fetch the license content
+          license_content = self.class.retrieve_license(match[1])
+          @nuspec_remote_license_file = Licensee::ProjectFiles::LicenseFile.new(license_content, { uri: match[1] }) if license_content
+        end
+
+        class << self
+          def strip_html(html)
+            return unless html
+
+            if html.downcase.include?("<html")
+              ReverseMarkdown.convert(html, unknown_tags: :bypass)
+            else
+              html
             end
+          end
 
-            unless ignored_url?(url)
-              # Transform URLs that are known to return HTML but have a corresponding text-based URL
-              url = get_text_content_url(url)
+          def ignored_url?(url)
+            # Many Microsoft packages that now use <license> use this for <licenseUrl>
+            # No need to fetch this page - it just contains NuGet documentation
+            url == "https://aka.ms/deprecateLicenseUrl"
+          end
 
-              # Attempt to fetch the license content
-              license_data = retrieve_license(url)
-              unless license_data.nil?
-                @nuspec_remote_license_file = Licensee::ProjectFiles::LicenseFile.new(license_data, { uri: original_url })
+          def text_content_url(url)
+            # Convert github file URLs to raw URLs
+            return url unless match = url.match(/https?:\/\/(?:www\.)?github.com\/([^\/]+)\/([^\/]+)\/blob\/(.*)/i)
+            "https://github.com/#{match[1]}/#{match[2]}/raw/#{match[3]}"
+          end
+
+          def retrieve_license(url)
+            return unless url
+            return if ignored_url?(url)
+
+            # Transform URLs that are known to return HTML but have a corresponding text-based URL
+            text_url = text_content_url(url)
+
+            raw_content = fetch_content(text_url)
+            strip_html(raw_content)
+          end
+
+          def fetch_content(url, redirect_limit = 5)
+            url = URI.parse(url) if url.instance_of? String
+            return @response_by_url[url] if (@response_by_url ||= {}).key?(url)
+            return if redirect_limit == 0
+
+            begin
+              response = Net::HTTP.get_response(url)
+              case response
+              when Net::HTTPSuccess     then
+                @response_by_url[url] = response.body
+              when Net::HTTPRedirection then
+                redirect_url = URI.parse(response["location"])
+                if redirect_url.relative?
+                  redirect_url = url + redirect_url
+                end
+                # The redirect might be to a URL that requires transformation, i.e. a github file
+                redirect_url = text_content_url(redirect_url.to_s)
+                @response_by_url[url] = fetch_content(redirect_url, redirect_limit - 1)
               end
+            rescue => error
+              # Host might no longer exist or some other error, ignore
             end
-          end
-        end
-
-        def get_text_content_url(url)
-          # Convert github file URLs to raw URLs
-          if match = url.match(/https?:\/\/(?:www\.)?github.com\/([^\/]+)\/([^\/]+)\/blob\/(.*)/i)
-            url = "https://github.com/#{match[1]}/#{match[2]}/raw/#{match[3]}"
-          else
-            url
-          end
-        end
-
-        def inspect_url_for_license(url)
-          if match = url.match(/https?:\/\/licenses.nuget.org\/(.*)/i)
-            Licensee::License.find(match[1])
-          elsif match = url.match(/https?:\/\/opensource.org\/licenses\/(.*)/i)
-            Licensee::License.find(match[1])
-          elsif match = url.match(/https?:\/\/(?:www\.)?apache.org\/licenses\/(.*?)(?:\.html|\.txt)?$/i)
-            Licensee::License.find(match[1].gsub("LICENSE", "Apache"))
-          end
-        end
-
-        def ignored_url?(url)
-          url == "https://aka.ms/deprecateLicenseUrl"
-        end
-
-        def retrieve_license(url, redirect_limit = 2)
-          return if redirect_limit == 0
-          begin
-            response = Net::HTTP.get_response(URI(url))
-            case response
-            when Net::HTTPSuccess     then response.body
-            when Net::HTTPRedirection then retrieve_license(response["location"], redirect_limit - 1)
-            end
-          rescue
           end
         end
       end
@@ -173,6 +149,20 @@ module Licensed
         config.dig("nuget", "obj_root") || config.pwd
       end
 
+      def dump_projects?
+        config.dig("nuget", "projects", "dump")
+      end
+
+      def exclude_projects
+        config.dig("nuget", "projects", "exclude") || []
+      end
+
+      def excluded_project?(project_name)
+        exclude_projects.any? do |pattern|
+          File.fnmatch?(pattern, project_name, File::FNM_PATHNAME | File::FNM_CASEFOLD)
+        end
+      end
+
       def nuget_config_exists(root)
         # Multiple supported casings: https://github.com/NuGet/Home/issues/1427
         File.exist?(File.join(root, "nuget.config")) || File.exist?(File.join(root, "NuGet.config")) || File.exist?(File.join(root, "NuGet.Config"))
@@ -180,14 +170,20 @@ module Licensed
 
       def enumerate_dependencies
         packages.map do |key, package|
+          metadata = {
+            "type" => NuGet.type,
+            "name" => package["name"]
+          }
+
+          # Emit the names of the projects that consume a particular dependency.
+          # Useful for determining projects to exclude.
+          metadata["projects"] = package["projects"].to_a.sort if dump_projects?
+
           NuGetDependency.new(
-            name: "#{package["name"]} #{package["version"]}",
+            name: "#{package["name"]}-#{package["version"]}",
             version: package["version"],
             path: package["path"],
-            metadata: {
-              "type"     => NuGet.type,
-              "name"     => package["name"]
-            }
+            metadata: metadata
           )
         end
       end
@@ -208,16 +204,24 @@ module Licensed
       def gather_packages(project_assets_file)
         json = JSON.parse(File.read(project_assets_file))
         nuget_packages_dir = json["project"]["restore"]["packagesPath"]
-        json["targets"].keys.map do |target|
-          json["targets"][target].keys.map do |reference|
-            next if @packages_by_id.has_key?(reference)
-            next unless json["targets"][target][reference]["type"] == "package"
-            package_id_parts = reference.partition("/")
-            path = File.join(nuget_packages_dir, json["libraries"][reference]["path"])
-            @packages_by_id[reference] = {
-              "name"    => package_id_parts[0],
-              "version" => package_id_parts[-1],
-              "path"    => path }
+        project_name = json["project"]["restore"]["projectName"]
+        return if excluded_project?(project_name)
+
+        json["targets"].map do |target_key, target|
+          target.map do |reference_key, reference|
+            next unless reference["type"] == "package"
+            package_id_parts = reference_key.partition("/")
+            path = File.join(nuget_packages_dir, json["libraries"][reference_key]["path"])
+            if @packages_by_id.key?(reference)
+              @packages_by_id[reference_key]["projects"].add(project_name)
+            else
+              @packages_by_id[reference_key] = {
+                "name"     => package_id_parts[0],
+                "version"  => package_id_parts[-1],
+                "path"     => path,
+                "projects" => Set.new([project_name])
+              }
+            end
           end
         end
       end

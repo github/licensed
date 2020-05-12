@@ -15,3 +15,20 @@ If your project's `obj` folder isn't located within the source tree, you can cha
 nuget:
   obj_root: ../obj
 ```
+
+### Excluding projects
+You can exclude projects from being evaluated by using:
+```yml
+nuget:
+  projects:
+    exclude:
+      - Foo.Tests
+```
+
+You can also have `licensed` emit a list of the projects that consume a dependency into the cached dependency files by using:
+```yml
+nuget:
+  projects:
+    dump: true
+```
+This can help you determine projects that you may wish to exclude.

@@ -31,24 +31,26 @@ if Licensed::Shell.tool_available?("dotnet")
     describe "dependencies" do
       it "includes declared dependencies" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json 12.0.3" }
+          dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
           assert dep
           assert_equal "nuget", dep.record["type"]
-          assert_equal "Newtonsoft.Json", dep.package_name
-          assert_equal "12.0.3", dep.version
+          assert_equal "Newtonsoft.Json", dep.record["name"]
+          assert_equal "12.0.3", dep.record["version"]
+          assert_equal "https://www.newtonsoft.com/json", dep.record["homepage"]
         end
       end
     end
 
     describe "license expressions" do
       it "license expression and LICENSE.md and licenseUrl" do
+        Net::HTTP.expects(:get_response).never
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json 12.0.3" }
+          dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
           assert dep
 
           assert_equal "mit", dep.license_key
-          assert_equal 3, dep.matched_files.count
-          assert_equal 2, dep.record.licenses.count # The license expression from the nuspec isn't included in the record
+          assert_equal 2, dep.matched_files.count # LICENSE.md and the package file (license expression)
+          assert_equal 1, dep.record.licenses.count # The license expression from the nuspec isn't included in the record
           assert dep.record.licenses.find { |l| l.text =~ /MIT License/ && l.sources == ["LICENSE.md"] }
         end
       end
@@ -56,8 +58,9 @@ if Licensed::Shell.tool_available?("dotnet")
 
     describe "license files" do
       it "finds nonstandard license file using license file property" do
+        Net::HTTP.expects(:get_response).never
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Microsoft.Azure.Kusto.Data 8.0.7" }
+          dep = source.dependencies.detect { |d| d.name == "Microsoft.Azure.Kusto.Data-8.0.7" }
           assert dep
 
           assert_equal "other", dep.license_key
@@ -70,36 +73,13 @@ if Licensed::Shell.tool_available?("dotnet")
       end
     end
 
-    describe "offline license url" do
-      it "understands opensource.org" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Handlebars.Net 1.10.1" }
-          assert dep
-
-          assert_equal "mit", dep.license_key
-          assert_equal 1, dep.matched_files.count
-          assert_equal 1, dep.record.licenses.count
-          assert dep.record.licenses.find { |l| l.text =~ /MIT License/ && l.sources == ["https://opensource.org/licenses/mit"] }
-        end
-      end
-
-      it "understands apache.org" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Serilog 2.5.0" }
-          assert dep
-
-          assert_equal "apache-2.0", dep.license_key
-          assert_equal 1, dep.matched_files.count
-          assert_equal 1, dep.record.licenses.count
-          assert dep.record.licenses.find { |l| l.text =~ /Apache/ && l.sources == ["http://www.apache.org/licenses/LICENSE-2.0"] }
-        end
-      end
-    end
-
-    describe "online license url" do
+    describe "download license url" do
       it "tranforms to github raw urls" do
+        response = Net::HTTPSuccess.new(1.0, "200", "OK")
+        response.stubs(:body).returns(Licensee::License.find("apache-2.0").content)
+        Net::HTTP.expects(:get_response).with(URI("https://github.com/benaadams/Ben.Demystifier/raw/master/LICENSE")).returns(response)
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Ben.Demystifier 0.1.4" }
+          dep = source.dependencies.detect { |d| d.name == "Ben.Demystifier-0.1.4" }
           assert dep
 
           assert_equal "apache-2.0", dep.license_key
@@ -107,6 +87,34 @@ if Licensed::Shell.tool_available?("dotnet")
           assert_equal 1, dep.record.licenses.count
           assert dep.record.licenses.find { |l| l.text =~ /Apache/ && l.sources == ["https://github.com/benaadams/Ben.Demystifier/blob/master/LICENSE"] }
         end
+      end
+    end
+  end
+
+  describe Licensed::Sources::Gradle::Dependency do
+    describe "retreive license" do
+      it "caches downloaded urls" do
+        response = Net::HTTPSuccess.new(1.0, "200", "OK")
+        response.stubs(:body).returns("some license")
+        Net::HTTP.expects(:get_response).returns(response).once
+
+        data1 = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
+        data2 = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
+        assert_equal "some license", data2
+      end
+
+      it "strips html" do
+        response = Net::HTTPSuccess.new(1.0, "200", "OK")
+        response.stubs(:body).returns("<html><body>some license</body></html>")
+        Net::HTTP.expects(:get_response).returns(response)
+
+        data = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://strips/html")
+        assert_equal "some license", data
+      end
+
+      it "ignores deprecatedUrl" do
+        Licensed::Sources::NuGet::NuGetDependency.expects(:fetch_content).never
+        Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://aka.ms/deprecateLicenseUrl")
       end
     end
   end
