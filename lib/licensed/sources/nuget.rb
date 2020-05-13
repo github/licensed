@@ -33,7 +33,8 @@ module Licensed
 
         def project_url
           return unless nuspec_contents
-          @project_url ||= begin
+          return @project_url if defined?(@project_url)
+          @project_url = begin
             match = nuspec_contents.match PROJECT_URL_REGEX
             match[1] if match && match[1]
           end
@@ -85,11 +86,8 @@ module Licensed
           def strip_html(html)
             return unless html
 
-            if html.downcase.include?("<html")
-              ReverseMarkdown.convert(html, unknown_tags: :bypass)
-            else
-              html
-            end
+            return html unless html.downcase.include?("<html")
+            ReverseMarkdown.convert(html, unknown_tags: :bypass)
           end
 
           def ignored_url?(url)
@@ -134,7 +132,7 @@ module Licensed
                 redirect_url = text_content_url(redirect_url.to_s)
                 @response_by_url[url] = fetch_content(redirect_url, redirect_limit - 1)
               end
-            rescue => error
+            rescue
               # Host might no longer exist or some other error, ignore
             end
           end
@@ -194,14 +192,13 @@ module Licensed
       # to evaluate multiple projects.
       def packages
         return @packages_by_id if defined?(@packages_by_id)
-        @packages_by_id = Hash.new
-        Dir.glob(File.join(nuget_obj_root, "**/project.assets.json")).map do |file|
-          gather_packages(file)
+        search_path = File.join(nuget_obj_root, "**/project.assets.json")
+        @packages_by_id = Dir.glob(search_path).each_with_object({}) do |file, packages|
+          gather_packages(file, packages)
         end
-        @packages_by_id
       end
 
-      def gather_packages(project_assets_file)
+      def gather_packages(project_assets_file, packages)
         json = JSON.parse(File.read(project_assets_file))
         nuget_packages_dir = json["project"]["restore"]["packagesPath"]
         project_name = json["project"]["restore"]["projectName"]
