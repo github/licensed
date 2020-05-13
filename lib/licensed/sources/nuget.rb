@@ -15,10 +15,12 @@ module Licensed
         LICENSE_FILE_REGEX = /<license\s*type\s*=\s*\"\s*file\s*\"\s*>\s*(.*)\s*<\/license>/ix.freeze
         LICENSE_URL_REGEX = /<licenseUrl>\s*(.*)\s*<\/licenseUrl>/ix.freeze
         PROJECT_URL_REGEX = /<projectUrl>\s*(.*)\s*<\/projectUrl>/ix.freeze
+        PROJECT_DESC_REGEX = /<description>\s*(.*)\s*<\/description>/ix.freeze
 
         def initialize(name:, version:, path:, search_root: nil, metadata: {}, errors: [])
           super(name: name, version: version, path: path, search_root: search_root, metadata: metadata, errors: errors)
           @metadata["homepage"] = project_url if project_url
+          @metadata["summary"] = description if description
         end
 
         def nuspec_path
@@ -32,10 +34,19 @@ module Licensed
         end
 
         def project_url
-          return unless nuspec_contents
           return @project_url if defined?(@project_url)
+          return unless nuspec_contents
           @project_url = begin
             match = nuspec_contents.match PROJECT_URL_REGEX
+            match[1] if match && match[1]
+          end
+        end
+
+        def description
+          return @description if defined?(@description)
+          return unless nuspec_contents
+          @description = begin
+            match = nuspec_contents.match PROJECT_DESC_REGEX
             match[1] if match && match[1]
           end
         end
