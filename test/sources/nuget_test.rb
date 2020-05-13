@@ -71,6 +71,21 @@ if Licensed::Shell.tool_available?("dotnet")
           assert dep.record.licenses.find { |l| l.text =~ /MICROSOFT SOFTWARE LICENSE TERMS/ && l.sources == ["EULA-agreement.txt"] }
         end
       end
+
+      it "ignores standard license file if licensee already found it" do
+        Net::HTTP.expects(:get_response).never
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "Microsoft.Build.Traversal-2.0.2" }
+          assert dep
+
+          assert_equal "mit", dep.license_key
+
+          assert_equal 1, dep.matched_files.count # LICENSE.txt
+          assert_equal 1, dep.record.licenses.count
+          # Ensure LICENSE.txt source doesn't appear twice
+          assert dep.record.licenses.find { |l| l.text =~ /MIT License/ && l.sources == ["LICENSE.txt"] }
+        end
+      end
     end
 
     describe "download license url" do

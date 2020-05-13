@@ -19,5 +19,8 @@
 
     <!-- Has only a licenseUrl to https://github.com/benaadams/Ben.Demystifier/blob/master/LICENSE which we should convert to a "raw" URL and fetch -->
     <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
+
+    <!-- Has a LICENSE.txt which is also specified via <license type="file"> (and has a deprecated licenseUrl) -->
+    <PackageReference Include="Microsoft.Build.Traversal" Version="2.0.2" />
   </ItemGroup>
 </Project>

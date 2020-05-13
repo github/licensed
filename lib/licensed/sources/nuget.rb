@@ -42,12 +42,19 @@ module Licensed
 
         def project_files
           @nuget_project_files ||= begin
-            files = [super(), nuspec_local_license_file].flatten.compact
+            files = super().flatten.compact
+
+            # Only include the local file if it's a file licensee didn't already detect
+            nuspec_license_filename = File.basename(nuspec_local_license_file.filename) if nuspec_local_license_file
+            if nuspec_license_filename && files.none? { |file| File.basename(file.filename) == nuspec_license_filename }
+              files.push(nuspec_local_license_file)
+            end
 
             # Only download licenseUrl if no recognized license was found locally
             if files.none? { |file| file.license && file.license.key != "other" }
               files.push(nuspec_remote_license_file)
             end
+
             files.compact
           end
         end
@@ -209,10 +216,10 @@ module Licensed
             next unless reference["type"] == "package"
             package_id_parts = reference_key.partition("/")
             path = File.join(nuget_packages_dir, json["libraries"][reference_key]["path"])
-            if @packages_by_id.key?(reference)
-              @packages_by_id[reference_key]["projects"].add(project_name)
+            if packages.key?(reference)
+              packages[reference_key]["projects"].add(project_name)
             else
-              @packages_by_id[reference_key] = {
+              packages[reference_key] = {
                 "name"     => package_id_parts[0],
                 "version"  => package_id_parts[-1],
                 "path"     => path,
