@@ -25,7 +25,7 @@ module Licensed
 
         def nuspec_path
           name = @metadata["name"]
-          File.join(self.path, "#{name}.nuspec")
+          File.join(self.path, "#{name.downcase}.nuspec")
         end
 
         def nuspec_contents
