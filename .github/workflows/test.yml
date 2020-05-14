@@ -2,10 +2,11 @@ name: Test
 
 on:
   push:
-    branches:
-    - "*"
+    branches: 
+      - "*"
     tags:
-    - "!*"
+      - "!*"
+  pull_request:
 
 jobs:
   bower:
