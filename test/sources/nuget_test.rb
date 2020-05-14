@@ -6,20 +6,20 @@ require "fileutils"
 if Licensed::Shell.tool_available?("dotnet")
   describe Licensed::Sources::NuGet do
     let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
-    let(:fixtures) { File.expand_path("../../fixtures/nuget", __FILE__) }
+    let(:fixtures) { File.expand_path("../../fixtures/nuget/obj", __FILE__) }
     let(:source) { Licensed::Sources::NuGet.new(config) }
 
     describe "enabled?" do
-      it "is true if nuget.config exists" do
+      it "is true if project.assets.json exists" do
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
-            File.write "nuget.config", ""
+            File.write "project.assets.json", ""
             assert source.enabled?
           end
         end
       end
 
-      it "is false if no nuget.config exists" do
+      it "is false if no project.assets.json exists" do
         Dir.mktmpdir do |dir|
           Dir.chdir(dir) do
             refute source.enabled?

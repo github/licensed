@@ -157,88 +157,50 @@ module Licensed
         end
       end
 
+      def project_assets_file_path
+        File.join(config.pwd, "project.assets.json")
+      end
+
+      def project_assets_file
+        return @project_assets_file if defined?(@project_assets_file)
+        @project_assets_file = File.read(project_assets_file_path)
+      end
+
       def enabled?
-        nuget_config_exists(config.pwd)
-      end
-
-      def nuget_obj_root
-        config.dig("nuget", "obj_root") || config.pwd
-      end
-
-      def dump_projects?
-        config.dig("nuget", "projects", "dump")
-      end
-
-      def exclude_projects
-        config.dig("nuget", "projects", "exclude") || []
-      end
-
-      def excluded_project?(project_name)
-        exclude_projects.any? do |pattern|
-          File.fnmatch?(pattern, project_name, File::FNM_PATHNAME | File::FNM_CASEFOLD)
-        end
-      end
-
-      def nuget_config_exists(root)
-        # Multiple supported casings: https://github.com/NuGet/Home/issues/1427
-        File.exist?(File.join(root, "nuget.config")) || File.exist?(File.join(root, "NuGet.config")) || File.exist?(File.join(root, "NuGet.Config"))
-      end
-
-      def enumerate_dependencies
-        packages.map do |key, package|
-          metadata = {
-            "type" => NuGet.type,
-            "name" => package["name"]
-          }
-
-          # Emit the names of the projects that consume a particular dependency.
-          # Useful for determining projects to exclude.
-          metadata["projects"] = package["projects"].to_a.sort if dump_projects?
-
-          NuGetDependency.new(
-            name: "#{package["name"]}-#{package["version"]}",
-            version: package["version"],
-            path: package["path"],
-            metadata: metadata
-          )
-        end
+        File.exist?(project_assets_file_path)
       end
 
       # Inspect project.assets.json files for package references.
       # Ideally we'd use `dotnet list package` instead, but its output isn't
-      # easily machine readable, and it also requires repos to have a .sln file
-      # to evaluate multiple projects.
-      def packages
-        return @packages_by_id if defined?(@packages_by_id)
-        search_path = File.join(nuget_obj_root, "**/project.assets.json")
-        @packages_by_id = Dir.glob(search_path).each_with_object({}) do |file, packages|
-          gather_packages(file, packages)
-        end
-      end
-
-      def gather_packages(project_assets_file, packages)
-        json = JSON.parse(File.read(project_assets_file))
+      # easily machine readable and doesn't contain everything we need.
+      def enumerate_dependencies
+        json = JSON.parse(project_assets_file)
         nuget_packages_dir = json["project"]["restore"]["packagesPath"]
         project_name = json["project"]["restore"]["projectName"]
-        return if excluded_project?(project_name)
-
-        json["targets"].map do |target_key, target|
-          target.map do |reference_key, reference|
+        json["targets"].each_with_object({}) do |(target_key, target), dependencies|
+          target.each do |reference_key, reference|
+            # Ignore project references
             next unless reference["type"] == "package"
             package_id_parts = reference_key.partition("/")
+            name = package_id_parts[0]
+            version = package_id_parts[-1]
+            id = "#{name}-#{version}"
+
+            # Already know this package from another target
+            next if dependencies.key?(id)
+
             path = File.join(nuget_packages_dir, json["libraries"][reference_key]["path"])
-            if packages.key?(reference)
-              packages[reference_key]["projects"].add(project_name)
-            else
-              packages[reference_key] = {
-                "name"     => package_id_parts[0],
-                "version"  => package_id_parts[-1],
-                "path"     => path,
-                "projects" => Set.new([project_name])
+            dependencies[id] = NuGetDependency.new(
+              name: id,
+              version: version,
+              path: path,
+              metadata: {
+                "type" => NuGet.type,
+                "name" => name
               }
-            end
+            )
           end
-        end
+        end.values
       end
     end
   end
