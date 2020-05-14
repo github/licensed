@@ -1,11 +1,6 @@
 name: Test
 
-on:
-  push:
-    branches:
-    - "*"
-    tags:
-    - "!*"
+on: pull_request
 
 jobs:
   bower:
