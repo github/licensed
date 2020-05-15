@@ -2,8 +2,9 @@
   "name": "fixtures",
   "version": "1.0.0",
   "dependencies": {
-    "autoprefixer": "5.2.0",
-    "@github/query-selector": "1.0.3"
+    "@github/query-selector": "1.0.3",
+    "@optimizely/optimizely-sdk": "4.0.0",
+    "autoprefixer": "5.2.0"
   },
   "devDependencies": {
     "string.prototype.startswith": "0.2.0"
