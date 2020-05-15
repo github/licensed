@@ -20,16 +20,13 @@ module Licensed
       # Returns whether the command was a success
       def run(**options)
         begin
-          @cache_paths = Set.new
-          @files = Set.new
-
           result = super
           clear_stale_cached_records if result
 
           result
         ensure
-          @cache_paths = nil
-          @files = nil
+          cache_paths.clear
+          files.clear
         end
       end
 
@@ -43,7 +40,10 @@ module Licensed
       # Returns whether the command succeeded for the application.
       def run_app(app)
         result = super
-        @cache_paths << app.cache_path
+
+        # add the full cache path to the list of cache paths evaluted during this run
+        cache_paths << app.cache_path
+
         result
       end
 
@@ -62,7 +62,6 @@ module Licensed
         end
 
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
-        @files << filename.to_s
         cached_record = Licensed::DependencyRecord.read(filename)
         if options[:force] || save_dependency_record?(dependency, cached_record)
           if dependency.record.matches?(cached_record)
@@ -81,6 +80,9 @@ module Licensed
         if !dependency.exist?
           report.warnings << "expected dependency path #{dependency.path} does not exist"
         end
+
+        # add the absolute dependency file path to the list of files seen during this licensed run
+        files << filename.to_s
 
         true
       end
@@ -106,18 +108,25 @@ module Licensed
 
       # Clean up cached files that dont match current dependencies
       #
-      # app - An application configuration
-      # source - A dependency source enumerator
-      #
       # Returns nothing
       def clear_stale_cached_records
-        @cache_paths.each do |cache_path|
+        cache_paths.each do |cache_path|
           Dir.glob(cache_path.join("**/*.#{DependencyRecord::EXTENSION}")).each do |file|
-            next if @files.include?(file)
+            next if files.include?(file)
 
             FileUtils.rm(file)
           end
         end
+      end
+
+      # Set of unique cache paths that are evaluted during the run
+      def cache_paths
+        @cache_paths ||= Set.new
+      end
+
+      # Set of unique absolute file paths of cached records evaluted during the run
+      def files
+        @files ||= Set.new
       end
     end
   end
