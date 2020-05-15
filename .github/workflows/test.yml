@@ -61,7 +61,7 @@ jobs:
     strategy:
       matrix:
         ghc: [ '8.2.2', '8.6.5' ]
-        cabal: [ '2.0', '3.0' ]
+        cabal: [ '2.2', '2.4', '3.0', 'latest' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
