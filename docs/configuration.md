@@ -209,6 +209,26 @@ apps:
 
 In this example, the root configuration will contain a default cache path of `.licenses`.  `app1` will inherit this value and append it's name, resulting in a cache path of `.licenses/app1`.
 
+### Sharing caches between apps
+
+Dependency caches can be shared between apps by setting the same cache path on each app.
+
+```yaml
+apps:
+  - source_path: "path/to/app1"
+    cache_path: ".licenses/apps"
+  - source_path: "path/to/app2"
+    cache_path: ".licenses/apps"
+```
+
+When using a source path with a glob pattern, the apps created from the glob pattern can share a dependency by setting an explicit cache path and setting `shared_cache` to true.
+
+```yaml
+source_path: "path/to/apps/*"
+cache_path: ".licenses/apps"
+shared_cache: true
+```
+
 ## Source specific configuration
 
 See the [source documentation](./sources) for details on any source specific configuration.

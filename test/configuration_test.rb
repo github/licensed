@@ -158,6 +158,40 @@ describe Licensed::Configuration do
         assert_equal "#{name}-#{dir_name}", app["name"]
       end
     end
+
+    it "does not assign unique cache paths if shared_cache is true" do
+      cache_path = ".test_licenses"
+      apps.clear
+      apps << {
+        "source_path" => File.expand_path("../fixtures/*", __FILE__),
+        "cache_path" => cache_path,
+        "shared_cache" => true
+      }
+      expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
+      expected_source_paths.each do |source_path|
+        app = config.apps.find { |app| app["source_path"] == source_path }
+        assert app
+        assert_equal app.root.join(cache_path), app.cache_path
+      end
+    end
+
+    it "does not inherit the shared_cache setting" do
+      cache_path = ".test_licenses"
+      name = "test"
+      apps.clear
+      apps << {
+        "source_path" => File.expand_path("../fixtures/*", __FILE__),
+        "cache_path" => cache_path
+      }
+      options["shared_cache"] = true
+      expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
+      expected_source_paths.each do |source_path|
+        app = config.apps.find { |app| app["source_path"] == source_path }
+        assert app
+        dir_name = File.basename(source_path)
+        assert_equal app.root.join(cache_path, dir_name), app.cache_path
+      end
+    end
   end
 end
 

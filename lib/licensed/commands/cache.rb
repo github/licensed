@@ -11,20 +11,39 @@ module Licensed
         Licensed::Reporters::CacheReporter.new
       end
 
-      protected
-
-      # Run the command for all enumerated dependencies found in a dependency source,
-      # recording results in a report.
+      # Run the command.
       # Removes any cached records that don't match a current application
       # dependency.
       #
-      # app - The application configuration for the source
-      # source - A dependency source enumerator
+      # options - Options to run the command with
       #
-      # Returns whether the command succeeded for the dependency source enumerator
-      def run_source(app, source)
+      # Returns whether the command was a success
+      def run(**options)
+        begin
+          @cache_paths = Set.new
+          @files = Set.new
+
+          result = super
+          clear_stale_cached_records if result
+
+          result
+        ensure
+          @cache_paths = nil
+          @files = nil
+        end
+      end
+
+      protected
+
+      # Run the command for all enabled sources for an application configuration,
+      # recording results in a report.
+      #
+      # app - An application configuration
+      #
+      # Returns whether the command succeeded for the application.
+      def run_app(app)
         result = super
-        clear_stale_cached_records(app, source) if result
+        @cache_paths << app.cache_path
         result
       end
 
@@ -43,6 +62,7 @@ module Licensed
         end
 
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
+        @files << filename.to_s
         cached_record = Licensed::DependencyRecord.read(filename)
         if options[:force] || save_dependency_record?(dependency, cached_record)
           if dependency.record.matches?(cached_record)
@@ -90,12 +110,13 @@ module Licensed
       # source - A dependency source enumerator
       #
       # Returns nothing
-      def clear_stale_cached_records(app, source)
-        names = source.dependencies.map { |dependency| File.join(source.class.type, dependency.name) }
-        Dir.glob(app.cache_path.join(source.class.type, "**/*.#{DependencyRecord::EXTENSION}")).each do |file|
-          file_path = Pathname.new(file)
-          relative_path = file_path.relative_path_from(app.cache_path).to_s
-          FileUtils.rm(file) unless names.include?(relative_path.chomp(".#{DependencyRecord::EXTENSION}"))
+      def clear_stale_cached_records
+        @cache_paths.each do |cache_path|
+          Dir.glob(cache_path.join("**/*.#{DependencyRecord::EXTENSION}")).each do |file|
+            next if @files.include?(file)
+
+            FileUtils.rm(file)
+          end
         end
       end
     end

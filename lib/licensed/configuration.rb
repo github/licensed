@@ -167,7 +167,9 @@ module Licensed
         # will handle configurations that don't have these explicitly set
         dir_name = File.basename(path)
         config["name"] = "#{config["name"]}-#{dir_name}" if config["name"]
-        config["cache_path"] = File.join(config["cache_path"], dir_name) if config["cache_path"]
+        if config["cache_path"] && config["shared_cache"] != true
+          config["cache_path"] = File.join(config["cache_path"], dir_name)
+        end
 
         config
       end
