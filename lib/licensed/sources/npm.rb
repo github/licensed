@@ -48,6 +48,7 @@ module Licensed
       # package name to it's metadata
       def recursive_dependencies(dependencies, result = {})
         dependencies.each do |name, dependency|
+          next if dependency["peerMissing"]
           next if yarn_lock_present && dependency["missing"]
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)

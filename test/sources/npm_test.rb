@@ -76,6 +76,14 @@ if Licensed::Shell.tool_available?("npm")
         end
       end
 
+      it "does not include missing indirect peer dependencies" do
+        Dir.chdir fixtures do
+          # peer dependency of @optimizely/js-sdk-datafile-manager, which is
+          # an indirect dependency through @optimizely/optimizely-sdk
+          refute source.dependencies.detect { |dep| dep.name == "@react-native-community/async-storage" }
+        end
+      end
+
       describe "with multiple instances of a dependency" do
         it "includes version in the dependency name for multiple unique versions" do
           Dir.chdir fixtures do
