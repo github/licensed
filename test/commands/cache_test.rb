@@ -34,10 +34,11 @@ describe Licensed::Commands::Cache do
           generator.run
 
           expected_dependency = app["expected_dependency"]
+          expected_dependency_name = app["expected_dependency_name"] || expected_dependency
           path = app.cache_path.join("#{source_type}/#{expected_dependency}.#{Licensed::DependencyRecord::EXTENSION}")
           assert path.exist?
           record = Licensed::DependencyRecord.read(path)
-          assert_equal expected_dependency, record["name"]
+          assert_equal expected_dependency_name, record["name"]
           assert record["license"]
         end
       end

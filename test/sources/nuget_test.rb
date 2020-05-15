@@ -87,23 +87,6 @@ if Licensed::Shell.tool_available?("dotnet")
         end
       end
     end
-
-    describe "download license url" do
-      it "tranforms to github raw urls" do
-        response = Net::HTTPSuccess.new(1.0, "200", "OK")
-        response.stubs(:body).returns(Licensee::License.find("apache-2.0").content)
-        Net::HTTP.expects(:get_response).with(URI("https://github.com/benaadams/Ben.Demystifier/raw/master/LICENSE")).returns(response)
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Ben.Demystifier-0.1.4" }
-          assert dep
-
-          assert_equal "apache-2.0", dep.license_key
-          assert_equal 1, dep.matched_files.count
-          assert_equal 1, dep.record.licenses.count
-          assert dep.record.licenses.find { |l| l.text =~ /Apache/ && l.sources == ["https://github.com/benaadams/Ben.Demystifier/blob/master/LICENSE"] }
-        end
-      end
-    end
   end
 
   describe Licensed::Sources::Gradle::Dependency do
@@ -116,6 +99,12 @@ if Licensed::Shell.tool_available?("dotnet")
         data1 = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
         data2 = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
         assert_equal "some license", data2
+      end
+
+      it "transforms github urls to raw urls" do
+        original_url = "https://www.github.com/benaadams/Ben.Demystifier/blob/master/LICENSE"
+        new_url = Licensed::Sources::NuGet::NuGetDependency.text_content_url(original_url)
+        assert_equal "https://github.com/benaadams/Ben.Demystifier/raw/master/LICENSE", new_url
       end
 
       it "strips html" do
