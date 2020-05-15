@@ -108,7 +108,12 @@ module Licensed
     def detect_cache_path(options, inherited_options)
       return options["cache_path"] unless options["cache_path"].to_s.empty?
 
-      cache_path = inherited_options["cache_path"] || DEFAULT_CACHE_PATH
+      # if cache_path and shared_cache are both set in inherited_options,
+      # don't append the app name to the cache path
+      cache_path = inherited_options["cache_path"]
+      return cache_path if cache_path && inherited_options["shared_cache"] == true
+
+      cache_path ||= DEFAULT_CACHE_PATH
       File.join(cache_path, self["name"])
     end
 
@@ -167,6 +172,9 @@ module Licensed
         # will handle configurations that don't have these explicitly set
         dir_name = File.basename(path)
         config["name"] = "#{config["name"]}-#{dir_name}" if config["name"]
+
+        # if a cache_path is set and is not marked as shared, append the app name
+        # to the end of the cache path to make a unique cache path for the app
         if config["cache_path"] && config["shared_cache"] != true
           config["cache_path"] = File.join(config["cache_path"], dir_name)
         end

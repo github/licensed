@@ -175,7 +175,7 @@ describe Licensed::Configuration do
       end
     end
 
-    it "does not inherit the shared_cache setting" do
+    it "does not apply an inherited shared_cache setting to an app-configured cache path" do
       cache_path = ".test_licenses"
       name = "test"
       apps.clear
@@ -184,6 +184,7 @@ describe Licensed::Configuration do
         "cache_path" => cache_path
       }
       options["shared_cache"] = true
+
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
         app = config.apps.find { |app| app["source_path"] == source_path }
@@ -228,6 +229,26 @@ describe Licensed::AppConfiguration do
     )
     assert_equal config.root.join("vendor/cache"), config.cache_path
     refute config.cache_path.to_s.end_with? config["name"]
+  end
+
+  it "applies an inherited shared_cache setting to an inherited cache path" do
+    config = Licensed::AppConfiguration.new(
+      { "source_path" => Dir.pwd },
+      { "shared_cache" => true, "cache_path" => "vendor/cache" }
+    )
+
+    assert_equal config.root.join("vendor/cache"), config.cache_path
+    refute config.cache_path.to_s.end_with? config["name"]
+  end
+
+  it "does not apply an inherited shared_cache setting to the default cache path" do
+    config = Licensed::AppConfiguration.new(
+      { "source_path" => Dir.pwd },
+      { "shared_cache" => true }
+    )
+
+    assert_equal config.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, config["name"]),
+                 config.cache_path
   end
 
   describe "ignore" do
