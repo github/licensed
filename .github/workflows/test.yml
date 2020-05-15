@@ -281,6 +281,30 @@ jobs:
     - name: Run tests
       run: script/test npm
 
+  nuget:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.202
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - run: bundle lock
+    - uses: actions/cache@v1
+      with:
+        path: vendor/gems
+        key: ${{ runner.os }}-gem-2.6.x-${{ hashFiles('**/Gemfile.lock') }}
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/nuget
+    - name: Run tests
+      run: script/test nuget
+
   pip:
     runs-on: ubuntu-latest
     strategy:

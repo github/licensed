@@ -23,13 +23,14 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.3.0"
 
-  spec.add_dependency "licensee", ">= 9.13.2", "< 10.0.0"
+  spec.add_dependency "licensee", ">= 9.14.0", "< 10.0.0"
   spec.add_dependency "thor", ">= 0.19"
   spec.add_dependency "pathname-common_prefix", "~> 0.0.1"
   spec.add_dependency "tomlrb", "~> 1.2"
   spec.add_dependency "bundler", ">= 1.10"
   spec.add_dependency "ruby-xxHash", "~> 0.4"
   spec.add_dependency "parallel", ">= 0.18.0"
+  spec.add_dependency "reverse_markdown", "~> 1.0"
 
   spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "minitest", "~> 5.8"

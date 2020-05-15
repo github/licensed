@@ -1,0 +1,6 @@
+expected_dependency: Newtonsoft.Json-12.0.3
+expected_dependency_name: Newtonsoft.Json
+source_path: test/fixtures/nuget/obj
+cache_path: test/fixtures/nuget/obj/.licenses
+sources:
+  nuget: true
