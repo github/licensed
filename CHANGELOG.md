@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.10.0
+2020-05-15
+
+### Changed
+- NPM source ignores missing peer dependencies (https://github.com/github/licensed/pull/267)
+
+### Added
+- Nuget source (:tada: @zarenner https://github.com/github/licensed/pull/261)
+- Multiple apps can share a single cache location (https://github.com/github/licensed/pull/263)
+
 ## 2.9.2
 2020-04-28
 
@@ -292,4 +302,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.9.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.10.0...HEAD
