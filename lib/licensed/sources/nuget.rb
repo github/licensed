@@ -176,8 +176,7 @@ module Licensed
       def enumerate_dependencies
         json = JSON.parse(project_assets_file)
         nuget_packages_dir = json["project"]["restore"]["packagesPath"]
-        project_name = json["project"]["restore"]["projectName"]
-        json["targets"].each_with_object({}) do |(target_key, target), dependencies|
+        json["targets"].each_with_object({}) do |(_, target), dependencies|
           target.each do |reference_key, reference|
             # Ignore project references
             next unless reference["type"] == "package"
