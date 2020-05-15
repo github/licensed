@@ -7,12 +7,12 @@ describe Licensed::Commands::Cache do
   let(:apps) { [] }
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
-  let(:generator) { Licensed::Commands::Cache.new(config: config) }
-  let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
-
-  before do
-    Spy.on(generator, :create_reporter).and_return(reporter)
+  let(:generator) do
+    command = Licensed::Commands::Cache.new(config: config)
+    Spy.on(command, :create_reporter).and_return(reporter)
+    command
   end
+  let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   after do
     config.apps.each do |app|
@@ -69,6 +69,19 @@ describe Licensed::Commands::Cache do
     config.apps.each do |app|
       refute app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}").exist?
     end
+  end
+
+  it "does not clean up dependencies from shared caches" do
+    apps << { "source_path" => Dir.pwd, "cache_path" => cache_path, "test" => { name: 1 } }
+    apps << { "source_path" => Dir.pwd, "cache_path" => cache_path, "test" => { name: 2 } }
+
+    generator.run
+
+    files = Dir.glob(File.join(cache_path, "**/*.#{Licensed::DependencyRecord::EXTENSION}"))
+               .map(&File.method(:basename))
+               .map { |file| file.chomp(".#{Licensed::DependencyRecord::EXTENSION}") }
+               .sort
+    assert_equal files, ["1", "2"]
   end
 
   it "uses cached record if license text does not change" do
