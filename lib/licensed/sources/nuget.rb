@@ -175,7 +175,7 @@ module Licensed
       # easily machine readable and doesn't contain everything we need.
       def enumerate_dependencies
         json = JSON.parse(project_assets_file)
-        nuget_packages_dirs = [ json["project"]["restore"]["packagesPath"] ]
+        nuget_packages_dirs = [json["project"]["restore"]["packagesPath"]]
         nuget_packages_dirs << json["project"]["restore"]["fallbackFolders"]
         json["targets"].each_with_object({}) do |(_, target), dependencies|
           target.each do |reference_key, reference|
