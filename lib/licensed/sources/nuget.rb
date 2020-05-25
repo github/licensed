@@ -175,7 +175,8 @@ module Licensed
       # easily machine readable and doesn't contain everything we need.
       def enumerate_dependencies
         json = JSON.parse(project_assets_file)
-        nuget_packages_dir = json["project"]["restore"]["packagesPath"]
+        nuget_packages_dirs = [ json["project"]["restore"]["packagesPath"] ]
+        nuget_packages_dirs << json["project"]["restore"]["fallbackFolders"]
         json["targets"].each_with_object({}) do |(_, target), dependencies|
           target.each do |reference_key, reference|
             # Ignore project references
@@ -188,16 +189,27 @@ module Licensed
             # Already know this package from another target
             next if dependencies.key?(id)
 
-            path = File.join(nuget_packages_dir, json["libraries"][reference_key]["path"])
-            dependencies[id] = NuGetDependency.new(
-              name: id,
-              version: version,
-              path: path,
-              metadata: {
-                "type" => NuGet.type,
-                "name" => name
-              }
-            )
+            # Find package in one of nuget folders
+            nuget_packages_dirs.each do |packages_dir|
+              path = File.join(packages_dir, json["libraries"][reference_key]["path"])
+              if (File.directory?(path))
+                dependencies[id] = NuGetDependency.new(
+                  name: id,
+                  version: version,
+                  path: path,
+                  metadata: {
+                    "type" => NuGet.type,
+                    "name" => name
+                  }
+                )
+                break
+              end
+            end
+
+            # Throw if package not found
+            unless dependencies.key?(id)
+              raise "Package #{id} not found, looked in #{nuget_packages_dirs}"
+            end
           end
         end.values
       end
