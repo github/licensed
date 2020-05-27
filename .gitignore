@@ -45,6 +45,8 @@ test/fixtures/mix/mix.lock
 test/fixtures/yarn/*
 !test/fixtures/yarn/package.json
 
+test/fixtures/nuget/obj/*
+
 vendor/licenses
 .licenses
 *.gem
