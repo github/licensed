@@ -120,7 +120,7 @@ module Licensed
         return go_mod["Version"] if go_mod
 
         package_directory = package["Dir"]
-        return unless package_directory
+        return unless package_directory && File.exist?(package_directory)
 
         # find most recent git SHA for a package, or nil if SHA is
         # not available
