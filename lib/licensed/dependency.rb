@@ -74,7 +74,7 @@ module Licensed
     def license_contents
       files = matched_files.reject { |f| f == package_file }
                            .group_by(&:content)
-                           .map { |content, files| { "sources" => license_content_sources(files), "text" => content } }
+                           .map { |content, sources| { "sources" => license_content_sources(sources), "text" => content } }
 
       files << generated_license_contents if files.empty?
       files.compact
