@@ -111,11 +111,11 @@ module Licensed
         info = package_info_command(id).strip
         return missing_package(id) if info.empty?
 
-        info.lines.each_with_object({}) do |line, info|
+        info.lines.each_with_object({}) do |line, hsh|
           key, value = line.split(":", 2).map(&:strip)
           next unless key && value
 
-          info[key] = value
+          hsh[key] = value
         end
       end
 

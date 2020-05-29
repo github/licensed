@@ -28,16 +28,16 @@ module Licensed
           shell.info "  #{source.class.type}"
           result = yield report
 
-          errored_reports = report.all_reports.select { |report| report.errors.any? }.to_a
+          errored_reports = report.all_reports.select { |r| r.errors.any? }.to_a
           if errored_reports.any?
             shell.newline
             shell.error "  * Errors:"
-            errored_reports.each do |report|
-              display_metadata = report.map { |k, v| "#{k}: #{v}" }.join(", ")
+            errored_reports.each do |r|
+              display_metadata = r.map { |k, v| "#{k}: #{v}" }.join(", ")
 
-              shell.error "    * #{report.name}"
+              shell.error "    * #{r.name}"
               shell.error "    #{display_metadata}" unless display_metadata.empty?
-              report.errors.each do |error|
+              r.errors.each do |error|
                 shell.error "      - #{error}"
               end
               shell.newline
