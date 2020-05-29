@@ -28,7 +28,7 @@ module Licensed
       run Licensed::Commands::List.new(config: config)
     end
 
-    desc "notices", "Generate a NOTICES file from cached records"
+    desc "notices", "Generate a NOTICE file from cached records"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def notices

@@ -38,7 +38,7 @@ describe Licensed::Reporters::NoticesReporter do
       reporter.report_run(command) do
         reporter.report_app(app) {}
 
-        path = app.cache_path.join("NOTICES")
+        path = app.cache_path.join("NOTICE")
         assert_includes shell.messages,
                         {
                            message: "Writing notices for #{app["name"]} to #{path}",
@@ -48,7 +48,7 @@ describe Licensed::Reporters::NoticesReporter do
       end
     end
 
-    it "writes dependencies' licenses and notices to a NOTICES file" do
+    it "writes dependencies' licenses and notices to a NOTICE file" do
       reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
@@ -66,7 +66,7 @@ describe Licensed::Reporters::NoticesReporter do
           end
         end
 
-        path = app.cache_path.join("NOTICES")
+        path = app.cache_path.join("NOTICE")
         assert File.exist?(path)
         notices_contents = File.read(path)
         assert_includes notices_contents, "license1"
@@ -76,7 +76,7 @@ describe Licensed::Reporters::NoticesReporter do
       end
     end
 
-    it "writes dependencies' licenses and notices to a NOTICES.<app> file in a shared cache" do
+    it "writes dependencies' licenses and notices to a NOTICE.<app> file in a shared cache" do
       app["shared_cache"] = true
 
       reporter.report_run(command) do
@@ -96,7 +96,7 @@ describe Licensed::Reporters::NoticesReporter do
           end
         end
 
-        path = app.cache_path.join("NOTICES.#{app["name"]}")
+        path = app.cache_path.join("NOTICE.#{app["name"]}")
         assert File.exist?(path)
         notices_contents = File.read(path)
         assert_includes notices_contents, "license1"

@@ -65,7 +65,7 @@ For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/loc
 - `licensed list`: Output enumerated dependencies only.
 - `licensed cache`: Cache licenses and metadata.
 - `licensed status`: Check status of dependencies' cached licenses.
-- `licensed notices`: Write a `NOTICES` file for each application configuration.
+- `licensed notices`: Write a `NOTICE` file for each application configuration.
 - `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`
 - `licensed env`: Output environment information from the licensed configuration.
 

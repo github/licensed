@@ -14,7 +14,7 @@ module Licensed
       # Note - must be called from inside the `report_run` scope
       def report_app(app)
         super do |report|
-          filename = app["shared_cache"] ? "NOTICES.#{app["name"]}" : "NOTICES"
+          filename = app["shared_cache"] ? "NOTICE.#{app["name"]}" : "NOTICE"
           path = app.cache_path.join(filename)
           shell.info "Writing notices for #{app["name"]} to #{path}"
 
