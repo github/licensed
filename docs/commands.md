@@ -31,6 +31,12 @@ A dependency will fail the status checks if:
 5. The cached record is flagged for re-review.
    - This occurs when the record's license text has changed since the record was reviewed.
 
+## `notices`
+
+Outputs license and notice text for all dependencies in each app into a `NOTICES` file in the app's `source_path`.  If an app uses a shared cache path, the file name will contain the app name as well, e.g. `NOTICES.my_app`.
+
+The `NOTICE` file contents are retrieved from cached records, with the assumption that cached records have already been reviewed in a compliance workflow.
+
 ## `env`
 
 Prints the runtime environment used by licensed after loading a configuration file.  By default the output is in YAML format, but can be output in JSON using the `--json` flag.

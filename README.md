@@ -24,13 +24,13 @@ See the [migration documentation](./docs/migrating_to_newer_versions.md) for mor
 ### Dependencies
 
 Licensed uses the `libgit2` bindings for Ruby provided by `rugged`. `rugged` requires `cmake` and `pkg-config` which you may need to install before you can install Licensed.
-   
+
    >  Ubuntu
-    
+
     sudo apt-get install cmake pkg-config
-    
+
    >  OS X
-       
+
     brew install cmake pkg-config
 
 ### With a Gemfile
@@ -64,8 +64,10 @@ For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/loc
 
 - `licensed list`: Output enumerated dependencies only.
 - `licensed cache`: Cache licenses and metadata.
-- `licensed status`: Check status of dependencies' cached licenses. For example:
+- `licensed status`: Check status of dependencies' cached licenses.
+- `licensed notices`: Write a `NOTICES` file for each application configuration.
 - `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`
+- `licensed env`: Output environment information from the licensed configuration.
 
 See the [commands documentation](./docs/commands.md) for additional documentation, or run `licensed -h` to see all of the current available commands.
 
