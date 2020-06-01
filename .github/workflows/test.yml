@@ -93,7 +93,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup php
-      uses: nanasess/setup-php@v1.0.2
+      uses: nanasess/setup-php@v3.0.4
       with:
         php-version: ${{ matrix.php }}
     - name: Set up Ruby
