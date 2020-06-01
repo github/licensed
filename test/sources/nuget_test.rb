@@ -89,7 +89,7 @@ if Licensed::Shell.tool_available?("dotnet")
     end
   end
 
-  describe Licensed::Sources::Gradle::Dependency do
+  describe Licensed::Sources::NuGet::NuGetDependency do
     it "does not error for paths that don't exist" do
       path = Dir.mktmpdir
       FileUtils.rm_rf(path)
@@ -111,7 +111,7 @@ if Licensed::Shell.tool_available?("dotnet")
         response.stubs(:body).returns("some license")
         Net::HTTP.expects(:get_response).returns(response).once
 
-        data1 = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
+        Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
         data2 = Licensed::Sources::NuGet::NuGetDependency.retrieve_license("https://caches/download/urls")
         assert_equal "some license", data2
       end
