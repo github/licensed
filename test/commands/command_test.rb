@@ -20,13 +20,13 @@ describe Licensed::Commands::Command do
   it "runs a command for all dependencies in the configuration" do
     command.run
     command.config.apps.each do |app|
-      app_report = command.reporter.report.reports.find { |report| report.name == app["name"] }
+      app_report = command.reporter.report.reports.find { |r| r.name == app["name"] }
       assert app_report
 
-      source_report = app_report.reports.find { |report| report.name == "#{app["name"]}.#{TestSource.type}" }
+      source_report = app_report.reports.find { |r| r.name == "#{app["name"]}.#{TestSource.type}" }
       assert source_report
 
-      assert source_report.reports.find { |report| report.name == "#{app["name"]}.#{TestSource.type}.dependency" }
+      assert source_report.reports.find { |r| r.name == "#{app["name"]}.#{TestSource.type}.dependency" }
     end
   end
 
@@ -43,10 +43,10 @@ describe Licensed::Commands::Command do
     proc = lambda { |app, _| raise Licensed::Shell::Error.new(["#{app["name"]}"], 0, nil) }
     refute command.run(source_proc: proc)
 
-    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::AppConfiguration) }
+    reports = command.reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::AppConfiguration) }
     refute_empty reports
-    reports.each do |report|
-      assert_includes report.errors, "'#{report.name}' exited with status 0\n"
+    reports.each do |r|
+      assert_includes r.errors, "'#{r.name}' exited with status 0\n"
     end
   end
 
@@ -54,10 +54,10 @@ describe Licensed::Commands::Command do
     proc = lambda { |app, source, _| raise Licensed::Shell::Error.new(["#{app["name"]}.#{source.class.type}"], 0, nil) }
     refute command.run(dependency_proc: proc)
 
-    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::Sources::Source) }
+    reports = command.reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::Sources::Source) }
     refute_empty reports
-    reports.each do |report|
-      assert_includes report.errors, "'#{report.name}' exited with status 0\n"
+    reports.each do |r|
+      assert_includes r.errors, "'#{r.name}' exited with status 0\n"
     end
   end
 
@@ -76,7 +76,7 @@ describe Licensed::Commands::Command do
     dependency_name = "#{apps.first["name"]}.test.dependency"
     proc = lambda { |app, source, dep| dep.errors << "error" }
     refute command.run(dependency_proc: proc)
-    report = command.reporter.report.all_reports.find { |report| report.name == dependency_name }
+    report = command.reporter.report.all_reports.find { |r| r.name == dependency_name }
     assert report
     assert_includes report.errors, "error"
   end
@@ -85,26 +85,26 @@ describe Licensed::Commands::Command do
     proc = lambda { |app, source, _| raise Licensed::Sources::Source::Error.new("#{app["name"]}.#{source.class.type}") }
     refute command.run(dependency_proc: proc)
 
-    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::Sources::Source) }
+    reports = command.reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::Sources::Source) }
     refute_empty reports
-    reports.each do |report|
-      assert_includes report.errors, report.name
+    reports.each do |r|
+      assert_includes r.errors, r.name
     end
   end
 
   it "allows implementations to add extra data to reports with a yielded block" do
     command.run
 
-    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Commands::Command) }
+    report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Commands::Command) }
     assert_equal true, report["extra"]
 
-    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::AppConfiguration) }
+    report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::AppConfiguration) }
     assert_equal true, report["extra"]
 
-    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Sources::Source) }
+    report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
     assert_equal true, report["extra"]
 
-    report = command.reporter.report.all_reports.find { |report| report.target.is_a?(Licensed::Dependency) }
+    report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
     assert_equal true, report["extra"]
   end
 end
