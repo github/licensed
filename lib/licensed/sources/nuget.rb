@@ -17,10 +17,13 @@ module Licensed
         PROJECT_URL_REGEX = /<projectUrl>\s*(.*)\s*<\/projectUrl>/ix.freeze
         PROJECT_DESC_REGEX = /<description>\s*(.*)\s*<\/description>/ix.freeze
 
-        def initialize(name:, version:, path:, search_root: nil, metadata: {}, errors: [])
-          super(name: name, version: version, path: path, search_root: search_root, metadata: metadata, errors: errors)
-          @metadata["homepage"] = project_url if project_url
-          @metadata["summary"] = description if description
+        # Returns the metadata that represents this dependency.  This metadata
+        # is written to YAML in the dependencys cached text file
+        def license_metadata
+          super.tap do |record_metadata|
+            record_metadata["homepage"] = project_url if project_url
+            record_metadata["summary"] = description if description
+          end
         end
 
         def nuspec_path
@@ -29,14 +32,17 @@ module Licensed
         end
 
         def nuspec_contents
-          return unless nuspec_path
-          @nuspec_contents ||= File.read(nuspec_path)
+          return @nuspec_contents if defined?(@nuspec_contents)
+          @nuspec_contents = begin
+            return unless nuspec_path && File.exist?(nuspec_path)
+            File.read(nuspec_path)
+          end
         end
 
         def project_url
           return @project_url if defined?(@project_url)
-          return unless nuspec_contents
           @project_url = begin
+            return unless nuspec_contents
             match = nuspec_contents.match PROJECT_URL_REGEX
             match[1] if match && match[1]
           end
@@ -44,8 +50,8 @@ module Licensed
 
         def description
           return @description if defined?(@description)
-          return unless nuspec_contents
           @description = begin
+            return unless nuspec_contents
             match = nuspec_contents.match PROJECT_DESC_REGEX
             match[1] if match && match[1]
           end
