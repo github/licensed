@@ -33,7 +33,7 @@ A dependency will fail the status checks if:
 
 ## `notices`
 
-Outputs license and notice text for all dependencies in each app into a `NOTICE` file in the app's `source_path`.  If an app uses a shared cache path, the file name will contain the app name as well, e.g. `NOTICE.my_app`.
+Outputs license and notice text for all dependencies in each app into a `NOTICE` file in the app's `cache_path`.  If an app uses a shared cache path, the file name will contain the app name as well, e.g. `NOTICE.my_app`.
 
 The `NOTICE` file contents are retrieved from cached records, with the assumption that cached records have already been reviewed in a compliance workflow.
 
