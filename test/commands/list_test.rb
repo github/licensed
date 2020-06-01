@@ -25,15 +25,15 @@ describe Licensed::Commands::List do
           next unless enabled
 
           command.run
-          app_report = reporter.report.reports.find { |app_report| app_report.target == app }
+          app_report = reporter.report.reports.find { |r| r.target == app }
           assert app_report
 
           app.sources.each do |source|
-            source_report = app_report.reports.find { |source_report| source_report.target == source }
+            source_report = app_report.reports.find { |r| r.target == source }
             assert source_report
 
             expected_dependency = app["expected_dependency"]
-            assert source_report.reports.find { |dependency_report| dependency_report.name.include?(expected_dependency) }
+            assert source_report.reports.find { |r| r.name.include?(expected_dependency) }
           end
         end
       end

@@ -54,7 +54,7 @@ if Licensed::Shell.tool_available?("php")
 
       it "includes nested dependencies" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |dep| dep.name == "psr/log" }
+          dep = source.dependencies.detect { |d| d.name == "psr/log" }
           assert dep
           assert_equal "composer", dep.record["type"]
           # psr/log requirement for monolog/monolog is `~1.0`

@@ -26,13 +26,13 @@ describe Licensed::Commands::Status do
   end
 
   def dependency_errors(app, source, dependency_name = "dependency")
-    app_report = reporter.report.reports.find { |app_report| app_report.name == app["name"] }
+    app_report = reporter.report.reports.find { |r| r.name == app["name"] }
     assert app_report
 
-    source_report = app_report.reports.find { |source_report| source_report.target == source }
+    source_report = app_report.reports.find { |r| r.target == source }
     assert source_report
 
-    dependency_report = source_report.reports.find { |dependency_report| dependency_report.name.include?(dependency_name) }
+    dependency_report = source_report.reports.find { |r| r.name.include?(dependency_name) }
     dependency_report&.errors || []
   end
 

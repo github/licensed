@@ -35,7 +35,7 @@ describe Licensed::Commands::Environment do
       command.run
 
       config.apps.each do |app|
-        report = reporter.report.all_reports.find { |report| report.target == app }
+        report = reporter.report.all_reports.find { |r| r.target == app }
         assert report
 
         Licensed::Commands::Environment::AppEnvironment.new(app).to_h.each do |key, value|

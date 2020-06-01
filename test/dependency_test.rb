@@ -129,8 +129,8 @@ describe Licensed::Dependency do
 
         contents = dependency.license_contents.first
         assert contents
-        assert_match /auto-generated/i, contents["sources"]
-        refute_match /copyright \(c\)/i, contents["text"]
+        assert_match(/auto-generated/i, contents["sources"])
+        refute_match(/copyright \(c\)/i, contents["text"])
 
         file = Licensee::ProjectFiles::LicenseFile.new(contents["text"])
         assert_equal "mit", file.license&.key

@@ -98,7 +98,7 @@ describe Licensed::Configuration do
       options["source_path"] = File.expand_path("../fixtures/*", __FILE__)
       expected_source_paths = Dir.glob(options["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
-        app = config.apps.find { |app| app["source_path"] == source_path }
+        app = config.apps.find { |a| a["source_path"] == source_path }
         assert app
         dir_name = File.basename(source_path)
         assert_equal app.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, dir_name),
@@ -131,7 +131,7 @@ describe Licensed::Configuration do
       apps << { "source_path" => File.expand_path("../fixtures/*", __FILE__) }
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
-        app = config.apps.find { |app| app["source_path"] == source_path }
+        app = config.apps.find { |a| a["source_path"] == source_path }
         assert app
         dir_name = File.basename(source_path)
         assert_equal app.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, dir_name),
@@ -151,7 +151,7 @@ describe Licensed::Configuration do
       }
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
-        app = config.apps.find { |app| app["source_path"] == source_path }
+        app = config.apps.find { |a| a["source_path"] == source_path }
         assert app
         dir_name = File.basename(source_path)
         assert_equal app.root.join(cache_path, dir_name), app.cache_path
@@ -169,7 +169,7 @@ describe Licensed::Configuration do
       }
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
-        app = config.apps.find { |app| app["source_path"] == source_path }
+        app = config.apps.find { |a| a["source_path"] == source_path }
         assert app
         assert_equal app.root.join(cache_path), app.cache_path
       end
@@ -177,7 +177,6 @@ describe Licensed::Configuration do
 
     it "does not apply an inherited shared_cache setting to an app-configured cache path" do
       cache_path = ".test_licenses"
-      name = "test"
       apps.clear
       apps << {
         "source_path" => File.expand_path("../fixtures/*", __FILE__),
@@ -187,7 +186,7 @@ describe Licensed::Configuration do
 
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
-        app = config.apps.find { |app| app["source_path"] == source_path }
+        app = config.apps.find { |a| a["source_path"] == source_path }
         assert app
         dir_name = File.basename(source_path)
         assert_equal app.root.join(cache_path, dir_name), app.cache_path
