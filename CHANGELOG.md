@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.11.0
+2020-06-02
+
+### Added
+- `notices` command to create a `NOTICE` file for each configured app (https://github.com/github/licensed/pull/277)
+
+### Fixed
+- NuGet source no longer crashes on a non-existent dependency path (https://github.com/github/licensed/pull/280)
+- Go source no longer crashes on a non-existent dependency package path (https://github.com/github/licensed/pull/274)
+
 ## 2.10.0
 2020-05-15
 
@@ -13,7 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - NPM source ignores missing peer dependencies (https://github.com/github/licensed/pull/267)
 
 ### Added
-- Nuget source (:tada: @zarenner https://github.com/github/licensed/pull/261)
+- NuGet source (:tada: @zarenner https://github.com/github/licensed/pull/261)
 - Multiple apps can share a single cache location (https://github.com/github/licensed/pull/263)
 
 ## 2.9.2
@@ -302,4 +312,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.10.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.11.0...HEAD
