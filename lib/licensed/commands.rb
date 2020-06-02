@@ -6,5 +6,6 @@ module Licensed
     require "licensed/commands/status"
     require "licensed/commands/list"
     require "licensed/commands/environment"
+    require "licensed/commands/notices"
   end
 end

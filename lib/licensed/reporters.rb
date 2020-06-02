@@ -7,5 +7,6 @@ module Licensed
     require "licensed/reporters/list_reporter"
     require "licensed/reporters/json_reporter"
     require "licensed/reporters/yaml_reporter"
+    require "licensed/reporters/notices_reporter"
   end
 end
