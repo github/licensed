@@ -90,6 +90,21 @@ if Licensed::Shell.tool_available?("dotnet")
   end
 
   describe Licensed::Sources::NuGet::NuGetDependency do
+    it "does not error for paths that don't exist" do
+      path = Dir.mktmpdir
+      FileUtils.rm_rf(path)
+
+      dep = Licensed::Sources::NuGet::NuGetDependency.new(
+        name: "test",
+        version: "1.0",
+        path: path,
+        metadata: {
+          "name" => "test"
+        }
+      )
+      assert dep.record
+    end
+
     describe "retreive license" do
       it "caches downloaded urls" do
         response = Net::HTTPSuccess.new(1.0, "200", "OK")
