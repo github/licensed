@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.11.1
+2020-06-09
+
+### Fixed
+- `notices` command properly reads cached dependency notices contents (https://github.com/github/licensed/pull/283)
+
 ## 2.11.0
 2020-06-02
 
@@ -312,4 +318,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.11.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.11.1...HEAD
