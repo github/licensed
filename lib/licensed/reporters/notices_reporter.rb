@@ -55,16 +55,7 @@ module Licensed
         return unless cached_record
 
         texts = cached_record.licenses.map(&:text)
-        cached_record.notices.each do |notice|
-          case notice
-          when Hash
-            texts << notice["text"]
-          when String
-            texts << notice
-          else
-            shell.warn "* unable to parse notices for #{report.target.name}"
-          end
-        end
+        texts.concat(cached_record.notices)
 
         <<~NOTICE
           #{cached_record["name"]}@#{cached_record["version"]}

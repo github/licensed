@@ -48,32 +48,6 @@ describe Licensed::Reporters::NoticesReporter do
       end
     end
 
-    it "prints a warning if dependency notice contents can't be parsed" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            source.dependencies.each do |dependency|
-              reporter.report_dependency(dependency) do |report|
-                report["cached_record"] = Licensed::DependencyRecord.new(
-                  licenses: [],
-                  notices: [1]
-                )
-              end
-            end
-          end
-        end
-      end
-
-      source.dependencies.each do |dependency|
-        assert_includes shell.messages,
-                        {
-                           message: "* unable to parse notices for #{dependency.name}",
-                           newline: true,
-                           style: :warn
-                        }
-      end
-    end
-
     it "writes dependencies' licenses and notices to a NOTICE file" do
       reporter.report_run(command) do
         reporter.report_app(app) do
@@ -85,10 +59,7 @@ describe Licensed::Reporters::NoticesReporter do
                     { "sources" => "LICENSE1", "text" => "license1" },
                     { "sources" => "LICENSE2", "text" => "license2" }
                   ],
-                  notices: [
-                    "notice1",
-                    { "sources" => "NOTICE", "text" => "notice2" }
-                  ]
+                  notices: ["notice1", "notice2"]
                 )
               end
             end
@@ -118,10 +89,7 @@ describe Licensed::Reporters::NoticesReporter do
                     { "sources" => "LICENSE1", "text" => "license1" },
                     { "sources" => "LICENSE2", "text" => "license2" }
                   ],
-                  notices: [
-                    "notice1",
-                    { "sources" => "NOTICE", "text" => "notice2" }
-                  ]
+                  notices: ["notice1", "notice2"]
                 )
               end
             end
