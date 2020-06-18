@@ -21,7 +21,9 @@ module Licensed
         begin
           result = reporter.report_run(self) do |report|
             # allow additional report data to be given by commands
-            yield report if block_given?
+            if block_given?
+              next if (yield report) == :skip
+            end
 
             config.apps.sort_by { |app| app["name"] }
                        .map { |app| run_app(app) }
@@ -57,7 +59,9 @@ module Licensed
           Dir.chdir app.source_path do
             begin
               # allow additional report data to be given by commands
-              yield report if block_given?
+              if block_given?
+                next if (yield report) == :skip
+              end
 
               app.sources.select(&:enabled?)
                          .sort_by { |source| source.class.type }
@@ -81,7 +85,9 @@ module Licensed
         reporter.report_source(source) do |report|
           begin
             # allow additional report data to be given by commands
-            yield report if block_given?
+            if block_given?
+              next if (yield report) == :skip
+            end
 
             source.dependencies.sort_by { |dependency| dependency.name }
                                .map { |dependency| run_dependency(app, source, dependency) }
@@ -114,7 +120,9 @@ module Licensed
 
           begin
             # allow additional report data to be given by commands
-            yield report if block_given?
+            if block_given?
+              next if (yield report) == :skip
+            end
 
             evaluate_dependency(app, source, dependency, report)
           rescue Licensed::Shell::Error => err

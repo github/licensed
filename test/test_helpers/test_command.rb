@@ -15,7 +15,9 @@ class TestCommand < Licensed::Commands::Command
 
   def run(**options)
     super do |report|
+      # byebug
       report["extra"] = true
+      next :skip if options[:skip_run]
     end
   end
 
@@ -24,6 +26,7 @@ class TestCommand < Licensed::Commands::Command
   def run_app(app)
     super do |report|
       report["extra"] = true
+      next :skip if options[:skip_app]
     end
   end
 
@@ -31,6 +34,7 @@ class TestCommand < Licensed::Commands::Command
     options[:source_proc].call(app, source) if options[:source_proc]
     super do |report|
       report["extra"] = true
+      next :skip if options[:skip_source]
     end
   end
 
@@ -38,11 +42,13 @@ class TestCommand < Licensed::Commands::Command
     options[:dependency_proc].call(app, source, dependency) if options[:dependency_proc]
     super do |report|
       report["extra"] = true
+      next :skip if options[:skip_dependency]
     end
   end
 
   def evaluate_dependency(app, source, dependency, report)
     return options[:evaluate_proc].call(app, source, dependency) if options[:evaluate_proc]
+    report["evaluated"] = true
     true
   end
 end

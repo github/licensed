@@ -66,9 +66,9 @@ describe Licensed::Commands::List do
     command.run
 
     reports = reporter.report.all_reports
-    dependency_report = reports.find { |dependency| dependency.name == "licensed.test.dependency" }
+    dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
     assert dependency_report
-    assert_equal fixtures, dependency_report[:dependency].path
+    assert_equal fixtures, dependency_report.target.path
   end
 
   describe "with multiple apps" do
