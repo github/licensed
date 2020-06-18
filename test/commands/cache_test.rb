@@ -85,6 +85,21 @@ describe Licensed::Commands::Cache do
     assert_equal files, ["1", "2"]
   end
 
+  it "does not clean up dependencies outside of sources' cache paths" do
+    config.apps.each do |app|
+      FileUtils.mkdir_p app.cache_path.join("other")
+      File.write app.cache_path.join("root.#{Licensed::DependencyRecord::EXTENSION}"), ""
+      File.write app.cache_path.join("other", "dep.#{Licensed::DependencyRecord::EXTENSION}"), ""
+    end
+
+    generator.run
+
+    config.apps.each do |app|
+      assert app.cache_path.join("root.#{Licensed::DependencyRecord::EXTENSION}").exist?
+      assert app.cache_path.join("other", "dep.#{Licensed::DependencyRecord::EXTENSION}").exist?
+    end
+  end
+
   it "uses cached record if license text does not change" do
     generator.run
 
@@ -213,6 +228,19 @@ describe Licensed::Commands::Cache do
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
       record = Licensed::DependencyRecord.read(path)
       assert_equal fixtures, record["dir"]
+    end
+  end
+
+  it "skips a dependency sources not specified in optional :sources argument" do
+    generator.run(sources: "alternate")
+
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
+    refute_empty report.warnings
+    assert report.warnings.any? { |w| w == "skipped source" }
+
+    config.apps.each do |app|
+      path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+      refute Licensed::DependencyRecord.read(path)
     end
   end
 

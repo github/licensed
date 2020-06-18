@@ -10,8 +10,11 @@ module Licensed
       desc: "Overwrite licenses even if version has not changed."
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
+    method_option :sources, aliases: "-s", type: :array,
+      desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def cache
-      run Licensed::Commands::Cache.new(config: config), force: options[:force]
+      run Licensed::Commands::Cache.new(config: config),
+          { force: options[:force], sources: options[:sources] }
     end
 
     desc "status", "Check status of dependencies' cached licenses"
