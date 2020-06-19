@@ -107,4 +107,25 @@ describe Licensed::Commands::Command do
     report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
     assert_equal true, report["extra"]
   end
+
+  it "allows implementations to skip running a command with a yielded block" do
+    command.run(skip_run: true)
+    refute command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::AppConfiguration) }
+  end
+
+  it "allows implementations to skip running apps with a yielded block" do
+    command.run(skip_app: true)
+    refute command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
+  end
+
+  it "allows implementations to skip running sources with a yielded block" do
+    command.run(skip_source: true)
+    refute command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+  end
+
+  it "allows implementations to skip evaluating dependencies with a yielded block" do
+    command.run(skip_dependency: true)
+    report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+    refute_equal true, report["evaluated"]
+  end
 end

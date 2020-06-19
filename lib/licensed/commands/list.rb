@@ -13,6 +13,25 @@ module Licensed
 
       protected
 
+      # Run the command for all enumerated dependencies found in a dependency source,
+      # recording results in a report.
+      # Enumerating dependencies in the source is skipped if a :sources option
+      # is provided and the evaluated `source.class.type` is not in the :sources values
+      #
+      # app - The application configuration for the source
+      # source - A dependency source enumerator
+      #
+      # Returns whether the command succeeded for the dependency source enumerator
+      def run_source(app, source)
+        super do |report|
+          next if Array(options[:sources]).empty?
+          next if options[:sources].include?(source.class.type)
+
+          report.warnings << "skipped source"
+          :skip
+        end
+      end
+
       # Listing dependencies requires no extra work.
       #
       # app - The application configuration for the dependency

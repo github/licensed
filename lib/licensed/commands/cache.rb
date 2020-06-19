@@ -32,19 +32,26 @@ module Licensed
 
       protected
 
-      # Run the command for all enabled sources for an application configuration,
+      # Run the command for all enumerated dependencies found in a dependency source,
       # recording results in a report.
+      # Enumerating dependencies in the source is skipped if a :sources option
+      # is provided and the evaluated `source.class.type` is not in the :sources values
       #
-      # app - An application configuration
+      # app - The application configuration for the source
+      # source - A dependency source enumerator
       #
-      # Returns whether the command succeeded for the application.
-      def run_app(app)
-        result = super
+      # Returns whether the command succeeded for the dependency source enumerator
+      def run_source(app, source)
+        super do |report|
+          if Array(options[:sources]).any? && !options[:sources].include?(source.class.type)
+            report.warnings << "skipped source"
+            next :skip
+          end
 
-        # add the full cache path to the list of cache paths evaluted during this run
-        cache_paths << app.cache_path
-
-        result
+          # add the full cache path to the list of cache paths
+          # that should be cleaned up after the command run
+          cache_paths << app.cache_path.join(source.class.type)
+        end
       end
 
       # Cache dependency record data.

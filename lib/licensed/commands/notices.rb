@@ -13,6 +13,25 @@ module Licensed
 
       protected
 
+      # Run the command for all enumerated dependencies found in a dependency source,
+      # recording results in a report.
+      # Enumerating dependencies in the source is skipped if a :sources option
+      # is provided and the evaluated `source.class.type` is not in the :sources values
+      #
+      # app - The application configuration for the source
+      # source - A dependency source enumerator
+      #
+      # Returns whether the command succeeded for the dependency source enumerator
+      def run_source(app, source)
+        super do |report|
+          next if Array(options[:sources]).empty?
+          next if options[:sources].include?(source.class.type)
+
+          report.warnings << "skipped source"
+          :skip
+        end
+      end
+
       # Load stored dependency record data to add to the notices report.
       #
       # app - The application configuration for the dependency
@@ -25,7 +44,7 @@ module Licensed
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
         report["cached_record"] = Licensed::DependencyRecord.read(filename)
         if !report["cached_record"]
-          report["warning"] = "expected cached record not found at #{filename}"
+          report.warnings << "expected cached record not found at #{filename}"
         end
 
         true

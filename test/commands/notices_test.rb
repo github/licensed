@@ -59,10 +59,20 @@ describe Licensed::Commands::Notices do
           assert report
           assert_nil report["cached_record"]
           path = app.cache_path.join(source.class.type, "#{dependency.name}.#{Licensed::DependencyRecord::EXTENSION}")
-          assert_equal "expected cached record not found at #{path}",
-                       report["warning"]
+          assert_equal ["expected cached record not found at #{path}"],
+                       report.warnings
         end
       end
     end
+  end
+
+  it "skips dependency sources not specified in optional :sources argument" do
+    command.run(sources: "alternate")
+
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
+    refute_empty report.warnings
+    assert report.warnings.any? { |w| w == "skipped source" }
+
+    refute reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
   end
 end

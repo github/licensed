@@ -33,6 +33,26 @@ module Licensed
         end
       end
 
+
+      # Reports on a dependency source enumerator in a notices command run.
+      # Shows warnings encountered during the run.
+      #
+      # source - A dependency source enumerator
+      #
+      # Returns the result of the yielded method
+      # Note - must be called from inside the `report_run` scope
+      def report_source(source)
+        super do |report|
+          result = yield report
+
+          report.warnings.each do |warning|
+            shell.warn "* #{report.name}: #{warning}"
+          end
+
+          result
+        end
+      end
+
       # Reports on a dependency in a notices command run.
       #
       # dependency - An application dependency
@@ -42,7 +62,9 @@ module Licensed
       def report_dependency(dependency)
         super do |report|
           result = yield report
-          shell.warn "* #{report["warning"]}" if report["warning"]
+          report.warnings.each do |warning|
+            shell.warn "* #{report.name}: #{warning}"
+          end
           result
         end
       end

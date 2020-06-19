@@ -139,6 +139,49 @@ describe Licensed::Reporters::NoticesReporter do
     end
   end
 
+  describe "#report_source" do
+    it "runs a block" do
+      success = false
+      reporter.report_run(command) do
+        reporter.report_app(app) do
+          reporter.report_source(source) { success = true }
+        end
+      end
+
+      assert success
+    end
+
+    it "returns the result of the block" do
+      reporter.report_run(command) do
+        reporter.report_app(app) do
+          assert_equal 1, reporter.report_source(source) { 1 }
+        end
+      end
+    end
+
+    it "provides a report hash to the block" do
+      reporter.report_run(command) do
+        reporter.report_app(app) do
+          reporter.report_source(source) { |report| refute_nil report }
+        end
+      end
+    end
+
+    it "prints a warning from a source report" do
+      reporter.report_run(command) do
+        reporter.report_app(app) do
+          reporter.report_source(source) { |report| report.warnings << "warning" }
+          assert_includes shell.messages,
+                          {
+                            message: "* #{app["name"]}.#{source.class.type}: warning",
+                            newline: true,
+                            style: :warn
+                          }
+        end
+      end
+    end
+  end
+
   describe "#report_dependency" do
     it "runs a block" do
       success = false
@@ -184,10 +227,10 @@ describe Licensed::Reporters::NoticesReporter do
         reporter.report_app(app) do
           reporter.report_source(source) do
             source.dependencies.each do |dependency|
-              reporter.report_dependency(dependency) { |report| report["warning"] = "warning" }
+              reporter.report_dependency(dependency) { |report| report.warnings << "warning" }
               assert_includes shell.messages,
                               {
-                                message: "* warning",
+                                message: "* #{app["name"]}.#{source.class.type}.#{dependency.name}: warning",
                                 newline: true,
                                 style: :warn
                               }

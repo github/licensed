@@ -13,18 +13,4 @@ class TestReporter < Licensed::Reporters::Reporter
       yield report
     end
   end
-
-  # Reports on a dependency in a list command run.
-  #
-  # dependency - An application dependency
-  #
-  # Returns the result of the yielded method
-  # Note - must be called from inside the `report_run` scope
-  def report_dependency(dependency)
-    super do |report|
-      result = yield report
-      report[:dependency] = dependency
-      result
-    end
-  end
 end
