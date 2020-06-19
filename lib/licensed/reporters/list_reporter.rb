@@ -28,6 +28,22 @@ module Licensed
           shell.info "  #{source.class.type}"
           result = yield report
 
+          warning_reports = report.all_reports.select { |r| r.warnings.any? }.to_a
+          if warning_reports.any?
+            shell.newline
+            shell.warn "  * Warnings:"
+            warning_reports.each do |r|
+              display_metadata = r.map { |k, v| "#{k}: #{v}" }.join(", ")
+
+              shell.warn "    * #{r.name}"
+              shell.warn "    #{display_metadata}" unless display_metadata.empty?
+              r.warnings.each do |warning|
+                shell.warn "      - #{warning}"
+              end
+              shell.newline
+            end
+          end
+
           errored_reports = report.all_reports.select { |r| r.errors.any? }.to_a
           if errored_reports.any?
             shell.newline

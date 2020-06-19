@@ -30,8 +30,11 @@ module Licensed
     desc "list", "List dependencies"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
+    method_option :sources, aliases: "-s", type: :array,
+      desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def list
-      run Licensed::Commands::List.new(config: config)
+      run Licensed::Commands::List.new(config: config),
+          { sources: options[:sources] }
     end
 
     desc "notices", "Generate a NOTICE file from cached records"
