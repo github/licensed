@@ -40,8 +40,11 @@ module Licensed
     desc "notices", "Generate a NOTICE file from cached records"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
+    method_option :sources, aliases: "-s", type: :array,
+      desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def notices
-      run Licensed::Commands::Notices.new(config: config)
+      run Licensed::Commands::Notices.new(config: config),
+          { sources: options[:sources] }
     end
 
     map "-v" => :version
