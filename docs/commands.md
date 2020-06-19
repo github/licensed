@@ -6,9 +6,13 @@ Run `licensed -h` to see help content for running licensed commands.
 
 Running the list command finds the dependencies for all sources in all configured applications.  No additional actions are taken on each dependency.
 
+An optional `--sources` flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
+
 ## `cache`
 
 The cache command finds all dependencies and ensures that each dependency has an up-to-date cached record.
+
+An optional `--sources` flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
 
 Dependency records will be saved if:
 1. The `force` option is set
@@ -22,6 +26,8 @@ After the cache command is run, any cached records that don't match up to a curr
 
 The status command finds all dependencies and checks whether each dependency has a valid cached record.
 
+An optional `--sources` flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
+
 A dependency will fail the status checks if:
 1. No cached record is found
 2. The cached record's version is different than the current dependency's version
@@ -34,6 +40,8 @@ A dependency will fail the status checks if:
 ## `notices`
 
 Outputs license and notice text for all dependencies in each app into a `NOTICE` file in the app's `cache_path`.  If an app uses a shared cache path, the file name will contain the app name as well, e.g. `NOTICE.my_app`.
+
+An optional `--sources` flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
 
 The `NOTICE` file contents are retrieved from cached records, with the assumption that cached records have already been reviewed in a compliance workflow.
 
