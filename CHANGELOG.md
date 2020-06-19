@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.12.0
+2020-06-19
+
+### Added
+- `--sources` argument for cache, list, status and notices commands to filter running sources (https://github.com/github/licensed/pull/287)
+
+### Fixed
+- `cache` command will not remove files outside of enabled source cache paths (https://github.com/github/licensed/pull/287)
+
 ## 2.11.1
 2020-06-09
 
