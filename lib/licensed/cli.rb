@@ -20,8 +20,11 @@ module Licensed
     desc "status", "Check status of dependencies' cached licenses"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
+    method_option :sources, aliases: "-s", type: :array,
+      desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def status
-      run Licensed::Commands::Status.new(config: config)
+      run Licensed::Commands::Status.new(config: config),
+          { sources: options[:sources] }
     end
 
     desc "list", "List dependencies"

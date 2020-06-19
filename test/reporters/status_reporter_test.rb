@@ -39,6 +39,8 @@ describe Licensed::Reporters::StatusReporter do
               report["meta2"] = "data2"
               report.errors << "error1"
               report.errors << "error2"
+              report.warnings << "warning1"
+              report.warnings << "warning2"
             end
           end
         end
@@ -48,6 +50,34 @@ describe Licensed::Reporters::StatusReporter do
                            message: "Checking cached dependency records for #{app["name"]}",
                            newline: true,
                            style: :info
+                        }
+
+        assert_includes shell.messages,
+                        {
+                           message: "* #{app["name"]}.#{source.class.type}.#{dependency.name}",
+                           newline: true,
+                           style: :warn
+                        }
+
+        assert_includes shell.messages,
+                        {
+                           message: "  meta1: data1, meta2: data2",
+                           newline: true,
+                           style: :warn
+                        }
+
+        assert_includes shell.messages,
+                        {
+                          message: "    - warning1",
+                          newline: true,
+                          style: :warn
+                        }
+
+        assert_includes shell.messages,
+                        {
+                          message: "    - warning2",
+                          newline: true,
+                          style: :warn
                         }
 
         assert_includes shell.messages,
