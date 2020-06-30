@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.12.1
+2020-06-30
+
+### Fixed
+- `licensed` no longer exits an error code when using the `--sources` CLI argument(https://github.com/github/licensed/pull/290)
+
 ## 2.12.0
 2020-06-19
 
@@ -327,4 +333,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.11.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.12.1...HEAD
