@@ -93,7 +93,7 @@ describe Licensed::Commands::Command do
   end
 
   it "allows implementations to add extra data to reports with a yielded block" do
-    command.run
+    assert command.run
 
     report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Commands::Command) }
     assert_equal true, report["extra"]
@@ -109,22 +109,22 @@ describe Licensed::Commands::Command do
   end
 
   it "allows implementations to skip running a command with a yielded block" do
-    command.run(skip_run: true)
+    assert command.run(skip_run: true)
     refute command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::AppConfiguration) }
   end
 
   it "allows implementations to skip running apps with a yielded block" do
-    command.run(skip_app: true)
+    assert command.run(skip_app: true)
     refute command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
   end
 
   it "allows implementations to skip running sources with a yielded block" do
-    command.run(skip_source: true)
+    assert command.run(skip_source: true)
     refute command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
   end
 
   it "allows implementations to skip evaluating dependencies with a yielded block" do
-    command.run(skip_dependency: true)
+    assert command.run(skip_dependency: true)
     report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
     refute_equal true, report["evaluated"]
   end
