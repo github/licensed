@@ -22,7 +22,7 @@ module Licensed
           result = reporter.report_run(self) do |report|
             # allow additional report data to be given by commands
             if block_given?
-              next if (yield report) == :skip
+              next true if (yield report) == :skip
             end
 
             config.apps.sort_by { |app| app["name"] }
@@ -60,7 +60,7 @@ module Licensed
             begin
               # allow additional report data to be given by commands
               if block_given?
-                next if (yield report) == :skip
+                next true if (yield report) == :skip
               end
 
               app.sources.select(&:enabled?)
@@ -86,7 +86,7 @@ module Licensed
           begin
             # allow additional report data to be given by commands
             if block_given?
-              next if (yield report) == :skip
+              next true if (yield report) == :skip
             end
 
             source.dependencies.sort_by { |dependency| dependency.name }
@@ -121,7 +121,7 @@ module Licensed
           begin
             # allow additional report data to be given by commands
             if block_given?
-              next if (yield report) == :skip
+              next true if (yield report) == :skip
             end
 
             evaluate_dependency(app, source, dependency, report)
