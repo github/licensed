@@ -14,7 +14,7 @@ module Licensed
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def cache
       run Licensed::Commands::Cache.new(config: config),
-          { force: options[:force], sources: options[:sources] }
+          force: options[:force], sources: options[:sources]
     end
 
     desc "status", "Check status of dependencies' cached licenses"
@@ -23,8 +23,7 @@ module Licensed
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def status
-      run Licensed::Commands::Status.new(config: config),
-          { sources: options[:sources] }
+      run Licensed::Commands::Status.new(config: config), sources: options[:sources]
     end
 
     desc "list", "List dependencies"
@@ -33,8 +32,7 @@ module Licensed
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def list
-      run Licensed::Commands::List.new(config: config),
-          { sources: options[:sources] }
+      run Licensed::Commands::List.new(config: config), sources: options[:sources]
     end
 
     desc "notices", "Generate a NOTICE file from cached records"
@@ -43,8 +41,7 @@ module Licensed
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def notices
-      run Licensed::Commands::Notices.new(config: config),
-          { sources: options[:sources] }
+      run Licensed::Commands::Notices.new(config: config), sources: options[:sources]
     end
 
     map "-v" => :version
@@ -99,7 +96,7 @@ module Licensed
     end
 
     def run(command, **args)
-      exit command.run(args)
+      exit command.run(**args)
     end
   end
 end
