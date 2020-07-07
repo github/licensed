@@ -25,10 +25,10 @@ describe "licensed" do
     end
 
     it "accepts a path to a config file" do
-      out, status = Open3.capture2 "bundle exec exe/licensed cache -c #{config_path}"
+      out, = Open3.capture2 "bundle exec exe/licensed cache -c #{config_path}"
       refute out =~ /Usage/i
 
-      out, status = Open3.capture2 "bundle exec exe/licensed cache --config #{config_path}"
+      out, = Open3.capture2 "bundle exec exe/licensed cache --config #{config_path}"
       refute out =~ /Usage/i
     end
   end
@@ -49,10 +49,10 @@ describe "licensed" do
     end
 
     it "accepts a path to a config file" do
-      out, status = Open3.capture2 "bundle exec exe/licensed status -c #{config_path}"
+      out, = Open3.capture2 "bundle exec exe/licensed status -c #{config_path}"
       refute out =~ /Usage/i
 
-      out, status = Open3.capture2 "bundle exec exe/licensed status --config #{config_path}"
+      out, = Open3.capture2 "bundle exec exe/licensed status --config #{config_path}"
       refute out =~ /Usage/i
     end
   end
@@ -73,10 +73,10 @@ describe "licensed" do
     end
 
     it "accepts a path to a config file" do
-      out, status = Open3.capture2 "bundle exec exe/licensed list -c #{config_path}"
+      out, = Open3.capture2 "bundle exec exe/licensed list -c #{config_path}"
       refute out =~ /Usage/i
 
-      out, status = Open3.capture2 "bundle exec exe/licensed list --config #{config_path}"
+      out, = Open3.capture2 "bundle exec exe/licensed list --config #{config_path}"
       refute out =~ /Usage/i
     end
   end
@@ -84,13 +84,13 @@ describe "licensed" do
   describe "version" do
     it "outputs VERSION constant" do
       expected_out = "#{Licensed::VERSION}\n"
-      out, status = Open3.capture2 "bundle exec exe/licensed version"
+      out, = Open3.capture2 "bundle exec exe/licensed version"
       assert_equal out, expected_out
 
-      out, status = Open3.capture2 "bundle exec exe/licensed -v"
+      out, = Open3.capture2 "bundle exec exe/licensed -v"
       assert_equal out, expected_out
 
-      out, status = Open3.capture2 "bundle exec exe/licensed --version"
+      out, = Open3.capture2 "bundle exec exe/licensed --version"
       assert_equal out, expected_out
     end
   end
