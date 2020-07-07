@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.12.2
+2020-07-07
+
+### Changed
+- Cleaned up ruby 2.7 warnings (:tada: @jurre https://github.com/github/licensed/pull/292)
+- Cleaned up additional warnings in tests (https://github.com/github/licensed/pull/293)
+
 ## 2.12.1
 2020-06-30
 
@@ -333,4 +340,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.12.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.12.2...HEAD
