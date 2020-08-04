@@ -24,6 +24,17 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
+      it "is true if gems.locked exists" do
+        Dir.mktmpdir do |tmp|
+          Dir.chdir(tmp) do
+            File.write("gems.rb", "")
+            File.write("gems.locked", "")
+
+            assert source.enabled?
+          end
+        end
+      end
+
       it "is false no Gemfile.lock exists" do
         Dir.chdir(Dir.tmpdir) do
           refute source.enabled?
@@ -98,11 +109,11 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
-      it "returns gems.rb.lock for gems.rb gemfile_path" do
+      it "returns gems.locked for gems.rb gemfile_path" do
         Dir.mktmpdir do |tmp|
           Dir.chdir(tmp) do
             File.write("gems.rb", "")
-            assert_equal Pathname.pwd.join("gems.rb.lock"), source.lockfile_path
+            assert_equal Pathname.pwd.join("gems.locked"), source.lockfile_path
           end
         end
       end
