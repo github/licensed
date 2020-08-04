@@ -74,7 +74,7 @@ module Licensed
         end
       end
 
-      GEMFILES = %w{Gemfile gems.rb}.freeze
+      GEMFILES = { "Gemfile" => "Gemfile.lock", "gems.rb" => "gems.locked" }
       DEFAULT_WITHOUT_GROUPS = %i{development test}
 
       def enabled?
@@ -272,14 +272,15 @@ module Licensed
 
       # Returns the path to the Bundler Gemfile
       def gemfile_path
-        @gemfile_path ||= GEMFILES.map { |g| config.pwd.join g }
+        @gemfile_path ||= GEMFILES.keys
+                                  .map { |g| config.pwd.join g }
                                   .find { |f| f.exist? }
       end
 
       # Returns the path to the Bundler Gemfile.lock
       def lockfile_path
         return unless gemfile_path
-        @lockfile_path ||= gemfile_path.dirname.join("#{gemfile_path.basename}.lock")
+        @lockfile_path ||= gemfile_path.dirname.join(GEMFILES[gemfile_path.basename.to_s])
       end
 
       # Returns the configured bundler executable to use, or "bundle" by default.
