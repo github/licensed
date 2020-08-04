@@ -30,7 +30,7 @@ module Licensed
       end
 
       def packages
-        root_dependencies = JSON.parse(package_metadata_command)["dependencies"]
+        root_dependencies = package_metadata["dependencies"]
         recursive_dependencies(root_dependencies).each_with_object({}) do |(name, results), hsh|
           results.uniq! { |package| package["version"] }
           if results.size == 1
@@ -54,6 +54,18 @@ module Licensed
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
         result
+      end
+
+      # Returns parsed package metadata returned from `npm list`
+      def package_metadata
+        return @package_metadata if defined?(@package_metadata)
+
+        @package_metadata = begin
+          JSON.parse(package_metadata_command)
+        rescue JSON::ParserError => e
+          raise Licensed::Sources::Source::Error,
+            "Licensed was unable to parse the output from 'npm list'. Please run 'npm list --json --long' and check for errors. Error: #{e.message}"
+        end
       end
 
       # Returns the output from running `npm list` to get package metadata
