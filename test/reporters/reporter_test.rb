@@ -6,7 +6,7 @@ describe Licensed::Reporters::Reporter do
   let(:app) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { TestSource.new(app) }
   let(:dependency) { source.dependencies.first }
-  let(:command) { TestCommand.new(config: nil, reporter: reporter) }
+  let(:command) { TestCommand.new(config: nil) }
 
   describe "#report_run" do
     it "runs a block" do
