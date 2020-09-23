@@ -72,6 +72,17 @@ describe Licensed::Commands::Command do
     end
   end
 
+  it "catches dependency record errors thrown when evaluating a dependency" do
+    proc = lambda { |app, source, dep| raise Licensed::DependencyRecord::Error.new("dependency record error") }
+    refute command.run(evaluate_proc: proc)
+
+    reports = command.reporter.report.all_reports.select { |report| report.target.is_a?(Licensed::Dependency) }
+    refute_empty reports
+    reports.each do |report|
+      assert_includes report.errors, "dependency record error"
+    end
+  end
+
   it "reports errors found on a dependency" do
     dependency_name = "#{apps.first["name"]}.test.dependency"
     proc = lambda { |app, source, dep| dep.errors << "error" }

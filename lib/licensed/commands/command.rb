@@ -125,7 +125,7 @@ module Licensed
             end
 
             evaluate_dependency(app, source, dependency, report)
-          rescue Licensed::Shell::Error => err
+          rescue Licensed::DependencyRecord::Error, Licensed::Shell::Error => err
             report.errors << err.message
             false
           end

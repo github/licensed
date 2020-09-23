@@ -5,6 +5,8 @@ require "licensee"
 
 module Licensed
   class DependencyRecord
+    class Error < StandardError; end
+
     class License
       attr_reader :text, :sources
       def initialize(content)
@@ -46,6 +48,8 @@ module Licensed
         notices: data.delete("notices"),
         metadata: data
       )
+    rescue Psych::SyntaxError => e
+      raise Licensed::DependencyRecord::Error.new(e.message)
     end
 
     def_delegators :@metadata, :[], :[]=
