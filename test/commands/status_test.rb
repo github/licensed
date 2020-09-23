@@ -9,6 +9,7 @@ describe Licensed::Commands::Status do
   let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
   let(:verifier) { Licensed::Commands::Status.new(config: config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
+  let(:command) { Licensed::Commands::Status.new(config: config) }
 
   before do
     Spy.on(verifier, :create_reporter).and_return(reporter)
@@ -366,6 +367,20 @@ describe Licensed::Commands::Status do
           assert dependency_errors(app, source).empty?
         end
       end
+    end
+  end
+
+  describe "#create_reporter" do
+    it "uses a status reporter by default" do
+      assert command.create_reporter({}).is_a?(Licensed::Reporters::StatusReporter)
+    end
+
+    it "uses a YAML reporter when format is set to yaml" do
+      assert command.create_reporter(format: "yaml").is_a?(Licensed::Reporters::YamlReporter)
+    end
+
+    it "uses a JSON reporter when format is set to json" do
+      assert command.create_reporter(format: "json").is_a?(Licensed::Reporters::JsonReporter)
     end
   end
 end
