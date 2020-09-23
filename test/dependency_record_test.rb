@@ -28,6 +28,13 @@ describe Licensed::DependencyRecord do
       assert_equal ["license1", "license2"], content.licenses.map(&:text)
       assert_equal ["notice", "author"], content.notices
     end
+
+    it "raises an error on invalid YAML" do
+      File.write(@filename, "name: [")
+      assert_raises Licensed::DependencyRecord::Error do
+        Licensed::DependencyRecord.read(@filename)
+      end
+    end
   end
 
   describe "save" do
