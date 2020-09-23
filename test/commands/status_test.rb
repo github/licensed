@@ -1,23 +1,22 @@
 # frozen_string_literal: true
 require "test_helper"
+require "test_helpers/command_test_helpers"
 
 describe Licensed::Commands::Status do
+  include CommandTestHelpers
+
   let(:cache_path) { Dir.mktmpdir }
   let(:reporter) { TestReporter.new }
   let(:apps) { [] }
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
-  let(:verifier) { Licensed::Commands::Status.new(config: config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
   let(:command) { Licensed::Commands::Status.new(config: config) }
 
   before do
-    Spy.on(verifier, :create_reporter).and_return(reporter)
-
     generator_config = Marshal.load(Marshal.dump(config))
     generator = Licensed::Commands::Cache.new(config: generator_config)
-    Spy.on(generator, :create_reporter).and_return(TestReporter.new)
-    generator.run(force: true)
+    generator.run(force: true, reporter: TestReporter.new)
   end
 
   after do
@@ -38,7 +37,7 @@ describe Licensed::Commands::Status do
   end
 
   it "warns if license is not allowed" do
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert_includes dependency_errors(app, source), "license needs review: mit"
@@ -54,7 +53,7 @@ describe Licensed::Commands::Status do
       record.save(path)
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert_includes \
@@ -69,7 +68,7 @@ describe Licensed::Commands::Status do
       app.allow "mit"
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         refute_includes dependency_errors(app, source), "license needs review: mit"
@@ -78,7 +77,7 @@ describe Licensed::Commands::Status do
   end
 
   it "does not warn if dependency is ignored" do
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert dependency_errors(app, source).any?
@@ -86,7 +85,7 @@ describe Licensed::Commands::Status do
       end
     end
 
-    verifier.run
+    run_command
 
     config.apps.each do |app|
       app.sources.each do |source|
@@ -96,7 +95,7 @@ describe Licensed::Commands::Status do
   end
 
   it "does not warn if dependency is reviewed" do
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert dependency_errors(app, source).any?
@@ -104,7 +103,7 @@ describe Licensed::Commands::Status do
       end
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert dependency_errors(app, source).empty?
@@ -119,7 +118,7 @@ describe Licensed::Commands::Status do
       record.save(filename)
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert_includes dependency_errors(app, source), "missing license text"
@@ -134,7 +133,7 @@ describe Licensed::Commands::Status do
       record.save(filename)
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert_includes dependency_errors(app, source), "missing license text"
@@ -149,7 +148,7 @@ describe Licensed::Commands::Status do
       record.save(filename)
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         refute_includes dependency_errors(app, source), "missing license text"
@@ -165,7 +164,7 @@ describe Licensed::Commands::Status do
       record.save(filename)
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert_includes dependency_errors(app, source), "cached dependency record out of date"
@@ -178,7 +177,7 @@ describe Licensed::Commands::Status do
       FileUtils.rm app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         assert_includes dependency_errors(app, source), "cached dependency record not found"
@@ -192,7 +191,7 @@ describe Licensed::Commands::Status do
       app.ignore "type" => "test", "name" => "dependency"
     end
 
-    verifier.run
+    run_command
     config.apps.each do |app|
       app.sources.each do |source|
         refute_includes dependency_errors(app, source), "cached dependency record not found"
@@ -201,14 +200,14 @@ describe Licensed::Commands::Status do
   end
 
   it "does not include ignored dependencies in dependency counts" do
-    verifier.run
+    run_command
     count = reporter.report.all_reports.size
 
     config.apps.each do |app|
       app.ignore "type" => "test", "name" => "dependency"
     end
 
-    verifier.run
+    run_command
     ignored_count = reporter.report.all_reports.size
 
     assert_equal count - config.apps.size, ignored_count
@@ -219,7 +218,7 @@ describe Licensed::Commands::Status do
       app["source_path"] = fixtures
     end
 
-    verifier.run
+    run_command
 
     reports = reporter.report.all_reports
     dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
@@ -228,7 +227,7 @@ describe Licensed::Commands::Status do
   end
 
   it "skips a dependency sources not specified in optional :sources argument" do
-    verifier.run(sources: "alternate")
+    run_command(sources: "alternate")
 
     report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
     refute_empty report.warnings
@@ -254,7 +253,7 @@ describe Licensed::Commands::Status do
     end
 
     it "verifies dependencies for all apps" do
-      verifier.run
+      run_command
       apps.each do |app|
         assert reporter.report.reports.find { |report| report.name == app["name"] }
       end
@@ -271,7 +270,7 @@ describe Licensed::Commands::Status do
         record.save(filename)
       end
 
-      verifier.run
+      run_command
       config.apps.each do |app|
         app.sources.each do |source|
           assert_includes dependency_errors(app, source, "dependency/path"), "missing license text"
@@ -309,7 +308,7 @@ describe Licensed::Commands::Status do
       # because the top level license field is allowed
       update_records("mit", mit, agpl_3)
 
-      verifier.run
+      run_command
       config.apps.each do |app|
         app.sources.each do |source|
           assert dependency_errors(app, source).empty?
@@ -322,7 +321,7 @@ describe Licensed::Commands::Status do
       # them when the record's top level license field is set to other
       update_records("agpl-3.0", mit, bsd_3)
 
-      verifier.run
+      run_command
       config.apps.each do |app|
         app.sources.each do |source|
           assert_includes dependency_errors(app, source), "license needs review: agpl-3.0"
@@ -335,7 +334,7 @@ describe Licensed::Commands::Status do
       # and will be checked because the top level license field is set to other
       update_records("other", mit, agpl_3)
 
-      verifier.run
+      run_command
       config.apps.each do |app|
         app.sources.each do |source|
           assert_includes dependency_errors(app, source), "license needs review: other"
@@ -348,7 +347,7 @@ describe Licensed::Commands::Status do
       # when the top level license field is set to other
       update_records("other", mit, bsd_3)
 
-      verifier.run
+      run_command
       config.apps.each do |app|
         app.sources.each do |source|
           assert dependency_errors(app, source).empty?
@@ -361,26 +360,12 @@ describe Licensed::Commands::Status do
       # but not as part of a LICENSE file
       update_records("other", readme_mit, bsd_3)
 
-      verifier.run
+      run_command
       config.apps.each do |app|
         app.sources.each do |source|
           assert dependency_errors(app, source).empty?
         end
       end
-    end
-  end
-
-  describe "#create_reporter" do
-    it "uses a status reporter by default" do
-      assert command.create_reporter({}).is_a?(Licensed::Reporters::StatusReporter)
-    end
-
-    it "uses a YAML reporter when format is set to yaml" do
-      assert command.create_reporter(format: "yaml").is_a?(Licensed::Reporters::YamlReporter)
-    end
-
-    it "uses a JSON reporter when format is set to json" do
-      assert command.create_reporter(format: "json").is_a?(Licensed::Reporters::JsonReporter)
     end
   end
 end

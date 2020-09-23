@@ -25,7 +25,7 @@ module Licensed
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     def status
-      run Licensed::Commands::Status.new(config: config), sources: options[:sources], format: options[:format]
+      run Licensed::Commands::Status.new(config: config), sources: options[:sources], reporter: options[:format]
     end
 
     desc "list", "List dependencies"
@@ -59,7 +59,7 @@ module Licensed
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def env
-      run Licensed::Commands::Environment.new(config: config), format: options[:format]
+      run Licensed::Commands::Environment.new(config: config), reporter: options[:format]
     end
 
     desc "migrate", "Migrate from a previous version of licensed"

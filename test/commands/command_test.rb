@@ -128,4 +128,23 @@ describe Licensed::Commands::Command do
     report = command.reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
     refute_equal true, report["evaluated"]
   end
+
+  describe "#create_reporter" do
+    it "uses a YAML reporter when reporter is set to yaml" do
+      assert command.create_reporter(reporter: "yaml").is_a?(Licensed::Reporters::YamlReporter)
+    end
+
+    it "uses a JSON reporter when reporter is set to json" do
+      assert command.create_reporter(reporter: "json").is_a?(Licensed::Reporters::JsonReporter)
+    end
+
+    it "uses a passed in reporter if given" do
+      reporter = Licensed::Reporters::StatusReporter.new
+      assert_equal reporter, command.create_reporter(reporter: reporter)
+    end
+
+    it "uses the commands default_reporter by default" do
+      assert command.create_reporter.is_a?(TestReporter)
+    end
+  end
 end

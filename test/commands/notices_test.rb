@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 require "test_helper"
+require "test_helpers/command_test_helpers"
 
 describe Licensed::Commands::Notices do
+  include CommandTestHelpers
+
   let(:cache_path) { Dir.mktmpdir }
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new("cache_path" => cache_path, "sources" => { "test" => true }) }
   let(:command) { Licensed::Commands::Notices.new(config: config) }
 
   before do
-    Spy.on(command, :create_reporter).and_return(reporter)
-
     generator_config = Marshal.load(Marshal.dump(config))
     generator = Licensed::Commands::Cache.new(config: generator_config)
-    Spy.on(generator, :create_reporter).and_return(TestReporter.new)
-    generator.run(force: true)
+    generator.run(force: true, reporter: TestReporter.new)
   end
 
   after do
@@ -33,7 +33,7 @@ describe Licensed::Commands::Notices do
   end
 
   it "reports cached records found for dependencies" do
-    command.run
+    run_command
 
     config.apps.each do |app|
       app.sources.each do |source|
@@ -50,7 +50,7 @@ describe Licensed::Commands::Notices do
 
   it "reports a warning on missing cached records" do
     config.apps.each { |app| FileUtils.rm_rf app.cache_path }
-    command.run
+    run_command
 
     config.apps.each do |app|
       app.sources.each do |source|
@@ -67,7 +67,7 @@ describe Licensed::Commands::Notices do
   end
 
   it "skips dependency sources not specified in optional :sources argument" do
-    command.run(sources: "alternate")
+    run_command(sources: "alternate")
 
     report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
     refute_empty report.warnings

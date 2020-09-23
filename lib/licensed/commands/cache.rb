@@ -2,12 +2,12 @@
 module Licensed
   module Commands
     class Cache < Command
-      # Create a reporter to use during a command run
+      # Returns the default reporter to use during the command run
       #
       # options - The options the command was run with
       #
-      # Raises a Licensed::Reporters::CacheReporter
-      def create_reporter(options)
+      # Returns a Licensed::Reporters::CacheReporter
+      def default_reporter(options)
         Licensed::Reporters::CacheReporter.new
       end
 
