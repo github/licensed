@@ -10,7 +10,14 @@ module Licensed
       #
       # Returns a Licensed::Reporters::StatusReporter
       def create_reporter(options)
-        Licensed::Reporters::StatusReporter.new
+        case options[:format]
+        when "json"
+          Licensed::Reporters::JsonReporter.new
+        when "yaml"
+          Licensed::Reporters::YamlReporter.new
+        else
+          Licensed::Reporters::StatusReporter.new
+        end
       end
 
       protected
