@@ -144,7 +144,7 @@ describe Licensed::Commands::Command do
     end
 
     it "uses the commands default_reporter by default" do
-      assert command.create_reporter.is_a?(TestReporter)
+      assert command.create_reporter({}).is_a?(TestReporter)
     end
   end
 end
