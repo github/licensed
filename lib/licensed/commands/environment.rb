@@ -35,13 +35,13 @@ module Licensed
         end
       end
 
-      def create_reporter(options)
-        case options[:format]
-        when "json"
-          Licensed::Reporters::JsonReporter.new
-        else
-          Licensed::Reporters::YamlReporter.new
-        end
+      # Returns the default reporter to use during the command run
+      #
+      # options - The options the command was run with
+      #
+      # Returns a Licensed::Reporters::StatusReporter
+      def default_reporter(options)
+        Licensed::Reporters::YamlReporter.new
       end
 
       protected

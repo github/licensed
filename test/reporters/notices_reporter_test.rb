@@ -7,7 +7,7 @@ describe Licensed::Reporters::NoticesReporter do
   let(:reporter) { Licensed::Reporters::NoticesReporter.new(shell) }
   let(:app) { Licensed::AppConfiguration.new("source_path" => Dir.pwd, "cache_path" => cache_path) }
   let(:source) { TestSource.new(app) }
-  let(:command) { TestCommand.new(config: nil, reporter: reporter) }
+  let(:command) { TestCommand.new(config: nil) }
 
   after do
     FileUtils.rm_rf app.cache_path

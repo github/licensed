@@ -1,21 +1,19 @@
 # frozen_string_literal: true
 class TestCommand < Licensed::Commands::Command
-  def initialize(config:, reporter: TestReporter.new)
-    super(config: config)
-    @test_reporter = reporter
-  end
-
   def reporter
     @test_reporter
   end
 
   def create_reporter(options)
-    @test_reporter
+    @test_reporter ||= super(options)
+  end
+
+  def default_reporter(options)
+    TestReporter.new
   end
 
   def run(**options)
     super do |report|
-      # byebug
       report["extra"] = true
       next :skip if options[:skip_run]
     end

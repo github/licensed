@@ -37,13 +37,29 @@ module Licensed
         result
       end
 
-      # Create a reporter to use during a command run
+      # Creates a reporter to use during a command run
+      #
+      # options - The options the command was run with
+      #
+      # Returns the reporter to use during the command run
+      def create_reporter(options)
+        return options[:reporter] if options[:reporter].is_a?(Licensed::Reporters::Reporter)
+
+        if options[:reporter].is_a?(String)
+          klass = "#{options[:reporter].capitalize}Reporter"
+          return Licensed::Reporters.const_get(klass).new if Licensed::Reporters.const_defined?(klass)
+        end
+
+        default_reporter(options)
+      end
+
+      # Returns the default reporter to use during the command run
       #
       # options - The options the command was run with
       #
       # Raises an error
-      def create_reporter(options)
-        raise "`create_reporter` must be implemented by commands"
+      def default_reporter(options)
+        raise "`default_reporter` must be implemented by commands"
       end
 
       protected

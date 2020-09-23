@@ -2,12 +2,12 @@
 module Licensed
   module Commands
     class List < Command
-      # Create a reporter to use during a command run
+      # Returns the default reporter to use during the command run
       #
       # options - The options the command was run with
       #
       # Returns a Licensed::Reporters::ListReporter
-      def create_reporter(options)
+      def default_reporter(options)
         Licensed::Reporters::ListReporter.new
       end
 

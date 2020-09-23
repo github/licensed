@@ -38,5 +38,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop", "~> 0.49", "< 0.67"
   spec.add_development_dependency "rubocop-github", "~> 0.6"
   spec.add_development_dependency "byebug", "~> 10.0.0"
-  spec.add_development_dependency "spy",  "~> 1.0.0"
 end

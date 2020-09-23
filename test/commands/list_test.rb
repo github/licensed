@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 require "test_helper"
+require "test_helpers/command_test_helpers"
 
 describe Licensed::Commands::List do
+  include CommandTestHelpers
+
   let(:reporter) { TestReporter.new }
   let(:apps) { [] }
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "sources" => { "test" => true }, "test" => source_config) }
   let(:command) { Licensed::Commands::List.new(config: config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
-
-  before do
-    Spy.on(command, :create_reporter).and_return(reporter)
-  end
 
   each_source do |source_class|
     describe "with #{source_class.type}" do
@@ -24,7 +23,7 @@ describe Licensed::Commands::List do
           enabled = Dir.chdir(app.source_path) { app.sources.any? { |source| source.enabled? } }
           next unless enabled
 
-          command.run
+          run_command
           app_report = reporter.report.reports.find { |r| r.target == app }
           assert app_report
 
@@ -41,7 +40,7 @@ describe Licensed::Commands::List do
   end
 
   it "does not include ignored dependencies" do
-    command.run
+    run_command
     dependencies = reporter.report.all_reports
     assert dependencies.any? { |dependency| dependency.name == "licensed.test.dependency" }
     count = dependencies.size
@@ -50,7 +49,7 @@ describe Licensed::Commands::List do
       app.ignore("type" => "test", "name" => "dependency")
     end
 
-    command.run
+    run_command
     dependencies = reporter.report.all_reports
     refute dependencies.any? { |dependency| dependency.name == "licensed.test.dependency" }
     ignored_count = dependencies.size
@@ -63,7 +62,7 @@ describe Licensed::Commands::List do
       app["source_path"] = fixtures
     end
 
-    command.run
+    run_command
 
     reports = reporter.report.all_reports
     dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
@@ -72,7 +71,7 @@ describe Licensed::Commands::List do
   end
 
   it "skips a dependency sources not specified in optional :sources argument" do
-    command.run(sources: "alternate")
+    run_command(sources: "alternate")
 
     report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
     refute_empty report.warnings
@@ -98,7 +97,7 @@ describe Licensed::Commands::List do
     end
 
     it "lists dependencies for all apps" do
-      command.run
+      run_command
       config.apps.each do |app|
         assert reporter.report.reports.find { |report| report.name == app["name"] }
       end

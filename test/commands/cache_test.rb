@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 require "test_helper"
+require "test_helpers/command_test_helpers"
 
 describe Licensed::Commands::Cache do
+  include CommandTestHelpers
+
   let(:cache_path) { Dir.mktmpdir }
-  let(:reporter) { TestReporter.new }
   let(:apps) { [] }
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
-  let(:generator) do
-    command = Licensed::Commands::Cache.new(config: config)
-    Spy.on(command, :create_reporter).and_return(reporter)
-    command
-  end
+  let(:reporter) { TestReporter.new }
+  let(:command) { Licensed::Commands::Cache.new(config: config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   after do
@@ -31,7 +30,7 @@ describe Licensed::Commands::Cache do
           enabled = Dir.chdir(app.source_path) { app.sources.any? { |source| source.enabled? } }
           next unless enabled
 
-          generator.run
+          run_command
 
           expected_dependency = app["expected_dependency"]
           expected_dependency_name = app["expected_dependency_name"] || expected_dependency
@@ -51,7 +50,7 @@ describe Licensed::Commands::Cache do
       File.write app.cache_path.join("test/old_dep.#{Licensed::DependencyRecord::EXTENSION}"), ""
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       refute app.cache_path.join("test/old_dep.#{Licensed::DependencyRecord::EXTENSION}").exist?
@@ -65,7 +64,7 @@ describe Licensed::Commands::Cache do
       app.ignore "type" => "test", "name" => "dependency"
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       refute app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}").exist?
@@ -76,7 +75,7 @@ describe Licensed::Commands::Cache do
     apps << { "source_path" => Dir.pwd, "cache_path" => cache_path, "test" => { name: 1 } }
     apps << { "source_path" => Dir.pwd, "cache_path" => cache_path, "test" => { name: 2 } }
 
-    generator.run
+    run_command
 
     files = Dir.glob(File.join(cache_path, "**/*.#{Licensed::DependencyRecord::EXTENSION}"))
                .map(&File.method(:basename))
@@ -92,7 +91,7 @@ describe Licensed::Commands::Cache do
       File.write app.cache_path.join("other", "dep.#{Licensed::DependencyRecord::EXTENSION}"), ""
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       assert app.cache_path.join("root.#{Licensed::DependencyRecord::EXTENSION}").exist?
@@ -101,7 +100,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "uses cached record if license text does not change" do
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -111,7 +110,7 @@ describe Licensed::Commands::Cache do
       record.save(path)
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -122,7 +121,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "requires re-review after license text changes" do
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -135,7 +134,7 @@ describe Licensed::Commands::Cache do
       app.review(record)
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -146,7 +145,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "does not reuse nil record version" do
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -156,7 +155,7 @@ describe Licensed::Commands::Cache do
       record.save(path)
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -167,7 +166,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "does not reuse empty record version" do
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -177,7 +176,7 @@ describe Licensed::Commands::Cache do
       record.save(path)
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -188,7 +187,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "does not include ignored dependencies in dependency counts" do
-    generator.run
+    run_command
     count = reporter.report.all_reports.size
 
     config.apps.each do |app|
@@ -197,14 +196,14 @@ describe Licensed::Commands::Cache do
       app.ignore "type" => "test", "name" => "dependency"
     end
 
-    generator.run
+    run_command
     ignored_count = reporter.report.all_reports.size
     assert_equal count - config.apps.size, ignored_count
   end
 
   it "reports a warning when a dependency doesn't exist" do
     source_config[:path] = File.join(Dir.pwd, "non-existant")
-    generator.run
+    run_command
     report = reporter.report.all_reports.find { |r| r.name&.include?("dependency") }
     refute_empty report.warnings
     assert report.warnings.any? { |w| w =~ /expected dependency path .*? does not exist/ }
@@ -212,7 +211,7 @@ describe Licensed::Commands::Cache do
 
   it "reports an error when a dependency's path is empty" do
     source_config[:path] = nil
-    generator.run
+    run_command
     report = reporter.report.all_reports.find { |r| r.name&.include?("dependency") }
     assert_includes report.errors, "dependency path not found"
   end
@@ -222,7 +221,7 @@ describe Licensed::Commands::Cache do
       app["source_path"] = fixtures
     end
 
-    generator.run
+    run_command
 
     config.apps.each do |app|
       path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
@@ -232,7 +231,7 @@ describe Licensed::Commands::Cache do
   end
 
   it "skips a dependency sources not specified in optional :sources argument" do
-    generator.run(sources: "alternate")
+    run_command(sources: "alternate")
 
     report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
     refute_empty report.warnings
@@ -261,7 +260,7 @@ describe Licensed::Commands::Cache do
     end
 
     it "caches metadata for all apps" do
-      generator.run
+      run_command
       config.apps.each do |app|
         assert app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}").exist?
         assert app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}").exist?
@@ -273,7 +272,7 @@ describe Licensed::Commands::Cache do
     let(:source_config) { { name: "dependency/path" } }
 
     it "caches metadata at the given file path" do
-      generator.run
+      run_command
       config.apps.each do |app|
         assert app.cache_path.join("test/dependency/path.#{Licensed::DependencyRecord::EXTENSION}").exist?
       end

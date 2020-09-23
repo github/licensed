@@ -4,20 +4,13 @@ require "yaml"
 module Licensed
   module Commands
     class Status < Command
-      # Create a reporter to use during a command run
+      # Returns the default reporter to use during the command run
       #
       # options - The options the command was run with
       #
       # Returns a Licensed::Reporters::StatusReporter
-      def create_reporter(options)
-        case options[:format]
-        when "json"
-          Licensed::Reporters::JsonReporter.new
-        when "yaml"
-          Licensed::Reporters::YamlReporter.new
-        else
-          Licensed::Reporters::StatusReporter.new
-        end
+      def default_reporter(options)
+        Licensed::Reporters::StatusReporter.new
       end
 
       protected
