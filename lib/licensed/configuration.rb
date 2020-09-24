@@ -69,7 +69,9 @@ module Licensed
 
     # Is the given dependency reviewed?
     def reviewed?(dependency)
-      Array(self["reviewed"][dependency["type"]]).include?(dependency["name"])
+      Array(self["reviewed"][dependency["type"]]).any? do |pattern|
+        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
+      end
     end
 
     # Is the given dependency ignored?
