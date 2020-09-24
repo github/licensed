@@ -23,7 +23,7 @@ If a root path is not specified, it will default to using the following, in orde
 
 The `source_path` property can use a glob path to share configuration properties across multiple application entrypoints.
 
-For example, there is a common pattern in go projects to include multiple executable entrypoints under folders in `cmd`.  Using a glob pattern allows users to avoid manually configuring and maintaining multiple licensed application `source_path`s.  Using a glob pattern will also ensure that any new entrypoints matching the pattern are automatically picked up by licensed commands as they are added.
+For example, there is a common pattern in Go projects to include multiple executable entrypoints under folders in `cmd`.  Using a glob pattern allows users to avoid manually configuring and maintaining multiple licensed application `source_path`s.  Using a glob pattern will also ensure that any new entrypoints matching the pattern are automatically picked up by licensed commands as they are added.
 
 ```yml
 sources:
@@ -119,7 +119,7 @@ ignored:
     - some-internal-package
 
   go:
-    # ignore all go packages from import paths starting with github.com/internal-package
+    # ignore all Go packages from import paths starting with github.com/internal-package
     # see the `File.fnmatch?` documentation for details on how patterns are matched.
     # comparisons use the FNM_CASEFOLD and FNM_PATHNAME flags
     - github.com/internal-package/**/*
