@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.13.0
+2020-09-23
+
+### Added
+- `status` command results can be output in YAML and JSON formats (:tada: @julianvilas https://github.com/github/licensed/pull/303)
+
+### Fixed
+- `licensed` no longer crashes when parsing invalid YAML from cached records (https://github.com/github/licensed/pull/306)
+- NPM source will no longer crash when invalid JSON is returned from npm CLI calls (https://github.com/github/licensed/pull/300)
+- Bundler source is fixed to work properly with `gems.rb` lockfiles (https://github.com/github/licensed/pull/299)
+
 ## 2.12.2
 2020-07-07
 
@@ -17,7 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 2020-06-30
 
 ### Fixed
-- `licensed` no longer exits an error code when using the `--sources` CLI argument(https://github.com/github/licensed/pull/290)
+- `licensed` no longer exits an error code when using the `--sources` CLI argument (https://github.com/github/licensed/pull/290)
 
 ## 2.12.0
 2020-06-19
@@ -340,4 +351,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.12.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.13.0...HEAD
