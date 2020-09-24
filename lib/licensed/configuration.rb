@@ -158,19 +158,22 @@ module Licensed
     def self.expand_app_source_path(app_config)
       return app_config if app_config["source_path"].to_s.empty?
 
+      # check if the source path maps to an existing directory
       source_path = File.expand_path(app_config["source_path"], AppConfiguration.root_for(app_config))
+      return app_config if Dir.exist?(source_path)
+
+      # try to expand the source path for glob patterns
       expanded_source_paths = Dir.glob(source_path).select { |p| File.directory?(p) }
-      # return the original configuration if glob didn't result in multiple paths
-      return app_config if expanded_source_paths.size <= 1
+      configs = expanded_source_paths.map { |path| app_config.merge("source_path" => path) }
 
-      # map the expanded paths to new application configurations
-      expanded_source_paths.map do |path|
-        config = app_config.merge("source_path" => path)
+      # if no directories are found for the source path, return the original config
+      return app_config if configs.size == 0
 
-        # update configured values for name and cache_path for uniqueness.
-        # this is only needed when values are explicitly set, AppConfiguration
-        # will handle configurations that don't have these explicitly set
-        dir_name = File.basename(path)
+      # update configured values for name and cache_path for uniqueness.
+      # this is only needed when values are explicitly set, AppConfiguration
+      # will handle configurations that don't have these explicitly set
+      configs.each do |config|
+        dir_name = File.basename(config["source_path"])
         config["name"] = "#{config["name"]}-#{dir_name}" if config["name"]
 
         # if a cache_path is set and is not marked as shared, append the app name
@@ -178,9 +181,9 @@ module Licensed
         if config["cache_path"] && config["shared_cache"] != true
           config["cache_path"] = File.join(config["cache_path"], dir_name)
         end
-
-        config
       end
+
+      configs
     end
 
     # Find a default configuration file in the given directory.

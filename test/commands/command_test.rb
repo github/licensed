@@ -103,6 +103,19 @@ describe Licensed::Commands::Command do
     end
   end
 
+  it "catches and reports a non-existent app source path" do
+    nonexistent_path = File.join(Dir.pwd, "nonexistent")
+    apps.each { |app| app["source_path"] = nonexistent_path }
+
+    refute command.run
+
+    reports = command.reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::AppConfiguration) }
+    refute_empty reports
+    reports.each do |r|
+      assert_includes r.errors, "No such directory #{nonexistent_path}"
+    end
+  end
+
   it "allows implementations to add extra data to reports with a yielded block" do
     assert command.run
 
