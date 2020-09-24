@@ -323,12 +323,56 @@ describe Licensed::AppConfiguration do
   end
 
   describe "review" do
-    let(:package) { { "type" => "bundler", "name" => "bundler" } }
+    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package" } }
 
     it "marks the dependency as reviewed" do
       refute config.reviewed?(package)
       config.review package
       assert config.reviewed?(package)
+    end
+
+    describe "with glob patterns" do
+      it "does not match trailing ** to multiple path segments" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "github.com/github/**")
+        refute config.reviewed?(package)
+      end
+
+      it "matches internal ** to multiple path segments" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "github.com/**/package")
+        assert config.reviewed?(package)
+      end
+
+      it "matches trailing * to single path segment" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "github.com/github/licensed/*")
+        assert config.reviewed?(package)
+      end
+
+      it "maches internal * to single path segment" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "github.com/*/licensed/package")
+        assert config.reviewed?(package)
+      end
+
+      it "matches multiple globstars in a pattern" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "**/licensed/*")
+        assert config.reviewed?(package)
+      end
+
+      it "does not match * to multiple path segments" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "github.com/github/*")
+        refute config.reviewed?(package)
+      end
+
+      it "is case insensitive" do
+        refute config.reviewed?(package)
+        config.review package.merge("name" => "GITHUB.com/github/**")
+        refute config.reviewed?(package)
+      end
     end
   end
 
