@@ -24,6 +24,26 @@ The setting supports absolute, relative and expandable (e.g. "~") paths.  Relati
 
 Non-empty `GOPATH` configuration settings will override the `GOPATH` environment variable while enumerating `go` dependencies.  The `GOPATH` environment variable is restored once dependencies have been enumerated.
 
+#### Reviewing and ignoring all packages from a Go module
+
+Go's package and module structure has common conventions that documentation and metadata for all packages in a module live in the module root.  In this scenario all packages share the same LICENSE information and can be reviewed or ignored at the module level rather than per-package using glob patterns.
+
+```yaml
+reviewed:
+  go:
+    # review all Go packages from import paths starting with github.com/external-package
+    # see the `File.fnmatch?` documentation for details on how patterns are matched.
+    # comparisons use the FNM_CASEFOLD and FNM_PATHNAME flags
+    - github.com/external-package/**/*
+
+ignored:
+  go:
+    # ignore all Go packages from import paths starting with github.com/internal-package
+    # see the `File.fnmatch?` documentation for details on how patterns are matched.
+    # comparisons use the FNM_CASEFOLD and FNM_PATHNAME flags
+    - github.com/internal-package/**/*
+```
+
 #### Versioning
 
 The go source supports multiple versioning strategies to determine if cached dependency metadata is stale.  A version strategy is chosen based on the availability of go module information along with the current app configuration.
