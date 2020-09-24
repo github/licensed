@@ -72,6 +72,12 @@ module Licensed
       # Returns whether the command succeeded for the application.
       def run_app(app)
         reporter.report_app(app) do |report|
+          # ensure the app source path exists before evaluation
+          if !Dir.exist?(app.source_path)
+            report.errors << "No such directory #{app.source_path}"
+            next false
+          end
+
           Dir.chdir app.source_path do
             begin
               # allow additional report data to be given by commands
