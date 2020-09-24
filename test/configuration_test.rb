@@ -111,6 +111,10 @@ describe Licensed::Configuration do
       assert_equal 2, config.apps.size
       assert_equal "app1", config.apps[0]["name"]
       assert_equal "app2", config.apps[1]["name"]
+
+      config.apps.each do |app|
+        assert_equal File.expand_path("../../", __FILE__), app["source_path"]
+      end
     end
 
     it "includes default options" do
@@ -129,6 +133,20 @@ describe Licensed::Configuration do
     it "expands patterns in configured apps" do
       apps.clear
       apps << { "source_path" => File.expand_path("../fixtures/*", __FILE__) }
+      expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
+      expected_source_paths.each do |source_path|
+        app = config.apps.find { |a| a["source_path"] == source_path }
+        assert app
+        dir_name = File.basename(source_path)
+        assert_equal app.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, dir_name),
+                     app.cache_path
+        assert_equal dir_name, app["name"]
+      end
+    end
+
+    it "expands source_path patters that result in a single path" do
+      apps.clear
+      apps << { "source_path" => File.expand_path("../../lib/*", __FILE__) }
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
       expected_source_paths.each do |source_path|
         app = config.apps.find { |a| a["source_path"] == source_path }
