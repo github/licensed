@@ -39,7 +39,7 @@ Pull requests that include a new dependency source must also
 ## Releasing
 If you are the current maintainer of this gem:
 
-1. Create a branch for the release: git checkout -b cut-release-vxx.xx.xx
+1. Create a branch for the release: git checkout -b cut-release-xx.xx.xx
 2. Make sure your local dependencies are up to date: `script/bootstrap`
 3. Ensure that tests are green: `bundle exec rake test`
 4. Bump gem version in lib/licensed/version.rb.
@@ -51,15 +51,16 @@ If you are the current maintainer of this gem:
    2. Install the new gem locally
    3. Test behavior locally, branch deploy, whatever needs to happen
 9. Merge github/licensed PR
-10. Tag and push: `git tag x.xx.xx; git push --tags`
+10. Create a new [github/licensed release](https://github.com/github/licensed/releases)
+   - Set the release name and tag to the release version - `x.xx.x`
+   - Set the release body to the changelog entries for the release
 
 The following steps will happen automatically from a GitHub Actions workflow
-after pushing a new tag. In case that fails, the following steps can be performed manually
+after creating the release. In case that fails, the following steps can be performed manually
 
-11. Push to rubygems.org -- `gem push licensed-x.xx.xx.gem`
+11. Push the gem from (7) to rubygems.org -- `gem push licensed-x.xx.xx.gem`
 12. Build packages for new tag: `VERSION=x.xx.xx bundle exec rake package`
-13. Create release for new tag at github/licensed.
-14. Add built packages to new release
+13. Upload packages from (12) to release from (10)
 
 ## Resources
 
