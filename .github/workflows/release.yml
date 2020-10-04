@@ -87,6 +87,8 @@ jobs:
 
     - name: Publish linux package
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ./licensed-${{github.event.release.tag_name}}-linux-x64.tar.gz
@@ -95,6 +97,8 @@ jobs:
 
     - name: Publish mac package
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ./licensed-${{github.event.release.tag_name}}-darwin-x64.tar.gz
