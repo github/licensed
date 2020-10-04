@@ -101,14 +101,13 @@ jobs:
         asset_name: licensed-${{github.event.release.tag_name}}-darwin-x64.tar.gz
         asset_content_type: application/gzip
 
-    # TODO: uncomment once testing completed
-    # - name: Publish gem to RubyGems
-    #   run: |
-    #     mkdir -p $HOME/.gem
-    #     touch $HOME/.gem/credentials
-    #     chmod 0600 $HOME/.gem/credentials
-    #     printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
-    #     gem push $GEM
-    #   env:
-    #     GEM_HOST_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
-    #     GEM: licensed-${{github.event.release.tag_name}}.gem
+    - name: Publish gem to RubyGems
+      run: |
+        mkdir -p $HOME/.gem
+        touch $HOME/.gem/credentials
+        chmod 0600 $HOME/.gem/credentials
+        printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
+        gem push $GEM
+      env:
+        RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
+        GEM: licensed-${{github.event.release.tag_name}}.gem
