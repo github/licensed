@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.14.0
+2020-10-04
+
+### Addded
+- `reviewed` dependencies can use glob pattern matching (https://github.com/github/licensed/pull/313)
+
+### Fixed
+- Fix configuring source path globs that expand into a single directory (https://github.com/github/licensed/pull/312)
+
 ## 2.13.0
 2020-09-23
 
@@ -351,4 +360,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.13.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.14.0...HEAD
