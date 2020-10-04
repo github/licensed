@@ -53,7 +53,7 @@ jobs:
         ruby-version: 2.6.x
 
     - name: Build gem
-      run: gem build *.gemspec
+      run: gem build licensed.gemspec -o licensed-${{github.event.release.tag_name}}.gem
 
     - uses: actions/upload-artifact@v2
       with:
