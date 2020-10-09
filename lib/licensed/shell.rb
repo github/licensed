@@ -9,11 +9,12 @@ module Licensed
     def self.execute(cmd, *args, allow_failure: false, env: {})
       stdout, stderr, status = Open3.capture3(env, cmd, *args)
 
-      if status.success? || allow_failure
-        stdout.strip
-      else
-        raise Error.new([cmd, *args], status.exitstatus, stderr)
+      if !status.success? && !allow_failure
+        raise Error.new([cmd, *args], status.exitstatus, encode_content(stderr))
       end
+
+      # ensure that returned data is properly encoded
+      encode_content(stdout.strip)
     end
 
     # Executes a command and returns a boolean value indicating if the command
@@ -54,6 +55,22 @@ module Licensed
           end
         end.join(" ")
       end
+    end
+
+    private
+
+    ENCODING = Encoding::UTF_8
+    ENCODING_OPTIONS = {
+      invalid: :replace,
+      undef:   :replace,
+      replace: "",
+      univeral_newline: true
+    }.freeze
+
+    # Ensure that content that is returned from shell commands is in a usable
+    # encoding for the rest of the application
+    def self.encode_content(content)
+      content.encode(ENCODING, **ENCODING_OPTIONS)
     end
   end
 end
