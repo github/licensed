@@ -6,10 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.14.1
+2020-10-09
+
+### Fixed
+- Shell command output is encoded to UTF8 (https://github.com/github/licensed/pull/319)
+
 ## 2.14.0
 2020-10-04
 
-### Addded
+### Added
 - `reviewed` dependencies can use glob pattern matching (https://github.com/github/licensed/pull/313)
 
 ### Fixed
@@ -360,4 +366,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.14.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.14.1...HEAD
