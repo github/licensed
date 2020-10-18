@@ -5,7 +5,7 @@ go:
 
 apps:
   - source_path: test/fixtures/go/src/test
-  - source_path: test/fixtures/go
+  - source_path: test/fixtures/go/src/test/cmd
 
 sources:
   go: true
