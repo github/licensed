@@ -385,5 +385,74 @@ if Licensed::Shell.tool_available?("go")
         refute source.go_std_package?(package)
       end
     end
+
+    describe "vendored_path_parts" do
+      it "returns nil for a nil package" do
+        assert_nil source.vendored_path_parts(nil)
+      end
+
+      it "returns nil if the package doesn't contain a Dir value" do
+        assert_nil source.vendored_path_parts({})
+      end
+
+      it "returns nil if the package isn't vendored" do
+        package = { "Dir" => "#{root}/pkg/foo" }
+        assert_nil source.vendored_path_parts(package)
+      end
+
+      it "returns nil if the package directory doesn't start with the config root" do
+        package = { "Dir" => "#{gopath}/vendor/github.com/owner/repo" }
+        assert_nil source.vendored_path_parts(package)
+      end
+
+      it "returns nil if the package name is vendor" do
+        package = { "Dir" => "#{root}/pkg/vendor" }
+        assert_nil source.vendored_path_parts(package)
+      end
+
+      it "returns the import path for a vendored package at project root" do
+        package = { "Dir" => "#{root}/vendor/github.com/owner/repo" }
+        match = source.vendored_path_parts(package)
+        assert match
+        assert_equal "#{root}/vendor", match[:vendor_path]
+        assert_equal "github.com/owner/repo", match[:import_path]
+      end
+
+      it "returns the import path for a vendored package at project subfolder" do
+        package = { "Dir" => "#{root}/sub_module/vendor/github.com/owner/repo" }
+        match = source.vendored_path_parts(package)
+        assert match
+        assert_equal "#{root}/sub_module/vendor", match[:vendor_path]
+        assert_equal "github.com/owner/repo", match[:import_path]
+      end
+    end
+
+    describe "non_vendored_import_path" do
+      it "returns nil if package is nil" do
+        assert_nil source.non_vendored_import_path(nil)
+      end
+
+      it "returns the non-vendored import path for a vendored package" do
+        # it should never happen that the import path is different from the
+        # directory path... but this tests that the right value is used
+        package = {
+          "ImportPath" => "github.com/owner/repo2",
+          "Dir" => "#{root}/vendor/github.com/owner/repo"
+        }
+
+        assert_equal "github.com/owner/repo", source.non_vendored_import_path(package)
+      end
+
+      it "returns the package's ImportPath property for a non-vendored package" do
+        # it should never happen that the import path is different from the
+        # directory path... but this tests that the right value is used
+        package = {
+          "ImportPath" => "test/pkg/foo/bar2",
+          "Dir" => "#{root}/pkg/foo/bar"
+        }
+
+        assert_equal "test/pkg/foo/bar2", source.non_vendored_import_path(package)
+      end
+    end
   end
 end
