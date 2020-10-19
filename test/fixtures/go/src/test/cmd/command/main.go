@@ -1,4 +1,4 @@
-package test
+package command
 
 import (
   lru "github.com/hashicorp/golang-lru"

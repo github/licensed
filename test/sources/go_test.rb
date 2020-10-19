@@ -6,7 +6,8 @@ if Licensed::Shell.tool_available?("go")
   describe Licensed::Sources::Go do
     let(:gopath) { File.expand_path("../../fixtures/go", __FILE__) }
     let(:fixtures) { File.join(gopath, "src/test") }
-    let(:config) { Licensed::AppConfiguration.new({ "go" => { "GOPATH" => gopath }, "source_path" => Dir.pwd }) }
+    let(:root) { File.join(gopath, "src/test") }
+    let(:config) { Licensed::AppConfiguration.new({ "go" => { "GOPATH" => gopath }, "source_path" => fixtures, "root" => root }) }
     let(:source) { Licensed::Sources::Go.new(config) }
 
     describe "enabled?" do
@@ -31,7 +32,7 @@ if Licensed::Shell.tool_available?("go")
       end
 
       it "works with a configuration path relative to repository root" do
-        config["go"]["GOPATH"] = "test/fixtures/go"
+        config["go"]["GOPATH"] = "../.."
         assert_equal gopath, source.gopath
       end
 
@@ -208,6 +209,7 @@ if Licensed::Shell.tool_available?("go")
 
       describe "with vendored go modules" do
         let(:fixtures) { File.join(gopath, "src/modules_test") }
+        let(:root) { File.join(gopath, "src/modules_test") }
 
         before do
           skip unless source.go_version >= Gem::Version.new("1.11.0")
@@ -229,6 +231,45 @@ if Licensed::Shell.tool_available?("go")
             source.dependencies.each do |dep|
               assert dep.path.include?("vendor/")
             end
+          end
+        end
+      end
+
+      describe "from a subfolder source_path" do
+        let(:fixtures) { File.join(gopath, "src/test/cmd/command") }
+
+        it "includes direct dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
+            assert dep
+            assert_equal "go", dep.record["type"]
+            assert dep.record["homepage"]
+            assert dep.record["summary"]
+          end
+        end
+
+        it "includes indirect dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
+            assert dep
+            assert_equal "go", dep.record["type"]
+            assert dep.record["homepage"]
+          end
+        end
+
+        it "searches for license files under the vendor folder for vendored dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/davecgh/go-spew/spew" }
+            assert dep
+
+            # find the license one directory higher
+            license_path = File.join(root, "vendor/github.com/davecgh/go-spew/LICENSE")
+            license = dep.record.licenses.find { |l| l.sources == ["go-spew/LICENSE"] }
+            assert license
+            assert_equal File.read(license_path), license.text
+
+            # do not find the license outside the vendor folder
+            assert_nil dep.record.licenses.find { |l| l.sources == ["LICENSE"] }
           end
         end
       end
@@ -310,17 +351,27 @@ if Licensed::Shell.tool_available?("go")
       end
 
       it "returns true if the vendored import path matches 'go list std'" do
-        package = { "ImportPath" => "#{root_package_import_path}/vendor/package/3" }
+        package = {
+          "ImportPath" => "#{root_package_import_path}/vendor/package/3",
+          "Dir" => "#{root}/vendor/package/3"
+        }
         assert source.go_std_package?(package)
       end
 
       it "returns true if the underscore vendored import path matches 'go list std'" do
-        package = { "ImportPath" => "#{root_package_import_path}/vendor/golang.org/package/4" }
+        package = {
+          "ImportPath" => "#{root_package_import_path}/vendor/golang.org/package/4",
+          "Dir" => "#{root}/vendor/golang.org/package/4"
+        }
         assert source.go_std_package?(package)
       end
 
-      it "returns true if the vendored import path without 'vendor/' matches 'go list std'" do
-        package = { "ImportPath" => "#{root_package_import_path}/vendor/package/2" }
+      it "returns true if the non-vendored import path matches 'go list std'" do
+        package = {
+          "ImportPath" => "#{root_package_import_path}/vendor/package/2",
+          # determining the non-vendored path requires the "Dir" value to be set
+          "Dir" => "#{root}/vendor/package/2"
+        }
         assert source.go_std_package?(package)
       end
 
@@ -332,6 +383,75 @@ if Licensed::Shell.tool_available?("go")
       it "returns false if vendored import path does't match 'go list std'" do
         package = { "ImportPath" => "#{root_package_import_path}/vendor/package/5" }
         refute source.go_std_package?(package)
+      end
+    end
+
+    describe "vendored_path_parts" do
+      it "returns nil for a nil package" do
+        assert_nil source.vendored_path_parts(nil)
+      end
+
+      it "returns nil if the package doesn't contain a Dir value" do
+        assert_nil source.vendored_path_parts({})
+      end
+
+      it "returns nil if the package isn't vendored" do
+        package = { "Dir" => "#{root}/pkg/foo" }
+        assert_nil source.vendored_path_parts(package)
+      end
+
+      it "returns nil if the package directory doesn't start with the config root" do
+        package = { "Dir" => "#{gopath}/vendor/github.com/owner/repo" }
+        assert_nil source.vendored_path_parts(package)
+      end
+
+      it "returns nil if the package name is vendor" do
+        package = { "Dir" => "#{root}/pkg/vendor" }
+        assert_nil source.vendored_path_parts(package)
+      end
+
+      it "returns the import path for a vendored package at project root" do
+        package = { "Dir" => "#{root}/vendor/github.com/owner/repo" }
+        match = source.vendored_path_parts(package)
+        assert match
+        assert_equal "#{root}/vendor", match[:vendor_path]
+        assert_equal "github.com/owner/repo", match[:import_path]
+      end
+
+      it "returns the import path for a vendored package at project subfolder" do
+        package = { "Dir" => "#{root}/sub_module/vendor/github.com/owner/repo" }
+        match = source.vendored_path_parts(package)
+        assert match
+        assert_equal "#{root}/sub_module/vendor", match[:vendor_path]
+        assert_equal "github.com/owner/repo", match[:import_path]
+      end
+    end
+
+    describe "non_vendored_import_path" do
+      it "returns nil if package is nil" do
+        assert_nil source.non_vendored_import_path(nil)
+      end
+
+      it "returns the non-vendored import path for a vendored package" do
+        # it should never happen that the import path is different from the
+        # directory path... but this tests that the right value is used
+        package = {
+          "ImportPath" => "github.com/owner/repo2",
+          "Dir" => "#{root}/vendor/github.com/owner/repo"
+        }
+
+        assert_equal "github.com/owner/repo", source.non_vendored_import_path(package)
+      end
+
+      it "returns the package's ImportPath property for a non-vendored package" do
+        # it should never happen that the import path is different from the
+        # directory path... but this tests that the right value is used
+        package = {
+          "ImportPath" => "test/pkg/foo/bar2",
+          "Dir" => "#{root}/pkg/foo/bar"
+        }
+
+        assert_equal "test/pkg/foo/bar2", source.non_vendored_import_path(package)
       end
     end
   end
