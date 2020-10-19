@@ -351,12 +351,18 @@ if Licensed::Shell.tool_available?("go")
       end
 
       it "returns true if the vendored import path matches 'go list std'" do
-        package = { "ImportPath" => "#{root_package_import_path}/vendor/package/3" }
+        package = {
+          "ImportPath" => "#{root_package_import_path}/vendor/package/3",
+          "Dir" => "#{root}/vendor/package/3"
+        }
         assert source.go_std_package?(package)
       end
 
       it "returns true if the underscore vendored import path matches 'go list std'" do
-        package = { "ImportPath" => "#{root_package_import_path}/vendor/golang.org/package/4" }
+        package = {
+          "ImportPath" => "#{root_package_import_path}/vendor/golang.org/package/4",
+          "Dir" => "#{root}/vendor/golang.org/package/4"
+        }
         assert source.go_std_package?(package)
       end
 

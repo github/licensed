@@ -83,14 +83,16 @@ module Licensed
         import_path = non_vendored_import_path(package)
         return false unless import_path
 
-        # true if go standard packages includes the import path as given
-        return true if go_std_packages.include?(import_path)
-        return true if go_std_packages.include?("vendor/#{import_path}")
-        return true if go_std_packages.include?(import_path.sub("golang.org", "internal"))
-
-        # modify the import path to look like the import path `go list` returns for vendored std packages
-        vendor_path = import_path.sub("#{root_package["ImportPath"]}/", "")
-        go_std_packages.include?(vendor_path) || go_std_packages.include?(vendor_path.sub("golang.org", "golang_org"))
+        # check different variations of the import path to match against
+        # what's returned from `go list std`
+        [
+          import_path,
+          import_path.sub("golang.org", "internal"),
+          import_path.sub("golang.org", "golang_org"),
+        ].any? do |path|
+          # true if go standard packages includes the path or "vendor/<path>"
+          go_std_packages.include?(path) || go_std_packages.include?("vendor/#{path}")
+        end
       end
 
       # Returns whether the package is local to the current project
@@ -177,6 +179,7 @@ module Licensed
       #
       # package - Package to get the non-vendored import path for
       def non_vendored_import_path(package)
+        return if package.nil?
         parts = vendored_path_parts(package)
         return parts[:import_path] if parts
 
