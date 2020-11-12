@@ -36,7 +36,7 @@ module Licensed
       def packages
         return [] if yarn_package_tree.nil?
         all_dependencies = {}
-        recursive_dependencies(config.pwd, yarn_package_tree).each do |name, results|
+        recursive_dependencies(yarn_package_tree).each do |name, results|
           results.uniq! { |package| package["version"] }
           if results.size == 1
             # if there is only one package for a name, reference it by name
@@ -55,24 +55,32 @@ module Licensed
 
       # Recursively parse dependency JSON data.  Returns a hash mapping the
       # package name to it's metadata
-      def recursive_dependencies(path, dependencies, result = {})
+      def recursive_dependencies(dependencies, result = {})
         dependencies.each do |dependency|
           # "shadow" indicate a dependency requirement only, not a
           # resolved package identifier
           next if dependency["shadow"]
           name, _, version = dependency["name"].rpartition("@")
 
-          # the dependency should be found under the parent's "node_modules" path
-          dependency_path = path.join("node_modules", name)
           (result[name] ||= []) << {
             "id" => dependency["name"],
             "name" => name,
             "version" => version,
-            "path" => dependency_path
+            "path" => dependency_paths[dependency["name"]]
           }
-          recursive_dependencies(dependency_path, dependency["children"], result)
+          recursive_dependencies(dependency["children"], result)
         end
         result
+      end
+
+      # Returns a hash that maps all dependency names to their location on disk
+      # by parsing every package.json file under node_modules.
+      def dependency_paths
+        @dependency_paths ||= Dir.glob(config.pwd.join("node_modules/**/package.json")).each_with_object({}) do |file, hsh|
+          dirname = File.dirname(file)
+          json = JSON.parse(File.read(file))
+          hsh["#{json["name"]}@#{json["version"]}"] = dirname
+        end
       end
 
       # Finds and returns the yarn package tree listing from `yarn list` output
