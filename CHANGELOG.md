@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.14.2
+2020-11-20
+
+## Fixed
+- Yarn source correctly finds dependency paths on disk (https://github.com/github/licensed/pull/326)
+- Go source better handles finding dependencies that have been vendored (https://github.com/github/licensed/pull/323)
+
 ## 2.14.1
 2020-10-09
 
@@ -366,4 +373,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.14.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.14.2...HEAD
