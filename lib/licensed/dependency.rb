@@ -142,6 +142,7 @@ module Licensed
     def generated_license_contents
       return unless license
       return if license.key == "other"
+      return unless license.text.nil?
 
       # strip copyright clauses and any extra newlines
       # many package managers don't provide enough information to
