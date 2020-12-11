@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.14.3
+2020-12-11
+
+## Fixed
+- Auto-generating license text for a known license will no longer raise an error if the found license has no text (:tada: @Eun https://github.com/github/licensed/pull/328)
+
 ## 2.14.2
 2020-11-20
 
@@ -373,4 +379,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.14.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.14.3...HEAD
