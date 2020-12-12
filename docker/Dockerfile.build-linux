@@ -12,3 +12,4 @@ RUN gem update --system && gem update bundler
 ENV CPPFLAGS="-P"
 ENV RUBYC="/usr/local/bin/rubyc"
 ENV LANG=C.UTF-8
+ENV SSL_CERT_DIR="/etc/ssl/certs"
