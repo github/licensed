@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
-      upload_url: ${{ steps.get_url.outputs.url }}
+      upload_url: ${{ steps.get_url.outputs.result }}
     steps:
       - id: get_version
         run: |
@@ -37,6 +37,7 @@ jobs:
         uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
           script: |
             let uploadUrl = "${{ github.event.release.upload_url}}"
             const tag = "${{ github.event.inputs.release_tag }}"
@@ -123,7 +124,7 @@ jobs:
         path: licensed-${{needs.vars.outputs.version}}.gem
 
   upload_packages:
-    if: ${{ needs.vars.outputs.upload_url }}
+    if: ${{ needs.vars.outputs.upload_url != '' }}
     runs-on: ubuntu-latest
     needs: [vars, package_linux, package_mac, build_gem]
 
