@@ -3,9 +3,60 @@ name: Build and publish release assets
 on:
   release:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Commit-like version of github/licensed to build package at'
+        required: true
+      release_tag:
+        description: 'Release tag to upload built packages to'
+        required: false
 
 jobs:
+  vars:
+    name: "Gather values for remainder of steps"
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      upload_url: ${{ steps.get_url.outputs.url }}
+    steps:
+      - id: get_version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION"  ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+          fi
+
+          if [ -z "$VERSION" ]; then
+            echo "could not find a version to build" >&2
+            exit 1
+          fi
+
+          echo "::set-output name=version::$VERSION"
+      - id: get_url
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let uploadUrl = "${{ github.event.release.upload_url}}"
+            const tag = "${{ github.event.inputs.release_tag }}"
+            if (!uploadUrl && tag) {
+              const { data: release } = await github.repos.getReleaseByTag({
+                ...context.repo,
+                tag
+              })
+
+              if (!release.upload_url) {
+                throw new Error("unable to find a release upload url")
+              }
+
+              uploadUrl = release.upload_url
+            }
+
+            return uploadUrl
+
   package_linux:
+    needs: vars
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -17,14 +68,15 @@ jobs:
     - name: Build package
       run: script/packages/linux
       env:
-        VERSION: ${{github.event.release.tag_name}}
+        VERSION: ${{needs.vars.outputs.version}}
 
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{github.event.release.tag_name}}-linux
-        path: pkg/${{github.event.release.tag_name}}/licensed-${{github.event.release.tag_name}}-linux-x64.tar.gz
+        name: ${{needs.vars.outputs.version}}-linux
+        path: pkg/${{needs.vars.outputs.version}}/licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
 
   package_mac:
+    needs: vars
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@v2
@@ -36,14 +88,15 @@ jobs:
     - name: Build package
       run: script/packages/mac
       env:
-        VERSION: ${{github.event.release.tag_name}}
+        VERSION: ${{needs.vars.outputs.version}}
 
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{github.event.release.tag_name}}-darwin
-        path: pkg/${{github.event.release.tag_name}}/licensed-${{github.event.release.tag_name}}-darwin-x64.tar.gz
+        name: ${{needs.vars.outputs.version}}-darwin
+        path: pkg/${{needs.vars.outputs.version}}/licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
 
   build_gem:
+    needs: vars
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -53,16 +106,17 @@ jobs:
         ruby-version: 2.6.x
 
     - name: Build gem
-      run: gem build licensed.gemspec -o licensed-${{github.event.release.tag_name}}.gem
+      run: gem build licensed.gemspec -o licensed-${{needs.vars.outputs.version}}.gem
 
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{github.event.release.tag_name}}-gem
-        path: licensed-${{github.event.release.tag_name}}.gem
+        name: ${{needs.vars.outputs.version}}-gem
+        path: licensed-${{needs.vars.outputs.version}}.gem
 
   upload_packages:
+    if: ${{ needs.vars.outputs.upload_url }}
     runs-on: ubuntu-latest
-    needs: [package_linux, package_mac, build_gem]
+    needs: [vars, package_linux, package_mac, build_gem]
 
     steps:
     - name: Set up Ruby 2.6
@@ -73,26 +127,26 @@ jobs:
     - name: Download linux package
       uses: actions/download-artifact@v2
       with:
-        name: ${{github.event.release.tag_name}}-linux
+        name: ${{needs.vars.outputs.version}}-linux
 
     - name: Download macOS package
       uses: actions/download-artifact@v2
       with:
-        name: ${{github.event.release.tag_name}}-darwin
+        name: ${{needs.vars.outputs.version}}-darwin
 
     - name: Download gem
       uses: actions/download-artifact@v2
       with:
-        name: ${{github.event.release.tag_name}}-gem
+        name: ${{needs.vars.outputs.version}}-gem
 
     - name: Publish linux package
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./licensed-${{github.event.release.tag_name}}-linux-x64.tar.gz
-        asset_name: licensed-${{github.event.release.tag_name}}-linux-x64.tar.gz
+        upload_url: ${{ needs.vars.outputs.upload_url }}
+        asset_path: ./licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
+        asset_name: licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
         asset_content_type: application/gzip
 
     - name: Publish mac package
@@ -100,9 +154,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./licensed-${{github.event.release.tag_name}}-darwin-x64.tar.gz
-        asset_name: licensed-${{github.event.release.tag_name}}-darwin-x64.tar.gz
+        upload_url: ${{ needs.vars.outputs.upload_url }}
+        asset_path: ./licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
+        asset_name: licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
         asset_content_type: application/gzip
 
     - name: Publish gem to RubyGems
@@ -114,4 +168,4 @@ jobs:
         gem push $GEM
       env:
         RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
-        GEM: licensed-${{github.event.release.tag_name}}.gem
+        GEM: licensed-${{needs.vars.outputs.version}}.gem

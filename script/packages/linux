@@ -42,6 +42,7 @@ build_linux_local() {
   fi
 
   export CPPFLAGS="-P"
+  export SSL_CERT_DIR="/etc/ssl/certs"
   export RUBYC
   "$BASE_DIR"/script/packages/build
 }
