@@ -17,23 +17,27 @@ jobs:
     name: "Gather values for remainder of steps"
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.get_version.outputs.version }}
+      version: ${{ steps.get_version.outputs.result }}
       upload_url: ${{ steps.get_url.outputs.result }}
       ref: ${{ steps.get_ref.outputs.result }}
     steps:
       - id: get_version
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          if [ -z "$VERSION"  ]; then
-            VERSION="${{ github.event.release.tag_name }}"
-          fi
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            let version = "${{ github.event.release.tag_name }}"
+            if (!version) {
+              version = "${{ github.event.inputs.version }}"
+            }
 
-          if [ -z "$VERSION" ]; then
-            echo "could not find a version to build" >&2
-            exit 1
-          fi
+            if (!version) {
+              throw new Error("unable to find package build version")
+            }
 
-          echo "::set-output name=version::$VERSION"
+            return version
+
       - id: get_url
         uses: actions/github-script@v3
         with:
@@ -66,10 +70,10 @@ jobs:
             let ref = "${{ github.event.release.tag_name }}"
             if (!ref) {
               ref = "${{ github.event.ref }}".replace(/refs\/[^\/]+\//, '')
+            }
 
-              if (!ref) {
-                throw new Error("unable to find a ref for action")
-              }
+            if (!ref) {
+              throw new Error("unable to find a ref for action")
             }
 
             return ref
