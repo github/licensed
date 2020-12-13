@@ -19,6 +19,7 @@ jobs:
     outputs:
       version: ${{ steps.get_version.outputs.version }}
       upload_url: ${{ steps.get_url.outputs.result }}
+      ref: ${{ steps.get_ref.outputs.result }}
     steps:
       - id: get_version
         run: |
@@ -56,13 +57,33 @@ jobs:
 
             return uploadUrl
 
+      - id: get_ref
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            let ref = "${{ github.event.release.tag_name }}"
+            if (!ref) {
+              ref = "${{ github.event.ref }}".replace(/refs\/[^\/]+\//, '')
+
+              if (!ref) {
+                throw new Error("unable to find a ref for action")
+              }
+            }
+
+            return ref
+
   package_linux:
     needs: vars
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
       with:
-        ref: ${{needs.vars.outputs.version}}
+        # checkout at the ref for the action, separate from the target build version
+        # this allows running build scripts independent of the target version
+        ref: ${{needs.vars.outputs.ref}}
+        fetch-depth: 0
 
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
@@ -85,7 +106,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        ref: ${{needs.vars.outputs.version}}
+        # checkout at the ref for the action, separate from the target build version
+        # this allows running build scripts independent of the target version
+        ref: ${{needs.vars.outputs.ref}}
+        fetch-depth: 0
 
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
@@ -108,8 +132,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
+        # building a gem doesn't use a different ref from the version input
         ref: ${{needs.vars.outputs.version}}
-        
+
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
