@@ -37,8 +37,10 @@ module Licensed
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     method_option :format, aliases: "-f", enum: ["yaml", "json"],
       desc: "Output format"
+    method_option :licenses, aliases: "-l", type: :boolean,
+      desc: "Include detected licenses in output"
     def list
-      run Licensed::Commands::List.new(config: config), sources: options[:sources], reporter: options[:format]
+      run Licensed::Commands::List.new(config: config), sources: options[:sources], reporter: options[:format], licenses: options[:licenses]
     end
 
     desc "notices", "Generate a NOTICE file from cached records"

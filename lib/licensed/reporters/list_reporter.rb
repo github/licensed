@@ -75,7 +75,9 @@ module Licensed
       def report_dependency(dependency)
         super do |report|
           result = yield report
-          shell.info "    #{dependency.name} (#{dependency.version})"
+          info = "#{dependency.name} (#{dependency.version})"
+          info = "#{info}: #{report["license"]}" if report["license"]
+          shell.info "    #{info}"
 
           result
         end

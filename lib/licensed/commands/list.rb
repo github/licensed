@@ -41,6 +41,13 @@ module Licensed
       #
       # Returns true.
       def evaluate_dependency(app, source, dependency, report)
+        report["dependency"] = dependency.name
+        report["version"] = dependency.version
+
+        if options[:licenses]
+          report["license"] = dependency.license_key
+        end
+
         true
       end
     end
