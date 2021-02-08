@@ -12,9 +12,11 @@ module Licensed
       desc: "Path to licensed configuration file"
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
+    method_option :format, aliases: "-f", enum: ["yaml", "json"],
+      desc: "Output format"
     def cache
       run Licensed::Commands::Cache.new(config: config),
-          force: options[:force], sources: options[:sources]
+          force: options[:force], sources: options[:sources], reporter: options[:format]
     end
 
     desc "status", "Check status of dependencies' cached licenses"
@@ -33,8 +35,12 @@ module Licensed
       desc: "Path to licensed configuration file"
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
+    method_option :format, aliases: "-f", enum: ["yaml", "json"],
+      desc: "Output format"
+    method_option :licenses, aliases: "-l", type: :boolean,
+      desc: "Include detected licenses in output"
     def list
-      run Licensed::Commands::List.new(config: config), sources: options[:sources]
+      run Licensed::Commands::List.new(config: config), sources: options[:sources], reporter: options[:format], licenses: options[:licenses]
     end
 
     desc "notices", "Generate a NOTICE file from cached records"

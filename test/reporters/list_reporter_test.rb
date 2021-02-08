@@ -188,14 +188,30 @@ describe Licensed::Reporters::ListReporter do
       end
     end
 
-    it "prints an informative messages for a cached dependency to the shell" do
+    it "prints an informative messages to the shell" do
       reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do
-            reporter.report_dependency(dependency) { |report| report["cached"] = true }
+            reporter.report_dependency(dependency) {}
             assert_includes shell.messages,
                             {
                                message: "    #{dependency.name} (#{dependency.version})",
+                               newline: true,
+                               style: :info
+                            }
+          end
+        end
+      end
+    end
+
+    it "includes the license in output to shell if license is set" do
+      reporter.report_run(command) do
+        reporter.report_app(app) do
+          reporter.report_source(source) do
+            reporter.report_dependency(dependency) { |report| report["license"] = dependency.license_key }
+            assert_includes shell.messages,
+                            {
+                               message: "    #{dependency.name} (#{dependency.version}): #{dependency.license_key}",
                                newline: true,
                                style: :info
                             }

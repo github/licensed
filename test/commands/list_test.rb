@@ -103,4 +103,24 @@ describe Licensed::Commands::List do
       end
     end
   end
+
+  it "sets the dependency version in dependency reports" do
+    run_command
+    dependencies = reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::Dependency) }
+    assert dependencies.all? { |dependency| dependency["version"] }
+  end
+
+  describe "detected license key" do
+    it "is not included in dependency reports by default" do
+      run_command
+      dependencies = reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::Dependency) }
+      refute dependencies.any? { |dependency| dependency["license"] }
+    end
+
+    it "is included in depenency reports if the license CLI flag is set" do
+      run_command(licenses: true)
+      dependencies = reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::Dependency) }
+      assert dependencies.all? { |dependency| dependency["license"] }
+    end
+  end
 end
