@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.14.4
+2021-02-09
+
+## Added
+- `list` and `cache` commands optionally print output in JSON or YML formats using the `--format/-f` flag (https://github.com/github/licensed/pull/334)
+- `list` command will include detected license keys using the `--licenses/-l` flag (https://github.com/github/licensed/pull/334)
+
 ## 2.14.3
 2020-12-11
 
@@ -379,4 +386,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.14.3...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.14.4...HEAD
