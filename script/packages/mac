@@ -28,6 +28,9 @@ brew update
 brew list "squashfs" &>/dev/null || brew install "squashfs"
 brew list "pkg-config" &>/dev/null || brew install "pkg-config"
 
+gem update --system
+gem update bundler
+
 if [ ! -f "$RUBYC" ]; then
   mkdir -p "$(dirname "$RUBYC")"
   curl -L https://github.com/kontena/ruby-packer/releases/download/2.6.0-0.6.0/rubyc-2.6.0-0.6.0-osx-amd64.gz | gunzip > "$RUBYC"
