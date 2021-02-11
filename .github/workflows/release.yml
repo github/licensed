@@ -93,9 +93,9 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
 
     - name: Build package
       run: script/packages/linux
@@ -119,9 +119,9 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
 
     - name: Build package
       run: script/packages/mac
@@ -143,9 +143,9 @@ jobs:
         ref: ${{needs.vars.outputs.version}}
 
     - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
 
     - name: Build gem
       run: gem build licensed.gemspec -o licensed-${{needs.vars.outputs.version}}.gem
@@ -162,9 +162,9 @@ jobs:
 
     steps:
     - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
 
     - name: Download linux package
       uses: actions/download-artifact@v2

@@ -51,8 +51,11 @@ cd $COPY_DIR
     trap "git checkout $CURRENT_BRANCH" EXIT
   fi
 
+  # get the openssl dir to use when building based on ruby's default ssl cert dir
+  OPENSSL_DIR="$(cd "$(ruby -e 'require "net/https"; puts OpenSSL::X509::DEFAULT_CERT_DIR')/.." && pwd)"
+
   # build the licensed rubyc executable
-  "$RUBYC" --clean-tmpdir -o "$BUILD_DIR/licensed" "$COPY_DIR/exe/licensed"
+  "$RUBYC" --openssl-dir "$OPENSSL_DIR" --clean-tmpdir -o "$BUILD_DIR/licensed" "$COPY_DIR/exe/licensed"
   chmod +x $BUILD_DIR/licensed
 )
 
