@@ -10,8 +10,25 @@ fi
 BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd $BASE_PATH/test/fixtures/npm
 
+FORCE=""
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" -and -not -name "package\.json" -print0 | xargs -0 rm -rf
+  FORCE=1
+fi
+
+NPM_MAJOR_VERSION="$(npm -v | cut -d'.' -f1)"
+if [ "$NPM_MAJOR_VERSION" -ge "7" ]; then
+  PACKAGE_JSON_SRC="package.json.npm7"
+else
+  PACKAGE_JSON_SRC="package.json.npm6"
+fi
+
+if [ ! -f "package.json" ] || [ "$(cat package.json | md5sum )" != "$(cat "$PACKAGE_JSON_SRC" | md5sum)" ]; then
+  FORCE=1
+  cp -f "$PACKAGE_JSON_SRC" package.json
+fi
+
+if [ -n "$FORCE" ]; then
+  find . -not -regex "\.*" -and -not -name "package\.json*" -print0 | xargs -0 rm -rf
 fi
 
 npm install
