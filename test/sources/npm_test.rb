@@ -36,8 +36,19 @@ if Licensed::Shell.tool_available?("npm")
           assert dep
           assert_equal "npm", dep.record["type"]
           assert_equal "5.2.0", dep.version
-          assert dep.record["homepage"]
+          if source.npm_version < Gem::Version.new("7.0.0")
+            assert dep.record["homepage"]
+          end
           assert dep.record["summary"]
+        end
+      end
+
+      it "includes homepage information if available" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "amdefine" }
+          assert dep
+          assert_equal "npm", dep.record["type"]
+          assert dep.record["homepage"]
         end
       end
 
@@ -46,7 +57,9 @@ if Licensed::Shell.tool_available?("npm")
           dep = source.dependencies.detect { |d| d.name == "@github/query-selector" }
           assert dep
           assert_equal "1.0.3", dep.version
-          assert dep.record["homepage"]
+          if source.npm_version < Gem::Version.new("7.0.0")
+            assert dep.record["homepage"]
+          end
           assert dep.record["summary"]
         end
       end
@@ -78,6 +91,7 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       it "does not include missing indirect peer dependencies" do
+        skip if source.npm_version >= Gem::Version.new("7.0.0")
         Dir.chdir fixtures do
           # peer dependency of @optimizely/js-sdk-datafile-manager, which is
           # an indirect dependency through @optimizely/optimizely-sdk
