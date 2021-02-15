@@ -8,6 +8,7 @@ if Licensed::Shell.tool_available?("npm")
     let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
     let(:source) { Licensed::Sources::NPM.new(config) }
+    let(:version) { Gem::Version.new(Licensed::Shell.execute("npm", "-v")) }
 
     describe "enabled?" do
       it "is true if package.json exists" do
@@ -35,8 +36,19 @@ if Licensed::Shell.tool_available?("npm")
           assert dep
           assert_equal "npm", dep.record["type"]
           assert_equal "5.2.0", dep.version
-          assert dep.record["homepage"]
+          if source.npm_version < Gem::Version.new("7.0.0")
+            assert dep.record["homepage"]
+          end
           assert dep.record["summary"]
+        end
+      end
+
+      it "includes homepage information if available" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "amdefine" }
+          assert dep
+          assert_equal "npm", dep.record["type"]
+          assert dep.record["homepage"]
         end
       end
 
@@ -45,7 +57,9 @@ if Licensed::Shell.tool_available?("npm")
           dep = source.dependencies.detect { |d| d.name == "@github/query-selector" }
           assert dep
           assert_equal "1.0.3", dep.version
-          assert dep.record["homepage"]
+          if source.npm_version < Gem::Version.new("7.0.0")
+            assert dep.record["homepage"]
+          end
           assert dep.record["summary"]
         end
       end
@@ -77,6 +91,7 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       it "does not include missing indirect peer dependencies" do
+        skip if source.npm_version >= Gem::Version.new("7.0.0")
         Dir.chdir fixtures do
           # peer dependency of @optimizely/js-sdk-datafile-manager, which is
           # an indirect dependency through @optimizely/optimizely-sdk
@@ -119,6 +134,9 @@ if Licensed::Shell.tool_available?("npm")
 
     describe "missing dependencies (glob is missing package)" do
       it "includes missing dependencies when yarn.lock is missing" do
+        # this test is incompatible with npm >=7
+        skip if source.npm_version >= Gem::Version.new("7.0.0")
+
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "npm")
@@ -132,6 +150,9 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       it "excludes missing dependencies when yarn.lock is present" do
+        # this test is incompatible with npm >=7
+        skip if source.npm_version >= Gem::Version.new("7.0.0")
+
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "npm")
@@ -141,6 +162,25 @@ if Licensed::Shell.tool_available?("npm")
           Dir.chdir dir do
             assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
             refute source.dependencies.detect { |dep| dep.name == "glob" }
+          end
+        end
+      end
+
+      it "raises Licensed::Sources::Source::Error on missing dependencies" do
+        # this test is incompatible with npm <7
+        skip if source.npm_version < Gem::Version.new("7.0.0")
+
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "npm")
+          FileUtils.rm_rf(File.join(dir, "node_modules/wrappy"))
+
+          Dir.chdir dir do
+            error = assert_raises Licensed::Sources::Source::Error do
+              source.dependencies
+            end
+
+            assert error.message.include? "missing: wrappy@1"
           end
         end
       end

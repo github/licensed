@@ -4,6 +4,25 @@ require "json"
 module Licensed
   module Sources
     class NPM < Source
+      class Dependency < ::Licensed::Dependency
+        # override license_metadata to pull homepage and summary information
+        # from a packages package.json file, if it exists
+        # this accounts for the lack of this information in npm 7's `npm list` output
+        def license_metadata
+          data = super
+          return data if !data["homepage"].to_s.empty? && !data["summary"].to_s.empty?
+
+          package_json_path = File.join(path, "package.json")
+          return data unless File.exist?(package_json_path)
+
+          package_json = JSON.parse(File.read(package_json_path))
+          data["homepage"] = package_json["homepage"]
+          data["summary"] = package_json["description"]
+
+          data
+        end
+      end
+
       def self.type
         "npm"
       end
@@ -50,6 +69,7 @@ module Licensed
         dependencies.each do |name, dependency|
           next if dependency["peerMissing"]
           next if yarn_lock_present && dependency["missing"]
+          dependency["name"] = name
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)
         end
@@ -59,20 +79,48 @@ module Licensed
       # Returns parsed package metadata returned from `npm list`
       def package_metadata
         return @package_metadata if defined?(@package_metadata)
+        @package_metadata = JSON.parse(package_metadata_command)
+      rescue JSON::ParserError => e
+        message = "Licensed was unable to parse the output from 'npm list'. JSON Error: #{e.message}"
+        npm_error = package_metadata_error
+        message = "#{message}. NPM Error: #{npm_error}" if npm_error
+        raise Licensed::Sources::Source::Error, message
+      end
 
-        @package_metadata = begin
-          JSON.parse(package_metadata_command)
-        rescue JSON::ParserError => e
-          raise Licensed::Sources::Source::Error,
-            "Licensed was unable to parse the output from 'npm list'. Please run 'npm list --json --long' and check for errors. Error: #{e.message}"
-        end
+      # Returns an error, if one exists, from running `npm list` to get package metadata
+      def package_metadata_error
+        Licensed::Shell.execute("npm", "list", *package_metadata_args)
+        return ""
+      rescue Licensed::Shell::Error => e
+        return e.message
       end
 
       # Returns the output from running `npm list` to get package metadata
       def package_metadata_command
         args = %w(--json --long)
-        args << "--production" unless include_non_production?
+        args.concat(package_metadata_args)
+
         Licensed::Shell.execute("npm", "list", *args, allow_failure: true)
+      end
+
+      # Returns an array of arguments that should be used for all `npm list`
+      # calls, regardless of how the output is formatted
+      def package_metadata_args
+        args = []
+        args << "--production" unless include_non_production?
+
+        # on npm 7+, the --all argument is necessary to evaluate the project's
+        # full dependency tree
+        args << "--all" if npm_version >= Gem::Version.new("7.0.0")
+
+        return args
+      end
+
+      # Returns the currently installed version of npm as a Gem::Version object
+      def npm_version
+        @npm_version ||= begin
+          Gem::Version.new(Licensed::Shell.execute("npm", "-v").strip)
+        end
       end
 
       # Returns true if a yarn.lock file exists in the current directory
