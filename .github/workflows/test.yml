@@ -60,8 +60,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: [ '8.2', '8.6', '8.8', '8.10', 'latest' ]
-        cabal: [ '2.4', '3.0', 'latest' ]
+        ghc: [ '8.2', '8.6', '8.8', '8.10' ]
+        cabal: [ '2.4', '3.0', '3.2' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
