@@ -69,7 +69,7 @@ jobs:
       with:
         ruby-version: 2.6
     - name: Setup Haskell
-      uses: actions/setup-haskell@v1
+      uses: haskell/actions/setup@v1
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
