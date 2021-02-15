@@ -222,13 +222,24 @@ module Licensed
 
       # Returns a package info structure with an error set
       def missing_package(id)
-        name, _, version = if id.index(/\s/).nil?
-          id.rpartition("-") # e.g. to match the right-most dash from ipid fused-effects-1.0.0.0
-        else
-          id.partition(/\s/) # e.g. to match the left-most space from constraint fused-effects > 1.0.0.0
-        end
-
+        name, version = package_id_name_version(id)
         { "name" => name, "version" => version, "error" => "package not found" }
+      end
+
+      # Parses the name and version pieces from an id or package requirement string
+      def package_id_name_version(id)
+        name, version = id.split(" ", 2)
+        return [name, version] if version
+
+        # split by dashes, find the rightmost thing that looks like an
+        parts = id.split("-")
+        version_start_index = parts.rindex { |part| part.match?(/^[\d\.]+$/) }
+        return [id, nil] if version_start_index.nil?
+
+        [
+          parts[0...version_start_index].join("-"),
+          parts[version_start_index..-1].join("-")
+        ]
       end
     end
   end

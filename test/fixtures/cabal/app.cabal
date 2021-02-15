@@ -15,5 +15,5 @@ library
 executable app
   hs-source-dirs:      app
   main-is:             Main.hs
-  build-depends:       base, semilattices
+  build-depends:       base, semilattices == 0.0.0.4
   default-language:    Haskell2010
