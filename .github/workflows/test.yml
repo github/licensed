@@ -230,8 +230,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [21.x, 22.x]
-        elixir: [1.8.x, 1.9.x]
+        otp: [21.x, 22.x, 23.x]
+        elixir: [ 1.10.x, 1.11.x ]
     steps:
     - uses: actions/checkout@v2
     - uses: erlef/setup-elixir@v1.6.0
