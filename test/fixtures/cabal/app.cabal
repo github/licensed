@@ -9,14 +9,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      .
-  build-depends:       unliftio-core < 0.2.0.0,
-                       fused-effects == 0.4.0.0
+  build-depends:       fused-effects
   default-language:    Haskell2010
 
 executable app
   hs-source-dirs:      app
   main-is:             Main.hs
-  build-depends:       unliftio-core < 0.2.0.0,
-                       base,
-                       semilattices == 0.0.0.4
+  build-depends:       base, semilattices == 0.0.0.4
   default-language:    Haskell2010

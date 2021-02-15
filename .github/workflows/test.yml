@@ -14,9 +14,9 @@ jobs:
     - name: Install Bower
       run: npm install -g bower
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -37,9 +37,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - name: Set up Bundler
       run: |
         yes | gem uninstall bundler --all
@@ -60,16 +60,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: [ '8.2.2', '8.6.5' ]
-        cabal: [ '2.2', '2.4', '3.0', 'latest' ]
+        ghc: [ '8.2', '8.6', '8.8', '8.10' ]
+        cabal: [ '2.4', '3.0', '3.2' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - name: Setup Haskell
-      uses: actions/setup-haskell@v1
+      uses: haskell/actions/setup@v1
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
@@ -89,17 +89,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ '5.6', '7.1', '7.2', '7.3' ]
+        php: [ '7.3', '7.4' ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup php
-      uses: nanasess/setup-php@v3.0.4
+      uses: nanasess/setup-php@v3.0.6
       with:
         php-version: ${{ matrix.php }}
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -116,11 +116,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: [ 2.4.x, 2.5.x, 2.6.x, 2.7.x ]
+        ruby: [ 2.5, 2.6, 2.7 ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}
     - name: Set up Bundler
@@ -146,9 +146,9 @@ jobs:
       with:
         go-version: 1.10.x
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -173,9 +173,9 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -193,9 +193,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -213,9 +213,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -230,18 +230,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [21.x, 22.x]
-        elixir: [1.8.x, 1.9.x]
+        otp: [21.x, 22.x, 23.x]
+        elixir: [ 1.10.x, 1.11.x ]
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-elixir@v1.0.0
+    - uses: erlef/setup-elixir@v1.6.0
       with:
         otp-version: ${{matrix.otp}}
         elixir-version: ${{matrix.elixir}}
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -266,9 +266,9 @@ jobs:
       with:
         node-version: ${{ matrix.node_version }}
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -290,9 +290,9 @@ jobs:
       with:
         dotnet-version: 3.1.202
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -318,9 +318,9 @@ jobs:
         python-version: ${{ matrix.python }}
         architecture: x64
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -345,9 +345,9 @@ jobs:
         python-version: '3.x'
         architecture: x64
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
@@ -379,9 +379,9 @@ jobs:
       env:
         YARN_VERSION: ${{ matrix.yarn_version }}
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v1
       with:
