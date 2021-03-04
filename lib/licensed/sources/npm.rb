@@ -83,7 +83,7 @@ module Licensed
       rescue JSON::ParserError => e
         message = "Licensed was unable to parse the output from 'npm list'. JSON Error: #{e.message}"
         npm_error = package_metadata_error
-        message = "#{message}. NPM Error: #{npm_error}" if npm_error
+        message = "#{message}. npm Error: #{npm_error}" if npm_error
         raise Licensed::Sources::Source::Error, message
       end
 
