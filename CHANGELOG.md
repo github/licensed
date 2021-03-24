@@ -6,23 +6,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.15.0
+2021-03-24
+
+### Added
+- Support for npm 7 (https://github.com/github/licensed/pull/341)
+
+### Fixed
+- Files in the manifest source will be found correctly for apps that are not at the repository root (https://github.com/github/licensed/pull/345)
+
 ## 2.14.4
 2021-02-09
 
-## Added
+### Added
 - `list` and `cache` commands optionally print output in JSON or YML formats using the `--format/-f` flag (https://github.com/github/licensed/pull/334)
 - `list` command will include detected license keys using the `--licenses/-l` flag (https://github.com/github/licensed/pull/334)
 
 ## 2.14.3
 2020-12-11
 
-## Fixed
+### Fixed
 - Auto-generating license text for a known license will no longer raise an error if the found license has no text (:tada: @Eun https://github.com/github/licensed/pull/328)
 
 ## 2.14.2
 2020-11-20
 
-## Fixed
+### Fixed
 - Yarn source correctly finds dependency paths on disk (https://github.com/github/licensed/pull/326)
 - Go source better handles finding dependencies that have been vendored (https://github.com/github/licensed/pull/323)
 
@@ -386,4 +395,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.14.4...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.15.0...HEAD
