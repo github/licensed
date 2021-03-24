@@ -267,4 +267,13 @@ describe Licensed::Sources::Manifest do
       assert_equal Pathname.new(manifest_path), source.manifest_path
     end
   end
+
+  describe "all_files" do
+    it "checks for files from the git repository root" do
+      Dir.chdir fixtures do
+        # file paths will include the entire path from the root of the repo
+        assert_includes source.all_files, "test/fixtures/manifest/manifest.yml"
+      end
+    end
+  end
 end

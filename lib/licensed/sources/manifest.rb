@@ -170,7 +170,7 @@ module Licensed
       def all_files
         # remove files if they are tracked but don't exist on the file system
         @all_files ||= Set.new(Licensed::Git.files || [])
-                          .delete_if { |f| !File.exist?(f) }
+                          .delete_if { |f| !File.exist?(File.join(Licensed::Git.repository_root, f)) }
       end
 
       class Dependency < Licensed::Dependency
