@@ -69,6 +69,8 @@ module Licensed
         dependencies.each do |name, dependency|
           next if dependency["peerMissing"]
           next if yarn_lock_present && dependency["missing"]
+          next if dependency["extraneous"] && dependency["missing"]
+
           dependency["name"] = name
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result)
