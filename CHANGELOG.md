@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ## 2.15.0
+
+2021-03-24
+
+### Changed
+
+- The npm source will ignore dependencies that are marked as both extraneous and missing (https://github.com/github/licensed/pull/347)
+
+## 2.15.0
 2021-03-24
 
 ### Added
@@ -395,4 +403,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.15.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.15.1...HEAD
