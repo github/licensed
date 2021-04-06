@@ -8,7 +8,7 @@ module Licensed
   module Sources
     class Pip < Source
       VERSION_OPERATORS = %w(< > <= >= == !=).freeze
-      PACKAGE_REGEX = /^([\w-]+)(#{VERSION_OPERATORS.join("|")})?/
+      PACKAGE_REGEX = /^([\w\.-]+)(#{VERSION_OPERATORS.join("|")})?/
 
       def enabled?
         return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)

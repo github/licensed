@@ -124,6 +124,16 @@ if Licensed::Shell.tool_available?("pip")
           assert dep.record["summary"]
         end
       end
+
+      it "detects dependencies with dots in package name" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "backports.shutil-get-terminal-size" }
+          assert dep
+          assert_equal "pip", dep.record["type"]
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
+        end
+      end
     end
   end
 end
