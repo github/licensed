@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.15.2
+
+2021-04-06
+
+### Fixed
+
+- The pip source works with package names containing periods (:tada: @bcskda https://github.com/github/licensed/pull/350)
+
 ## 2.15.1
 
 2021-03-29
@@ -403,4 +411,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.15.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/2.15.2...HEAD
