@@ -283,5 +283,26 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
     end
+
+    describe "when run in ruby packer runtime" do
+      top_dir = RbConfig::TOPDIR
+      before do
+        RbConfig.send(:remove_const, "TOPDIR")
+        RbConfig.const_set("TOPDIR", "__enclose_io_memfs__")
+      end
+
+      after do
+        RbConfig.send(:remove_const, "TOPDIR")
+        RbConfig.const_set("TOPDIR", top_dir)
+      end
+
+      it "raises an error" do
+        Dir.chdir(fixtures) do
+          assert_raises Licensed::Sources::Source::Error do
+            source.dependencies
+          end
+        end
+      end
+    end
   end
 end

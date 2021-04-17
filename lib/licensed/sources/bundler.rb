@@ -76,6 +76,7 @@ module Licensed
 
       GEMFILES = { "Gemfile" => "Gemfile.lock", "gems.rb" => "gems.locked" }
       DEFAULT_WITHOUT_GROUPS = %i{development test}
+      RUBY_PACKER_ERROR = "The bundler source cannot be used from the executable built with ruby-packer.  Please install licensed using `gem install` or using bundler."
 
       def enabled?
         # running a ruby-packer-built licensed exe when ruby isn't available
@@ -85,6 +86,8 @@ module Licensed
       end
 
       def enumerate_dependencies
+        raise Licensed::Sources::Source::Error.new(RUBY_PACKER_ERROR) if ruby_packer?
+
         with_local_configuration do
           specs.map do |spec|
             error = spec.error if spec.respond_to?(:error)
@@ -307,19 +310,6 @@ module Licensed
         # force bundler to use the local gem file
         original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], gemfile_path.to_s
 
-        if ruby_packer?
-          # if running under ruby-packer, set environment from host
-
-          # hack: setting this ENV var allows licensed to use Gem paths outside
-          # of the ruby-packer filesystem.  this is needed to find spec sources
-          # from the host filesystem
-          ENV["ENCLOSE_IO_RUBYC_1ST_PASS"] = "1"
-          ruby_version = Gem::ConfigMap[:ruby_version]
-          # set the ruby version in Gem::ConfigMap to the ruby version from the host.
-          # this helps Bundler find the correct spec sources and paths
-          Gem::ConfigMap[:ruby_version] = host_ruby_version
-        end
-
         # reset all bundler configuration
         ::Bundler.reset!
         # and re-configure with settings for current directory
@@ -327,12 +317,6 @@ module Licensed
 
         yield
       ensure
-        if ruby_packer?
-          # if running under ruby-packer, restore environment after block is finished
-          ENV.delete("ENCLOSE_IO_RUBYC_1ST_PASS")
-          Gem::ConfigMap[:ruby_version] = ruby_version
-        end
-
         ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
         # restore bundler configuration
         ::Bundler.reset!
@@ -342,11 +326,6 @@ module Licensed
       # Returns whether the current licensed execution is running ruby-packer
       def ruby_packer?
         @ruby_packer ||= RbConfig::TOPDIR =~ /__enclose_io_memfs__/
-      end
-
-      # Returns the ruby version found in the bundler environment
-      def host_ruby_version
-        Licensed::Shell.execute(*ruby_command_args("ruby", "-e", "puts Gem::ConfigMap[:ruby_version]"))
       end
     end
   end
