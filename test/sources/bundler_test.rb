@@ -116,6 +116,7 @@ if Licensed::Shell.tool_available?("bundle")
         Dir.chdir(fixtures) do
           config["name"] = "semantic"
           refute source.dependencies.find { |d| d.name == "semantic" }
+        end
       end
 
       it "finds dependencies from Gemfile" do
