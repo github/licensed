@@ -82,7 +82,6 @@ The [bundler-licensed plugin](https://github.com/sergey-alekseev/bundler-license
 The [licensed-ci](https://github.com/marketplace/actions/licensed-ci) GitHub Action runs `licensed` as part of an opinionated CI workflow and can be configured to run on any GitHub Action event.  See the linked actions for usage and details.
 
 The [setup-licensed](https://github.com/marketplace/actions/setup-github-licensed) GitHub Action installs `licensed` to the workflow environment.  See the linked actions for usage and details.
-   - This action is intended for projects that don't have a ruby installation setup.  If your workflow has ruby setup please install `licensed` via `Gemfile` + `bundle install` or with `gem install`.
 
 ### Configuration
 
