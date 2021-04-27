@@ -6,16 +6,8 @@ if Licensed::Shell.tool_available?("bundle")
   describe Licensed::Sources::Bundler do
     let(:fixtures) { File.expand_path("../../fixtures/bundler", __FILE__) }
     let(:source_config) { Hash.new }
-    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }, "bundler" => source_config) }
+    let(:config) { Licensed::AppConfiguration.new({ "name" => "bundler_test", "source_path" => Dir.pwd }, "bundler" => source_config) }
     let(:source) { Licensed::Sources::Bundler.new(config) }
-
-    before do
-      @original_bundle_gemfile = ENV["BUNDLE_GEMFILE"]
-    end
-
-    after do
-      ENV["BUNDLE_GEMFILE"] = @original_bundle_gemfile
-    end
 
     describe "enabled?" do
       it "is true if Gemfile.lock exists" do
@@ -120,6 +112,13 @@ if Licensed::Shell.tool_available?("bundle")
     end
 
     describe "dependencies" do
+      it "does not include the source project" do
+        Dir.chdir(fixtures) do
+          config["name"] = "semantic"
+          refute source.dependencies.find { |d| d.name == "semantic" }
+        end
+      end
+
       it "finds dependencies from Gemfile" do
         Dir.chdir(fixtures) do
           dep = source.dependencies.find { |d| d.name == "semantic" }
@@ -143,6 +142,12 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       describe "when bundler is a listed dependency" do
+        it "include_bundler? is true" do
+          Dir.chdir(fixtures) do
+            assert source.include_bundler?
+          end
+        end
+
         it "includes bundler as a dependency" do
           Dir.chdir(fixtures) do
             assert source.dependencies.find { |d| d.name == "bundler" }
@@ -152,6 +157,12 @@ if Licensed::Shell.tool_available?("bundle")
 
       describe "when bundler is not explicitly listed as a dependency" do
         let(:source_config) { { "without" => "bundler" } }
+
+        it "include_bundler? is false" do
+          Dir.chdir(fixtures) do
+            refute source.include_bundler?
+          end
+        end
 
         it "does not include bundler as a dependency" do
           Dir.chdir(fixtures) do
@@ -201,7 +212,6 @@ if Licensed::Shell.tool_available?("bundle")
       end
 
       it "ignores local gemspecs" do
-        fixtures = File.expand_path("../../fixtures/bundler", __FILE__)
         Dir.chdir(fixtures) do
           assert_nil source.dependencies.find { |d| d.name == "licensed" }
         end
@@ -212,10 +222,11 @@ if Licensed::Shell.tool_available?("bundle")
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "bundler")
           FileUtils.rm_rf(File.join(dir, "vendor"))
+
           Dir.chdir(dir) do
             dep = source.dependencies.find { |d| d.name == "semantic" }
             assert dep
-            assert_includes dep.errors, "could not find semantic (= 1.6.0) in any sources"
+            assert_includes dep.errors, "could not find semantic (1.6.0) in any sources"
           end
         end
       end
@@ -228,58 +239,40 @@ if Licensed::Shell.tool_available?("bundle")
           assert_equal "apache-2.0", dep.license_key
         end
       end
-    end
 
-    describe "bundler_exe" do
-
-      it "returns bundle if not configured" do
-        assert_equal "bundle", source.bundler_exe
-      end
-
-      it "returns the configured value if specifying an available tool" do
-        (config["bundler"] ||= {})["bundler_exe"] = "ruby"
-        assert_equal "ruby", source.bundler_exe
-      end
-
-      it "returns the configured value relative to the configuration root" do
-        (config["bundler"] ||= {})["bundler_exe"] = "lib/licensed.rb"
-        assert_equal config.root.join("lib/licensed.rb"), source.bundler_exe
-      end
-    end
-
-    describe "ruby_command_args" do
-      it "returns 'bundle exec args' when bundler exe is available'" do
-        Licensed::Shell.stub(:tool_available?, true) do
-          assert_equal "bundle exec test", source.ruby_command_args("test").join(" ")
+      it "sets a search root relative to the bundler gem dir for bundled gems" do
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.find { |d| d.name == "semantic" }
+          assert_equal "#{Gem.dir}/gems/#{dep.name}-#{dep.version}", dep.instance_variable_get("@root")
         end
       end
 
-      it "returns args when bundler exe is not available'" do
-        Licensed::Shell.stub(:tool_available?, false) do
-          assert_equal "test", source.ruby_command_args("test").join(" ")
+      it "sets a search root relative to the system gem dir for system gems" do
+        Dir.chdir(fixtures) do
+          dep = source.dependencies.find { |d| d.name == "bundler" }
+          assert dep
+          assert_equal "#{Gem.default_dir}/gems/#{dep.name}-#{dep.version}", dep.instance_variable_get("@root")
         end
       end
     end
 
-    describe "bundle_exec_gem_spec" do
-      it "gets a gem specification for a version" do
-        Dir.chdir(fixtures) do
-          version = source.dependencies.find { |d| d.name == "bundler" }.version
-          assert source.bundle_exec_gem_spec("bundler", version)
-        end
+    describe "when run in ruby packer runtime" do
+      top_dir = RbConfig::TOPDIR
+      before do
+        RbConfig.send(:remove_const, "TOPDIR")
+        RbConfig.const_set("TOPDIR", "__enclose_io_memfs__")
       end
 
-      it "gets a gem specification for a requirement" do
-        Dir.chdir(fixtures) do
-          version = source.dependencies.find { |d| d.name == "bundler" }.version
-          assert source.bundle_exec_gem_spec("bundler", Gem::Requirement.new(">= #{version}"))
-        end
+      after do
+        RbConfig.send(:remove_const, "TOPDIR")
+        RbConfig.const_set("TOPDIR", top_dir)
       end
 
-      it "returns nil if a gem specification isn't found" do
+      it "raises an error" do
         Dir.chdir(fixtures) do
-          version = source.dependencies.find { |d| d.name == "bundler" }.version
-          refute source.bundle_exec_gem_spec("bundler", version.to_f - 1)
+          assert_raises Licensed::Sources::Source::Error do
+            source.dependencies
+          end
         end
       end
     end
