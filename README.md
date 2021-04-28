@@ -12,12 +12,24 @@ Licensed is **not** a complete open source license compliance solution. Please u
 
 Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
 
+## Licensed v3
+
+Licensed v3 includes a breaking change if both of the following are true:
+
+1. a project uses bundler to manage ruby dependencies
+2. a project uses the self-contained executable build of licensed
+
+All other usages of licensed should not encounter any major changes migrating from the latest 2.x build to 3.0.  
+
+See [CHANGELOG.md](./CHANGELOG.md) for more details on what's changed.
+See the [v3 migration documentation](./docs/migrations/v3.md) for more info on migrating to v3.
+
 ## Licensed v2
 
 Licensed v2 includes many internal changes intended to make licensed more extensible and easier to update in the future.  While not too much has changed externally, v2 is incompatible with configuration files and cached records from previous versions.  Fortunately, migrating is easy using the `licensed migrate` command.
 
 See [CHANGELOG.md](./CHANGELOG.md) for more details on what's changed.
-See the [migration documentation](./docs/migrating_to_newer_versions.md) for more info on migrating to v2, or run `licensed help migrate`.
+See the [v2 migration documentation](./docs/migrations/v2.md) for more info on migrating to v2, or run `licensed help migrate`.
 
 ## Installation
 
