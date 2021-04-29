@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.0.0
+
+2021-04-27
+
+**This is a major release and includes potentially breaking changes to bundler dependency enumeration.**
+
+### Changed
+
+- The bundler source will return an error when run from an executable.  Please install licensed as a gem to continue using the bundler source.  Please see the [v3 migration document](./docs/migrations/v3.md) for full details and migration strategies.
+
 ## 2.15.2
 
 2021-04-06
@@ -411,4 +421,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/2.15.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.0.0...HEAD

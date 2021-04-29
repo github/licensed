@@ -74,11 +74,14 @@ module Licensed
     method_option :from, aliases: "-f", type: :string, required: true,
       desc: "Licensed version to migrate from - #{Licensed.previous_major_versions.map { |major| "v#{major}" }.join(", ")}"
     def migrate
+      shell = Thor::Base.shell.new
       case options["from"]
       when "v1"
         Licensed::Migrations::V2.migrate(options["config"])
+      when "v2"
+        shell.say "No configuration or cached file migration needed."
+        shell.say "Please see the documentation at https://github.com/github/licensed/tree/master/docs/migrations/v3.md for details."
       else
-        shell = Thor::Base.shell.new
         shell.say "Unrecognized option from=#{options["from"]}", :red
         CLI.command_help(shell, "migrate")
         exit 1
