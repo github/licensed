@@ -125,6 +125,7 @@ Dependencies will be automatically detected for all of the following sources by 
 1. [NuGet](./docs/sources/nuget.md)
 1. [Pip](./docs/sources/pip.md)
 1. [Pipenv](./docs/sources/pipenv.md)
+1. [Swift](./docs/sources/swift.md)
 1. [Yarn](./docs/sources/yarn.md)
 
 You can disable any of them in the configuration file:

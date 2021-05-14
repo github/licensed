@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "LinkedList",
+        "repositoryURL": "https://github.com/mona/LinkedList.git",
+        "state": {
+          "branch": null,
+          "revision": "cfdacae39417d7a987f63a0ea5335a80b16d4659",
+          "version": "1.2.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

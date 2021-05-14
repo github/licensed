@@ -1,0 +1,5 @@
+expected_dependency: LinkedList
+source_path: test/fixtures/swift
+cache_path: test/fixtures/swift/.licenses
+sources:
+  swift: true
