@@ -147,33 +147,16 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
-      describe "when bundler is a listed dependency" do
-        it "include_bundler? is true" do
-          Dir.chdir(fixtures) do
-            assert source.include_bundler?
-          end
-        end
-
-        it "includes bundler as a dependency" do
-          Dir.chdir(fixtures) do
-            assert source.dependencies.find { |d| d.name == "bundler" }
-          end
+      it "includes bundler as a dependency when explicitly listed" do
+        Dir.chdir(fixtures) do
+          assert source.dependencies.find { |d| d.name == "bundler" }
         end
       end
 
-      describe "when bundler is not explicitly listed as a dependency" do
-        let(:source_config) { { "without" => "bundler" } }
-
-        it "include_bundler? is false" do
-          Dir.chdir(fixtures) do
-            refute source.include_bundler?
-          end
-        end
-
-        it "does not include bundler as a dependency" do
-          Dir.chdir(fixtures) do
-            assert_nil source.dependencies.find { |d| d.name == "bundler" }
-          end
+      it "does not include bundler as a dependency when not explicitly listed" do
+        source_config["without"] = "bundler"
+        Dir.chdir(fixtures) do
+          assert_nil source.dependencies.find { |d| d.name == "bundler" }
         end
       end
 
@@ -227,12 +210,11 @@ if Licensed::Shell.tool_available?("bundle")
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "bundler")
+          Dir[File.join(dir, "**/*semantic*")].each do |path|
+            FileUtils.rm_rf(path)
+          end
 
           Dir.chdir(dir) do
-            Dir["**/*semantic*"].each do |path|
-              FileUtils.rm_rf(path)
-            end
-
             dep = source.dependencies.find { |d| d.name == "semantic" }
             assert dep
             assert_includes dep.errors, "could not find semantic (1.6.0) in any sources"
