@@ -248,21 +248,6 @@ if Licensed::Shell.tool_available?("bundle")
           assert_equal "apache-2.0", dep.license_key
         end
       end
-
-      it "sets a search root relative to the bundler gem dir for bundled gems" do
-        Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d.name == "semantic" }
-          assert_equal "#{Gem.dir}/gems/#{dep.name}-#{dep.version}", dep.instance_variable_get("@root")
-        end
-      end
-
-      it "sets a search root relative to the system gem dir for system gems" do
-        Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d.name == "bundler" }
-          assert dep
-          assert_equal "#{Gem.default_dir}/gems/#{dep.name}-#{dep.version}", dep.instance_variable_get("@root")
-        end
-      end
     end
 
     describe "when run in ruby packer runtime" do

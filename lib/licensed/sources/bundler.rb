@@ -12,9 +12,9 @@ module Licensed
       class Dependency < Licensed::Dependency
         attr_reader :loaded_from
 
-        def initialize(name:, version:, path:, loaded_from:, search_root:, errors: [], metadata: {})
+        def initialize(name:, version:, path:, loaded_from:, errors: [], metadata: {})
           @loaded_from = loaded_from
-          super name: name, version: version, path: path, errors: errors, metadata: metadata, search_root: search_root
+          super name: name, version: version, path: path, errors: errors, metadata: metadata
         end
 
         # Load a package manager file from the base Licensee::Projects::FsProject
@@ -62,7 +62,6 @@ module Licensed
               version: spec.version.to_s,
               path: spec.gem_dir,
               loaded_from: spec.loaded_from,
-              search_root: spec_root(spec),
               errors: Array(error),
               metadata: {
                 "type"     => Bundler.type,
@@ -89,20 +88,6 @@ module Licensed
           return true if specs.flat_map(&:dependencies).any? { |d| d.name == "bundler" }
           false
         end
-      end
-
-      # Returns a search root for a specification, one of:
-      # - the local bundler gem location
-      # - the system rubygems install gem location
-      # - nil
-      def spec_root(spec)
-        return if spec.gem_dir.nil?
-        root = [Gem.default_dir, Gem.dir].find { |dir| spec.gem_dir.start_with?(dir) }
-        return unless root
-
-        path = "#{root}/gems/#{spec.full_name}"
-        return unless File.exist?(path)
-        path
       end
 
       # Build the bundler definition
