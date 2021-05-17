@@ -60,7 +60,7 @@ module Licensed
             Dependency.new(
               name: spec.name,
               version: spec.version.to_s,
-              path: spec.gem_dir,
+              path: spec.full_gem_path,
               loaded_from: spec.loaded_from,
               errors: Array(error),
               metadata: {
