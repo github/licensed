@@ -100,7 +100,9 @@ module Licensed
         root = [Gem.default_dir, Gem.dir].find { |dir| spec.gem_dir.start_with?(dir) }
         return unless root
 
-        "#{root}/gems/#{spec.full_name}"
+        path = "#{root}/gems/#{spec.full_name}"
+        return unless File.exist?(path)
+        path
       end
 
       # Build the bundler definition

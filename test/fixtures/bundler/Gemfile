@@ -31,3 +31,5 @@ gem "mini_racer", "0.3.1"
 
 # verify https://github.com/github/licensed/issues/153
 gem "aws-sdk-core", "3.39.0"
+
+gem "thor", git: "https://github.com/erikhuda/thor"

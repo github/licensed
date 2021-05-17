@@ -141,6 +141,12 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
+      it "finds dependencies from git sources" do
+        Dir.chdir(fixtures) do
+          assert source.dependencies.find { |d| d.name == "thor" }
+        end
+      end
+
       describe "when bundler is a listed dependency" do
         it "include_bundler? is true" do
           Dir.chdir(fixtures) do
@@ -221,9 +227,12 @@ if Licensed::Shell.tool_available?("bundle")
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "bundler")
-          FileUtils.rm_rf(File.join(dir, "vendor"))
 
           Dir.chdir(dir) do
+            Dir["**/*semantic*"].each do |path|
+              FileUtils.rm_rf(path)
+            end
+
             dep = source.dependencies.find { |d| d.name == "semantic" }
             assert dep
             assert_includes dep.errors, "could not find semantic (1.6.0) in any sources"
