@@ -141,33 +141,22 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
 
-      describe "when bundler is a listed dependency" do
-        it "include_bundler? is true" do
-          Dir.chdir(fixtures) do
-            assert source.include_bundler?
-          end
-        end
-
-        it "includes bundler as a dependency" do
-          Dir.chdir(fixtures) do
-            assert source.dependencies.find { |d| d.name == "bundler" }
-          end
+      it "finds dependencies from git sources" do
+        Dir.chdir(fixtures) do
+          assert source.dependencies.find { |d| d.name == "thor" }
         end
       end
 
-      describe "when bundler is not explicitly listed as a dependency" do
-        let(:source_config) { { "without" => "bundler" } }
-
-        it "include_bundler? is false" do
-          Dir.chdir(fixtures) do
-            refute source.include_bundler?
-          end
+      it "includes bundler as a dependency when explicitly listed" do
+        Dir.chdir(fixtures) do
+          assert source.dependencies.find { |d| d.name == "bundler" }
         end
+      end
 
-        it "does not include bundler as a dependency" do
-          Dir.chdir(fixtures) do
-            assert_nil source.dependencies.find { |d| d.name == "bundler" }
-          end
+      it "does not include bundler as a dependency when not explicitly listed" do
+        source_config["without"] = "bundler"
+        Dir.chdir(fixtures) do
+          assert_nil source.dependencies.find { |d| d.name == "bundler" }
         end
       end
 
@@ -221,7 +210,9 @@ if Licensed::Shell.tool_available?("bundle")
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "bundler")
-          FileUtils.rm_rf(File.join(dir, "vendor"))
+          Dir[File.join(dir, "**/*semantic*")].each do |path|
+            FileUtils.rm_rf(path)
+          end
 
           Dir.chdir(dir) do
             dep = source.dependencies.find { |d| d.name == "semantic" }
@@ -237,21 +228,6 @@ if Licensed::Shell.tool_available?("bundle")
           assert dep
           assert_equal "3.39.0", dep.version
           assert_equal "apache-2.0", dep.license_key
-        end
-      end
-
-      it "sets a search root relative to the bundler gem dir for bundled gems" do
-        Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d.name == "semantic" }
-          assert_equal "#{Gem.dir}/gems/#{dep.name}-#{dep.version}", dep.instance_variable_get("@root")
-        end
-      end
-
-      it "sets a search root relative to the system gem dir for system gems" do
-        Dir.chdir(fixtures) do
-          dep = source.dependencies.find { |d| d.name == "bundler" }
-          assert dep
-          assert_equal "#{Gem.default_dir}/gems/#{dep.name}-#{dep.version}", dep.instance_variable_get("@root")
         end
       end
     end
