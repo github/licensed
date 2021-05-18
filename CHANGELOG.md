@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.0.1
+
+2021-05-17
+
+### Fixed
+
+- The bundler source will correctly enumerate dependencies pulled with a `git:` directive (https://github.com/github/licensed/pull/360)
+
 ## 3.0.0
 
 2021-04-27
@@ -421,4 +429,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.0.1...HEAD
