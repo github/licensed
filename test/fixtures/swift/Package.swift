@@ -12,15 +12,18 @@ let package = Package(
             targets: ["Fixtures"]),
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/mona/LinkedList.git", from: "1.2.0"),
+        .package(name: "DeckOfPlayingCards",
+                 url: "https://github.com/apple/example-package-deckofplayingcards.git", 
+                 from: "3.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Fixtures",
-            dependencies: []),
+            dependencies: [
+                .product(name: "DeckOfPlayingCards", package: "DeckOfPlayingCards")
+            ]),
         .testTarget(
             name: "FixturesTests",
             dependencies: ["Fixtures"]),
