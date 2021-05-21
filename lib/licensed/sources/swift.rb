@@ -32,13 +32,13 @@ module Licensed
           json = JSON.parse(File.read(package_resolved_file_path))
           json.dig("object", "pins")
         rescue JSON::ParserError => e
-          message = "Licensed was unable to parse the Package.resolved file'. JSON Error: #{e.message}"
+          message = "Licensed was unable to parse the Package.resolved file. JSON Error: #{e.message}"
           raise Licensed::Sources::Source::Error, message
         end
       end
 
       def dependency_path_for_url(url)
-        last_path_component = URI(url).path.split('/').last.sub(/\.git$/, '')
+        last_path_component = URI(url).path.split("/").last.sub(/\.git$/, "")
         File.join(config.pwd, ".build", "checkouts", last_path_component)
       end
 
