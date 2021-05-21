@@ -31,6 +31,9 @@ module Licensed
         @pins = begin
           json = JSON.parse(File.read(package_resolved_file_path))
           json.dig("object", "pins")
+        rescue JSON::ParserError => e
+          message = "Licensed was unable to parse the Package.resolved file'. JSON Error: #{e.message}"
+          raise Licensed::Sources::Source::Error, message
         end
       end
 
