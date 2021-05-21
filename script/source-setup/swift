@@ -7,3 +7,13 @@ if [ -z "$(which swift)" ]; then
 fi
 
 swift --version
+
+if [ "$1" == "-f" ]; then
+  find . -not -regex "\.*" \
+    -and -not -path "*/Package.swift" \
+    -and -not -path "*/Sources*" \
+    -and -not -path "*/Tests*" \
+    -print0 | xargs -0 rm -rf
+fi
+
+swift package resolve
