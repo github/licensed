@@ -8,6 +8,9 @@ fi
 
 swift --version
 
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd $BASE_PATH/test/fixtures/swift
+
 if [ "$1" == "-f" ]; then
   find . -not -regex "\.*" \
     -and -not -path "*/Package.swift" \
