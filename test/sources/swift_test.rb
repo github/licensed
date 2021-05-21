@@ -32,10 +32,17 @@ if Licensed::Shell.tool_available?("swift")
 
       it "finds dependencies from path sources" do
         Dir.chdir(fixtures) do
-          dep = source.enumerate_dependencies.find { |d| d.name == "LinkedList" }
+          dep = source.enumerate_dependencies.find { |d| d.name == "DeckOfPlayingCards" }
           assert dep
-          assert_equal "1.2.1", dep.version
-          assert_equal "https://github.com/mona/LinkedList.git", dep.url
+          assert_equal "3.0.4", dep.version
+
+          dep = source.enumerate_dependencies.find { |d| d.name == "FisherYates" }
+          assert dep
+          assert_equal "2.0.6", dep.version
+
+          dep = source.enumerate_dependencies.find { |d| d.name == "PlayingCard" }
+          assert dep
+          assert_equal "3.0.5", dep.version
 
           dep = source.enumerate_dependencies.find { |d| d.name == "Invalid" }
           refute dep
