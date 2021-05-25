@@ -67,7 +67,7 @@ if Licensed::Shell.tool_available?("swift")
         assert dep
         assert dep.errors
       end
-      
+
       it "handles invalid Package.resolved file" do
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
