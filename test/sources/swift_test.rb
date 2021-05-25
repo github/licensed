@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 require "tmpdir"
+require "pp"
 
 if Licensed::Shell.tool_available?("swift")
   describe Licensed::Sources::Swift do
@@ -46,6 +47,37 @@ if Licensed::Shell.tool_available?("swift")
 
           dep = source.enumerate_dependencies.find { |d| d.name == "Invalid" }
           refute dep
+        end
+      end
+
+      it "handles invalid repositoryURL field" do
+        source.stubs(:pins).returns(
+          JSON.parse <<-JSON
+            [{
+              "package": "Invalid",
+              "repositoryURL": "Invalid",
+              "state": {
+                "version": "1.0.0"
+              }
+            }]
+          JSON
+        )
+
+        dep = source.enumerate_dependencies.find { |d| d.name == "Invalid" }
+        assert dep
+        assert dep.errors
+      end
+      
+      it "handles invalid Package.resolved file" do
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          File.write(File.join(dir, "Package.resolved"), %("Invalid"))
+
+          Dir.chdir(dir) do
+            assert_raises ::Licensed::Sources::Source::Error do
+              source.enumerate_dependencies
+            end
+          end
         end
       end
     end

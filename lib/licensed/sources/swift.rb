@@ -15,10 +15,21 @@ module Licensed
 
       def enumerate_dependencies
         pins.map { |pin|
+          errors = []
+
+          begin
+            name = pin["package"]
+            version = pin.dig("state", "version")
+            path = dependency_path_for_url(pin["repositoryURL"])
+          rescue => e
+            errors << e
+          end
+
           Dependency.new(
-            name: pin["package"],
-            path: dependency_path_for_url(pin["repositoryURL"]),
-            version: pin.dig("state", "version")
+            name: name,
+            path: path,
+            version: version,
+            errors: errors
           )
         }
       end
@@ -31,8 +42,8 @@ module Licensed
         @pins = begin
           json = JSON.parse(File.read(package_resolved_file_path))
           json.dig("object", "pins")
-        rescue JSON::ParserError => e
-          message = "Licensed was unable to parse the Package.resolved file. JSON Error: #{e.message}"
+        rescue => e
+          message = "Licensed was unable to read the Package.resolved file. Error: #{e.message}"
           raise Licensed::Sources::Source::Error, message
         end
       end
