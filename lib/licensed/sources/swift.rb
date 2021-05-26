@@ -13,11 +13,12 @@ module Licensed
 
       def enumerate_dependencies
         pins.map { |pin|
+          name = pin["package"]
+          version = pin.dig("state", "version")
+          path = nil
           errors = []
 
           begin
-            name = pin["package"]
-            version = pin.dig("state", "version")
             path = dependency_path_for_url(pin["repositoryURL"])
           rescue => e
             errors << e
