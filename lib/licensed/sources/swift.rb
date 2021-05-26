@@ -3,8 +3,6 @@ require "json"
 require "pathname"
 require "uri"
 
-require "licensed/sources/helpers/content_versioning"
-
 module Licensed
   module Sources
     class Swift < Source
