@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "DeckOfPlayingCards",
+        "repositoryURL": "https://github.com/apple/example-package-deckofplayingcards.git",
+        "state": {
+          "branch": null,
+          "revision": "2c0e5ac3e10216151fc78ac1ec6bd9c2c0111a3a",
+          "version": "3.0.4"
+        }
+      },
+      {
+        "package": "FisherYates",
+        "repositoryURL": "https://github.com/apple/example-package-fisheryates.git",
+        "state": {
+          "branch": null,
+          "revision": "e729f197bbc3831b9a3005fa71ad6f38c1e7e17e",
+          "version": "2.0.6"
+        }
+      },
+      {
+        "package": "PlayingCard",
+        "repositoryURL": "https://github.com/apple/example-package-playingcard.git",
+        "state": {
+          "branch": null,
+          "revision": "39ddabb01e8102ab548a8c6bb3eb20b15f3b4fbc",
+          "version": "3.0.5"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

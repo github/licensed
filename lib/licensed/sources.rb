@@ -14,6 +14,7 @@ module Licensed
     require "licensed/sources/nuget"
     require "licensed/sources/pip"
     require "licensed/sources/pipenv"
+    require "licensed/sources/swift"
     require "licensed/sources/gradle"
     require "licensed/sources/mix"
     require "licensed/sources/yarn"

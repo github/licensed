@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+if [ -z "$(which swift)" ]; then
+  echo "A local swift installation is required for swift development." >&2
+  exit 127
+fi
+
+swift --version
+
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd $BASE_PATH/test/fixtures/swift
+
+if [ "$1" == "-f" ]; then
+  find . -not -regex "\.*" \
+    -and -not -path "*/Package.swift" \
+    -and -not -path "*/Sources*" \
+    -and -not -path "*/Tests*" \
+    -print0 | xargs -0 rm -rf
+fi
+
+swift package resolve
