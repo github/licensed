@@ -54,7 +54,7 @@ module Licensed
       end
 
       def dependency_path_for_url(url)
-        last_path_component = URI(url).path.split("/").last
+        last_path_component = URI(url).path.split("/").last.sub(/\.git$/, "")
         File.join(config.pwd, ".build", "checkouts", last_path_component)
       end
 
