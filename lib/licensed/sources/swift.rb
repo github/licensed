@@ -15,25 +15,17 @@ module Licensed
         pins.map { |pin|
           name = pin["package"]
           version = pin.dig("state", "version")
-          url = pin["repositoryURL"]
-          homepage = url.sub(/\.git$/, "")
-          path = nil
-          errors = []
-
-          begin
-            path = dependency_path_for_url(url)
-          rescue => e
-            errors << e
-          end
+          path = dependency_path_for_url(pin["repositoryURL"])
+          error = "Unable to determine project path from #{url}" unless path
 
           Dependency.new(
             name: name,
             path: path,
             version: version,
-            errors: errors,
+            errors: Array(error),
             metadata: {
               "type"      => Swift.type,
-              "homepage"  => homepage
+              "homepage"  => homepage_for_url(pin["repositoryURL"])
             }
           )
         }
@@ -56,6 +48,13 @@ module Licensed
       def dependency_path_for_url(url)
         last_path_component = URI(url).path.split("/").last.sub(/\.git$/, "")
         File.join(config.pwd, ".build", "checkouts", last_path_component)
+      rescue URI::InvalidURIError
+      end
+
+      def homepage_for_url(url)
+        return unless %w{http https}.include?(URI(url).scheme)
+        url.sub(/\.git$/, "")
+      rescue URI::InvalidURIError
       end
 
       def package_resolved_file_path
