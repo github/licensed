@@ -195,7 +195,7 @@ module Licensed
 
           path = full_dependency_path(reference_key)
           error = "Package #{id} not found at any project package folder" if path.nil?
-          
+
           NuGetDependency.new(
             name: id,
             version: version,
