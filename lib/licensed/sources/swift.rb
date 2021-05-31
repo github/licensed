@@ -15,7 +15,8 @@ module Licensed
         pins.map { |pin|
           name = pin["package"]
           version = pin.dig("state", "version")
-          url = pin["repositoryURL"].sub(/\.git$/, "")
+          url = pin["repositoryURL"]
+          homepage = url.sub(/\.git$/, "")
           path = nil
           errors = []
 
@@ -32,7 +33,7 @@ module Licensed
             errors: errors,
             metadata: {
               "type"      => Swift.type,
-              "homepage"  => url
+              "homepage"  => homepage
             }
           )
         }
