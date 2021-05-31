@@ -15,11 +15,12 @@ module Licensed
         pins.map { |pin|
           name = pin["package"]
           version = pin.dig("state", "version")
+          url = pin["repositoryURL"].sub(/\.git$/, "")
           path = nil
           errors = []
 
           begin
-            path = dependency_path_for_url(pin["repositoryURL"])
+            path = dependency_path_for_url(url)
           rescue => e
             errors << e
           end
@@ -28,7 +29,11 @@ module Licensed
             name: name,
             path: path,
             version: version,
-            errors: errors
+            errors: errors,
+            metadata: {
+              "type"      => Swift.type,
+              "homepage"  => url
+            }
           )
         }
       end
@@ -48,7 +53,7 @@ module Licensed
       end
 
       def dependency_path_for_url(url)
-        last_path_component = URI(url).path.split("/").last.sub(/\.git$/, "")
+        last_path_component = URI(url).path.split("/").last
         File.join(config.pwd, ".build", "checkouts", last_path_component)
       end
 

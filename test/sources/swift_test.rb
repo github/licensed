@@ -36,6 +36,7 @@ if Licensed::Shell.tool_available?("swift")
           dep = source.enumerate_dependencies.find { |d| d.name == "DeckOfPlayingCards" }
           assert dep
           assert_equal "3.0.4", dep.version
+          assert_equal "https://github.com/apple/example-package-deckofplayingcards", dep.record["homepage"]
 
           dep = source.enumerate_dependencies.find { |d| d.name == "FisherYates" }
           assert dep
