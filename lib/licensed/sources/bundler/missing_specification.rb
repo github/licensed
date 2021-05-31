@@ -48,7 +48,7 @@ module Bundler
       spec = orig_materialize
       return spec if spec
 
-      Licensed::Bundler:: MissingSpecification.new(name: name, version: version, platform: platform, source: source)
+      Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
     end
   end
 end
