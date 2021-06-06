@@ -19,9 +19,13 @@ If a root path is not specified, it will default to using the following, in orde
 1. the root of the local git repository, if run inside a git repository
 2. the current directory
 
-### Source path glob patterns
+### Source paths
 
-The `source_path` property can use a glob path to share configuration properties across multiple application entrypoints.
+A source path is the directory in which licensed should run to enumerate dependencies.  This is often dependent on the project type, for example the bundler source should be run from the directory containing a `Gemfile` or `gems.rb` while the go source should be run from the directory containing an entrypoint function.
+
+#### Using glob patterns
+
+The `source_path` property can use one or more glob patterns to share configuration properties across multiple application entrypoints.
 
 For example, there is a common pattern in Go projects to include multiple executable entrypoints under folders in `cmd`.  Using a glob pattern allows users to avoid manually configuring and maintaining multiple licensed application `source_path`s.  Using a glob pattern will also ensure that any new entrypoints matching the pattern are automatically picked up by licensed commands as they are added.
 
@@ -31,6 +35,14 @@ sources:
 
 # treat all directories under `cmd` as separate apps
 source_path: cmd/*
+```
+
+In order to better filter the results from glob patterns, the `source_path` property also accepts an array of inclusion and exclusion glob patterns similar to gitignore files.  Inclusion patterns will add matching directory paths to resulting set of source paths, while exclusion patterns will remove matching directory paths.
+
+```yml
+source_path:
+  - "projects/*" # include by default all directories under "projects"
+  - "!projects/*Test" # exclude all projects ending in "Test"
 ```
 
 Glob patterns are syntactic sugar for, and provide the same functionality as, manually specifying multiple `source_path` values. See the instructions on [specifying multiple apps](./#specifying-multiple-apps) below for additional considerations when using multiple apps.

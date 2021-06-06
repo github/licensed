@@ -158,18 +158,41 @@ module Licensed
     private
 
     def self.expand_app_source_path(app_config)
-      return app_config if app_config["source_path"].to_s.empty?
+      # map a source_path configuration value to an array of non-empty values
+      source_path_array = Array(app_config["source_path"])
+                            .reject { |path| path.to_s.empty? }
+                            .compact
+      app_root = AppConfiguration.root_for(app_config)
+      return app_config.merge("source_path" => app_root) if source_path_array.empty?
 
       # check if the source path maps to an existing directory
-      source_path = File.expand_path(app_config["source_path"], AppConfiguration.root_for(app_config))
-      return app_config if Dir.exist?(source_path)
+      if source_path_array.length == 1
+        source_path = File.expand_path(source_path_array[0], app_root)
+        return app_config.merge("source_path" => source_path) if Dir.exist?(source_path)
+      end
 
       # try to expand the source path for glob patterns
-      expanded_source_paths = Dir.glob(source_path).select { |p| File.directory?(p) }
+      expanded_source_paths = source_path_array.reduce(Set.new) do |matched_paths, pattern|
+        current_matched_paths = if pattern.start_with?("!")
+          # if the pattern is an exclusion, remove all matching files
+          # from the result
+          matched_paths - Dir.glob(pattern[1..-1])
+        else
+          # if the pattern is an inclusion, add all matching files
+          # to the result
+          matched_paths + Dir.glob(pattern)
+        end
+
+        current_matched_paths.select { |p| File.directory?(p) }
+      end
+
       configs = expanded_source_paths.map { |path| app_config.merge("source_path" => path) }
 
       # if no directories are found for the source path, return the original config
-      return app_config if configs.size == 0
+      if configs.size == 0
+        app_config["source_path"] = app_root if app_config["source_path"].is_a?(Array)
+        return app_config
+      end
 
       # update configured values for name and cache_path for uniqueness.
       # this is only needed when values are explicitly set, AppConfiguration
