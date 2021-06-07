@@ -144,7 +144,7 @@ describe Licensed::Configuration do
       end
     end
 
-    it "expands source_path patters that result in a single path" do
+    it "expands source_path patterns that result in a single path" do
       apps.clear
       apps << { "source_path" => File.expand_path("../../lib/*", __FILE__) }
       expected_source_paths = Dir.glob(apps[0]["source_path"]).select { |p| File.directory?(p) }
@@ -209,6 +209,54 @@ describe Licensed::Configuration do
         dir_name = File.basename(source_path)
         assert_equal app.root.join(cache_path, dir_name), app.cache_path
       end
+    end
+  end
+
+  describe "with an array of source_paths" do
+    it "handles empty arrays" do
+      options["source_path"] = []
+      assert_equal 1, config.apps.count
+      assert_equal Licensed::AppConfiguration.root_for(options), config.apps.first.source_path.to_s
+    end
+
+    it "handles arrays with nil values" do
+      options["source_path"] = [
+        File.expand_path("../fixtures/bundler", __FILE__),
+        nil
+      ]
+      assert_equal 1, config.apps.count
+      assert_equal File.expand_path("../fixtures/bundler", __FILE__), config.apps.first.source_path.to_s
+    end
+
+    it "handles absolute paths" do
+      options["source_path"] = [
+        File.expand_path("../fixtures/bundler", __FILE__),
+        File.expand_path("../fixtures/go", __FILE__)
+      ]
+      options["source_path"].each do |source_path|
+        assert config.apps.find { |a| a.source_path.to_s == source_path }
+      end
+    end
+
+    it "handles paths relative to the application root directory" do
+      options["source_path"] = [
+        "test/fixtures/bundler",
+        "test/fixtures/go",
+      ]
+      options["source_path"].each do |relative_path|
+        expected_source_path = File.join(Licensed::AppConfiguration.root_for(options), relative_path)
+        assert config.apps.find { |a| a.source_path.to_s == expected_source_path }
+      end
+    end
+
+    it "handles glob patterns" do
+      excluded_path = File.expand_path("../fixtures/bundler", __FILE__)
+      options["source_path"] = [
+        File.expand_path("../fixtures/*", __FILE__),
+        "!#{excluded_path}"
+      ]
+      refute config.apps.find { |a| a.source_path.to_s == excluded_path }
+      assert config.apps.find { |a| a.source_path.to_s == File.expand_path("../fixtures/go", __FILE__) }
     end
   end
 end
