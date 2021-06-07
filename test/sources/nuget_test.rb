@@ -39,6 +39,18 @@ if Licensed::Shell.tool_available?("dotnet")
           assert_equal "https://www.newtonsoft.com/json", dep.record["homepage"]
         end
       end
+
+      it "finds dependendencies under a configured obj path" do
+        Dir.chdir File.join(fixtures, "..") do
+          config["nuget"] = { "obj_path" => "obj" }
+          dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
+          assert dep
+          assert_equal "nuget", dep.record["type"]
+          assert_equal "Newtonsoft.Json", dep.record["name"]
+          assert_equal "12.0.3", dep.record["version"]
+          assert_equal "https://www.newtonsoft.com/json", dep.record["homepage"]
+        end
+      end
     end
 
     describe "license expressions" do

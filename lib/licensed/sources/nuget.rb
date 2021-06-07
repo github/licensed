@@ -164,12 +164,16 @@ module Licensed
       end
 
       def project_assets_file_path
-        File.join(config.pwd, "project.assets.json")
+        File.join(config.pwd, nuget_obj_path, "project.assets.json")
       end
 
       def project_assets_file
         return @project_assets_file if defined?(@project_assets_file)
         @project_assets_file = File.read(project_assets_file_path)
+      end
+
+      def nuget_obj_path
+        config.dig("nuget", "obj_path") || ""
       end
 
       def enabled?
