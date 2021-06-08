@@ -86,14 +86,14 @@ if Licensed::Shell.tool_available?("go")
 
       it "does not include any local, non vendored packages" do
         Dir.chdir fixtures do
-          refute source.dependencies.detect { |d| d.name == "github.com/github/test/pkg/world" }
+          refute source.dependencies.detect { |d| d.name == "test/pkg/world" }
         end
       end
 
       it "uses case insensitive matching to determine local package paths" do
-        fixtures = File.join(gopath, "src/github.com/github/tesT")
+        fixtures = File.join(gopath, "src/tesT")
         Dir.chdir fixtures do
-          refute source.dependencies.detect { |d| d.name == "github.com/github/test/pkg/world" }
+          refute source.dependencies.detect { |d| d.name == "test/pkg/world" }
         end
       end
 

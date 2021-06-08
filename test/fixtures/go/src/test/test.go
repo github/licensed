@@ -1,18 +1,20 @@
 package test
 
 import (
-  lru "github.com/hashicorp/golang-lru"
-  ctx "github.com/gorilla/context"
-  "golang.org/x/net/http2/hpack"
-  "github.com/davecgh/go-spew/spew"
-  "test/internal/fakevendor/github.com/owner/repo"
+	"github.com/davecgh/go-spew/spew"
+	ctx "github.com/gorilla/context"
+	lru "github.com/hashicorp/golang-lru"
+	"golang.org/x/net/http2/hpack"
+	"test/internal/fakevendor/github.com/owner/repo"
+	"test/pkg/world"
 )
 
 func main() {
-  lru.New(1)
-  ctx.Purge(0)
-  _ = hpack.ErrInvalidHuffman
-  i := 1
-  spew.Dump(i)
-  testpackage.HelloWorld()
+	lru.New(1)
+	ctx.Purge(0)
+	_ = hpack.ErrInvalidHuffman
+	i := 1
+	spew.Dump(i)
+	testpackage.HelloWorld()
+	world.HelloWorld()
 }
