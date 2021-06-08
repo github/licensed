@@ -98,7 +98,7 @@ module Licensed
       # Returns whether the package is local to the current project
       def local_package?(package)
         return false unless package && package["Dir"]
-        return false unless File.fnmatch?("#{config.root.to_s}*", package["Dir"])
+        return false unless File.fnmatch?("#{config.root.to_s}*", package["Dir"], File::FNM_CASEFOLD)
         vendored_path_parts(package).nil?
       end
 
