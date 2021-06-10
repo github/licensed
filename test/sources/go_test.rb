@@ -84,6 +84,12 @@ if Licensed::Shell.tool_available?("go")
         end
       end
 
+      it "does not include any local, non vendored packages" do
+        Dir.chdir fixtures do
+          refute source.dependencies.detect { |d| d.name == "test/pkg/world" }
+        end
+      end
+
       it "includes direct dependencies" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }

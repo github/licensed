@@ -164,7 +164,7 @@ module Licensed
       end
 
       def project_assets_file_path
-        File.join(config.pwd, "project.assets.json")
+        File.join(config.pwd, nuget_obj_path, "project.assets.json")
       end
 
       def project_assets_file
@@ -177,6 +177,10 @@ module Licensed
       rescue JSON::ParserError => e
         message = "Licensed was unable to read the project.assets.json file. Error: #{e.message}"
         raise Licensed::Sources::Source::Error, message
+      end
+      
+      def nuget_obj_path
+        config.dig("nuget", "obj_path") || ""
       end
 
       def enabled?
