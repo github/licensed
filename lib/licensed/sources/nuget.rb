@@ -198,7 +198,7 @@ module Licensed
           id = "#{name}-#{version}"
 
           path = full_dependency_path(reference_key)
-          error = "Package #{id} not found at any project package folder" if path.nil?
+          error = "Package #{id} path was not found in project.assets.json, or does not exist on disk at any project package folder" if path.nil?
 
           NuGetDependency.new(
             name: id,
