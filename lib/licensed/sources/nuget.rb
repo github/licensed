@@ -178,7 +178,7 @@ module Licensed
         message = "Licensed was unable to read the project.assets.json file. Error: #{e.message}"
         raise Licensed::Sources::Source::Error, message
       end
-      
+
       def nuget_obj_path
         config.dig("nuget", "obj_path") || ""
       end
