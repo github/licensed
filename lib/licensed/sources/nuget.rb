@@ -172,6 +172,13 @@ module Licensed
         @project_assets_file = File.read(project_assets_file_path)
       end
 
+      def project_assets_json
+        @project_assets_json ||= JSON.parse(project_assets_file)
+      rescue JSON::ParserError => e
+        message = "Licensed was unable to read the project.assets.json file. Error: #{e.message}"
+        raise Licensed::Sources::Source::Error, message
+      end
+
       def nuget_obj_path
         config.dig("nuget", "obj_path") || ""
       end
@@ -184,32 +191,51 @@ module Licensed
       # Ideally we'd use `dotnet list package` instead, but its output isn't
       # easily machine readable and doesn't contain everything we need.
       def enumerate_dependencies
-        json = JSON.parse(project_assets_file)
-        nuget_packages_dir = json["project"]["restore"]["packagesPath"]
-        json["targets"].each_with_object({}) do |(_, target), dependencies|
-          target.each do |reference_key, reference|
-            # Ignore project references
-            next unless reference["type"] == "package"
-            package_id_parts = reference_key.partition("/")
-            name = package_id_parts[0]
-            version = package_id_parts[-1]
-            id = "#{name}-#{version}"
+        reference_keys.map do |reference_key|
+          package_id_parts = reference_key.partition("/")
+          name = package_id_parts[0]
+          version = package_id_parts[-1]
+          id = "#{name}-#{version}"
 
-            # Already know this package from another target
-            next if dependencies.key?(id)
+          path = full_dependency_path(reference_key)
+          error = "Package #{id} path was not found in project.assets.json, or does not exist on disk at any project package folder" if path.nil?
 
-            path = File.join(nuget_packages_dir, json["libraries"][reference_key]["path"])
-            dependencies[id] = NuGetDependency.new(
-              name: id,
-              version: version,
-              path: path,
-              metadata: {
-                "type" => NuGet.type,
-                "name" => name
-              }
-            )
-          end
-        end.values
+          NuGetDependency.new(
+            name: id,
+            version: version,
+            path: path,
+            errors: Array(error),
+            metadata: {
+              "type" => NuGet.type,
+              "name" => name
+            }
+          )
+        end
+      end
+
+      # Returns a unique set of the package reference keys used across all target groups
+      def reference_keys
+        all_reference_keys = project_assets_json["targets"].flat_map do |_, references|
+          references.select { |key, reference| reference["type"] == "package" }
+                    .keys
+        end
+
+        Set.new(all_reference_keys)
+      end
+
+      # Returns a dependency's path, if it exists, in one of the project's global or fallback package folders
+      def full_dependency_path(reference_key)
+        dependency_path = project_assets_json.dig("libraries", reference_key, "path")
+        return unless dependency_path
+
+        nuget_package_dirs = [
+          project_assets_json.dig("project", "restore", "packagesPath"),
+          *Array(project_assets_json.dig("project", "restore", "fallbackFolders"))
+        ].compact
+
+        nuget_package_dirs.map { |dir| File.join(dir, dependency_path) }
+                          .select { |path| File.directory?(path) }
+                          .first
       end
     end
   end

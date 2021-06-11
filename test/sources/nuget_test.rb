@@ -40,7 +40,60 @@ if Licensed::Shell.tool_available?("dotnet")
         end
       end
 
-      it "finds dependendencies under a configured obj path" do
+      it "find dependencies from fallback folders" do
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "obj")
+          assets_json_path = File.join(dir, "project.assets.json")
+          assets_json = JSON.parse(File.read(assets_json_path))
+          assets_json["project"]["restore"]["fallbackFolders"] = [
+            assets_json.dig("project", "restore", "packagesPath")
+          ]
+          assets_json["project"]["restore"]["packagesPath"] = ""
+          File.write(assets_json_path, JSON.pretty_generate(assets_json))
+
+          Dir.chdir(dir) do
+            dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
+            assert dep
+            assert_equal "nuget", dep.record["type"]
+            assert_equal "Newtonsoft.Json", dep.record["name"]
+            assert_equal "12.0.3", dep.record["version"]
+            assert_equal "https://www.newtonsoft.com/json", dep.record["homepage"]
+          end
+        end
+      end
+
+      it "sets a dependency error if a project isn't found" do
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "obj")
+          assets_json_path = File.join(dir, "project.assets.json")
+          assets_json = JSON.parse(File.read(assets_json_path))
+          assets_json["project"]["restore"]["packagesPath"] = ""
+          File.write(assets_json_path, JSON.pretty_generate(assets_json))
+
+          Dir.chdir(dir) do
+            dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
+            assert_equal ["Package Newtonsoft.Json-12.0.3 path was not found in project.assets.json, or does not exist on disk at any project package folder"],
+                         dep.errors
+          end
+        end
+      end
+
+      it "raises an error if project.assets.json can't be parsed" do
+        Dir.mktmpdir do |dir|
+          assets_json_path = File.join(dir, "project.assets.json")
+          File.write(assets_json_path, "invalid json")
+
+          Dir.chdir(dir) do
+            assert_raises ::Licensed::Sources::Source::Error do
+              source.dependencies
+            end
+          end
+        end
+      end
+
+      it "finds dependencies under a configured obj path" do
         Dir.chdir File.join(fixtures, "..") do
           config["nuget"] = { "obj_path" => "obj" }
           dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
