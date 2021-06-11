@@ -74,7 +74,7 @@ if Licensed::Shell.tool_available?("dotnet")
 
           Dir.chdir(dir) do
             dep = source.dependencies.detect { |d| d.name == "Newtonsoft.Json-12.0.3" }
-            assert_equal ["Package Newtonsoft.Json-12.0.3 not found at any project package folder"],
+            assert_equal ["Package Newtonsoft.Json-12.0.3 path was not found in project.assets.json, or does not exist on disk at any project package folder"],
                          dep.errors
           end
         end
