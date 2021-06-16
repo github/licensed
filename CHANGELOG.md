@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.1.0
+
+2021-06-16
+
+### Added
+
+- Licensed supports Swift/Swift package manager as a dependency source (:tada: @mattt https://github.com/github/licensed/pull/363)'
+
+### Changed
+
+- The `source_path` configuration property accepts arrays of inclusion and exclusion glob patterns (https://github.com/github/licensed/pull/368)
+- The Nuget source now uses configured fallback folders to find dependencies that are not in found in the project folder (https://github.com/github/licensed/pull/366)
+- The Nuget source supports a configurable property for the path from the project source path to the project's `obj` folder (https://github.com/github/licensed/pull/365)
+
+### Fixed
+- The Go source's checks for local packages will correctly find paths in case-insensitive file systems (https://github.com/github/licensed/pull/370)
+- The Bundler source will no longer unnecessarily reset the local Bundler environment configuration (https://github.com/github/licensed/pull/372)
+
 ## 3.0.1
 
 2021-05-17
@@ -429,4 +447,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.0.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.1.0...HEAD
