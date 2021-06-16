@@ -156,6 +156,7 @@ module Licensed
           ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
 
           # restore bundler configuration
+          ::Bundler.reset!
           ::Bundler.configure
         end
 
