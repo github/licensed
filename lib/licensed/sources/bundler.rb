@@ -134,28 +134,32 @@ module Licensed
         @lockfile_path ||= gemfile_path.dirname.join(GEMFILES[gemfile_path.basename.to_s])
       end
 
-      private
-
       # helper to clear all bundler environment around a yielded block
       def with_local_configuration
-        # force bundler to use the local gem file
-        original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], gemfile_path.to_s
-
         # silence any bundler warnings while running licensed
         bundler_ui, ::Bundler.ui = ::Bundler.ui, ::Bundler::UI::Silent.new
 
-        # reset all bundler configuration
-        ::Bundler.reset!
-        # and re-configure with settings for current directory
-        ::Bundler.configure
+        original_bundle_gemfile = nil
+        if gemfile_path.to_s != ENV["BUNDLE_GEMFILE"]
+          # force bundler to use the local gem file
+          original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], gemfile_path.to_s
+
+          # reset all bundler configuration
+          ::Bundler.reset!
+          # and re-configure with settings for current directory
+          ::Bundler.configure
+        end
 
         yield
       ensure
-        ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
-        ::Bundler.ui = bundler_ui
+        if original_bundle_gemfile
+          ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
 
-        # restore bundler configuration
-        ::Bundler.configure
+          # restore bundler configuration
+          ::Bundler.configure
+        end
+
+        ::Bundler.ui = bundler_ui
       end
 
       # Returns whether the current licensed execution is running ruby-packer
