@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        bundler: [ '~> 1.15.0', '~> 1.16.0', '~> 1.17.0', '~> 2.0.0' ]
+        bundler: [ '~> 1.17.0', '~> 2.0.0', '~> 2.1.0', '~> 2.2.0' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
@@ -60,8 +60,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: [ '8.2', '8.6', '8.8', '8.10' ]
-        cabal: [ '2.4', '3.0', '3.2' ]
+        ghc: [ '8.6', '8.8', '8.10', '9.0' ]
+        cabal: [ '3.0', '3.2', '3.4' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ '7.3', '7.4' ]
+        php: [ '7.4', '8.0' ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup php
@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: [ 2.5, 2.6, 2.7 ]
+        ruby: [ 2.6, 2.7, 3.0 ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
@@ -165,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.10.x', '1.11.x', '1.12.x', '1.13.x', '1.14.x', '1.15.x' ]
+        go: [ '1.12.x', '1.13.x', '1.14.x', '1.15.x', '1.16.x' ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup go
@@ -190,6 +190,9 @@ jobs:
 
   gradle:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '11', '15' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
@@ -197,6 +200,10 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java }}
     - uses: actions/cache@v1
       with:
         path: vendor/gems
@@ -230,8 +237,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [21.x, 22.x, 23.x]
-        elixir: [ 1.10.x, 1.11.x ]
+        otp: [22.x, 23.x, 24.x]
+        elixir: [ 1.11.x, 1.12.x ]
     steps:
     - uses: actions/checkout@v2
     - uses: erlef/setup-elixir@v1.6.0
@@ -258,7 +265,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node_version: [ 10, 12, 14, 15 ]
+        node_version: [ 12, 14, 16 ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup node
@@ -283,12 +290,15 @@ jobs:
 
   nuget:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet: [ '3.1.x', '5.x' ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup dotnet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.202
+        dotnet-version: ${{ matrix.dotnet }}
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -309,7 +319,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [ '2.x', '3.x' ]
+        python: [ '3.6', '3.7', '3.8', '3.9' ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup python
