@@ -252,5 +252,35 @@ if Licensed::Shell.tool_available?("bundle")
         end
       end
     end
+
+    describe "#with_local_configuration" do
+      it "resets the Bundler environment" do
+        begin
+          original_gem_home, ENV["GEM_HOME"] = ENV["GEM_HOME"], "foo"
+          Dir.chdir(fixtures) do
+            source.with_local_configuration do
+              refute_equal "foo", ENV["GEM_HOME"]
+            end
+          end
+        ensure
+          ENV["GEM_HOME"] = original_gem_home
+        end
+      end
+
+      it "does not reset Bundler environment when the correct environment is already set" do
+        begin
+          original_gem_home, ENV["GEM_HOME"] = ENV["GEM_HOME"], "foo"
+          original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], source.gemfile_path.to_s
+          Dir.chdir(fixtures) do
+            source.with_local_configuration do
+              assert_equal "foo", ENV["GEM_HOME"]
+            end
+          end
+        ensure
+          ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
+          ENV["GEM_HOME"] = original_gem_home
+        end
+      end
+    end
   end
 end
