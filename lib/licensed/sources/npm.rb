@@ -33,11 +33,12 @@ module Licensed
 
       def enumerate_dependencies
         packages.map do |name, package|
-          path = package["path"]
+          errors = package["problems"] unless package["path"]
           Dependency.new(
             name: name,
-            version: package["version"],
-            path: path,
+            version: package["version"] || package["required"],
+            path: package["path"],
+            errors: Array(errors),
             metadata: {
               "type"     => NPM.type,
               "name"     => package["name"],

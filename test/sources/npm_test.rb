@@ -167,20 +167,56 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       it "raises Licensed::Sources::Source::Error on missing dependencies" do
-        # this test is incompatible with npm <7
+        # this test is incompatible with npm <7, >=7.12.0 (possibly earlier versions as well, I haven't been able to verify)
         skip if source.npm_version < Gem::Version.new("7.0.0")
+        skip if source.npm_version >= Gem::Version.new("7.12.0")
 
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
           dir = File.join(dir, "npm")
-          FileUtils.rm_rf(File.join(dir, "node_modules/wrappy"))
+          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
 
           Dir.chdir dir do
             error = assert_raises Licensed::Sources::Source::Error do
               source.dependencies
             end
 
-            assert error.message.include? "missing: wrappy@1"
+            assert error.message.include? "missing: glob@^7"
+          end
+        end
+      end
+
+      it "sets errors on missing dependencies" do
+        # this test is incompatible with npm <7.12.0, (possibly earlier versions as well, I haven't been able to verify)
+        skip if source.npm_version < Gem::Version.new("7.12.0")
+
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "npm")
+          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
+
+          Dir.chdir dir do
+            glob = source.dependencies.find { |dep| dep.name == "glob" }
+            assert glob.version
+            assert_includes glob.errors, "missing: glob@^7.1.3, required by rimraf@2.7.1"
+          end
+        end
+      end
+
+      it "does not set errors on packages with reported problems that have a path" do
+        # this test is incompatible with npm <7.12.0, (possibly earlier versions as well, I haven't been able to verify)
+        skip if source.npm_version < Gem::Version.new("7.12.0")
+
+        Dir.mktmpdir do |dir|
+          FileUtils.cp_r(fixtures, dir)
+          dir = File.join(dir, "npm")
+          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
+
+          Dir.chdir dir do
+            # balanced-match is an extraneous dependency
+            dep = source.dependencies.find { |dep| dep.name == "balanced-match" }
+            assert dep
+            assert_empty dep.errors
           end
         end
       end
