@@ -314,13 +314,13 @@ if Licensed::Shell.tool_available?("go")
           Dir.chdir fixtures do
             dep = source.dependencies.detect { |d| d.name == "github.com/davecgh/go-spew/spew" }
             assert dep
-  
+
             # find the license one directory higher
             license_path = File.join(fixtures, "vendor/github.com/davecgh/go-spew/LICENSE")
             license = dep.record.licenses.find { |l| l.sources == ["go-spew/LICENSE"] }
             assert license
             assert_equal File.read(license_path), license.text
-  
+
             # do not find the license outside the vendor folder
             assert_nil dep.record.licenses.find { |l| l.sources == ["LICENSE"] }
           end
@@ -336,28 +336,28 @@ if Licensed::Shell.tool_available?("go")
         end
       end
 
-      # describe "from a subfolder source_path" do
-      #   let(:fixtures) { File.join(gopath, "src/modules_test/cmd/command") }
+      describe "from a subfolder source_path" do
+        let(:fixtures) { File.join(gopath, "src/modules_test/cmd/command") }
 
-      #   it "includes direct dependencies" do
-      #     Dir.chdir fixtures do
-      #       dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
-      #       assert dep
-      #       assert_equal "go", dep.record["type"]
-      #       assert dep.record["homepage"]
-      #       assert dep.record["summary"]
-      #     end
-      #   end
+        it "includes direct dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
+            assert dep
+            assert_equal "go", dep.record["type"]
+            assert dep.record["homepage"]
+            assert dep.record["summary"]
+          end
+        end
 
-      #   it "includes indirect dependencies" do
-      #     Dir.chdir fixtures do
-      #       dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
-      #       assert dep
-      #       assert_equal "go", dep.record["type"]
-      #       assert dep.record["homepage"]
-      #     end
-      #   end
-      # end
+        it "includes indirect dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
+            assert dep
+            assert_equal "go", dep.record["type"]
+            assert dep.record["homepage"]
+          end
+        end
+      end
     end
 
     describe "search_root" do
