@@ -1,11 +1,12 @@
 expected_dependency: github.com/gorilla/context
-cache_path: test/fixtures/go/.licenses
+cache_path: .licenses
+root: ../go/src/modules_test
 go:
-  GOPATH: test/fixtures/go
+  GOPATH: ../..
 
 apps:
-  - source_path: test/fixtures/go/src/test
-  - source_path: test/fixtures/go/src/test/cmd
+  - source_path: .
+  - source_path: cmd
 
 sources:
   go: true
