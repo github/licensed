@@ -1,4 +1,4 @@
-package test
+package command
 
 import (
 	"github.com/davecgh/go-spew/spew"
@@ -14,5 +14,4 @@ func main() {
 	i := 1
 	spew.Dump(i)
 	testpackage.HelloWorld()
-	world.HelloWorld()
 }

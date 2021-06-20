@@ -5,8 +5,8 @@ require "tmpdir"
 if Licensed::Shell.tool_available?("go")
   describe Licensed::Sources::Go do
     let(:gopath) { File.expand_path("../../fixtures/go", __FILE__) }
-    let(:fixtures) { File.join(gopath, "src/test") }
-    let(:root) { File.join(gopath, "src/test") }
+    let(:fixtures) { File.join(gopath, "src/modules_test") }
+    let(:root) { File.join(gopath, "src/modules_test") }
     let(:config) { Licensed::AppConfiguration.new({ "go" => { "GOPATH" => gopath }, "source_path" => fixtures, "root" => root }) }
     let(:source) { Licensed::Sources::Go.new(config) }
 
@@ -77,6 +77,18 @@ if Licensed::Shell.tool_available?("go")
     end
 
     describe "dependencies" do
+      let(:fixtures) { File.join(gopath, "src/test") }
+      let(:root) { File.join(gopath, "src/test") }
+
+      go_module_env = ENV["GO111MODULE"]
+      before do
+        ENV["GO111MODULE"] = "off"
+      end
+
+      after do
+        ENV["GO111MODULE"] = go_module_env
+      end
+
       it "does not include the current package" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name.end_with?("test") }
@@ -175,27 +187,6 @@ if Licensed::Shell.tool_available?("go")
       end
 
       describe "package version" do
-        describe "with go module information" do
-          let(:fixtures) { File.join(gopath, "src/modules_test") }
-
-          before do
-            skip unless source.go_version >= Gem::Version.new("1.11.0")
-            ENV["GO111MODULE"] = "on"
-          end
-
-          after do
-            ENV["GO111MODULE"] = nil
-          end
-
-          it "is the module version" do
-            Dir.chdir fixtures do
-              dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-              assert_equal "v1.1.1", dep.version
-            end
-          end
-        end
-
-        describe "without go module information" do
           it "is the latest git SHA of the package directory when configured" do
             Dir.chdir fixtures do
               dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
@@ -210,35 +201,6 @@ if Licensed::Shell.tool_available?("go")
               assert_equal source.contents_hash(Dir["#{dep.path}/*"]), dep.version
             end
           end
-        end
-      end
-
-      describe "with vendored go modules" do
-        let(:fixtures) { File.join(gopath, "src/modules_test") }
-        let(:root) { File.join(gopath, "src/modules_test") }
-
-        before do
-          skip unless source.go_version >= Gem::Version.new("1.11.0")
-
-          ENV["GO111MODULE"] = "on"
-          Dir.chdir fixtures do
-            Licensed::Shell.execute("go", "mod", "vendor")
-          end
-        end
-
-        after do
-          ENV["GO111MODULE"] = nil
-          FileUtils.rm_rf(File.join(fixtures, "vendor"))
-        end
-
-        it "is the module version" do
-          config["go"] = { "mod" => "vendor" }
-          Dir.chdir fixtures do
-            source.dependencies.each do |dep|
-              assert dep.path.include?("vendor/")
-            end
-          end
-        end
       end
 
       describe "from a subfolder source_path" do
@@ -276,6 +238,134 @@ if Licensed::Shell.tool_available?("go")
 
             # do not find the license outside the vendor folder
             assert_nil dep.record.licenses.find { |l| l.sources == ["LICENSE"] }
+          end
+        end
+      end
+    end
+
+    describe "module dependencies" do
+      go_module_env = ENV["GO111MODULE"]
+      before do
+        ENV["GO111MODULE"] = "on"
+      end
+
+      after do
+        ENV["GO111MODULE"] = go_module_env
+      end
+
+      it "does not include the current package" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name.end_with?("test") }
+          refute dep
+        end
+      end
+
+      it "does not include any local, non vendored packages" do
+        Dir.chdir fixtures do
+          refute source.dependencies.detect { |d| d.name == "test/pkg/world" }
+        end
+      end
+
+      it "includes direct dependencies" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
+          assert dep
+          assert_equal "go", dep.record["type"]
+          assert dep.record["homepage"]
+          assert dep.record["summary"]
+          assert_equal "v0.5.0", dep.version
+        end
+      end
+
+      it "includes indirect dependencies" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
+          assert dep
+          assert_equal "go", dep.record["type"]
+          assert dep.record["homepage"]
+        end
+      end
+
+      it "doesn't include dependencies from the go std library" do
+        Dir.chdir fixtures do
+          refute source.dependencies.any? { |d| d.name == "runtime" }
+        end
+      end
+
+      it "doesn't include vendored dependencies from the go std library" do
+        Dir.chdir fixtures do
+          refute source.dependencies.any? { |d| d.name == "golang.org/x/net/http2/hpack" }
+        end
+      end
+
+      it "searches for license files in the folder hierarchy up to GOPATH" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
+          assert dep
+          license_path = File.join(dep.path, "../LICENSE")
+          license = dep.record.licenses.find { |l| l.sources.any? { |s| s =~ /golang-lru@[^\/]*\/LICENSE/ } }
+          assert license
+          assert_equal File.read(license_path), license.text
+        end
+      end
+
+      describe "with vendored go modules" do
+        before do
+          Dir.chdir fixtures do
+            Licensed::Shell.execute("go", "mod", "vendor")
+          end
+          config["go"]["mod"] = "vendor"
+        end
+
+        after do
+          FileUtils.rm_rf(File.join(fixtures, "vendor"))
+        end
+
+        it "searches for license files under the vendor folder for vendored dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/davecgh/go-spew/spew" }
+            assert dep
+
+            # find the license one directory higher
+            license_path = File.join(fixtures, "vendor/github.com/davecgh/go-spew/LICENSE")
+            license = dep.record.licenses.find { |l| l.sources == ["go-spew/LICENSE"] }
+            assert license
+            assert_equal File.read(license_path), license.text
+
+            # do not find the license outside the vendor folder
+            assert_nil dep.record.licenses.find { |l| l.sources == ["LICENSE"] }
+          end
+        end
+
+        it "sets the error field on a missing dependency" do
+          FileUtils.rm_rf(File.join(fixtures, "vendor/github.com/hashicorp/golang-lru"))
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
+            assert dep
+            assert dep.errors.any? { |e| e =~ /cannot find package.*github\.com\/hashicorp\/golang-lru/im }
+          end
+        end
+      end
+
+      describe "from a subfolder source_path" do
+        let(:fixtures) { File.join(gopath, "src/modules_test/cmd/command") }
+
+        it "includes direct dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru" }
+            assert dep
+            assert_equal "go", dep.record["type"]
+            assert dep.record["homepage"]
+            assert dep.record["summary"]
+          end
+        end
+
+        it "includes indirect dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/hashicorp/golang-lru/simplelru" }
+            assert dep
+            assert_equal "go", dep.record["type"]
+            assert dep.record["homepage"]
           end
         end
       end
@@ -320,7 +410,7 @@ if Licensed::Shell.tool_available?("go")
     end
 
     describe "go_std_package?" do
-      let(:root_package_import_path) { "test" }
+      let(:root_package_import_path) { "modules_test" }
 
       before do
         source.stubs(:root_package).returns("ImportPath" => root_package_import_path)

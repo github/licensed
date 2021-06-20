@@ -125,10 +125,10 @@ module Licensed
       def self.add_gradle_license_report_plugins_block(gradle_build_file)
 
         if gradle_build_file.include? "plugins"
-          gradle_build_file.gsub(/(?<=plugins)\s+{/, " { id 'com.github.jk1.dependency-license-report' version '1.6'")
+          gradle_build_file.gsub(/(?<=plugins)\s+{/, " { id 'com.github.jk1.dependency-license-report' version '1.16'")
         else
 
-          gradle_build_file = " plugins { id 'com.github.jk1.dependency-license-report' version '1.6' }" + gradle_build_file
+          gradle_build_file = " plugins { id 'com.github.jk1.dependency-license-report' version '1.16' }" + gradle_build_file
         end
       end
 

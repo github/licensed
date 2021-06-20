@@ -25,7 +25,7 @@ if [ "$1" == "-f" ]; then
   fi
 fi
 
-(cd src/test && go get)
+(export GO111MODULE=off && cd src/test && go get)
 if go help mod >/dev/null; then
   (cd src/modules_test && GO111MODULE=on go mod download)
 fi
