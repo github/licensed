@@ -187,6 +187,8 @@ jobs:
       run: script/source-setup/go
     - name: Run tests
       run: script/test go
+      env:
+        GO111MODULE: "on"
 
   gradle:
     runs-on: ubuntu-latest

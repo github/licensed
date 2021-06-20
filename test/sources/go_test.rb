@@ -80,12 +80,13 @@ if Licensed::Shell.tool_available?("go")
       let(:fixtures) { File.join(gopath, "src/test") }
       let(:root) { File.join(gopath, "src/test") }
 
+      go_module_env = ENV["GO111MODULE"]
       before do
         ENV["GO111MODULE"] = "off"
       end
 
       after do
-        ENV["GO111MODULE"] = nil
+        ENV["GO111MODULE"] = go_module_env
       end
 
       it "does not include the current package" do
@@ -243,12 +244,13 @@ if Licensed::Shell.tool_available?("go")
     end
 
     describe "module dependencies" do
+      go_module_env = ENV["GO111MODULE"]
       before do
-        ENV["GO111MODULE"] = "on"  
+        ENV["GO111MODULE"] = "on"
       end
 
       after do
-        ENV["GO111MODULE"] = nil
+        ENV["GO111MODULE"] = go_module_env
       end
 
       it "does not include the current package" do
