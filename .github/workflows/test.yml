@@ -192,7 +192,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '16' ]
+        # TODO: the reporting plugin used to gather data is not yet fully compatible with
+        # gradle 7, which is needed for compatibility with Java 16.  after compatibility issues
+        # are resolved, update this matrix list with '16'.
+        # possibly fixed by https://github.com/jk1/Gradle-License-Report/pull/166
+        java: [ '11' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
