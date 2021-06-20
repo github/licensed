@@ -243,6 +243,14 @@ if Licensed::Shell.tool_available?("go")
     end
 
     describe "module dependencies" do
+      before do
+        ENV["GO111MODULE"] = "on"  
+      end
+
+      after do
+        ENV["GO111MODULE"] = nil
+      end
+
       it "does not include the current package" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name.end_with?("test") }
