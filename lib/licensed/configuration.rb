@@ -154,7 +154,7 @@ module Licensed
 
       # apply a root setting to all app configurations so that it's available
       # when expanding app source paths
-      apps.each { |app| app["root"] ||= options["root"] if options["root"] } 
+      apps.each { |app| app["root"] ||= options["root"] if options["root"] }
 
       apps = apps.flat_map { |app| self.class.expand_app_source_path(app) }
       @apps = apps.map { |app| AppConfiguration.new(app, options) }
