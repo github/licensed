@@ -35,6 +35,11 @@ if Licensed::Shell.tool_available?("bundle")
     end
 
     describe "gemfile_path" do
+      bundle_gemfile = ENV["BUNDLE_GEMFILE"]
+      after do
+        ENV["BUNDLE_GEMFILE"] = bundle_gemfile
+      end
+
       it "returns a the path to Gemfile local to the current directory" do
         Dir.mktmpdir do |tmp|
           bundle_gemfile_path = File.join(tmp, "gems.rb")
