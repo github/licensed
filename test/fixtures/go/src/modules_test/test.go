@@ -1,9 +1,6 @@
 package test
 
 import (
-	"modules_test/internal/fakevendor/github.com/owner/repo"
-	"modules_test/pkg/world"
-
 	"github.com/davecgh/go-spew/spew"
 	ctx "github.com/gorilla/context"
 	lru "github.com/hashicorp/golang-lru"
