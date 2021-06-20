@@ -304,6 +304,7 @@ if Licensed::Shell.tool_available?("go")
           Dir.chdir fixtures do
             Licensed::Shell.execute("go", "mod", "vendor")
           end
+          config["go"]["mod"] = "vendor"
         end
 
         after do
