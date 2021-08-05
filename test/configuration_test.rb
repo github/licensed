@@ -510,8 +510,8 @@ describe Licensed::AppConfiguration do
           "source_path must be a descendent of the app root to generate an app name from the relative source_path"
       end
 
-      it "raises an error when the configuration value is less than -1" do
-        options["name"] = { "generator" => "relative_path", "depth" => -2 }
+      it "raises an error when the configuration value is less than 0" do
+        options["name"] = { "generator" => "relative_path", "depth" => -1 }
         options["source_path"] = "lib/licensed/sources"
         error = assert_raises Licensed::Configuration::LoadError do
           config
