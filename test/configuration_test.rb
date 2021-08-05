@@ -492,6 +492,12 @@ describe Licensed::AppConfiguration do
         assert_equal config["name"], "licensed"
       end
 
+      it "uses all path parts when depth is larger than the number of path parts" do
+        options["name"] = { "generator" => "relative_path", "depth" => 10 }
+        options["source_path"] = "lib/licensed/sources"
+        assert_equal "lib-licensed-sources", config["name"]
+      end
+
       it "raises an error when generating a relative path name if source_path is not a descendant of the app root" do
         options["name"] = { "generator" => "relative_path" }
         options["root"] = Licensed::Git.repository_root
@@ -502,6 +508,17 @@ describe Licensed::AppConfiguration do
 
         assert_equal error.message,
           "source_path must be a descendent of the app root to generate an app name from the relative source_path"
+      end
+
+      it "raises an error when the configuration value is less than -1" do
+        options["name"] = { "generator" => "relative_path", "depth" => -2 }
+        options["source_path"] = "lib/licensed/sources"
+        error = assert_raises Licensed::Configuration::LoadError do
+          config
+        end
+
+        assert_equal error.message,
+          "name.depth configuration value cannot be less than -1"
       end
     end
   end

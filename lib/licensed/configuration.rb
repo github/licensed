@@ -176,8 +176,18 @@ module Licensed
       name_parts = source_path_parts[root_path_parts.size..-1]
 
       separator = self.dig("name", "separator") || DEFAULT_RELATIVE_PATH_NAME_SEPARATOR
-      depth = (self.dig("name", "depth") || 0) - 1
-      name_parts[(-1 - depth)..-1].join(separator)
+      depth = self.dig("name", "depth") || 0
+      if depth < 0
+        raise Licensed::Configuration::LoadError, "name.depth configuration value cannot be less than -1"
+      end
+
+      # offset the depth value by -1 to work as an offset from the end of the array
+      # 0 becomes -1, with a start index of (-1 - -1) = 0, or the full array
+      # 1 becomes 0, with a start index of (-1 - 0) = -1, or only the last element
+      # and so on...
+      depth = depth - 1
+      start_index = depth >= name_parts.length ? 0 : -1 - depth
+      name_parts[start_index..-1].join(separator)
     end
   end
 
