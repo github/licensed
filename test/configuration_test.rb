@@ -262,58 +262,14 @@ describe Licensed::Configuration do
 end
 
 describe Licensed::AppConfiguration do
-  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
+  let(:options) { { "source_path" => Dir.pwd } }
+  let(:config) { Licensed::AppConfiguration.new(options) }
   let(:fixtures) { File.expand_path("../fixtures/config", __FILE__) }
 
   it "raises an error if source_path is not set" do
     assert_raises ::Licensed::Configuration::LoadError do
       Licensed::AppConfiguration.new
     end
-  end
-
-  it "uses a default name" do
-    assert_equal "licensed", config["name"]
-  end
-
-  it "sets a default cache path with the app name if not configured" do
-    assert_equal config.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, config["name"]),
-                 config.cache_path
-  end
-
-  it "appends the app name to an inherited cache path" do
-    config = Licensed::AppConfiguration.new(
-      { "source_path" => Dir.pwd },
-      { "cache_path" => "vendor/cache" }
-    )
-    assert_equal config.root.join("vendor/cache", config["name"]), config.cache_path
-  end
-
-  it "does not append the app name to an explicit cache path" do
-    config = Licensed::AppConfiguration.new(
-      { "source_path" => Dir.pwd, "cache_path" => "vendor/cache" }
-    )
-    assert_equal config.root.join("vendor/cache"), config.cache_path
-    refute config.cache_path.to_s.end_with? config["name"]
-  end
-
-  it "applies an inherited shared_cache setting to an inherited cache path" do
-    config = Licensed::AppConfiguration.new(
-      { "source_path" => Dir.pwd },
-      { "shared_cache" => true, "cache_path" => "vendor/cache" }
-    )
-
-    assert_equal config.root.join("vendor/cache"), config.cache_path
-    refute config.cache_path.to_s.end_with? config["name"]
-  end
-
-  it "does not apply an inherited shared_cache setting to the default cache path" do
-    config = Licensed::AppConfiguration.new(
-      { "source_path" => Dir.pwd },
-      { "shared_cache" => true }
-    )
-
-    assert_equal config.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, config["name"]),
-                 config.cache_path
   end
 
   describe "ignore" do
@@ -479,6 +435,134 @@ describe Licensed::AppConfiguration do
 
     it "defaults to the git repository root" do
       assert_equal Licensed::Git.repository_root, config.root.to_s
+    end
+  end
+
+  describe "name" do
+    it "raises an error if name.generator is not an allowed value" do
+      options["name"] = { "generator" => true }
+      options["source_path"] = "lib/licensed/sources"
+      error = assert_raises Licensed::Configuration::LoadError do
+        config
+      end
+
+      assert_includes error.message, "Invalid value configured for name.generator: true"
+    end
+
+    it "uses the source path directory name when a name value is not set" do
+      assert_equal "licensed", config["name"]
+    end
+
+    it "uses the source path directory name when name.generator is not set" do
+      options["name"] = {}
+      assert_equal "licensed", config["name"]
+    end
+
+    describe "with directory_name generator" do
+      it "uses the source path directory name" do
+        options["name"] = { "generator" => "directory_name" }
+        assert_equal "licensed", config["name"]
+      end
+    end
+
+    describe "with relative_path generator" do
+      it "generates a name from relative source path parts" do
+        options["name"] = { "generator" => "relative_path" }
+        options["source_path"] = "lib/licensed/sources"
+        assert_equal "lib-licensed-sources", config["name"]
+      end
+
+      it "uses a configured separator when creating a name from relative source path parts" do
+        options["name"] = { "generator" => "relative_path", "separator" => "." }
+        options["source_path"] = "lib/licensed/sources"
+        assert_equal "lib.licensed.sources", config["name"]
+      end
+
+      it "uses a configured path depth when creating a name from relative source path parts" do
+        options["name"] = { "generator" => "relative_path", "depth" => 2 }
+        options["source_path"] = "lib/licensed/sources"
+        assert_equal "licensed-sources", config["name"]
+      end
+
+      it "handles equivalent root and source paths" do
+        options["name"] = { "generator" => "relative_path" }
+        options["root"] = Licensed::Git.repository_root
+        options["source_path"] = Licensed::Git.repository_root
+
+        assert_equal config["name"], "licensed"
+      end
+
+      it "uses all path parts when depth is larger than the number of path parts" do
+        options["name"] = { "generator" => "relative_path", "depth" => 4 }
+        options["source_path"] = "lib/licensed/sources"
+        assert_equal "lib-licensed-sources", config["name"]
+      end
+
+      it "raises an error when generating a relative path name if source_path is not a descendant of the app root" do
+        options["name"] = { "generator" => "relative_path" }
+        options["root"] = Licensed::Git.repository_root
+        options["source_path"] = "/bad/test/path"
+        error = assert_raises Licensed::Configuration::LoadError do
+          config
+        end
+
+        assert_equal error.message,
+          "source_path must be a descendent of the app root to generate an app name from the relative source_path"
+      end
+
+      it "raises an error when the configuration value is less than 0" do
+        options["name"] = { "generator" => "relative_path", "depth" => -1 }
+        options["source_path"] = "lib/licensed/sources"
+        error = assert_raises Licensed::Configuration::LoadError do
+          config
+        end
+
+        assert_equal error.message,
+          "name.depth configuration value cannot be less than -1"
+      end
+    end
+  end
+
+  describe "cache_path" do
+    it "sets a default cache path with the app name if not configured" do
+      assert_equal config.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, config["name"]),
+                   config.cache_path
+    end
+
+    it "appends the app name to an inherited cache path" do
+      config = Licensed::AppConfiguration.new(
+        { "source_path" => Dir.pwd },
+        { "cache_path" => "vendor/cache" }
+      )
+      assert_equal config.root.join("vendor/cache", config["name"]), config.cache_path
+    end
+
+    it "does not append the app name to an explicit cache path" do
+      config = Licensed::AppConfiguration.new(
+        { "source_path" => Dir.pwd, "cache_path" => "vendor/cache" }
+      )
+      assert_equal config.root.join("vendor/cache"), config.cache_path
+      refute config.cache_path.to_s.end_with? config["name"]
+    end
+
+    it "applies an inherited shared_cache setting to an inherited cache path" do
+      config = Licensed::AppConfiguration.new(
+        { "source_path" => Dir.pwd },
+        { "shared_cache" => true, "cache_path" => "vendor/cache" }
+      )
+
+      assert_equal config.root.join("vendor/cache"), config.cache_path
+      refute config.cache_path.to_s.end_with? config["name"]
+    end
+
+    it "does not apply an inherited shared_cache setting to the default cache path" do
+      config = Licensed::AppConfiguration.new(
+        { "source_path" => Dir.pwd },
+        { "shared_cache" => true }
+      )
+
+      assert_equal config.root.join(Licensed::AppConfiguration::DEFAULT_CACHE_PATH, config["name"]),
+                   config.cache_path
     end
   end
 end

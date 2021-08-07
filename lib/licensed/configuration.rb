@@ -3,9 +3,14 @@ require "pathname"
 
 module Licensed
   class AppConfiguration < Hash
+    DIRECTORY_NAME_GENERATOR_KEY = "directory_name".freeze
+    RELATIVE_PATH_GENERATOR_KEY = "relative_path".freeze
+    DEFAULT_RELATIVE_PATH_NAME_SEPARATOR = "-".freeze
+    ALL_NAME_GENERATOR_KEYS = [DIRECTORY_NAME_GENERATOR_KEY, RELATIVE_PATH_GENERATOR_KEY].freeze
+
     DEFAULT_CACHE_PATH = ".licenses".freeze
 
-    # Returns the root for a configuration in following order of precendence:
+    # Returns the root for a configuration in following order of precedence:
     # 1. explicitly configured "root" property
     # 2. a found git repository root
     # 3. the current directory
@@ -28,9 +33,9 @@ module Licensed
       self["ignored"] ||= {}
       self["allowed"] ||= []
       self["root"] = AppConfiguration.root_for(self)
-      # defaults to the directory name of the source path if not set
-      self["name"] ||= File.basename(self["source_path"])
-      # setting the cache path might need a valid app name
+      self["name"] = generate_app_name
+      # setting the cache path might need a valid app name.
+      # this must come after setting self["name"]
       self["cache_path"] = detect_cache_path(options, inherited_options)
     end
 
@@ -105,8 +110,9 @@ module Licensed
 
     # Returns the cache path for the application based on:
     # 1. An explicitly set cache path for the application, if set
-    # 2. An inherited root cache path joined with the app name
-    # 3. The default cache path joined with the app name
+    # 2. An inherited shared cache path
+    # 3. An inherited cache path joined with the app name if not shared
+    # 4. The default cache path joined with the app name
     def detect_cache_path(options, inherited_options)
       return options["cache_path"] unless options["cache_path"].to_s.empty?
 
@@ -123,6 +129,65 @@ module Licensed
       return if self[property]
       raise Licensed::Configuration::LoadError,
         "App #{self["name"]} is missing required property #{property}"
+    end
+
+    # Returns a name for the application as one of:
+    # 1. An explicitly configured app name, if set
+    # 2. A generated app name based on an configured "name" options hash
+    # 3. A default value - the source_path directory name
+    def generate_app_name
+      # use default_app_name if a name value is not set
+      return source_path_directory_app_name if self["name"].to_s.empty?
+      # keep the same name value unless a hash is given with naming options
+      return self["name"] unless self["name"].is_a?(Hash)
+
+      generator = self.dig("name", "generator")
+      case generator
+      when nil, DIRECTORY_NAME_GENERATOR_KEY
+        source_path_directory_app_name
+      when RELATIVE_PATH_GENERATOR_KEY
+        relative_path_app_name
+      else
+        raise Licensed::Configuration::LoadError,
+          "Invalid value configured for name.generator: #{generator}.  Value must be one of #{ALL_NAME_GENERATOR_KEYS.join(",")}"
+      end
+    end
+
+    # Returns an app name from the directory name of the configured source path
+    def source_path_directory_app_name
+      File.basename(self["source_path"])
+    end
+
+    # Returns an app name from the relative path from the configured app root
+    # to the configured app source path.
+    def relative_path_app_name
+      source_path_parts = File.expand_path(self["source_path"]).split("/")
+      root_path_parts = File.expand_path(self["root"]).split("/")
+
+      # if the source path is equivalent to the root path,
+      # return the root directory name
+      return root_path_parts[-1] if source_path_parts == root_path_parts
+
+      if source_path_parts[0..root_path_parts.size-1] != root_path_parts
+        raise Licensed::Configuration::LoadError,
+          "source_path must be a descendent of the app root to generate an app name from the relative source_path"
+      end
+
+      name_parts = source_path_parts[root_path_parts.size..-1]
+
+      separator = self.dig("name", "separator") || DEFAULT_RELATIVE_PATH_NAME_SEPARATOR
+      depth = self.dig("name", "depth") || 0
+      if depth < 0
+        raise Licensed::Configuration::LoadError, "name.depth configuration value cannot be less than -1"
+      end
+
+      # offset the depth value by -1 to work as an offset from the end of the array
+      # 0 becomes -1, with a start index of (-1 - -1) = 0, or the full array
+      # 1 becomes 0, with a start index of (-1 - 0) = -1, or only the last element
+      # and so on...
+      depth = depth - 1
+      start_index = depth >= name_parts.length ? 0 : -1 - depth
+      name_parts[start_index..-1].join(separator)
     end
   end
 
@@ -204,7 +269,7 @@ module Licensed
       # will handle configurations that don't have these explicitly set
       configs.each do |config|
         dir_name = File.basename(config["source_path"])
-        config["name"] = "#{config["name"]}-#{dir_name}" if config["name"]
+        config["name"] = "#{config["name"]}-#{dir_name}" if config["name"].is_a?(String)
 
         # if a cache_path is set and is not marked as shared, append the app name
         # to the end of the cache path to make a unique cache path for the app
