@@ -22,6 +22,18 @@ Dependency records will be saved if:
 
 After the cache command is run, any cached records that don't match up to a current application dependency will be deleted.
 
+### Reported Data
+
+The following data is reported for each dependency when the YAML or JSON report formats are used
+
+- name: the licensed recognized name for the dependency including the app and source name
+   - e.g. the full name for the `thor` bundler dependency used by this tool is `licensed.bundler.thor`
+- cached: true when the dependency's cached metadata file was updated, false otherwise
+- version: the version of the enumerated dependency
+- license: the dependency's SPDX license identifier
+- filename: the full path on disk to the dependency's cached metadata file, if available
+- warnings: any warning messages encountered while enumerating and caching dependency metadata, if available
+
 ## `status`
 
 The status command finds all dependencies and checks whether each dependency has a valid cached record.

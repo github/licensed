@@ -216,6 +216,36 @@ describe Licensed::Commands::Cache do
     assert_includes report.errors, "dependency path not found"
   end
 
+  it "reports the detected license" do
+    run_command
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+    assert_equal "mit", report["license"]
+  end
+
+  it "reports the cached file name" do
+    run_command
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+    assert report["filename"].end_with? "test/dependency.#{Licensed::DependencyRecord::EXTENSION}"
+  end
+
+  it "reports whether the cached metadata file was updated" do
+    run_command
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+    assert report["cached"]
+
+    reporter.report.all_reports.clear
+
+    run_command
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+    refute report["cached"]
+  end
+
+  it "reports the dependency version" do
+    run_command
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
+    assert_equal "1.0", report["version"]
+  end
+
   it "changes the current directory to app.source_path while running" do
     config.apps.each do |app|
       app["source_path"] = fixtures

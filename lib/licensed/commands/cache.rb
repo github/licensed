@@ -70,6 +70,12 @@ module Licensed
 
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
         cached_record = Licensed::DependencyRecord.read(filename)
+
+        report["cached"] = false
+        report["license"] = cached_record["license"] if cached_record
+        report["filename"] = filename.to_s
+        report["version"] = dependency.version
+
         if options[:force] || save_dependency_record?(dependency, cached_record)
           if dependency.record.matches?(cached_record)
             # use the cached license value if the license text wasn't updated
@@ -82,6 +88,7 @@ module Licensed
 
           dependency.record.save(filename)
           report["cached"] = true
+          report["license"] = dependency.record["license"]
         end
 
         if !dependency.exist?
