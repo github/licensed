@@ -2,8 +2,6 @@
 
 The cache command finds all dependencies and ensures that each dependency has an up-to-date cached record.
 
-An optional `--sources` flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
-
 Dependency records will be saved if:
 
 1. The `force` option is set

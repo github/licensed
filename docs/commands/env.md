@@ -5,8 +5,6 @@ Prints the runtime environment used by licensed after loading a configuration fi
 ## Options
 
 - `--config`/`-c`: the path to the licensed configuration file
-   - required: true
    - default value: `./.licensed.yml`
 - `--format`/`-f`: the output format
-   - required: false
    - default value: `yaml`
