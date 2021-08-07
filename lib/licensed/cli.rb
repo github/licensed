@@ -20,8 +20,6 @@ module Licensed
     end
 
     desc "status", "Check status of dependencies' cached licenses"
-    method_option :format, enum: ["yaml", "json"],
-      desc: "Output format"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     method_option :sources, aliases: "-s", type: :array,
