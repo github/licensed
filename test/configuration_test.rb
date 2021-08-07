@@ -493,7 +493,7 @@ describe Licensed::AppConfiguration do
       end
 
       it "uses all path parts when depth is larger than the number of path parts" do
-        options["name"] = { "generator" => "relative_path", "depth" => 10 }
+        options["name"] = { "generator" => "relative_path", "depth" => 4 }
         options["source_path"] = "lib/licensed/sources"
         assert_equal "lib-licensed-sources", config["name"]
       end
