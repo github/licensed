@@ -117,7 +117,7 @@ describe Licensed::Commands::List do
       refute dependencies.any? { |dependency| dependency["license"] }
     end
 
-    it "is included in depenency reports if the license CLI flag is set" do
+    it "is included in dependency reports if the license CLI flag is set" do
       run_command(licenses: true)
       dependencies = reporter.report.all_reports.select { |r| r.target.is_a?(Licensed::Dependency) }
       assert dependencies.all? { |dependency| dependency["license"] }

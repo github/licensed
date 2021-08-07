@@ -6,7 +6,18 @@ Run `licensed -h` to see help content for running licensed commands.
 
 Running the list command finds the dependencies for all sources in all configured applications.  No additional actions are taken on each dependency.
 
-An optional `--sources` flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
+An optional `--sources` (`-s`) flag can be given to limit which dependency sources are run.  This is a filter over sources that are enabled via the licensed configuration file and cannot be used to run licensed with a disabled source.
+
+An optional `--licenses` (`-l`) flag can be given to include the detected license in the reported output.
+
+### Reported Data
+
+The following data is reported for each dependency when the YAML or JSON report formats are used
+
+- name: the licensed recognized name for the dependency including the app and source name
+   - e.g. the full name for the `thor` bundler dependency used by this tool is `licensed.bundler.thor`
+- version: the version of the enumerated dependency
+- license: (optional) the dependency's SPDX license identifier
 
 ## `cache`
 
