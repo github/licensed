@@ -20,12 +20,12 @@ module Licensed
     end
 
     desc "status", "Check status of dependencies' cached licenses"
-    method_option :format, enum: ["yaml", "json"],
-      desc: "Output format"
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
+    method_option :format, aliases: "-f", enum: ["yaml", "json"],
+      desc: "Output format"
     def status
       run Licensed::Commands::Status.new(config: config), sources: options[:sources], reporter: options[:format]
     end

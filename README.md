@@ -80,8 +80,9 @@ For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/loc
 - `licensed notices`: Write a `NOTICE` file for each application configuration.
 - `licensed version`: Show current installed version of Licensed. Aliases: `-v|--version`
 - `licensed env`: Output environment information from the licensed configuration.
+- `licensed migrate`: Migrate licensed configuration and cached files from a previous major version.
 
-See the [commands documentation](./docs/commands.md) for additional documentation, or run `licensed -h` to see all of the current available commands.
+See the [commands documentation](./docs/commands) for additional documentation, or run `licensed -h` to see all of the current available commands.
 
 ### Automation
 
@@ -165,10 +166,6 @@ end
 ```
 
 See the [documentation on adding new sources](./docs/adding_a_new_source.md) for more information.
-
-#### Adding Commands
-
-See the [documentation on commands](./docs/commands.md) for information about adding a new CLI command.
 
 ## Contributing
 

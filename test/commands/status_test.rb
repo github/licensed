@@ -236,6 +236,35 @@ describe Licensed::Commands::Status do
     refute reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
   end
 
+  it "reports whether a dependency is allowed" do
+    run_command
+
+    reports = reporter.report.all_reports
+    dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
+    refute dependency_report["allowed"]
+
+    config.apps.each do |app|
+      app.sources.each do |source|
+        app.review "type" => source.class.type, "name" => "dependency"
+      end
+    end
+
+    reporter.report.all_reports.clear
+
+    run_command
+
+    reports = reporter.report.all_reports
+    dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
+    assert dependency_report["allowed"]
+  end
+
+  it "reports a cached record's recorded license" do
+    run_command
+    reports = reporter.report.all_reports
+    dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
+    assert_equal "mit", dependency_report["license"]
+  end
+
   describe "with multiple apps" do
     let(:apps) do
       [
