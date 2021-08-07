@@ -49,6 +49,18 @@ A dependency will fail the status checks if:
 5. The cached record is flagged for re-review.
    - This occurs when the record's license text has changed since the record was reviewed.
 
+### Reported Data
+
+The following data is reported for each dependency when the YAML or JSON report formats are used
+
+- name: the licensed recognized name for the dependency including the app and source name
+   - e.g. the full name for the `thor` bundler dependency used by this tool is `licensed.bundler.thor`
+- allowed: true if the dependency has passed all checks, false otherwise
+- version: the version of the enumerated dependency
+- license: the dependency's SPDX license identifier
+- filename: the full path on disk to the dependency's cached metadata file, if available
+- errors: any error messages from failed status checks, if available
+
 ## `notices`
 
 Outputs license and notice text for all dependencies in each app into a `NOTICE` file in the app's `cache_path`.  If an app uses a shared cache path, the file name will contain the app name as well, e.g. `NOTICE.my_app`.

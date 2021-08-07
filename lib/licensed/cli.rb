@@ -26,6 +26,8 @@ module Licensed
       desc: "Path to licensed configuration file"
     method_option :sources, aliases: "-s", type: :array,
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
+    method_option :format, aliases: "-f", enum: ["yaml", "json"],
+      desc: "Output format"
     def status
       run Licensed::Commands::Status.new(config: config), sources: options[:sources], reporter: options[:format]
     end

@@ -47,11 +47,14 @@ module Licensed
       def evaluate_dependency(app, source, dependency, report)
         filename = app.cache_path.join(source.class.type, "#{dependency.name}.#{DependencyRecord::EXTENSION}")
         report["filename"] = filename
+        report["version"] = dependency.version
 
         cached_record = cached_record(filename)
         if cached_record.nil?
+          report["license"] = nil
           report.errors << "cached dependency record not found"
         else
+          report["license"] = cached_record["license"]
           report.errors << "cached dependency record out of date" if cached_record["version"] != dependency.version
           report.errors << "missing license text" if cached_record.licenses.empty?
           if cached_record["review_changed_license"]
@@ -61,7 +64,7 @@ module Licensed
           end
         end
 
-        report.errors.empty?
+        report["allowed"] = report.errors.empty?
       end
 
       # Returns true if a cached record needs further review based on the
