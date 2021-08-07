@@ -29,7 +29,7 @@ module Licensed
         # `loaded_from` if available.
         def spec_file
           return @spec_file if defined?(@spec_file)
-          return @spec_file = nil unless loaded_from && File.exist?(loaded_from)
+          return @spec_file = nil unless loaded_from && File.file?(loaded_from)
           @spec_file = begin
             file = { name: File.basename(loaded_from), dir: File.dirname(loaded_from) }
             Licensee::ProjectFiles::PackageManagerFile.new(File.read(loaded_from), file)
