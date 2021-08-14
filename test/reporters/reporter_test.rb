@@ -21,7 +21,7 @@ describe Licensed::Reporters::Reporter do
 
     it "provides a report to the block" do
       reporter.report_run(command) do |report|
-        assert report.is_a?(Licensed::Reporters::Reporter::Report)
+        assert report.is_a?(Licensed::Report)
         assert_equal command, report.target
         assert_nil report.name
       end
@@ -46,7 +46,7 @@ describe Licensed::Reporters::Reporter do
     it "provides a report to the block" do
       reporter.report_run(command) do
         reporter.report_app(app) do |report|
-          assert report.is_a?(Licensed::Reporters::Reporter::Report)
+          assert report.is_a?(Licensed::Report)
           assert_equal app, report.target
           assert_equal app["name"], report.name
         end
@@ -101,7 +101,7 @@ describe Licensed::Reporters::Reporter do
       reporter.report_run(command) do
         reporter.report_app(app) do
           reporter.report_source(source) do |report|
-            assert report.is_a?(Licensed::Reporters::Reporter::Report)
+            assert report.is_a?(Licensed::Report)
             assert_equal source, report.target
             assert_equal "#{app["name"]}.#{source.class.type}", report.name
           end
@@ -167,7 +167,7 @@ describe Licensed::Reporters::Reporter do
         reporter.report_app(app) do
           reporter.report_source(source) do
             reporter.report_dependency(dependency) do |report|
-              assert report.is_a?(Licensed::Reporters::Reporter::Report)
+              assert report.is_a?(Licensed::Report)
               assert_equal dependency, report.target
               assert_equal "#{app["name"]}.#{source.class.type}.#{dependency.name}", report.name
             end
@@ -191,48 +191,6 @@ describe Licensed::Reporters::Reporter do
       assert_raises Licensed::Reporters::Reporter::ReportingError do
         reporter.report_dependency(dependency) {}
       end
-    end
-  end
-end
-
-describe Licensed::Reporters::Reporter::Report do
-  let(:report) { Licensed::Reporters::Reporter::Report.new(name: "test", target: nil) }
-
-  describe "#to_h" do
-    it "includes hash data" do
-      report[:key1] = "value1"
-      report["key2"] = "value2"
-
-      output = report.to_h
-      assert_equal "value1", output[:key1]
-      assert_equal "value2", output["key2"]
-    end
-
-    it "includes the report name if the name key isn't already set" do
-      output = report.to_h
-      assert_equal "test", output["name"]
-
-      report["name"] = "test_updated"
-      output = report.to_h
-      assert_equal "test_updated", output["name"]
-    end
-
-    it "includes warnings when set" do
-      output = report.to_h
-      assert_nil output["warnings"]
-
-      report.warnings << "warning"
-      output = report.to_h
-      assert_equal ["warning"], output["warnings"]
-    end
-
-    it "includes errors when set" do
-      output = report.to_h
-      assert_nil output["errors"]
-
-      report.errors << "error"
-      output = report.to_h
-      assert_equal ["error"], output["errors"]
     end
   end
 end
