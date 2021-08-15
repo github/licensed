@@ -260,19 +260,6 @@ describe Licensed::Commands::Cache do
     end
   end
 
-  it "skips a dependency sources not specified in optional :sources argument" do
-    run_command(sources: "alternate")
-
-    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
-    refute_empty report.warnings
-    assert report.warnings.any? { |w| w == "skipped source" }
-
-    config.apps.each do |app|
-      path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
-      refute Licensed::DependencyRecord.read(path)
-    end
-  end
-
   describe "with multiple apps" do
     let(:apps) do
       [

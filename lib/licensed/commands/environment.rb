@@ -29,12 +29,6 @@ module Licensed
         end
       end
 
-      def run(**options)
-        super do |report|
-          report["git_repo"] = Licensed::Git.git_repo?
-        end
-      end
-
       # Returns the default reporter to use during the command run
       #
       # options - The options the command was run with
@@ -46,11 +40,18 @@ module Licensed
 
       protected
 
-      def run_app(app)
-        reporter.report_app(app) do |report|
-          report.merge! AppEnvironment.new(app).to_h
-          true
-        end
+      def run_command(report)
+        report["git_repo"] = Licensed::Git.git_repo?
+        super
+      end
+
+      def run_app(app, report)
+        report.merge! AppEnvironment.new(app).to_h
+        super
+      end
+
+      def run_source(app, source, report)
+        true
       end
     end
   end

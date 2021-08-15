@@ -18,23 +18,12 @@ module Licensed
       def run(**options)
         @options = options
         @reporter = create_reporter(options)
-        begin
-          result = reporter.report_run(self) do |report|
-            # allow additional report data to be given by commands
-            if block_given?
-              next true if (yield report) == :skip
-            end
 
-            config.apps.sort_by { |app| app["name"] }
-                       .map { |app| run_app(app) }
-                       .all?
-          end
-        ensure
-          @options = nil
-          @reporter = nil
-        end
-
-        result
+        command_report = Licensed::Report.new(name: nil, target: self)
+        run_command(command_report)
+      ensure
+        @options = nil
+        @reporter = nil
       end
 
       # Creates a reporter to use during a command run
@@ -64,36 +53,66 @@ module Licensed
 
       protected
 
+      # Run the command for all application configurations
+      #
+      # report - A Licensed::Report object for this command
+      #
+      # Returns whether the command succeeded
+      def run_command(report)
+        reporter.begin_report_command(self, report)
+        apps = config.apps.sort_by { |app| app["name"] }
+        results = apps.map do |app|
+          app_report = Licensed::Report.new(name: app["name"], target: app)
+          report.reports << app_report
+          run_app(app, app_report)
+        end
+
+        result = results.all?
+
+        yield(result) if block_given?
+
+        result
+      ensure
+        reporter.end_report_command(self, report)
+      end
+
       # Run the command for all enabled sources for an application configuration,
       # recording results in a report.
       #
       # app - An application configuration
+      # report - A report object for this application
       #
       # Returns whether the command succeeded for the application.
-      def run_app(app)
-        reporter.report_app(app) do |report|
-          # ensure the app source path exists before evaluation
-          if !Dir.exist?(app.source_path)
-            report.errors << "No such directory #{app.source_path}"
-            next false
-          end
+      def run_app(app, report)
+        reporter.begin_report_app(app, report)
 
-          Dir.chdir app.source_path do
-            begin
-              # allow additional report data to be given by commands
-              if block_given?
-                next true if (yield report) == :skip
-              end
-
-              app.sources.select(&:enabled?)
-                         .sort_by { |source| source.class.type }
-                         .map { |source| run_source(app, source) }.all?
-            rescue Licensed::Shell::Error => err
-              report.errors << err.message
-              false
-            end
-          end
+        # ensure the app source path exists before evaluation
+        if !Dir.exist?(app.source_path)
+          report.errors << "No such directory #{app.source_path}"
+          return false
         end
+
+        sources_overrides = Array(options[:sources])
+        Dir.chdir app.source_path do
+          sources = app.sources.select(&:enabled?)
+                               .sort_by { |source| source.class.type }
+          results = sources.map do |source|
+            source_report = Licensed::Report.new(name: [report.name, source.class.type].join("."), target: source)
+            report.reports << source_report
+            run_source(app, source, source_report)
+          end
+
+          result = results.all?
+
+          yield(result) if block_given?
+
+          result
+        end
+      rescue Licensed::Shell::Error => err
+        report.errors << err.message
+        false
+      ensure
+        reporter.end_report_app(app, report)
       end
 
       # Run the command for all enumerated dependencies found in a dependency source,
@@ -101,27 +120,37 @@ module Licensed
       #
       # app - The application configuration for the source
       # source - A dependency source enumerator
+      # report - A report object for this source
       #
       # Returns whether the command succeeded for the dependency source enumerator
-      def run_source(app, source)
-        reporter.report_source(source) do |report|
-          begin
-            # allow additional report data to be given by commands
-            if block_given?
-              next true if (yield report) == :skip
-            end
+      def run_source(app, source, report)
+        reporter.begin_report_source(source, report)
 
-            source.dependencies.sort_by { |dependency| dependency.name }
-                               .map { |dependency| run_dependency(app, source, dependency) }
-                               .all?
-          rescue Licensed::Shell::Error => err
-            report.errors << err.message
-            false
-          rescue Licensed::Sources::Source::Error => err
-            report.errors << err.message
-            false
-          end
+        if !sources_overrides.empty? && !sources_overrides.include?(source.class.type)
+          report.warnings << "skipped source"
+          return true
         end
+
+        dependencies = source.dependencies.sort_by { |dependency| dependency.name }
+        results = dependencies.map do |dependency|
+          dependency_report = Licensed::Report.new(name: [report.name, dependency.name].join("."), target: dependency)
+          report.reports << dependency_report
+          run_dependency(app, source, dependency, dependency_report)
+        end
+
+        result = results.all?
+
+        yield(result) if block_given?
+
+        result
+      rescue Licensed::Shell::Error => err
+        report.errors << err.message
+        false
+      rescue Licensed::Sources::Source::Error => err
+        report.errors << err.message
+        false
+      ensure
+        reporter.end_report_source(source, report)
       end
 
       # Run the command for a dependency, evaluating the dependency and
@@ -131,27 +160,27 @@ module Licensed
       # app - The application configuration for the dependency
       # source - The dependency source enumerator for the dependency
       # dependency - An application dependency
+      # report - A report object for this dependency
       #
       # Returns whether the command succeeded for the dependency
-      def run_dependency(app, source, dependency)
-        reporter.report_dependency(dependency) do |report|
-          if dependency.errors?
-            report.errors.concat(dependency.errors)
-            return false
-          end
+      def run_dependency(app, source, dependency, report)
+        reporter.begin_report_dependency(dependency, report)
 
-          begin
-            # allow additional report data to be given by commands
-            if block_given?
-              next true if (yield report) == :skip
-            end
-
-            evaluate_dependency(app, source, dependency, report)
-          rescue Licensed::DependencyRecord::Error, Licensed::Shell::Error => err
-            report.errors << err.message
-            false
-          end
+        if dependency.errors?
+          report.errors.concat(dependency.errors)
+          return false
         end
+
+        result = evaluate_dependency(app, source, dependency, report)
+
+        yield(result) if block_given?
+
+        result
+      rescue Licensed::DependencyRecord::Error, Licensed::Shell::Error => err
+        report.errors << err.message
+        false
+      ensure
+        reporter.end_report_dependency(dependency, report)
       end
 
       # Evaluate a dependency for the command.  Must be implemented by a command implementation.
@@ -164,6 +193,10 @@ module Licensed
       # Returns whether the command succeeded for the dependency
       def evaluate_dependency(app, source, dependency, report)
         raise "`evaluate_dependency` must be implemented by a command"
+      end
+
+      def sources_overrides
+        @sources_overrides = Array(options[:sources])
       end
     end
   end
