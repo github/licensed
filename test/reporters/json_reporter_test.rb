@@ -5,32 +5,20 @@ require "json"
 describe Licensed::Reporters::JsonReporter do
   let(:shell) { TestShell.new }
   let(:reporter) { Licensed::Reporters::JsonReporter.new(shell) }
+  let(:report) { Licensed::Report.new(name: "report", target: nil) }
+
+  let(:command) { TestCommand.new(config: nil) }
   let(:app) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { TestSource.new(app) }
   let(:dependency) { source.dependencies.first }
-  let(:command) { TestCommand.new(config: nil) }
 
-  describe "#report_run" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        success = true
-      end
-      assert success
-    end
-
-    it "returns the result of the block" do
-      assert_equal 1, reporter.report_run(command) { 1 }
-    end
-
-    it "provides a report hash to the block" do
-      reporter.report_run(command) { |report| refute_nil report }
-    end
-
+  describe "#end_report_command" do
     it "prints any data set as JSON format" do
-      reporter.report_run(command) { |report| report["key"] = "test" }
+      report["key"] = "test"
+      reporter.end_report_command(command, report)
 
       expected_object = {
+        "name" => "report",
         "key" => "test"
       }
       assert_includes shell.messages,
@@ -42,173 +30,31 @@ describe Licensed::Reporters::JsonReporter do
     end
   end
 
-  describe "#report_app" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        reporter.report_app(app) { success = true }
-      end
-      assert success
-    end
+  describe "#end_report_app" do
+    it "sets source report data to the application report" do
+      source_report = Licensed::Report.new(name: "source", target: source)
+      source_report["test_data"] = "data"
+      report.reports << source_report
 
-    it "returns the result of the block" do
-      reporter.report_run(command) do
-        assert_equal 1, reporter.report_app(app) { 1 }
-      end
-    end
+      assert_nil report["sources"]
 
-    it "provides a report hash to the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) { |report| refute_nil report }
-      end
-    end
+      reporter.end_report_app(app, report)
 
-    it "prints any data set as JSON format" do
-      reporter.report_run(command) do
-        reporter.report_app(app) { |report| report["key"] = "test" }
-      end
-
-      expected_object = {
-        "apps" => [
-          {
-            "name" => app["name"],
-            "key" => "test"
-          }
-        ]
-      }
-      assert_includes shell.messages,
-                      {
-                         message: JSON.pretty_generate(expected_object),
-                         newline: true,
-                         style: :info
-                      }
+      assert_equal [source_report.to_h], report["sources"]
     end
   end
 
-  describe "#report_source" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) { success = true }
-        end
-      end
+  describe "#end_report_source" do
+    it "sets dependency report data to the source report" do
+      dependency_report = Licensed::Report.new(name: "source", target: source)
+      dependency_report["test_data"] = "data"
+      report.reports << dependency_report
 
-      assert success
-    end
+      assert_nil report["dependencies"]
 
-    it "returns the result of the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          assert_equal 1, reporter.report_source(source) { 1 }
-        end
-      end
-    end
+      reporter.end_report_source(app, report)
 
-    it "provides a report hash to the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) { |report| refute_nil report }
-        end
-      end
-    end
-
-    it "prints any data set as JSON format" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) { |report| report["key"] = "test" }
-        end
-      end
-
-      expected_object = {
-        "apps" => [
-          {
-            "name" => app["name"],
-            "sources" => [
-              {
-                "name" => "#{app["name"]}.#{source.class.type}",
-                "key" => "test"
-              }
-            ]
-          }
-        ]
-      }
-      assert_includes shell.messages,
-                      {
-                         message: JSON.pretty_generate(expected_object),
-                         newline: true,
-                         style: :info
-                      }
-    end
-  end
-
-  describe "#report_dependency" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) { success = true }
-          end
-        end
-      end
-
-      assert success
-    end
-
-    it "returns the result of the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            assert_equal 1, reporter.report_dependency(dependency) { 1 }
-          end
-        end
-      end
-    end
-
-    it "provides a report hash to the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) { |report| refute_nil report }
-          end
-        end
-      end
-    end
-
-    it "prints any data set as JSON format" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) { |report| report["key"] = "test" }
-          end
-        end
-      end
-
-      expected_object = {
-        "apps" => [
-          {
-            "name" => app["name"],
-            "sources" => [
-              {
-                "name" => "#{app["name"]}.#{source.class.type}",
-                "dependencies" => [
-                  {
-                    "name" => "#{app["name"]}.#{source.class.type}.#{dependency.name}",
-                    "key" => "test"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-      assert_includes shell.messages,
-                      {
-                         message: JSON.pretty_generate(expected_object),
-                         newline: true,
-                         style: :info
-                      }
+      assert_equal [dependency_report.to_h], report["dependencies"]
     end
   end
 end
