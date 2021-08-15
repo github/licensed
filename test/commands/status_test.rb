@@ -199,6 +199,15 @@ describe Licensed::Commands::Status do
     end
   end
 
+  it "reports a link to the documentation on any failures" do
+    # this is the same error case as "warns if license is not allowed"
+    run_command
+
+    command_errors = reporter.report.errors
+    refute_empty command_errors
+    assert command_errors.any? { |e| e =~ /Licensed found errors during source enumeration.  Please see/ }
+  end
+
   it "does not include ignored dependencies in dependency counts" do
     run_command
     count = reporter.report.all_reports.size

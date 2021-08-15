@@ -10,6 +10,22 @@ describe Licensed::Reporters::StatusReporter do
   let(:source) { TestSource.new(app) }
   let(:dependency) { source.dependencies.first }
 
+  describe "#end_report_command" do
+    let(:report) { Licensed::Report.new(name: nil, target: command) }
+
+    it "reports any errors specified on the report object" do
+      report.errors << "command error"
+      reporter.end_report_command(command, report)
+
+      assert_includes shell.messages,
+                      {
+                          message: "command error",
+                          newline: true,
+                          style: :error
+                      }
+    end
+  end
+
   describe "#begin_report_app" do
     let(:report) { Licensed::Report.new(name: app["name"], target: app) }
 

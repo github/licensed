@@ -3,7 +3,16 @@
 module Licensed
   module Reporters
     class StatusReporter < Reporter
+      # Reports any errors encountered at the command level
       #
+      # command - The command being run
+      # report - A report object containing information about the command run
+      def end_report_command(command, report)
+        if report.errors.any?
+          shell.newline
+          report.errors.each { |e| shell.error e }
+        end
+      end
 
       # Reports the start of checking records for an app
       #

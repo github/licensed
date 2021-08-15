@@ -15,6 +15,20 @@ module Licensed
 
       protected
 
+      # Run the comand and set an error message to review the documentation
+      # when any errors have been reported
+      #
+      # report - A Licensed::Report object for this command
+      #
+      # Returns whether the command succeeded based on the call to super
+      def run_command(report)
+        super do |result|
+          next if result
+
+          report.errors << "Licensed found errors during source enumeration.  Please see https://github.com/github/licensed/tree/master/docs/commands/status.md#status-errors-and-resolutions for possible resolutions."
+        end
+      end
+
       # Verifies that a cached record exists, is up to date and
       # has license data that complies with the licensed configuration.
       #
