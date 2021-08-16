@@ -49,7 +49,7 @@ The following data is reported for each dependency when the YAML or JSON report 
 
 ### missing license text
 
-**Cause:** A license file was found or a license determination was otherwise made, but the files contained no usable text
+**Cause:** A license determination was made, e.g. from package metadata, but no license text was found.
 **Resolution:** Manually verify whether the dependency includes a file containing license text.  If the dependency code that was downloaded locally does not contain the license text, please check the dependency source at the version listed in the dependency's cached metadata file to see if there is license text that can be used.
 
 If the dependency does not include license text but does specify that it uses a specific license, please copy the standard license text from a [well known source](https://opensource.org/licenses).
@@ -64,9 +64,9 @@ If the dependency does not include license text but does specify that it uses a 
 **Cause:** A dependency is using a license that is not in the configured [allowed list of licenses][allowed], and the dependency has not been marked [ignored] or [reviewed].
 **Resolution:** Review the dependency's usage and specified license with someone familiar with OSS licensing and compliance rules to determine whether the dependency is allowable.  Some common resolutions:
 
-1. The dependency might need to be marked as [ignored] or [reviewed] if either of those scenarios are applicable.
 1. The dependency's specified license text differed enough from the standard license text that it was not recognized and classified as `other`.  If, with human review, the license text is recognizable then update the `license: other` value in the cached metadata file to the correct license.
-1. If the used license is allowable, ensure that the license SPDX is set as [allowed] in the licensed configuration file.
+1. The dependency might need to be marked as [ignored] or [reviewed] if either of those scenarios are applicable.
+1. If the used license should be allowable without review (if your entity has a legal team, they may want to review this assessment), ensure the license SPDX is set as [allowed] in the licensed configuration file.
 
 [allowed]: ../configuration/allowed_licenses.md
 [ignored]: ../configuration/ignoring_dependencies.md
