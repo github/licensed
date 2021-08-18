@@ -10,6 +10,14 @@ Run `licensed -h` to see help content for running licensed commands.
 - [status](status.md)
 - [version](verison.md)
 
+Most commands accept a `-c`/`--config` option to specify a path to a configuration file or directory. If a directory is specified, `licensed` will look in that directory for a file named (in order of preference):
+
+1. `.licensed.yml`
+2. `.licensed.yaml`
+3. `.licensed.json`
+
+If the option is not specified, the value will be set to the current directory.
+
 ## Adding a new command
 
 ### Implement new `Command` class

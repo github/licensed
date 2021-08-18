@@ -4,13 +4,15 @@
 
 Dependency enumerators inherit and override the [`Licensed::Sources::Source`](../lib/licensed/sources/source.rb) class.
 
-#### Required method overrides
+### Required method overrides
+
 1. `Licensed::Sources::Source#enabled?`
    - Returns whether dependencies can be enumerated in the current environment.
 2. `Licensed::Sources::Source#enumerate_dependencies`
    - Returns an enumeration of `Licensed::Dependency` objects found which map to the dependencies of the current project.
 
-#### Optional method overrides
+### Optional method overrides
+
 1. `Licensed::Sources::Source.type`
    - Returns the name of the current dependency enumerator as it is found in a licensed configuration file.
 
@@ -22,12 +24,13 @@ whether `Licensed::Source::Sources#enumerate_dependencies` should be called on t
 Determining whether dependencies should be enumerated depends on whether all the tools or files needed to find dependencies are present.
 For example, to enumerate `npm` dependencies the `npm` CLI tool must be found with `Licensed::Shell.tool_available?` and a `package.json` file needs to exist in the licensed app's configured [`source_path`](./configuration.md#configuration-paths).
 
-#### Gating functionality when required tools are not available.
+### Gating functionality when required tools are not available.
 
 When adding new dependency sources, ensure that `script/bootstrap` scripting and tests are only run if the required tooling is available on the development machine.
 
-* See `script/bootstrap` for examples of gating scripting based on whether tooling executables are found.
-* Use `Licensed::Shell.tool_available?` when writing test files to gate running a test suite when tooling executables aren't available.
+- See `script/bootstrap` for examples of gating scripting based on whether tooling executables are found.
+- Use `Licensed::Shell.tool_available?` when writing test files to gate running a test suite when tooling executables aren't available.
+
 ```ruby
 if Licensed::Shell.tool_available?('bundle')
   describe Licensed::Source::Bundler do
@@ -47,11 +50,11 @@ Relying on external tools always has a risk that the tool could change.  It's ge
 or other implementation details as these could change over time.  CLI tools that provides the necessary information are generally preferred
 as they will more likely have requirements for backwards compatibility.
 
-#### Creating dependency objects
+### Creating dependency objects
 
 Creating a new `Licensed::Dependency` object requires name, version, and path arguments.  Dependency objects optionally accept a path to use as search root when finding licenses along with any other metadata that is useful to identify the dependency.
 
-##### `Licensed::Dependency` arguments
+#### `Licensed::Dependency` arguments
 
 1. name (required)
    - The name of the dependency. Together with the version, this should uniquely identify the dependency.
@@ -71,7 +74,7 @@ Creating a new `Licensed::Dependency` object requires name, version, and path ar
 6. errors (optional)
   - Any errors found when loading dependency information.
 
-##### Creating specialized Dependency objects
+#### Creating specialized Dependency objects
 
 `Licensed::Dependency` objects inherit from `Licensee::Projects::FsProject` and can override or extend the default `Licensee` behavior to find files for a dependency.
 
