@@ -12,36 +12,32 @@ class TestCommand < Licensed::Commands::Command
     TestReporter.new
   end
 
-  def run(**options)
-    super do |report|
-      report["extra"] = true
-      next :skip if options[:skip_run]
-    end
-  end
-
   protected
 
-  def run_app(app)
-    super do |report|
-      report["extra"] = true
-      next :skip if options[:skip_app]
-    end
+  def run_command(report)
+    report["extra"] = true
+    return true if options[:skip_run]
+    super
   end
 
-  def run_source(app, source)
+  def run_app(app, report)
+    report["extra"] = true
+    return true if options[:skip_app]
+    super
+  end
+
+  def run_source(app, source, report)
     options[:source_proc].call(app, source) if options[:source_proc]
-    super do |report|
-      report["extra"] = true
-      next :skip if options[:skip_source]
-    end
+    report["extra"] = true
+    return true if options[:skip_source]
+    super
   end
 
-  def run_dependency(app, source, dependency)
+  def run_dependency(app, source, dependency, report)
     options[:dependency_proc].call(app, source, dependency) if options[:dependency_proc]
-    super do |report|
-      report["extra"] = true
-      next :skip if options[:skip_dependency]
-    end
+    report["extra"] = true
+    return true if options[:skip_dependency]
+    super
   end
 
   def evaluate_dependency(app, source, dependency, report)

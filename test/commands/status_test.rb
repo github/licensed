@@ -199,6 +199,15 @@ describe Licensed::Commands::Status do
     end
   end
 
+  it "reports a link to the documentation on any failures" do
+    # this is the same error case as "warns if license is not allowed"
+    run_command
+
+    command_errors = reporter.report.errors
+    refute_empty command_errors
+    assert command_errors.any? { |e| e =~ /Licensed found errors during source enumeration.  Please see/ }
+  end
+
   it "does not include ignored dependencies in dependency counts" do
     run_command
     count = reporter.report.all_reports.size
@@ -224,16 +233,6 @@ describe Licensed::Commands::Status do
     dependency_report = reports.find { |report| report.target.is_a?(Licensed::Dependency) }
     assert dependency_report
     assert_equal fixtures, dependency_report.target.path
-  end
-
-  it "skips a dependency sources not specified in optional :sources argument" do
-    run_command(sources: "alternate")
-
-    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
-    refute_empty report.warnings
-    assert report.warnings.any? { |w| w == "skipped source" }
-
-    refute reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
   end
 
   it "reports whether a dependency is allowed" do

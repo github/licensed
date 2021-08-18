@@ -11,6 +11,8 @@ module Licensed
         Licensed::Reporters::CacheReporter.new
       end
 
+      protected
+
       # Run the command.
       # Removes any cached records that don't match a current application
       # dependency.
@@ -18,19 +20,14 @@ module Licensed
       # options - Options to run the command with
       #
       # Returns whether the command was a success
-      def run(**options)
-        begin
-          result = super
+      def run_command(report)
+        super do |result|
           clear_stale_cached_records if result
-
-          result
-        ensure
-          cache_paths.clear
-          files.clear
         end
+      ensure
+        cache_paths.clear
+        files.clear
       end
-
-      protected
 
       # Run the command for all enumerated dependencies found in a dependency source,
       # recording results in a report.
@@ -41,17 +38,12 @@ module Licensed
       # source - A dependency source enumerator
       #
       # Returns whether the command succeeded for the dependency source enumerator
-      def run_source(app, source)
-        super do |report|
-          if Array(options[:sources]).any? && !options[:sources].include?(source.class.type)
-            report.warnings << "skipped source"
-            next :skip
-          end
+      def run_source(app, source, report)
+        # add the full cache path to the list of cache paths
+        # that should be cleaned up after the command run
+        cache_paths << app.cache_path.join(source.class.type)
 
-          # add the full cache path to the list of cache paths
-          # that should be cleaned up after the command run
-          cache_paths << app.cache_path.join(source.class.type)
-        end
+        super
       end
 
       # Cache dependency record data.

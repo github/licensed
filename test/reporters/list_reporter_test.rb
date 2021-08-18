@@ -4,220 +4,145 @@ require "test_helper"
 describe Licensed::Reporters::ListReporter do
   let(:shell) { TestShell.new }
   let(:reporter) { Licensed::Reporters::ListReporter.new(shell) }
+
+  let(:command) { TestCommand.new(config: nil) }
   let(:app) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { TestSource.new(app) }
   let(:dependency) { source.dependencies.first }
-  let(:command) { TestCommand.new(config: nil) }
 
-  describe "#report_app" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        reporter.report_app(app) { success = true }
-      end
-      assert success
-    end
-
-    it "returns the result of the block" do
-      reporter.report_run(command) do
-        assert_equal 1, reporter.report_app(app) { 1 }
-      end
-    end
-
-    it "provides a report hash to the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) { |report| refute_nil report }
-      end
-    end
+  describe "#begin_report_app" do
+    let(:report) { Licensed::Report.new(name: app["name"], target: app) }
 
     it "prints an informative message to the shell" do
-      reporter.report_run(command) do
-        reporter.report_app(app) {}
+      reporter.begin_report_app(app, report)
 
-        assert_includes shell.messages,
-                        {
-                           message: "Listing dependencies for #{app["name"]}",
-                           newline: true,
-                           style: :info
-                        }
-      end
+      assert_includes shell.messages,
+                      {
+                          message: "Listing dependencies for #{app["name"]}",
+                          newline: true,
+                          style: :info
+                      }
     end
   end
 
-  describe "#report_source" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) { success = true }
-        end
-      end
+  describe "#begin_report_source" do
+    let(:report) { Licensed::Report.new(name: "source", target: source) }
 
-      assert success
+    it "prints an informative message to the shell" do
+      reporter.begin_report_source(source, report)
+      assert_includes shell.messages,
+                      {
+                          message: "  #{source.class.type}",
+                          newline: true,
+                          style: :info
+                      }
+    end
+  end
+
+  describe "#end_report_source" do
+    let(:report) { Licensed::Report.new(name: "source", target: source) }
+    let(:dependency_report) { Licensed::Report.new(name: "dependency", target: dependency) }
+
+    before do
+      report.reports << dependency_report
     end
 
-    it "returns the result of the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          assert_equal 1, reporter.report_source(source) { 1 }
-        end
-      end
+    it "reports the number of dependencies found in a source if no errors are reported" do
+      reporter.end_report_source(source, report)
+      assert_includes shell.messages,
+                      {
+                          message: "  * 1 #{source.class.type} dependencies",
+                          newline: true,
+                          style: :confirm
+                      }
     end
 
-    it "provides a report hash to the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) { |report| refute_nil report }
-        end
-      end
+    it "reports dependency errors during the source run" do
+      dependency_report.errors << "dependency error"
+      reporter.end_report_source(source, report)
+
+      assert_includes shell.messages,
+                      {
+                          message: "      - dependency error",
+                          newline: true,
+                          style: :error
+                      }
+      refute_includes shell.messages,
+                      {
+                          message: "  * 1 #{source.class.type} dependencies",
+                          newline: true,
+                          style: :confirm
+                      }
     end
 
-    it "prints informative messages to the shell" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) {}
-          assert_includes shell.messages,
-                          {
-                             message: "  #{source.class.type}",
-                             newline: true,
-                             style: :info
-                          }
+    it "reports source errors during the source run" do
+      report.errors << "source error"
+      reporter.end_report_source(source, report)
 
-          assert_includes shell.messages,
-                          {
-                             message: "  * 0 #{source.class.type} dependencies",
-                             newline: true,
-                             style: :confirm
-                          }
-        end
-      end
-    end
+      assert_includes shell.messages,
+                      {
+                        message: "      - source error",
+                        newline: true,
+                        style: :error
+                      }
 
-    it "reports errors during the source run" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do |app_report|
-          reporter.report_source(source) do |source_report|
-            source_report.errors << "source error"
-            reporter.report_dependency(dependency) do |dependency_report|
-              dependency_report.errors << "dependency error"
-            end
-          end
-        end
-
-        assert_includes shell.messages,
-                        {
-
-                           message: "      - source error",
-                           newline: true,
-                           style: :error
-                        }
-        assert_includes shell.messages,
-                        {
-                           message: "      - dependency error",
-                           newline: true,
-                           style: :error
-                        }
-        refute_includes shell.messages,
-                        {
-                           message: "  * 0 #{source.class.type} dependencies",
-                           newline: true,
-                           style: :confirm
-                        }
-      end
+      refute_includes shell.messages,
+                      {
+                          message: "  * 1 #{source.class.type} dependencies",
+                          newline: true,
+                          style: :confirm
+                      }
     end
 
     it "reports warnings during the source run" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do |app_report|
-          reporter.report_source(source) do |source_report|
-            source_report.warnings << "source warning"
-            reporter.report_dependency(dependency) do |dependency_report|
-              dependency_report.warnings << "dependency warning"
-            end
-          end
-        end
+      dependency_report.warnings << "dependency warning"
+      report.warnings << "source warning"
+      reporter.end_report_source(source, report)
 
-        assert_includes shell.messages,
-                        {
+      assert_includes shell.messages,
+                      {
 
-                           message: "      - source warning",
-                           newline: true,
-                           style: :warn
-                        }
-        assert_includes shell.messages,
-                        {
-                           message: "      - dependency warning",
-                           newline: true,
-                           style: :warn
-                        }
-      end
+                          message: "      - source warning",
+                          newline: true,
+                          style: :warn
+                      }
+      assert_includes shell.messages,
+                      {
+                          message: "      - dependency warning",
+                          newline: true,
+                          style: :warn
+                      }
+      assert_includes shell.messages,
+                      {
+                          message: "  * 1 #{source.class.type} dependencies",
+                          newline: true,
+                          style: :confirm
+                      }
     end
   end
 
-  describe "#report_dependency" do
-    it "runs a block" do
-      success = false
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) { success = true }
-          end
-        end
-      end
-
-      assert success
-    end
-
-    it "returns the result of the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            assert_equal 1, reporter.report_dependency(dependency) { 1 }
-          end
-        end
-      end
-    end
-
-    it "provides a report hash to the block" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) { |report| refute_nil report }
-          end
-        end
-      end
-    end
+  describe "#end_report_dependency" do
+    let(:report) { Licensed::Report.new(name: dependency.name, target: dependency) }
 
     it "prints an informative messages to the shell" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) {}
-            assert_includes shell.messages,
-                            {
-                               message: "    #{dependency.name} (#{dependency.version})",
-                               newline: true,
-                               style: :info
-                            }
-          end
-        end
-      end
+      reporter.end_report_dependency(dependency, report)
+      assert_includes shell.messages,
+                      {
+                          message: "    #{dependency.name} (#{dependency.version})",
+                          newline: true,
+                          style: :info
+                      }
     end
 
     it "includes the license in output to shell if license is set" do
-      reporter.report_run(command) do
-        reporter.report_app(app) do
-          reporter.report_source(source) do
-            reporter.report_dependency(dependency) { |report| report["license"] = dependency.license_key }
-            assert_includes shell.messages,
-                            {
-                               message: "    #{dependency.name} (#{dependency.version}): #{dependency.license_key}",
-                               newline: true,
-                               style: :info
-                            }
-          end
-        end
-      end
+      report["license"] = dependency.license_key
+      reporter.end_report_dependency(dependency, report)
+      assert_includes shell.messages,
+                      {
+                          message: "    #{dependency.name} (#{dependency.version}): #{dependency.license_key}",
+                          newline: true,
+                          style: :info
+                      }
     end
   end
 end

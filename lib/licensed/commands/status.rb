@@ -15,22 +15,17 @@ module Licensed
 
       protected
 
-      # Run the command for all enumerated dependencies found in a dependency source,
-      # recording results in a report.
-      # Enumerating dependencies in the source is skipped if a :sources option
-      # is provided and the evaluated `source.class.type` is not in the :sources values
+      # Run the comand and set an error message to review the documentation
+      # when any errors have been reported
       #
-      # app - The application configuration for the source
-      # source - A dependency source enumerator
+      # report - A Licensed::Report object for this command
       #
-      # Returns whether the command succeeded for the dependency source enumerator
-      def run_source(app, source)
-        super do |report|
-          next if Array(options[:sources]).empty?
-          next if options[:sources].include?(source.class.type)
+      # Returns whether the command succeeded based on the call to super
+      def run_command(report)
+        super do |result|
+          next if result
 
-          report.warnings << "skipped source"
-          :skip
+          report.errors << "Licensed found errors during source enumeration.  Please see https://github.com/github/licensed/tree/master/docs/commands/status.md#status-errors-and-resolutions for possible resolutions."
         end
       end
 

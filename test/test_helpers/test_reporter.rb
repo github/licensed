@@ -7,10 +7,7 @@ class TestReporter < Licensed::Reporters::Reporter
   end
 
   # Make the run report available for tests to examine
-  def report_run(command)
-    super do |report|
-      @report = report
-      yield report
-    end
+  def begin_report_command(command, report)
+    @report = report
   end
 end

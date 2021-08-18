@@ -65,14 +65,4 @@ describe Licensed::Commands::Notices do
       end
     end
   end
-
-  it "skips dependency sources not specified in optional :sources argument" do
-    run_command(sources: "alternate")
-
-    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Sources::Source) }
-    refute_empty report.warnings
-    assert report.warnings.any? { |w| w == "skipped source" }
-
-    refute reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::Dependency) }
-  end
 end
