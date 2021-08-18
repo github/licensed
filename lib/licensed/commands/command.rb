@@ -92,7 +92,6 @@ module Licensed
           return false
         end
 
-        sources_overrides = Array(options[:sources])
         Dir.chdir app.source_path do
           sources = app.sources.select(&:enabled?)
                                .sort_by { |source| source.class.type }
