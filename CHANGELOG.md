@@ -466,4 +466,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.1.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.2.0...HEAD
