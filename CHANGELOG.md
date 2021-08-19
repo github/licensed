@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.2.0
+
+2021-08-19
+
+### Added
+
+- Application names can be dynamically generated based on the path to the application source  (https://github.com/github/licensed/pull/375)
+
+### Changed
+
+- Updated command documentation (https://github.com/github/licensed/pull/378, https://github.com/github/licensed/pull/380/files)
+- Updated configuration documentation (https://github.com/github/licensed/pull/375)
+- Cache and status commands give additional diagnostic output when using JSON and YAML formatters (https://github.com/github/licensed/pull/378)
+- Status command will give users a link to documentation when compliance checks fail (https://github.com/github/licensed/pull/381)
+
+### Fixed
+
+- The bundler source correctly checks that the path bundler specifies a gem is loaded from is a file (https://github.com/github/licensed/pull/379)
+
 ## 3.1.0
 
 2021-06-16
