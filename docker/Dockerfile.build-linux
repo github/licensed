@@ -1,4 +1,4 @@
-FROM ruby:2.4-slim-stretch
+FROM ruby:2.6.8-slim-stretch
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends cmake make gcc pkg-config squashfs-tools git curl bison rsync \
