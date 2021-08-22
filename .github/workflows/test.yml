@@ -86,7 +86,7 @@ jobs:
         path: |
           ~/.cabal/packages
           ~/.cabal/store
-        key: ${{ runner.os }}-cabal-${{ matrix.ghc }}
+        key: ${{ runner.os }}-cabal-${{ matrix.ghc }}-${{ hashFiles('**/app.cabal') }}
         restore-keys: |
           ${{ runner.os }}-cabal-
     - uses: actions/cache@v2
