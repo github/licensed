@@ -48,7 +48,7 @@ module Licensed
 
         errored_reports = all_reports.select { |r| r.errors.any? }.to_a
 
-        dependency_count = all_reports.select { |r| r.target.is_a?(Licensed::Dependency) }.size
+        dependency_count = all_reports.count { |r| r.target.is_a?(Licensed::Dependency) }
         error_count = errored_reports.sum { |r| r.errors.size }
 
         if error_count > 0
