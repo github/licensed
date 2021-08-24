@@ -234,8 +234,7 @@ module Licensed
         ].compact
 
         nuget_package_dirs.map { |dir| File.join(dir, dependency_path) }
-                          .select { |path| File.directory?(path) }
-                          .first
+                          .find { |path| File.directory?(path) }
       end
     end
   end

@@ -61,11 +61,12 @@ module Licensed
 
         paths = paths.compact.select { |path| File.file?(path) }
         return if paths.empty?
-
+        # rubocop:disable GitHub/InsecureHashAlgorithm
         paths.sort
              .reduce(Digest::XXHash64.new, :file)
              .digest
              .to_s(16) # convert to hex
+        # rubocop:enable GitHub/InsecureHashAlgorithm
       end
     end
   end
