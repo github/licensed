@@ -65,6 +65,7 @@ If the dependency does not include license text but does specify that it uses a 
 **Resolution:** Review the dependency's usage and specified license with someone familiar with OSS licensing and compliance rules to determine whether the dependency is allowable.  Some common resolutions:
 
 1. The dependency's specified license text differed enough from the standard license text that it was not recognized and classified as `other`.  If, with human review, the license text is recognizable then update the `license: other` value in the cached metadata file to the correct license.
+   - An updated classification will persist through version upgrades until the detected license contents have changed.  The determination is made by [licensee/licensee](https://github.com/licensee/licensee), the library which this tool uses to detect and classify license contents.
 1. The dependency might need to be marked as [ignored] or [reviewed] if either of those scenarios are applicable.
 1. If the used license should be allowable without review (if your entity has a legal team, they may want to review this assessment), ensure the license SPDX is set as [allowed] in the licensed configuration file.
 
