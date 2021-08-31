@@ -132,10 +132,10 @@ module Licensed
         end
       end
 
-      # Returns the godoc.org page for a package.
+      # Returns the pkg.go.dev page for a package.
       def homepage(import_path)
         return unless import_path
-        "https://godoc.org/#{import_path}"
+        "https://pkg.go.dev/#{import_path}"
       end
 
       # Returns the root directory to search for a package license

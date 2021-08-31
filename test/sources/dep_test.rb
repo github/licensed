@@ -41,7 +41,7 @@ describe Licensed::Sources::Dep do
         dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
         assert dep
         assert_equal "dep", dep.record["type"]
-        assert_equal "https://godoc.org/github.com/gorilla/context", dep.record["homepage"]
+        assert_equal "https://pkg.go.dev/github.com/gorilla/context", dep.record["homepage"]
       end
     end
 
