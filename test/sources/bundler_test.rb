@@ -34,88 +34,6 @@ if Licensed::Shell.tool_available?("bundle")
       end
     end
 
-    describe "gemfile_path" do
-      bundle_gemfile = ENV["BUNDLE_GEMFILE"]
-      after do
-        ENV["BUNDLE_GEMFILE"] = bundle_gemfile
-      end
-
-      it "returns a the path to Gemfile local to the current directory" do
-        Dir.mktmpdir do |tmp|
-          bundle_gemfile_path = File.join(tmp, "gems.rb")
-          File.write(bundle_gemfile_path, "")
-          ENV["BUNDLE_GEMFILE"] = bundle_gemfile_path
-
-          path = File.join(tmp, "bundler")
-          Dir.mkdir(path)
-          Dir.chdir(path) do
-            File.write("Gemfile", "")
-            assert_equal Pathname.pwd.join("Gemfile"), source.gemfile_path
-          end
-        end
-      end
-
-      it "returns a the path to gems.rb local to the current directory" do
-        Dir.mktmpdir do |tmp|
-          bundle_gemfile_path = File.join(tmp, "Gemfile")
-          File.write(bundle_gemfile_path, "")
-          ENV["BUNDLE_GEMFILE"] = bundle_gemfile_path
-
-          path = File.join(tmp, "bundler")
-          Dir.mkdir(path)
-          Dir.chdir(path) do
-            File.write("gems.rb", "")
-            assert_equal Pathname.pwd.join("gems.rb"), source.gemfile_path
-          end
-        end
-      end
-
-      it "prefers Gemfile over gems.rb" do
-        Dir.mktmpdir do |tmp|
-          Dir.chdir(tmp) do
-            File.write("Gemfile", "")
-            File.write("gems.rb", "")
-            assert_equal Pathname.pwd.join("Gemfile"), source.gemfile_path
-          end
-        end
-      end
-
-      it "returns nil if a gem file can't be found" do
-        ENV["BUNDLE_GEMFILE"] = nil
-        Dir.mktmpdir do |tmp|
-          Dir.chdir(tmp) do
-            assert_nil source.gemfile_path
-          end
-        end
-      end
-    end
-
-    describe "lockfile_path" do
-      it "returns nil if gemfile_path is nil" do
-        source.stub(:gemfile_path, nil) do
-          assert_nil source.lockfile_path
-        end
-      end
-
-      it "returns Gemfile.lock for Gemfile gemfile_path" do
-        Dir.mktmpdir do |tmp|
-          Dir.chdir(tmp) do
-            File.write("Gemfile", "")
-            assert_equal Pathname.pwd.join("Gemfile.lock"), source.lockfile_path
-          end
-        end
-      end
-
-      it "returns gems.locked for gems.rb gemfile_path" do
-        Dir.mktmpdir do |tmp|
-          Dir.chdir(tmp) do
-            File.write("gems.rb", "")
-            assert_equal Pathname.pwd.join("gems.locked"), source.lockfile_path
-          end
-        end
-      end
-    end
-
     describe "dependencies" do
       it "does not include the source project" do
         Dir.chdir(fixtures) do
@@ -258,12 +176,12 @@ if Licensed::Shell.tool_available?("bundle")
       end
     end
 
-    describe "#with_local_configuration" do
+    describe "#with_application_environment" do
       it "resets the Bundler environment" do
         begin
           original_gem_home, ENV["GEM_HOME"] = ENV["GEM_HOME"], "foo"
           Dir.chdir(fixtures) do
-            source.with_local_configuration do
+            source.with_application_environment do
               refute_equal "foo", ENV["GEM_HOME"]
             end
           end
@@ -275,15 +193,25 @@ if Licensed::Shell.tool_available?("bundle")
       it "does not reset Bundler environment when the correct environment is already set" do
         begin
           original_gem_home, ENV["GEM_HOME"] = ENV["GEM_HOME"], "foo"
-          original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], source.gemfile_path.to_s
+          original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], source.config.source_path.join("Gemfile").to_s
           Dir.chdir(fixtures) do
-            source.with_local_configuration do
+            source.with_application_environment do
               assert_equal "foo", ENV["GEM_HOME"]
             end
           end
         ensure
           ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
           ENV["GEM_HOME"] = original_gem_home
+        end
+      end
+
+      it "reloads the Bundler runtime to the applications configured source_path" do
+        Dir.chdir(fixtures) do
+          refute_equal config.source_path, ::Bundler.load.root
+          source.with_application_environment do
+            assert_equal config.source_path, ::Bundler.load.root
+          end
+          refute_equal config.source_path, ::Bundler.load.root
         end
       end
     end

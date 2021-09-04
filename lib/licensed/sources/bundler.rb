@@ -3,6 +3,7 @@ require "delegate"
 begin
   require "bundler"
   require "licensed/sources/bundler/missing_specification"
+  require "licensed/sources/bundler/definition"
 rescue LoadError
 end
 
@@ -37,7 +38,6 @@ module Licensed
         end
       end
 
-      GEMFILES = { "Gemfile" => "Gemfile.lock", "gems.rb" => "gems.locked" }
       DEFAULT_WITHOUT_GROUPS = %i{development test}
       RUBY_PACKER_ERROR = "The bundler source cannot be used from the executable built with ruby-packer.  Please install licensed using `gem install` or using bundler."
 
@@ -45,15 +45,20 @@ module Licensed
         # running a ruby-packer-built licensed exe when ruby isn't available
         # could lead to errors if the host ruby doesn't exist
         return false if ruby_packer? && !Licensed::Shell.tool_available?("ruby")
-        defined?(::Bundler) && lockfile_path && lockfile_path.exist?
+
+        # if Bundler isn't loaded, this enumerator won't work!
+        return false unless defined?(::Bundler)
+
+        with_application_environment { ::Bundler.default_lockfile&.exist? }
+      rescue ::Bundler::GemfileNotFound
+        false
       end
 
       def enumerate_dependencies
         raise Licensed::Sources::Source::Error.new(RUBY_PACKER_ERROR) if ruby_packer?
 
-        with_local_configuration do
-          specs.map do |spec|
-            next if spec.name == "bundler" && !include_bundler?
+        with_application_environment do
+          definition.specs.map do |spec|
             next if spec.name == config["name"]
 
             error = spec.error if spec.respond_to?(:error)
@@ -73,41 +78,13 @@ module Licensed
         end
       end
 
-      # Returns an array of Gem::Specifications for all gem dependencies
-      def specs
-        @specs ||= definition.specs_for(groups)
-      end
-
-      # Returns whether to include bundler as a listed dependency of the project
-      def include_bundler?
-        @include_bundler ||= begin
-          # include if bundler is listed as a direct dependency that should be included
-          requested_dependencies = definition.dependencies.select { |d| (d.groups & groups).any? && d.should_include? }
-          return true if requested_dependencies.any? { |d| d.name == "bundler" }
-          # include if bundler is an indirect dependency
-          return true if specs.flat_map(&:dependencies).any? { |d| d.name == "bundler" }
-          false
-        end
-      end
-
-      # Build the bundler definition
       def definition
-        @definition ||= ::Bundler::Definition.build(gemfile_path, lockfile_path, nil)
-      end
-
-      # Returns the bundle definition groups, removing "without" groups,
-      # and including "with" groups
-      def groups
-        @groups ||= definition.groups - bundler_setting_array(:without) + bundler_setting_array(:with) - exclude_groups
-      end
-
-      # Returns a bundler setting as an array.
-      # Depending on the version of bundler, array values are either returned as
-      # a raw string ("a:b:c") or as an array ([:a, :b, :c])
-      def bundler_setting_array(key)
-        setting = ::Bundler.settings[key]
-        setting = setting.split(":").map(&:to_sym) if setting.is_a?(String)
-        Array(setting)
+        @definition ||= begin
+          definition = ::Bundler::Definition.build(::Bundler.default_gemfile, ::Bundler.default_lockfile, nil)
+          definition.extend Licensed::Bundler::DefinitionExtensions
+          definition.force_exclude_groups = exclude_groups
+          definition
+        end
       end
 
       # Returns any groups to exclude specified from both licensed configuration
@@ -121,43 +98,29 @@ module Licensed
         end
       end
 
-      # Returns the path to the Bundler Gemfile
-      def gemfile_path
-        @gemfile_path ||= GEMFILES.keys
-                                  .map { |g| config.pwd.join g }
-                                  .find { |f| f.exist? }
-      end
-
-      # Returns the path to the Bundler Gemfile.lock
-      def lockfile_path
-        return unless gemfile_path
-        @lockfile_path ||= gemfile_path.dirname.join(GEMFILES[gemfile_path.basename.to_s])
-      end
-
       # helper to clear all bundler environment around a yielded block
-      def with_local_configuration
+      def with_application_environment
         # silence any bundler warnings while running licensed
         bundler_ui, ::Bundler.ui = ::Bundler.ui, ::Bundler::UI::Silent.new
 
-        original_bundle_gemfile = nil
-        if gemfile_path.to_s != ENV["BUNDLE_GEMFILE"]
-          # force bundler to use the local gem file
-          original_bundle_gemfile, ENV["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"], gemfile_path.to_s
+        backup = nil
 
-          # reset all bundler configuration
+        if ::Bundler.root != config.source_path
+          backup = ENV.to_hash
+          ENV.replace(::Bundler.original_env)
+
+          # reset bundler to load from the current app's source path
           ::Bundler.reset!
-          # and re-configure with settings for current directory
-          ::Bundler.configure
+          ::Bundler.load
         end
 
         yield
       ensure
-        if original_bundle_gemfile
-          ENV["BUNDLE_GEMFILE"] = original_bundle_gemfile
-
+        if backup
           # restore bundler configuration
+          ENV.replace(backup)
           ::Bundler.reset!
-          ::Bundler.configure
+          ::Bundler.load
         end
 
         ::Bundler.ui = bundler_ui
