@@ -111,7 +111,7 @@ module Licensed
             ::Bundler.reset!
             ::Bundler.load
           end
-        
+
           yield
         end
       ensure
