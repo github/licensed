@@ -100,21 +100,20 @@ module Licensed
 
       # helper to clear all bundler environment around a yielded block
       def with_application_environment
-        # silence any bundler warnings while running licensed
-        bundler_ui, ::Bundler.ui = ::Bundler.ui, ::Bundler::UI::Silent.new
-
         backup = nil
 
-        if ::Bundler.root != config.source_path
-          backup = ENV.to_hash
-          ENV.replace(::Bundler.original_env)
+        ::Bundler.ui.silence do
+          if ::Bundler.root != config.source_path
+            backup = ENV.to_hash
+            ENV.replace(::Bundler.original_env)
 
-          # reset bundler to load from the current app's source path
-          ::Bundler.reset!
-          ::Bundler.load
+            # reset bundler to load from the current app's source path
+            ::Bundler.reset!
+            ::Bundler.load
+          end
+        
+          yield
         end
-
-        yield
       ensure
         if backup
           # restore bundler configuration
@@ -122,8 +121,6 @@ module Licensed
           ::Bundler.reset!
           ::Bundler.load
         end
-
-        ::Bundler.ui = bundler_ui
       end
 
       # Returns whether the current licensed execution is running ruby-packer
