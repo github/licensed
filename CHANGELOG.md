@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.2.1
+
+2021-09-06
+
+### Changed
+
+- Updated multiple dependency versions (:tada: @mmorel-35 https://github.com/github/licensed/pull/385, https://github.com/github/licensed/pull/389)
+- Go homepage links use pkg.go.dev instead of godoc.org (:tada: @mmorel-35 https://github.com/github/licensed/commit/73cfbbe954a3e8c8cbaf8b68253053b157e01b79)
+- Local development ruby version changed to 2.7.4 (https://github.com/github/licensed/pull/393)
+
+### Fixed
+
+- Bundler source correctly finds platform specific dependencies (https://github.com/github/licensed/pull/392)
+
 ## 3.2.0
 
 2021-08-19
@@ -466,4 +480,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.2.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.2.1...HEAD
