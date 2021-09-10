@@ -109,8 +109,10 @@ module Licensed
 
             # reset bundler to load from the current app's source path
             ::Bundler.reset!
-            ::Bundler.load
           end
+
+          # ensure the bundler environment is loaded before enumeration
+          ::Bundler.load
 
           yield
         end
@@ -119,8 +121,10 @@ module Licensed
           # restore bundler configuration
           ENV.replace(backup)
           ::Bundler.reset!
-          ::Bundler.load
         end
+
+        # reload the bundler environment after enumeration
+        ::Bundler.load
       end
 
       # Returns whether the current licensed execution is running ruby-packer
