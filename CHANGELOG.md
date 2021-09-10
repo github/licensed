@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.2.2
+
+2021-09-09
+
+### Fixed
+
+- Bundler source works properly again when used outside of `bundle exec` (https://github.com/github/licensed/pull/397)
+
 ## 3.2.1
 
 2021-09-06
@@ -480,4 +488,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.2.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.2.2...HEAD
