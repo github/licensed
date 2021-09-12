@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop", "~> 0.49", "< 1.20"
   spec.add_development_dependency "rubocop-github", "~> 0.6"
   spec.add_development_dependency "rubocop-performance"
-  spec.add_development_dependency "rubocop-rake"
   spec.add_development_dependency "rubocop-rails"
+  spec.add_development_dependency "rubocop-rake"
   spec.add_development_dependency "byebug", "~> 11.0.1"
 end
