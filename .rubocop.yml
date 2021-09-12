@@ -2,6 +2,9 @@ inherit_gem:
   rubocop-github:
     - config/default.yml
 
+require:
+  - rubocop-performance
+
 AllCops:
   Exclude:
     - test/fixtures/**/*
