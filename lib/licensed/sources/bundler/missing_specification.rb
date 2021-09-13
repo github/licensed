@@ -38,17 +38,20 @@ module Licensed
         "could not find #{name} (#{version}) in any sources"
       end
     end
+
+    module LazySpecification
+      def __materialize__
+        spec = super
+        return spec if spec
+
+        Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
+      end
+    end
   end
 end
 
 module Bundler
   class LazySpecification
-    alias_method :orig_materialize, :__materialize__
-    def __materialize__
-      spec = orig_materialize
-      return spec if spec
-
-      Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
-    end
+    prepend ::Licensed::Bundler::LazySpecification
   end
 end
