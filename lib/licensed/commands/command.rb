@@ -121,13 +121,16 @@ module Licensed
       # source - A dependency source enumerator
       # report - A report object for this source
       #
-      # Returns whether the command succeeded for the dependency source enumerator
+      # Returns whether the command succeeded, failed, or was skipped for the dependency source enumerator
       def run_source(app, source, report)
         reporter.begin_report_source(source, report)
 
         if !sources_overrides.empty? && !sources_overrides.include?(source.class.type)
           report.warnings << "skipped source"
-          return true
+
+          # return a symbol to speficy the source was skipped.
+          # This is truthy and will result in the source being considered successful
+          return :skipped
         end
 
         dependencies = source.dependencies.sort_by { |dependency| dependency.name }

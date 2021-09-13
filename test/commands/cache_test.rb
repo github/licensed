@@ -99,6 +99,19 @@ describe Licensed::Commands::Cache do
     end
   end
 
+  it "does not clean up dependencies from skipped sources" do
+    config.apps.each do |app|
+      FileUtils.mkdir_p app.cache_path.join("test")
+      File.write app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}"), ""
+    end
+
+    run_command(sources: ["other"])
+
+    config.apps.each do |app|
+      assert app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}").exist?
+    end
+  end
+
   it "uses cached record if license text does not change" do
     run_command
 
