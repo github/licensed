@@ -39,11 +39,13 @@ module Licensed
       #
       # Returns whether the command succeeded for the dependency source enumerator
       def run_source(app, source, report)
+        result = super
+
         # add the full cache path to the list of cache paths
         # that should be cleaned up after the command run
-        cache_paths << app.cache_path.join(source.class.type)
+        cache_paths << app.cache_path.join(source.class.type) unless result == :skipped
 
-        super
+        result
       end
 
       # Cache dependency record data.
