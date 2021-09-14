@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.2.3
+
+2021-09-14
+
+### Fixed
+
+- Bundler source will no longer infinitely recurse when enumerating specifications (https://github.com/github/licensed/pull/402)
+- Using the `--sources` command line option will no longer delete skipped sources' cached files (https://github.com/github/licensed/pull/401)
+
 ## 3.2.2
 
 2021-09-09
@@ -488,4 +497,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.2.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.2.3...HEAD
