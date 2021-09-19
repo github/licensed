@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.3.0
+
+2021-09-18
+
+### Added
+
+- New cargo source enumerates rust dependencies (https://github.com/github/licensed/pull/404)
+
+### Changed
+
+- Removed non-functional files from gem builds (https://github.com/github/licensed/pull/405)
+
 ## 3.2.3
 
 2021-09-14
@@ -497,4 +509,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.2.3...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.3.0...HEAD
