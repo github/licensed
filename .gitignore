@@ -48,6 +48,10 @@ test/fixtures/yarn/*
 
 test/fixtures/nuget/obj/*
 
+test/fixtures/cargo/*
+!test/fixtures/cargo/Cargo.*
+!test/fixtures/cargo/src
+
 vendor/licenses
 .licenses
 *.gem
