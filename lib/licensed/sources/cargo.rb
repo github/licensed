@@ -39,7 +39,7 @@ module Licensed
                       .reject { |id| cargo_metadata_workspace_members.include?(id) }
 
       end
-      
+
       # Returns a hash of id => package pairs sourced from the "packages" cargo metadata property
       def cargo_metadata_packages
         @cargo_metadata_packages ||= cargo_metadata["packages"].each_with_object({}) do |package, hsh|

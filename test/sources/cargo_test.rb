@@ -77,7 +77,7 @@ if Licensed::Shell.tool_available?("cargo")
         end
       end
     end
-    
+
     describe "cargo_metadata_command" do
       it "applies a configured string metadata cli option" do
         Dir.chdir fixtures do
