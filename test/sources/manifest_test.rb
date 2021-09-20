@@ -268,11 +268,11 @@ describe Licensed::Sources::Manifest do
     end
   end
 
-  describe "all_files" do
+  describe "tracked_files" do
     it "checks for files from the git repository root" do
       Dir.chdir fixtures do
         # file paths will include the entire path from the root of the repo
-        assert_includes source.all_files, "test/fixtures/manifest/manifest.yml"
+        assert_includes source.tracked_files, "test/fixtures/manifest/manifest.yml"
       end
     end
   end

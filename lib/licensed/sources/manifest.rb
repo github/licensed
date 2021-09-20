@@ -61,7 +61,7 @@ module Licensed
         manifest.each_with_object({}) do |(src, package_name), hsh|
           next if src.nil? || src.empty?
           hsh[package_name] ||= []
-          hsh[package_name] << File.join(config.root, src)
+          hsh[package_name] << File.absolute_path(src, config.root)
         end
       end
 
@@ -130,19 +130,17 @@ module Licensed
         @configured_dependencies ||= begin
           dependencies = config.dig("manifest", "dependencies")&.dup || {}
 
-          dependencies.each do |name, patterns|
+          dependencies.each_with_object({}) do |(name, patterns), hsh|
             # map glob pattern(s) listed for the dependency to a listing
             # of files that match the patterns and are not excluded
-            dependencies[name] = files_from_pattern_list(patterns) & included_files
+            hsh[name] = files_from_pattern_list(patterns) & included_files
           end
-
-          dependencies
         end
       end
 
       # Returns the set of project files that are included in dependency evaluation
       def included_files
-        @sources ||= all_files - files_from_pattern_list(config.dig("manifest", "exclude"))
+        @included_files ||= tracked_files - files_from_pattern_list(config.dig("manifest", "exclude"))
       end
 
       # Finds and returns all files in the project that match
@@ -151,26 +149,23 @@ module Licensed
         return Set.new if patterns.nil? || patterns.empty?
 
         # evaluate all patterns from the project root
-        Dir.chdir config.root do
-          Array(patterns).reduce(Set.new) do |files, pattern|
-            if pattern.start_with?("!")
-              # if the pattern is an exclusion, remove all matching files
-              # from the result
-              files - Dir.glob(pattern[1..-1], File::FNM_DOTMATCH)
-            else
-              # if the pattern is an inclusion, add all matching files
-              # to the result
-              files + Dir.glob(pattern, File::FNM_DOTMATCH)
-            end
+        Array(patterns).each_with_object(Set.new) do |pattern, files|
+          if pattern.start_with?("!")
+            # if the pattern is an exclusion, remove all matching files
+            # from the result
+            files.subtract(Dir.glob(pattern[1..-1], File::FNM_DOTMATCH, base: config.root))
+          else
+            # if the pattern is an inclusion, add all matching files
+            # to the result
+            files.merge(Dir.glob(pattern, File::FNM_DOTMATCH, base: config.root))
           end
         end
       end
 
-      # Returns all tracked files in the project
-      def all_files
-        # remove files if they are tracked but don't exist on the file system
-        @all_files ||= Set.new(Licensed::Git.files || [])
-                          .delete_if { |f| !File.exist?(File.join(Licensed::Git.repository_root, f)) }
+      # Returns all tracked files in the project as the intersection of what git tracks and the files in the project
+      def tracked_files
+        @tracked_files ||= Set.new(Array(Licensed::Git.files)) &
+                           Set.new(Dir.glob("**/*", File::FNM_DOTMATCH, base: config.root))
       end
 
       class Dependency < Licensed::Dependency
