@@ -49,7 +49,7 @@ jobs:
             let uploadUrl = "${{ github.event.release.upload_url}}"
             const tag = "${{ github.event.inputs.release_tag }}"
             if (!uploadUrl && tag) {
-              const { data: release } = await github.repos.getReleaseByTag({
+              const { data: release } = await github.rest.repos.getReleaseByTag({
                 ...context.repo,
                 tag
               })
