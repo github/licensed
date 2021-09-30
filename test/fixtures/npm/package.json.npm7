@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@github/query-selector": "1.0.3",
+    "@optimizely/optimizely-sdk": "4.0.0",
     "autoprefixer": "5.2.0"
   },
   "devDependencies": {
