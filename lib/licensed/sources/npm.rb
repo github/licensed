@@ -137,11 +137,11 @@ module Licensed
       end
 
       def missing_peer?(parent, dependency, name)
-        dependency["peerMissing"] || dependency["missing"] && peer_dependency?(parent, name)
+        dependency["peerMissing"] || (dependency["missing"] && peer_dependency?(parent, name))
       end
 
       def peer_dependency?(parent, name)
-        parent["peerDependencies"] && parent["peerDependencies"][name]
+        parent.dig("peerDependencies", name)
       end
     end
   end
