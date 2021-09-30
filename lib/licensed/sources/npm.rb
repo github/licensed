@@ -73,6 +73,8 @@ module Licensed
           next if dependency["extraneous"] && dependency["missing"]
 
           dependency["name"] = name
+          dependency["version"] ||= extract_version(parent, name) if dependency["missing"]
+
           (result[name] ||= []) << dependency
           recursive_dependencies(dependency["dependencies"] || {}, result, dependency)
         end
@@ -137,11 +139,15 @@ module Licensed
       end
 
       def missing_peer?(parent, dependency, name)
-        dependency["peerMissing"] || (dependency["missing"] && peer_dependency?(parent, name))
+        dependency["peerMissing"] || (dependency["missing"] && peer_dependency(parent, name))
       end
 
-      def peer_dependency?(parent, name)
+      def peer_dependency(parent, name)
         parent.dig("peerDependencies", name)
+      end
+
+      def extract_version(parent, name)
+        parent.dig("_dependencies", name) || peer_dependency(parent, name)
       end
     end
   end
