@@ -91,7 +91,6 @@ if Licensed::Shell.tool_available?("npm")
       end
 
       it "does not include missing indirect peer dependencies" do
-        skip if source.npm_version >= Gem::Version.new("7.0.0")
         Dir.chdir fixtures do
           # peer dependency of @optimizely/js-sdk-datafile-manager, which is
           # an indirect dependency through @optimizely/optimizely-sdk

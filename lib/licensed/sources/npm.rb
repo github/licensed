@@ -66,15 +66,17 @@ module Licensed
 
       # Recursively parse dependency JSON data.  Returns a hash mapping the
       # package name to it's metadata
-      def recursive_dependencies(dependencies, result = {})
+      def recursive_dependencies(dependencies, result = {}, parent = nil)
         dependencies.each do |name, dependency|
-          next if dependency["peerMissing"]
+          next if missing_peer?(parent, dependency, name)
           next if yarn_lock_present && dependency["missing"]
           next if dependency["extraneous"] && dependency["missing"]
 
           dependency["name"] = name
+          dependency["version"] ||= extract_version(parent, name) if dependency["missing"]
+
           (result[name] ||= []) << dependency
-          recursive_dependencies(dependency["dependencies"] || {}, result)
+          recursive_dependencies(dependency["dependencies"] || {}, result, dependency)
         end
         result
       end
@@ -134,6 +136,18 @@ module Licensed
       # Returns whether to include non production dependencies based on the licensed configuration settings
       def include_non_production?
         config.dig("npm", "production_only") == false
+      end
+
+      def missing_peer?(parent, dependency, name)
+        dependency["peerMissing"] || (dependency["missing"] && peer_dependency(parent, name))
+      end
+
+      def peer_dependency(parent, name)
+        parent&.dig("peerDependencies", name)
+      end
+
+      def extract_version(parent, name)
+        parent&.dig("_dependencies", name) || peer_dependency(parent, name)
       end
     end
   end
