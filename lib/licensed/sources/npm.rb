@@ -143,7 +143,7 @@ module Licensed
       end
 
       def peer_dependency(parent, name)
-        parent.dig("peerDependencies", name)
+        parent&.dig("peerDependencies", name)
       end
 
       def extract_version(parent, name)
