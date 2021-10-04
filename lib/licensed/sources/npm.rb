@@ -147,7 +147,7 @@ module Licensed
       end
 
       def extract_version(parent, name)
-        parent.dig("_dependencies", name) || peer_dependency(parent, name)
+        parent&.dig("_dependencies", name) || peer_dependency(parent, name)
       end
     end
   end
