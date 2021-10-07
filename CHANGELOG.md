@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.3.1
+
+2021-10-07
+
+### Fixed
+
+- Fix evaluation of peer dependencies with npm 7 (:tada: @manuelpuyol https://github.com/github/licensed/pull/411)
+
+### Changed
+
+- Manifest source evaluation performance improvements (https://github.com/github/licensed/pull/407)
+
 ## 3.3.0
 
 2021-09-18
@@ -509,4 +521,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.3.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.3.1...HEAD
