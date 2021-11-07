@@ -8,7 +8,7 @@ Run `licensed -h` to see help content for running licensed commands.
 - [migrate](migrate.md)
 - [notices](notices.md)
 - [status](status.md)
-- [version](verison.md)
+- [version](version.md)
 
 Most commands accept a `-c`/`--config` option to specify a path to a configuration file or directory. If a directory is specified, `licensed` will look in that directory for a file named (in order of preference):
 
