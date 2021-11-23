@@ -52,7 +52,7 @@ test/fixtures/cargo/*
 !test/fixtures/cargo/src
 
 vendor/licenses
-.licenses
+.licenses_test
 *.gem
 vendor/gems
 .byebug_history
