@@ -1,0 +1,65 @@
+name: Verify cached license metadata
+
+on:
+  # run on pushes to the default branch
+  push:
+    branches:
+      - master
+  # run on all pull request events
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  # run on demand
+  workflow_dispatch:
+
+jobs:
+  licensed:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # checkout the repo
+      - uses: actions/checkout@v2
+
+      # set up tooling
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.x
+      - uses: actions/cache@v2
+        name: cache gem dependencies
+        with:
+          path: vendor/gems
+          key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gem-2.6-
+      - name: Bootstrap
+        run: script/bootstrap
+
+      # run licensed
+      - uses: jonabc/licensed-ci@v1
+        with:
+          # override the command to use licensed built from this repo
+          command: bundle exec licensed
+          
+          # changes made using GITHUB_TOKEN will not re-trigger this action.
+          # set a custom token so that added or changed cached license files
+          # will cause this workflow to run and validate cached contents
+          #
+          # see https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+          # for additional details on GITHUB_TOKEN not re-triggering this action
+          github_token: ${{ secrets.LICENSED_CI_TOKEN }}
+          
+          # the "push" workflow updates license metadata files on the branch being examined.
+          # e.g. when the action is run on main, changes are pushed to main
+
+          # the "branch" workflow creates a new branch for license file updates.
+          # e.g. when the action is run on main, changes are pushed to a new "main-licenses" branch
+
+          # see https://github.com/jonabc/licensed-ci for more details
+          workflow: branch
+        env:
+          GOPRIVATE: "*github.com/github/*"
+          GOPROXY: "direct"
