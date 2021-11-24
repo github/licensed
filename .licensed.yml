@@ -8,3 +8,6 @@ allowed:
 reviewed:
   bundler:
     - pathname-common_prefix
+    - racc
+    - reverse_markdown
+    - ruby2_keywords
