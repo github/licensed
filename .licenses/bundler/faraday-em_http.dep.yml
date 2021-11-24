@@ -4,7 +4,7 @@ version: 1.0.0
 type: bundler
 summary: Faraday adapter for Em::Http
 homepage: https://github.com/lostisland/faraday-em_http
-license: other
+license: mit
 licenses:
 - sources: LICENSE.md
   text: |

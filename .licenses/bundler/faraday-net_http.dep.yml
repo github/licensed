@@ -4,7 +4,7 @@ version: 1.0.1
 type: bundler
 summary: Faraday adapter for Net::HTTP
 homepage: https://github.com/lostisland/faraday-net_http
-license: other
+license: mit
 licenses:
 - sources: LICENSE.md
   text: |
