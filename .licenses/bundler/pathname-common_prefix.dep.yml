@@ -1,0 +1,13 @@
+---
+name: pathname-common_prefix
+version: 0.0.1
+type: bundler
+summary: Calcurate prefix commont to some pathnames
+homepage: https://github.com/KitaitiMakoto/pathname-common_prefix
+license: other
+licenses:
+- sources: README.markdown
+  text: |-
+    This program is distributed under the Ruby's license.
+    But `setup.rb` is distributed under the GNU LGPS license. See the file for more information.
+notices: []
