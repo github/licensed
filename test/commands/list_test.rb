@@ -13,8 +13,8 @@ describe Licensed::Commands::List do
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   each_source do |source_class|
-    describe "with #{source_class.type}" do
-      let(:source_type) { source_class.type }
+    describe "with #{source_class.full_type}" do
+      let(:source_type) { source_class.full_type }
       let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
 

@@ -20,8 +20,8 @@ describe Licensed::Commands::Cache do
   end
 
   each_source do |source_class|
-    describe "with #{source_class.type}" do
-      let(:source_type) { source_class.type }
+    describe "with #{source_class.full_type}" do
+      let(:source_type) { source_class.full_type }
       let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
 
@@ -34,7 +34,7 @@ describe Licensed::Commands::Cache do
 
           expected_dependency = app["expected_dependency"]
           expected_dependency_name = app["expected_dependency_name"] || expected_dependency
-          path = app.cache_path.join("#{source_type}/#{expected_dependency}.#{Licensed::DependencyRecord::EXTENSION}")
+          path = app.cache_path.join("#{source_class.type}/#{expected_dependency}.#{Licensed::DependencyRecord::EXTENSION}")
           assert path.exist?
           record = Licensed::DependencyRecord.read(path)
           assert_equal expected_dependency_name, record["name"]
