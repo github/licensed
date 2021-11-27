@@ -104,7 +104,7 @@ if Licensed::Shell.tool_available?("yarn")
       it "raises an error if no packages are found" do
         Dir.mktmpdir do |dir|
           Dir.chdir dir do
-            assert_raises ::Licensed::Shell::Error do 
+            assert_raises ::Licensed::Shell::Error do
               source.packages
             end
           end
