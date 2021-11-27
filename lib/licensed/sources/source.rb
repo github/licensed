@@ -19,13 +19,32 @@ module Licensed
           (@sources ||= []) << klass
         end
 
-        # Returns the source name as the snake cased class name
+        # Returns the source name as the first snake cased class or module name
+        # following "Licensed::Sources::".  This is the type that is included
+        # in metadata files and cache paths.
+        # e.g. for `Licensed::Sources::Yarn::V1`, this returns "yarn"
         def type
-          self.name.split(/::/)
-                   .last
+          type_and_version[0]
+        end
+
+        # Returns the source name as a "/" delimited string of all the module and
+        # class names following "Licensed::Sources::".  This is the type that is
+        # used to distinguish multiple versions of a sources from each other.
+        # e.g. for `Licensed::Sources::Yarn::V1`, this returns `yarn/v1`
+        def full_type
+          type_and_version.join("/")
+        end
+
+        # Returns an array that includes the source's type name at the first index, and
+        # optionally a version string for the source as the second index.
+        # Callers should override this function and not `type` or `full_type` when
+        # needing to adjust the default type and version parsing logic
+        def type_and_version
+          self.name.gsub("#{Licensed::Sources.name}::", "")
                    .gsub(/([A-Z\d]+)([A-Z][a-z])/, "\\1_\\2".freeze)
                    .gsub(/([a-z\d])([A-Z])/, "\\1_\\2".freeze)
                    .downcase
+                   .split("::")
         end
       end
 

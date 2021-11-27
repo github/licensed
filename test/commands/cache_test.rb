@@ -27,8 +27,8 @@ describe Licensed::Commands::Cache do
 
       it "extracts license info" do
         config.apps.each do |app|
-          enabled = Dir.chdir(app.source_path) { app.sources.any? { |source| source.enabled? } }
-          next unless enabled
+          source = app.sources.find { |s| s.class == source_class }
+          next unless Dir.chdir(app.source_path) { source.enabled? }
 
           run_command
 
