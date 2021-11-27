@@ -42,8 +42,9 @@ test/fixtures/mix/_build
 test/fixtures/mix/deps
 test/fixtures/mix/mix.lock
 
-test/fixtures/yarn/*
-!test/fixtures/yarn/package.json
+test/fixtures/yarn/*/*
+!test/fixtures/yarn/*/package.json
+!test/fixtures/yarn/*/yarn.lock
 
 test/fixtures/nuget/obj/*
 

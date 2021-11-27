@@ -4,19 +4,15 @@ require "tmpdir"
 require "fileutils"
 
 if Licensed::Shell.tool_available?("yarn")
-  describe Licensed::Sources::Yarn do
+  describe Licensed::Sources::Yarn::V1 do
     let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
-    let(:fixtures) { File.expand_path("../../fixtures/yarn", __FILE__) }
-    let(:source) { Licensed::Sources::Yarn.new(config) }
+    let(:fixtures) { File.expand_path("../../../fixtures/yarn/v1", __FILE__) }
+    let(:source) { Licensed::Sources::Yarn::V1.new(config) }
 
     describe "enabled?" do
       it "is true if package.json and yarn.lock exists" do
-        Dir.mktmpdir do |dir|
-          Dir.chdir(dir) do
-            File.write "package.json", ""
-            File.write "yarn.lock", ""
-            assert source.enabled?
-          end
+        Dir.chdir(fixtures) do
+          assert source.enabled?
         end
       end
 
@@ -35,6 +31,13 @@ if Licensed::Shell.tool_available?("yarn")
             File.write "package.json", ""
             refute source.enabled?
           end
+        end
+      end
+
+      it "is false if the local yarn version is >= 2.0" do
+        source.stubs(:yarn_version).returns(Gem::Version.new("2.0"))
+        Dir.chdir(fixtures) do
+          refute source.enabled?
         end
       end
     end
@@ -80,7 +83,7 @@ if Licensed::Shell.tool_available?("yarn")
 
       it "does not include ignored dependencies" do
         Dir.chdir fixtures do
-          config.ignore({ "type" => Licensed::Sources::Yarn.type, "name" => "autoprefixer" })
+          config.ignore({ "type" => Licensed::Sources::Yarn::V1.type, "name" => "autoprefixer" })
           refute source.dependencies.detect { |dep| dep.name == "autoprefixer" }
         end
       end

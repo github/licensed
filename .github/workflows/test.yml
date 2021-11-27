@@ -542,7 +542,7 @@ jobs:
     - name: Run tests
       run: script/test swift
 
-  yarn:
+  yarn-v1:
     runs-on: ubuntu-latest
     needs: core
     strategy:
@@ -574,6 +574,6 @@ jobs:
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
-      run: script/source-setup/yarn
+      run: script/source-setup/yarn/v1
     - name: Run tests
-      run: script/test yarn
+      run: script/test yarn/v1
