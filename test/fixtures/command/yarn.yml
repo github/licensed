@@ -4,3 +4,5 @@ sources:
 
 apps:
   - source_path: test/fixtures/yarn/v1
+  - source_path: test/fixtures/yarn/berry
+

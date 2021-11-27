@@ -45,6 +45,11 @@ test/fixtures/mix/mix.lock
 test/fixtures/yarn/*/*
 !test/fixtures/yarn/*/package.json
 !test/fixtures/yarn/*/yarn.lock
+!test/fixtures/yarn/*/.yarn
+!test/fixtures/yarn/*/.yarnrc.yml
+test/fixtures/yarn/*/.yarn/*
+!test/fixtures/yarn/*/.yarn/releases
+!test/fixtures/yarn/*/.yarn/plugins
 
 test/fixtures/nuget/obj/*
 
