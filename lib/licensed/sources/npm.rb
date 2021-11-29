@@ -23,10 +23,6 @@ module Licensed
         end
       end
 
-      def self.type
-        "npm"
-      end
-
       def enabled?
         Licensed::Shell.tool_available?("npm") && File.exist?(config.pwd.join("package.json"))
       end

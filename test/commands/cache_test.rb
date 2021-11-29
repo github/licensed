@@ -20,21 +20,21 @@ describe Licensed::Commands::Cache do
   end
 
   each_source do |source_class|
-    describe "with #{source_class.type}" do
-      let(:source_type) { source_class.type }
+    describe "with #{source_class.full_type}" do
+      let(:source_type) { source_class.full_type }
       let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
 
       it "extracts license info" do
         config.apps.each do |app|
-          enabled = Dir.chdir(app.source_path) { app.sources.any? { |source| source.enabled? } }
-          next unless enabled
+          source = app.sources.find { |s| s.class == source_class }
+          next unless Dir.chdir(app.source_path) { source.enabled? }
 
           run_command
 
           expected_dependency = app["expected_dependency"]
           expected_dependency_name = app["expected_dependency_name"] || expected_dependency
-          path = app.cache_path.join("#{source_type}/#{expected_dependency}.#{Licensed::DependencyRecord::EXTENSION}")
+          path = app.cache_path.join("#{source_class.type}/#{expected_dependency}.#{Licensed::DependencyRecord::EXTENSION}")
           assert path.exist?
           record = Licensed::DependencyRecord.read(path)
           assert_equal expected_dependency_name, record["name"]

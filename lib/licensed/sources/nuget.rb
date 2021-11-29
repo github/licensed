@@ -7,8 +7,8 @@ module Licensed
     # Only supports ProjectReference (project.assets.json) style restore used in .NET Core.
     # Does not currently support packages.config style restore.
     class NuGet < Source
-      def self.type
-        "nuget"
+      def self.type_and_version
+        ["nuget"]
       end
 
       class NuGetDependency < Licensed::Dependency

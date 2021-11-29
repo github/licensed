@@ -13,27 +13,25 @@ describe Licensed::Commands::List do
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   each_source do |source_class|
-    describe "with #{source_class.type}" do
-      let(:source_type) { source_class.type }
+    describe "with #{source_class.full_type}" do
+      let(:source_type) { source_class.full_type }
       let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
 
       it "lists dependencies" do
         config.apps.each do |app|
-          enabled = Dir.chdir(app.source_path) { app.sources.any? { |source| source.enabled? } }
-          next unless enabled
+          source = app.sources.find { |s| s.class == source_class }
+          next unless Dir.chdir(app.source_path) { source.enabled? }
 
           run_command
           app_report = reporter.report.reports.find { |r| r.target == app }
           assert app_report
 
-          app.sources.each do |source|
-            source_report = app_report.reports.find { |r| r.target == source }
-            assert source_report
+          source_report = app_report.reports.find { |r| r.target == source }
+          assert source_report
 
-            expected_dependency = app["expected_dependency"]
-            assert source_report.reports.find { |r| r.name.include?(expected_dependency) }
-          end
+          expected_dependency = app["expected_dependency"]
+          assert source_report.reports.find { |r| r.name.include?(expected_dependency) }
         end
       end
     end

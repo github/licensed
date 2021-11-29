@@ -13,8 +13,37 @@ Dependency enumerators inherit and override the [`Licensed::Sources::Source`](..
 
 ### Optional method overrides
 
-1. `Licensed::Sources::Source.type`
-   - Returns the name of the current dependency enumerator as it is found in a licensed configuration file.
+1. `Licensed::Sources::Source.type_and_version`
+   - Returns the name, and optionally a version, of the current dependency enumerator as it is found in a licensed configuration file.  See [the method description](../lib/licensed/sources/source.rb#L38-L41) for more details
+
+### Implementing an enumerator for a new version of an existing source
+
+If a package manager introduces breaking changes, it can be easier to build a new implementation rather than making a single class work for all cases.  To enable seamless migration between source versions, the implementation for each version of the source enumerator should return the same `.type` and determine whether the version implementation should run in `#enabled?`.
+
+The sections below describe what was done when adding a new version for the `yarn` source.  Following these steps will make sure that the new version implementation follows the expected patterns for local development and test scenarios.
+
+#### Migrating the file structure for a single source enumerator to enable multiple source enumerator versions
+
+The following steps will migrate the source to the pattern expected for multi-version source enumerators.  
+
+The enumerators source code file is likely named to closely match the source enumerator, e.g. `lib/licensed/sources/yarn.rb`
+
+1. Create a new directory matching the name of the source and move the existing enumerator into the new folder with a version descriptive name, e.g. `lib/licensed/sources/yarn/v1.rb`
+1. Update the source enumerator class name to include a version identifier, e.g. `Licensed::Sources::Yarn::V1`
+1. Make similar changes for the source's [unit test fixtures](../test/fixtures), [unit test file](../test/sources) and [setup script](../scripts/source-setup), moving these files into subfolders and renaming the files to match the change in (1)
+   - Also be sure to update any references to old paths or class names
+1. If needed, update the source's `#type_and_version` to include a version value as a second array value
+   - If this isn't already set, the default implementation will return the type and version as the last two part names of the class name, snake cased and with a `/` delimeter,  e.g. `yarn/v1`
+1. Update the source's `#enabled?` method, adding a version check to ensure that the source only runs in the expected scenario
+1. Add a new generic source file in `lib/licensed/sources` that `require`s the new file, e.g. `lib/licensed/sources/yarn.rb`
+   - This is also an ideal spot to put shared code in a module that can be included in one or more versions of the source enumerator
+1. Update any references to the source in scripting and GitHub Actions automation to use the new versioned identifier, e.g. `yarn/v1` instead of the unversioned identifier.
+
+#### Adding a new implementation for the new version of the source
+
+1. Add the new implementation to the source's `lib/licensed/sources` subfolder.
+1. If there is shared code that can be reused between multiple source enumerator versions, put it in a module in the source's base file, e.g. `lib/licensed/sources/yarn.rb`.  Include the module in the version implementations.
+1. Ensure that the new version implementation checks for the expected source enumerator version in `#enabled?`
 
 ## Determining if dependencies should be enumerated
 
@@ -24,7 +53,7 @@ whether `Licensed::Source::Sources#enumerate_dependencies` should be called on t
 Determining whether dependencies should be enumerated depends on whether all the tools or files needed to find dependencies are present.
 For example, to enumerate `npm` dependencies the `npm` CLI tool must be found with `Licensed::Shell.tool_available?` and a `package.json` file needs to exist in the licensed app's configured [`source_path`](./configuration.md#configuration-paths).
 
-### Gating functionality when required tools are not available.
+### Gating functionality when required tools are not available
 
 When adding new dependency sources, ensure that `script/bootstrap` scripting and tests are only run if the required tooling is available on the development machine.
 

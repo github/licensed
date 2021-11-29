@@ -2,13 +2,16 @@
 require "bundler/gem_tasks"
 require "rake/testtask"
 require "rubocop/rake_task"
+require "licensed"
 
 desc "Run source setup scripts"
 task :setup, [:arguments] do |task, args|
   arguments = args[:arguments].to_s.split
   force = arguments.include?("-f") ? "-f" : ""
 
-  Dir["script/source-setup/*"].each do |script|
+  Dir["script/source-setup/**/*"].each do |script|
+    next if File.directory?(script)
+
     # green
     puts "\033[32mRunning #{script}.\e[0m"
 
@@ -27,8 +30,7 @@ task :setup, [:arguments] do |task, args|
   end
 end
 
-sources_search = File.expand_path("lib/licensed/sources/*.rb", __dir__)
-sources = Dir[sources_search].map { |f| File.basename(f, ".*") }
+sources = Licensed::Sources::Source.sources.map { |source| source.full_type }
 
 namespace :test do
   sources.each do |source|

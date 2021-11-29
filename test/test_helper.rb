@@ -16,7 +16,7 @@ def each_source(&block)
     next if source_class == TestSource
 
     # if a specific source type is set via ENV, skip other source types
-    next if ENV["SOURCE"] && source_class.type != ENV["SOURCE"].downcase
+    next if ENV["SOURCE"] && source_class.full_type != ENV["SOURCE"].downcase
 
     block.call(source_class)
   end

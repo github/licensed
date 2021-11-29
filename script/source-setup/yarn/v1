@@ -7,11 +7,11 @@ if [ -z "$(which yarn)" ]; then
 fi
 
 # setup test fixtures
-BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-cd $BASE_PATH/test/fixtures/yarn
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+cd $BASE_PATH/test/fixtures/yarn/v1
 
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" -and -not -name "package\.json" -print0 | xargs -0 rm -rf
+  git clean -fX .
 fi
 
 yarn install
