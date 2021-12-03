@@ -103,18 +103,18 @@ module Licensed
                                        .map(&:strip)
                                        .map(&JSON.method(:parse))
                                        .find { |json| json["type"] == "table" }
-          return [] if table.nil?
+          return {} if table.nil?
 
           head = table.dig("data", "head")
-          return [] if head.nil?
+          return {} if head.nil?
 
           name_index = head.index YARN_NAME_HEAD
           version_index = head.index YARN_VERSION_HEAD
           url_index = head.index YARN_URL_HEAD
-          return [] if name_index.nil? || version_index.nil? || url_index.nil?
+          return {} if name_index.nil? || version_index.nil? || url_index.nil?
 
           body = table.dig("data", "body")
-          return [] if body.nil?
+          return {} if body.nil?
 
           body.each_with_object({}) do |row, hsh|
             id = "#{row[name_index]}@#{row[version_index]}"
