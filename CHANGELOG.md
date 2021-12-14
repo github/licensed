@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.4.0
+
+2021-12-14
+
+### Added
+
+- New Yarn enumerator with support for berry versions (https://github.com/github/licensed/pull/423)
+
+### Fixed
+
+- Error handling cases return correct values in the Yarn enumerator (https://github.com/github/licensed/pull/425)
+- Fixed link in command documentation (:tada: @chibicco https://github.com/github/licensed/pull/416)
+- Fixed minor backwards compatibility issue for Ruby 2.3 support (:tada: @dzunk https://github.com/github/licensed/pull/414)
+
+### Changed
+
+- Licensed's own dependencies are cached in the repository and kept up to date with GitHub Actions (https://github.com/github/licensed/pull/421)
+
 ## 3.3.1
 
 2021-10-07
@@ -521,4 +539,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.3.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.4.0...HEAD
