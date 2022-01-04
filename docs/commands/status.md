@@ -39,30 +39,34 @@ The following data is reported for each dependency when the YAML or JSON report 
 
 ### cached dependency record not found
 
-**Cause:** A dependency was found while running `licensed status` that does not have a corresponding cached metadata file
-**Resolution:** Run `licensed cache` to update the metadata cache and create the missing metadata file
+*Cause:* A dependency was found while running `licensed status` that does not have a corresponding cached metadata file
+
+*Resolution:* Run `licensed cache` to update the metadata cache and create the missing metadata file
 
 ### cached dependency record out of date
 
-**Cause:** A dependency was found while running `licensed status` with a different version than is contained in the dependency's cached metadata file
-**Resolution:** Run `licensed cache` to update the out-of-date metadata files
+*Cause:* A dependency was found while running `licensed status` with a different version than is contained in the dependency's cached metadata file
+
+*Resolution:* Run `licensed cache` to update the out-of-date metadata files
 
 ### missing license text
 
-**Cause:** A license determination was made, e.g. from package metadata, but no license text was found.
-**Resolution:** Manually verify whether the dependency includes a file containing license text.  If the dependency code that was downloaded locally does not contain the license text, please check the dependency source at the version listed in the dependency's cached metadata file to see if there is license text that can be used.
+*Cause:* A license determination was made, e.g. from package metadata, but no license text was found.
+
+*Resolution:* Manually verify whether the dependency includes a file containing license text.  If the dependency code that was downloaded locally does not contain the license text, please check the dependency source at the version listed in the dependency's cached metadata file to see if there is license text that can be used.
 
 If the dependency does not include license text but does specify that it uses a specific license, please copy the standard license text from a [well known source](https://opensource.org/licenses).
 
 ### license text has changed and needs re-review. if the new text is ok, remove the `review_changed_license` flag from the cached record
 
-**Cause:** A dependency that is set as [reviewed] in the licensed configuration file has substantially changed and should be re-reviewed.
-**Resolution:** Review the changes to the license text and classification, along with other metadata contained in the cached file for the dependency.  If the dependency is still allowable for use in your project, remove the `review_changed_license` key from the cached record file.
+*Cause:* A dependency that is set as [reviewed] in the licensed configuration file has substantially changed and should be re-reviewed.
+
+*Resolution:* Review the changes to the license text and classification, along with other metadata contained in the cached file for the dependency.  If the dependency is still allowable for use in your project, remove the `review_changed_license` key from the cached record file.
 
 ### license needs review
 
-**Cause:** A dependency is using a license that is not in the configured [allowed list of licenses][allowed], and the dependency has not been marked [ignored] or [reviewed].
-**Resolution:** Review the dependency's usage and specified license with someone familiar with OSS licensing and compliance rules to determine whether the dependency is allowable.  Some common resolutions:
+*Cause:* A dependency is using a license that is not in the configured [allowed list of licenses][allowed], and the dependency has not been marked [ignored] or [reviewed].
+*Resolution:* Review the dependency's usage and specified license with someone familiar with OSS licensing and compliance rules to determine whether the dependency is allowable.  Some common resolutions:
 
 1. The dependency's specified license text differed enough from the standard license text that it was not recognized and classified as `other`.  If, with human review, the license text is recognizable then update the `license: other` value in the cached metadata file to the correct license.
    - An updated classification will persist through version upgrades until the detected license contents have changed.  The determination is made by [licensee/licensee](https://github.com/licensee/licensee), the library which this tool uses to detect and classify license contents.
