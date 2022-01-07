@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.4.1
+
+2022-01-07
+
+### Fixed
+
+- Malformed package.json files will no longer crash yarn dependency detection (https://github.com/github/licensed/pull/431)
+
 ## 3.4.0
 
 2021-12-14
@@ -539,4 +547,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.4.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.4.1...HEAD
