@@ -1,17 +1,16 @@
 ---
-name: bundler
-version: 2.3.4
+name: faraday-multipart
+version: 1.0.2
 type: bundler
-summary: The best way to manage your application's dependencies
-homepage: https://bundler.io
+summary: Perform multipart-post requests using Faraday.
+homepage: https://github.com/lostisland/faraday-multipart
 license: mit
 licenses:
 - sources: LICENSE.md
   text: |
-    The MIT License
+    The MIT License (MIT)
 
-    Portions copyright (c) 2010-2019 André Arko
-    Portions copyright (c) 2009 Engine Yard
+    Copyright (c) 2022 The Faraday Team
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -31,5 +30,5 @@ licenses:
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
 - sources: README.md
-  text: Bundler is available under an [MIT License](https://github.com/rubygems/rubygems/blob/master/bundler/LICENSE.md).
+  text: The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 notices: []
