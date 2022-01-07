@@ -60,6 +60,3 @@ jobs:
 
           # see https://github.com/jonabc/licensed-ci for more details
           workflow: branch
-        env:
-          GOPRIVATE: "*github.com/github/*"
-          GOPROXY: "direct"
