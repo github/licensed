@@ -59,6 +59,7 @@ if Licensed::Shell.tool_available?("yarn")
           dep = source.dependencies.detect { |d| d.name == "@github/query-selector" }
           assert dep
           assert_equal "1.0.3", dep.version
+          refute_equal "", dep.path
         end
       end
 
@@ -84,7 +85,7 @@ if Licensed::Shell.tool_available?("yarn")
             graceful_fs_dependencies = source.dependencies.select { |dep| dep.name =~ /graceful-fs/ }
             assert_equal 2, graceful_fs_dependencies.size
             graceful_fs_dependencies.each do |dependency|
-              assert_equal "#{dependency.record["name"]}-#{dependency.version}", dependency.name
+              assert_equal "#{dependency.record["name"]}@#{dependency.version}", dependency.name
               assert dependency.exist?
             end
           end

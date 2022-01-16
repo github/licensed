@@ -62,6 +62,7 @@ namespace :test do
     t.libs << "lib"
     t.test_files = FileList["test/**/*_test.rb"].exclude("test/fixtures/**/*_test.rb")
                                                 .exclude("test/sources/*_test.rb")
+                                                .exclude("test/sources/**/*_test.rb")
   end
 end
 

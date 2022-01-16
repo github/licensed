@@ -59,6 +59,7 @@ if Licensed::Shell.tool_available?("yarn")
           assert dep
           assert_equal "1.0.3", dep.version
           assert dep.record["homepage"]
+          refute_equal "", dep.path
         end
       end
 

@@ -23,6 +23,25 @@ module Licensed
       def yarn_version
         Gem::Version.new(Licensed::Shell.execute("yarn", "-v"))
       end
+
+      # Returns a hash that maps all dependency names to their location on disk
+      # by parsing every package.json file under node_modules.
+      def dependency_paths
+        @dependency_paths ||= [
+            *Dir.glob(config.pwd.join("**/node_modules/*/package.json")),
+            *Dir.glob(config.pwd.join("**/node_modules/@*/*/package.json"))
+          ].each_with_object({}) do |file, hsh|
+          begin
+            dirname = File.dirname(file)
+            json = JSON.parse(File.read(file))
+            hsh["#{json["name"]}@#{json["version"]}"] = dirname
+          rescue JSON::ParserError
+            # don't crash execution if there is a problem parsing a package.json file
+            # if the bad package.json file relates to a package that licensed should be reporting on
+            # then this will still result in an error about a missing package
+          end
+        end
+      end
     end
   end
 end

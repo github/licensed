@@ -1,6 +1,6 @@
 ---
 name: faraday-multipart
-version: 1.0.2
+version: 1.0.3
 type: bundler
 summary: Perform multipart-post requests using Faraday.
 homepage: https://github.com/lostisland/faraday-multipart
