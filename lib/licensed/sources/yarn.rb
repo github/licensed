@@ -27,7 +27,10 @@ module Licensed
       # Returns a hash that maps all dependency names to their location on disk
       # by parsing every package.json file under node_modules.
       def dependency_paths
-        @dependency_paths ||= Dir.glob(config.pwd.join("**/node_modules/*/package.json")).each_with_object({}) do |file, hsh|
+        @dependency_paths ||= [
+            *Dir.glob(config.pwd.join("**/node_modules/*/package.json")),
+            *Dir.glob(config.pwd.join("**/node_modules/@*/*/package.json"))
+          ].each_with_object({}) do |file, hsh|
           begin
             dirname = File.dirname(file)
             json = JSON.parse(File.read(file))

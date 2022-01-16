@@ -59,6 +59,7 @@ if Licensed::Shell.tool_available?("yarn")
           dep = source.dependencies.detect { |d| d.name == "@github/query-selector" }
           assert dep
           assert_equal "1.0.3", dep.version
+          refute_equal "", dep.path
         end
       end
 
