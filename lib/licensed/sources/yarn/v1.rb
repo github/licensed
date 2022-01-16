@@ -73,22 +73,6 @@ module Licensed
         result
       end
 
-      # Returns a hash that maps all dependency names to their location on disk
-      # by parsing every package.json file under node_modules.
-      def dependency_paths
-        @dependency_paths ||= Dir.glob(config.pwd.join("node_modules/**/package.json")).each_with_object({}) do |file, hsh|
-          begin
-            dirname = File.dirname(file)
-            json = JSON.parse(File.read(file))
-            hsh["#{json["name"]}@#{json["version"]}"] = dirname
-          rescue JSON::ParserError
-            # don't crash execution if there is a problem parsing a package.json file
-            # if the bad package.json file relates to a package that licensed should be reporting on
-            # then this will still result in an error about a missing package
-          end
-        end
-      end
-
       # Finds and returns the yarn package tree listing from `yarn list` output
       def yarn_package_tree
         return @yarn_package_tree if defined?(@yarn_package_tree)
