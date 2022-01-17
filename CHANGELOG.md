@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.4.2
+
+2022-01-17
+
+### Fixed
+
+- The yarn source will no longer evaluate package.json files that do not represent project dependencies (https://github.com/github/licensed/pull/439)
+
 ## 3.4.1
 
 2022-01-07
@@ -547,4 +555,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.4.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.4.2...HEAD
