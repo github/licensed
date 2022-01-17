@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Licensed
-  VERSION = "3.4.1".freeze
+  VERSION = "3.4.2".freeze
 
   def self.previous_major_versions
     major_version = Gem::Version.new(Licensed::VERSION).segments.first
