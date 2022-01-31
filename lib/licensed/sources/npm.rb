@@ -135,7 +135,15 @@ module Licensed
       end
 
       def missing_peer?(parent, dependency, name)
-        dependency["peerMissing"] || (dependency["missing"] && peer_dependency(parent, name))
+        # return true if dependency is marked as "peerMissing"
+        return true if dependency["peerMissing"]
+
+        # return false unless the parent has registered the dependency
+        # as a peer
+        return false unless peer_dependency(parent, name)
+        # return true if the dependency itself is marked as missing
+        return true if dependency["missing"]
+        dependency.empty? && parent&.dig("peerDependenciesMeta", name, "optional")
       end
 
       def peer_dependency(parent, name)

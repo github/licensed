@@ -94,7 +94,13 @@ if Licensed::Shell.tool_available?("npm")
         Dir.chdir fixtures do
           # peer dependency of @optimizely/js-sdk-datafile-manager, which is
           # an indirect dependency through @optimizely/optimizely-sdk
+          # this checks the combination of being set in peerDependencies + `"missing": true`
           refute source.dependencies.detect { |dep| dep.name == "@react-native-community/async-storage" }
+
+          # peer dependency of node-fetch
+          # this checks the combination of being set in peerDependencies,
+          # + peerDependencyMetadata `"optional": true`, + empty dependency data
+          refute source.dependencies.detect { |dep| dep.name == "encoding" }
         end
       end
 

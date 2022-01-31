@@ -4,7 +4,8 @@
   "dependencies": {
     "@github/query-selector": "1.0.3",
     "@optimizely/optimizely-sdk": "4.0.0",
-    "autoprefixer": "5.2.0"
+    "autoprefixer": "5.2.0",
+    "node-fetch": "2.6.7"
   },
   "devDependencies": {
     "string.prototype.startswith": "0.2.0"
