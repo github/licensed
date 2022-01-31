@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.4.3
+
+2022-01-31
+
+### Added
+
+- The npm source handles more cases of missing, optional, peer dependencies (https://github.com/github/licensed/pull/443)
+
 ## 3.4.2
 
 2022-01-17
@@ -555,4 +563,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.4.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.4.3...HEAD
