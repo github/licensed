@@ -1,6 +1,6 @@
 ---
 name: ruby-xxHash
-version: 0.4.0.1
+version: 0.4.0.2
 type: bundler
 summary: A pure Ruby implementation of xxhash.
 homepage: https://github.com/justinwsmith/ruby-xxhash
