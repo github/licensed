@@ -147,7 +147,13 @@ module Licensed
       end
 
       def peer_dependency(parent, name)
-        parent&.dig("peerDependencies", name)
+        return unless parent.is_a?(Hash)
+
+        peerDependencies = parent["peerDependencies"]
+        # "peerDependencies" could be set to the string "[Circular]"
+        return unless peerDependencies.is_a?(Hash)
+
+        peerDependencies["name"]
       end
 
       def extract_version(parent, name)
