@@ -153,7 +153,7 @@ module Licensed
         # "peerDependencies" could be set to the string "[Circular]"
         return unless peerDependencies.is_a?(Hash)
 
-        peerDependencies["name"]
+        peerDependencies[name]
       end
 
       def extract_version(parent, name)
