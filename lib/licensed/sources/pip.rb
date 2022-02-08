@@ -63,7 +63,10 @@ module Licensed
       def virtual_env_dir
         return @virtual_env_dir if defined?(@virtual_env_dir)
         @virtual_env_dir = begin
-          venv_dir = config.dig("python", "virtual_env_dir")
+          python_config = config["python"]
+          return unless python_config.is_a?(Hash)
+
+          venv_dir = python_config["virtual_env_dir"]
           File.expand_path(venv_dir, config.root) if venv_dir
         end
       end

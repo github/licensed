@@ -20,5 +20,5 @@ You have to add this setting to your licensed configuration file.
 An example usage of this might look like:
 ```yaml
 python:
-    virtual_env_dir:"/path/to/your/venv_dir"
+    virtual_env_dir: "/path/to/your/venv_dir"
 ```
