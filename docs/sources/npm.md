@@ -4,7 +4,7 @@ The npm source will detect dependencies `package.json` is found at an apps `sour
 
 ### Including development dependencies
 
-By default, the npm source will exclude all non-development dependencies.  To include development or test dependencies, set `production_only: false` in the licensed configuration.
+By default, the npm source will exclude all development dependencies. To include development or test dependencies, set `production_only: false` in the licensed configuration.
 
 ```yml
 npm:
