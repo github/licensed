@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.4.4
+
+2022-02-07
+
+### Fixed
+
+- The npm and pip sources have better protection from strings causing crashes in `Hash#dig` (https://github.com/github/licensed/pull/450)
+
 ## 3.4.3
 
 2022-01-31
@@ -563,4 +571,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.4.3...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.4.4...HEAD
