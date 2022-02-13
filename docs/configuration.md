@@ -4,7 +4,7 @@ A configuration file specifies the details of enumerating and operating on licen
 
 Configuration can be specified in either YML or JSON formats, with examples given in YML.  The example
 below describes common configuration values and their purposes.  See [configuration options documentation](./configuration)
-for in depth information.  
+for in depth information.
 
 Additionally, some dependency sources have their own specific configuration options.  See the [source documentation](./sources) for details.
 
