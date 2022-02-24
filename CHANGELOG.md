@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.5.0
+
+2022-02-24
+
+### Added
+
+- [Licensee](https://github.com/licensee/licensee) confidence thresholds can be configured in the licensed configuration file (https://github.com/github/licensed/pull/455)
+
 ## 3.4.4
 
 2022-02-07
