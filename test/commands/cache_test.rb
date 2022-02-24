@@ -273,6 +273,17 @@ describe Licensed::Commands::Cache do
     end
   end
 
+  it "sets licensee configuration when evaluating an app" do
+    config.apps.each do |app|
+      app["licensee"] = { "confidence_threshold" => 50 }
+    end
+
+    run_command
+
+    report = reporter.report.all_reports.find { |r| r.target.is_a?(Licensed::AppConfiguration) }
+    assert_equal({ "confidence_threshold" => 50 }, report["licensee"])
+  end
+
   describe "with multiple apps" do
     let(:apps) do
       [

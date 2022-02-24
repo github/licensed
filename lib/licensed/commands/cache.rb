@@ -29,6 +29,18 @@ module Licensed
         files.clear
       end
 
+      # Run the command for an application configurations.
+      # Applies a licensee configuration for the duration of the operation.
+      #
+      # report - A Licensed::Report object for this command
+      #
+      # Returns whether the command succeeded
+      def run_app(app, report)
+        with_licensee_configuration(app, report) do
+          super
+        end
+      end
+
       # Run the command for all enumerated dependencies found in a dependency source,
       # recording results in a report.
       # Enumerating dependencies in the source is skipped if a :sources option
@@ -135,6 +147,22 @@ module Licensed
       # Set of unique absolute file paths of cached records evaluted during the run
       def files
         @files ||= Set.new
+      end
+
+      # Configure licensee for the duration of a yielded operation
+      def with_licensee_configuration(app, report)
+        licensee_configuration = app["licensee"]
+        return yield unless licensee_configuration
+
+        report["licensee"] = licensee_configuration
+
+        if new_threshold = licensee_configuration["confidence_threshold"]
+          old_threshold, Licensee.confidence_threshold = Licensee.confidence_threshold, new_threshold
+        end
+
+        yield
+      ensure
+        Licensee.confidence_threshold = old_threshold if old_threshold
       end
     end
   end
