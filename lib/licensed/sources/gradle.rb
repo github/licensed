@@ -134,6 +134,7 @@ module Licensed
 
       def self.gradle_command(*args, path:, executable:, configurations:)
         gradle_build_file = File.read("build.gradle")
+        gradle_settings_file = File.read("settings.gradle") if File.exist?("settings.gradle")
 
         if !gradle_build_file.include? "dependency-license-report"
           gradle_build_file = Licensed::Sources::Gradle.add_gradle_license_report_plugins_block(gradle_build_file)
@@ -144,7 +145,12 @@ module Licensed
             f.write(gradle_build_file)
             f.write gradle_file(configurations)
             f.close
-            Licensed::Shell.execute(executable, "-q", "-b", f.path, *args)
+            Tempfile.create(["settings-licensed-", ".gradle"], path) do |s|
+              s.write(gradle_settings_file) if gradle_settings_file
+              s.write("rootProject.buildFileName = \"#{File.basename(f.path)}\"")
+              s.close
+              Licensed::Shell.execute(executable, "-q", "-b", f.path, "-c", s.path, *args)
+            end
           end
         end
       end
