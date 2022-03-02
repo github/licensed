@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup node
       uses: actions/setup-node@v3
       with:
@@ -40,7 +40,7 @@ jobs:
       matrix:
         bundler: [ '~> 1.17.0', '~> 2.0.0', '~> 2.1.0', '~> 2.2.0' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -72,7 +72,7 @@ jobs:
         ghc: [ '8.6', '8.8', '8.10', '9.0' ]
         cabal: [ '3.0', '3.2', '3.4' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -149,7 +149,7 @@ jobs:
       matrix:
         php: [ '7.4', '8.0' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup php
       uses: nanasess/setup-php@v3.0.9
       with:
@@ -179,7 +179,7 @@ jobs:
       matrix:
         ruby: [ 2.6, 2.7, 3.0 ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -205,7 +205,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup go
       uses: actions/setup-go@v2
       with:
@@ -236,7 +236,7 @@ jobs:
       matrix:
         go: [ '1.12.x', '1.13.x', '1.14.x', '1.15.x', '1.16.x' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup go
       uses: actions/setup-go@v2
       with:
@@ -282,7 +282,7 @@ jobs:
         # possibly fixed by https://github.com/jk1/Gradle-License-Report/pull/166
         java: [ '11' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -320,7 +320,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -346,7 +346,7 @@ jobs:
         otp: [22.x, 23.x, 24.x]
         elixir: [ 1.11.x, 1.12.x ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: erlef/setup-elixir@v1.11
       with:
         otp-version: ${{matrix.otp}}
@@ -377,7 +377,7 @@ jobs:
       matrix:
         node_version: [ 12, 14, 16 ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup node
       uses: actions/setup-node@v3
       with:
@@ -408,7 +408,7 @@ jobs:
       matrix:
         dotnet: [ '3.1.x', '5.x' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup dotnet
       uses: actions/setup-dotnet@v2.0.0
       with:
@@ -439,7 +439,7 @@ jobs:
       matrix:
         python: [ '3.6', '3.7', '3.8', '3.9' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup python
       uses: actions/setup-python@v3
       with:
@@ -477,7 +477,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup python
       uses: actions/setup-python@v3
       with:
@@ -511,7 +511,7 @@ jobs:
       matrix:
         swift: [ "5.4", "5.3" ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Swift
       uses: fwal/setup-swift@v1
       with:
@@ -550,7 +550,7 @@ jobs:
         # not using 1.0.0 because it doesn't support `yarn list --production`
         yarn_version: [ 1.4.0, latest ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup node
       uses: actions/setup-node@v3
       with:
@@ -582,7 +582,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup node
       uses: actions/setup-node@v3
       with:
