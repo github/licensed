@@ -85,7 +85,7 @@ jobs:
     needs: vars
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         # checkout at the ref for the action, separate from the target build version
         # this allows running build scripts independent of the target version
@@ -111,7 +111,7 @@ jobs:
     needs: vars
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         # checkout at the ref for the action, separate from the target build version
         # this allows running build scripts independent of the target version
@@ -137,7 +137,7 @@ jobs:
     needs: vars
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         # building a gem doesn't use a different ref from the version input
         ref: ${{needs.vars.outputs.version}}
