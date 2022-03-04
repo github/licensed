@@ -20,7 +20,7 @@ jobs:
         ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v2
-      name: cache gem dependencies 
+      name: cache gem dependencies
       with:
         path: vendor/gems
         key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
@@ -312,7 +312,11 @@ jobs:
     - name: Bootstrap
       run: script/bootstrap
     - name: Gradle version
-      run: test/fixtures/gradle/gradlew --quiet --version
+      run: |
+        for d in $(ls test/fixtures/gradle/)
+        do
+          test/fixtures/gradle/${d}/gradlew --quiet --version
+        done
     - name: Run tests
       run: script/test gradle
 
