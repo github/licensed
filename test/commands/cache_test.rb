@@ -319,4 +319,50 @@ describe Licensed::Commands::Cache do
       end
     end
   end
+
+  describe "with the force option" do
+    it "overwrites an existing cached record" do
+      run_command
+
+      config.apps.each do |app|
+        path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+        record = Licensed::DependencyRecord.read(path)
+        record["license"] = "updated"
+        record["version"] = "updated"
+        record["homepage"] = "updated"
+        record.licenses.clear
+        record.save(path)
+      end
+
+      run_command(force: true)
+
+      config.apps.each do |app|
+        path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+        record = Licensed::DependencyRecord.read(path)
+        refute_equal "updated", record["license"]
+        refute_equal "updated", record["version"]
+        refute_equal "updated", record["homepage"]
+        refute_empty record.licenses
+      end
+    end
+
+    it "overwrites a record when the version and license contents match" do
+      run_command
+
+      config.apps.each do |app|
+        path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+        record = Licensed::DependencyRecord.read(path)
+        record["license"] = "updated"
+        record.save(path)
+      end
+
+      run_command(force: true)
+
+      config.apps.each do |app|
+        path = app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
+        record = Licensed::DependencyRecord.read(path)
+        refute_equal "updated", record["license"]
+      end
+    end
+  end
 end

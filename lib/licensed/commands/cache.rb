@@ -82,15 +82,8 @@ module Licensed
         report["filename"] = filename.to_s
         report["version"] = dependency.version
 
-        if options[:force] || save_dependency_record?(dependency, cached_record)
-          if dependency.record.matches?(cached_record)
-            # use the cached license value if the license text wasn't updated
-            dependency.record["license"] = cached_record["license"]
-          elsif cached_record && app.reviewed?(dependency.record)
-            # if the license text changed and the dependency is set as reviewed
-            # force a re-review of the dependency
-            dependency.record["review_changed_license"] = true
-          end
+        if save_dependency_record?(dependency, cached_record)
+          update_dependency_from_cached_record(app, dependency, cached_record)
 
           dependency.record.save(filename)
           report["cached"] = true
@@ -119,11 +112,29 @@ module Licensed
       # Returns true if dependency's record should be saved
       def save_dependency_record?(dependency, cached_record)
         return true if cached_record.nil?
+        return true if options[:force]
 
         cached_version = cached_record["version"]
         return true if cached_version.nil? || cached_version.empty?
         return true if dependency.version != cached_version
         false
+      end
+
+      # Update dependency metadata from the cached record, to support:
+      # 1. continuity between cache runs to cut down on churn
+      # 2. notifying users when changed content needs to be reviewed
+      def update_dependency_from_cached_record(app, dependency, cached_record)
+        return if cached_record.nil?
+        return if options[:force]
+
+        if dependency.record.matches?(cached_record)
+          # use the cached license value if the license text wasn't updated
+          dependency.record["license"] = cached_record["license"]
+        elsif app.reviewed?(dependency.record)
+          # if the license text changed and the dependency is set as reviewed
+          # force a re-review of the dependency
+          dependency.record["review_changed_license"] = true
+        end
       end
 
       # Clean up cached files that dont match current dependencies
