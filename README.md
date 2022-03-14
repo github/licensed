@@ -74,6 +74,8 @@ For system wide usage, install licensed to a location on `$PATH`, e.g. `/usr/loc
 
 ## Usage
 
+See [getting started](./docs/getting_started.md) for guidance using Licensed as part of your developer workflow.
+
 ### Available commands
 
 See the [commands documentation](./docs/commands) for documentation on available commands, or run `licensed -h` to see all of the current available commands.
@@ -85,18 +87,6 @@ A configuration file is required for most commands.  See the [configuration file
 ### Available dependency sources
 
 Licensed can enumerate dependency for many languages, package managers, and frameworks.  See the [sources documentation](./docs/sources) for the list of currently available sources.  Sources can be explicitly enabled and disabled as a [configuration option](./docs/configuration/dependency_source_enumerators.md.md).
-
-### Automation
-
-#### Bundler
-
-The [bundler-licensed plugin](https://github.com/sergey-alekseev/bundler-licensed) runs `licensed cache` automatically when using `bundler`.  See the linked repo for usage and details.
-
-#### GitHub Actions
-
-The [licensed-ci](https://github.com/marketplace/actions/licensed-ci) GitHub Action runs `licensed` as part of an opinionated CI workflow and can be configured to run on any GitHub Action event.  See the linked actions for usage and details.
-
-The [setup-licensed](https://github.com/marketplace/actions/setup-github-licensed) GitHub Action installs `licensed` to the workflow environment.  See the linked actions for usage and details.
 
 ## Development
 
