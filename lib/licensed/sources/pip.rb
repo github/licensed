@@ -7,17 +7,14 @@ require "parallel"
 module Licensed
   module Sources
     class Pip < Source
-      VERSION_OPERATORS = %w(< > <= >= == !=).freeze
-      PACKAGE_REGEX = /^([\w\.-]+)(#{VERSION_OPERATORS.join("|")})?/
+      PACKAGE_INFO_SEPARATOR = "\n---\n"
 
       def enabled?
-        return unless virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
-        File.exist?(config.pwd.join("requirements.txt"))
+        virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
       end
 
       def enumerate_dependencies
-        Parallel.map(packages_from_requirements_txt, in_threads: Parallel.processor_count) do |package_name|
-          package = package_info(package_name)
+        packages.map do |package|
           location = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
             name: package["Name"],
@@ -34,25 +31,45 @@ module Licensed
 
       private
 
-      def packages_from_requirements_txt
-        File.read(config.pwd.join("requirements.txt"))
-            .lines
-            .reject { |line| line.include?("://") }
-            .map { |line| line.strip.match(PACKAGE_REGEX) { |match| match.captures.first } }
-            .compact
+      # Returns parsed information for all packages used by the project,
+      # using `pip list` to determine what packages are used and `pip show`
+      # to gather package information
+      def packages
+        all_packages = pip_show_command(package_names)
+        all_packages.split(PACKAGE_INFO_SEPARATOR).reduce([]) do |accum, val|
+          accum << parse_package_info(val)
+        end
       end
 
-      def package_info(package_name)
-        p_info = pip_command(package_name).lines
-        p_info.each_with_object(Hash.new(0)) { |pkg, a|
+      # Returns the names of all of the packages used by the current project,
+      # as returned from `pip list`
+      def package_names
+        @package_names ||= begin
+          JSON.parse(pip_list_command).map { |package| package["name"] }
+        rescue JSON::ParserError => e
+          message = "Licensed was unable to parse the output from 'npm list'. JSON Error: #{e.message}"
+          raise Licensed::Sources::Source::Error, message
+        end
+      end
+
+      # Returns a hash filled with package info parsed from the email-header formatted output
+      # returned by `pip show`
+      def parse_package_info(package_info)
+        package_info.lines.each_with_object(Hash.new(0)) { |pkg, a|
           k, v = pkg.split(":", 2)
           next if k.nil? || k.empty?
           a[k.strip] = v&.strip
         }
       end
 
-      def pip_command(*args)
-        Licensed::Shell.execute(virtual_env_pip, "--disable-pip-version-check", "show", *args)
+      # Returns the output from `pip list --format=json`
+      def pip_list_command
+        Licensed::Shell.execute(virtual_env_pip, "--disable-pip-version-check", "list", "--format=json")
+      end
+
+      # Returns the output from `pip show <package> <package> ...`
+      def pip_show_command(packages)
+        Licensed::Shell.execute(virtual_env_pip, "--disable-pip-version-check", "show", *packages)
       end
 
       def virtual_env_pip
