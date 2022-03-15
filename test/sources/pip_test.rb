@@ -38,7 +38,7 @@ if Licensed::Shell.tool_available?("pip")
 
       it "detects transitive dependencies" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "google-auth-oauthlib" }
+          dep = source.dependencies.detect { |d| d.name == "MarkupSafe" }
           assert dep
           assert_equal "pip", dep.record["type"]
           assert dep.record["homepage"]
