@@ -25,109 +25,20 @@ if Licensed::Shell.tool_available?("pip")
     end
 
     describe "dependencies" do
-      it "detects dependencies without a version constraint" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "scapy" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with == version constraint" do
+      it "detects explicit dependencies" do
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "Jinja2" }
           assert dep
+          assert_equal "2.9.6", dep.version
           assert_equal "pip", dep.record["type"]
           assert dep.record["homepage"]
           assert dep.record["summary"]
         end
       end
 
-      it "detects dependencies with >= version constraint" do
+      it "detects transitive dependencies" do
         Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "requests" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with <= version constraint" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "tqdm" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with < version constraint" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Pillow" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with > version constraint" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "Scrapy" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with != version constraint" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "numpy" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with whitespace between the package name and version operator" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "botocore" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with multiple version constraints" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "boto3" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with hyphens in package name" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "lazy-object-proxy" }
-          assert dep
-          assert_equal "pip", dep.record["type"]
-          assert dep.record["homepage"]
-          assert dep.record["summary"]
-        end
-      end
-
-      it "detects dependencies with dots in package name" do
-        Dir.chdir fixtures do
-          dep = source.dependencies.detect { |d| d.name == "backports.shutil-get-terminal-size" }
+          dep = source.dependencies.detect { |d| d.name == "google-auth-oauthlib" }
           assert dep
           assert_equal "pip", dep.record["type"]
           assert dep.record["homepage"]
