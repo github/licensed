@@ -135,6 +135,31 @@ if Licensed::Shell.tool_available?("npm")
           end
         end
       end
+
+      describe "from a workspace" do
+        let(:fixtures) { File.expand_path("../../fixtures/npm/packages/a", __FILE__) }
+
+        it "finds dependencies" do
+          # workspaces will only work as expected with npm > 8.5.0
+          skip if source.npm_version < Gem::Version.new("8.5.0")
+
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "callbackify" }
+            assert dep
+            assert_equal "npm", dep.record["type"]
+            assert_equal "1.1.0", dep.version
+          end
+        end
+
+        it "does not include the current workspace project" do
+          # workspaces will only work as expected with npm > 8.5.0
+          skip if source.npm_version < Gem::Version.new("8.5.0")
+
+          Dir.chdir fixtures do
+            refute source.dependencies.detect { |d| d.name == "licensed-fixtures-a" }
+          end
+        end
+      end
     end
 
     describe "missing dependencies (glob is missing package)" do

@@ -1,5 +1,5 @@
 {
-  "name": "fixtures",
+  "name": "licensed-fixtures",
   "version": "1.0.0",
   "dependencies": {
     "@github/query-selector": "1.0.3",
@@ -11,6 +11,9 @@
   "devDependencies": {
     "string.prototype.startswith": "0.2.0"
   },
+  "workspaces": [
+    "packages/a"
+  ],
   "description": "npm test fixture",
   "repository": "https://github.com/github/licensed",
   "license": "MIT"
