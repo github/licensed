@@ -24,11 +24,13 @@ module Licensed
       end
 
       def enabled?
-        Licensed::Shell.tool_available?("npm") && File.exist?(config.pwd.join("package.json"))
+        Licensed::Shell.tool_available?("npm") && File.exist?(package_json_path)
       end
 
       def enumerate_dependencies
         packages.map do |name, package|
+          next if package["name"] == project_name
+
           errors = package["problems"] unless package["path"]
           Dependency.new(
             name: name,
@@ -158,6 +160,26 @@ module Licensed
 
       def extract_version(parent, name)
         parent&.dig("_dependencies", name) || peer_dependency(parent, name)
+      end
+
+      # Returns the current projects name
+      def project_name
+        return unless package_json
+        package_json["name"]
+      end
+
+      ## Returns the parse package.json for the current project
+      def package_json
+        return unless File.exist?(package_json_path)
+
+        @package_json ||= JSON.parse(File.read(package_json_path))
+      rescue JSON::ParserError => e
+        message = "Licensed was unable to parse package.json. JSON Error: #{e.message}"
+        raise Licensed::Sources::Source::Error, message
+      end
+
+      def package_json_path
+        @package_json_path ||= File.join(config.pwd, "package.json")
       end
     end
   end
