@@ -29,9 +29,7 @@ module Licensed
 
       def packages
         packages = JSON.parse(File.read(composer_lock))
-        if not include_dev?
-            return packages["packages"]
-        end
+        return packages["packages"] unless include_dev?
 
         packages["packages"] + packages["packages-dev"]
       end
