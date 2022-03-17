@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.6.0
+
+2022-03-17
+
+### Added
+
+- Composer dev dependencies can optionally be included in enumerated PHP dependencies (:tada: @digilist https://github.com/github/licensed/pull/486)
+- Getting started usage documentation (https://github.com/github/licensed/pull/483)
+- Initial support for NPM workspaces (https://github.com/github/licensed/pull/485)
+
+### Changed
+
+- Transitive dependencies are now enumerated by the `pip` source (https://github.com/github/licensed/pull/480)
+
+### Fixed
+
+- `licensed cache --force` will now correctly overwrite existing license classifications (https://github.com/github/licensed/pull/473)
+
 ## 3.5.0
 
 2022-02-24
@@ -579,4 +597,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.4.4...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.6.0...HEAD
