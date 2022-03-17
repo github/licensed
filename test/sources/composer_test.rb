@@ -70,6 +70,13 @@ if Licensed::Shell.tool_available?("php")
           refute source.dependencies.detect { |dep| dep.name == "phpunit/php-file-iterator" }
         end
       end
+
+      it "includes dev dependencies if enabled" do
+        config["composer"] = { "include_dev" => true }
+        Dir.chdir fixtures do
+          assert source.dependencies.detect { |dep| dep.name == "phpunit/php-file-iterator" }
+        end
+      end
     end
 
     describe "composer_application_path" do

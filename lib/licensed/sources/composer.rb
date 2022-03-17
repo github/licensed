@@ -28,7 +28,10 @@ module Licensed
       end
 
       def packages
-        JSON.parse(File.read(composer_lock))["packages"]
+        packages = JSON.parse(File.read(composer_lock))
+        return packages["packages"] unless include_dev?
+
+        packages["packages"] + packages["packages-dev"]
       end
 
       # Returns the output from running `php composer.phar` to get package metadata
@@ -55,6 +58,11 @@ module Licensed
 
       def composer_lock
         config.pwd.join("composer.lock")
+      end
+
+      # Returns whether to include dev packages based on the licensed configuration settings
+      def include_dev?
+        config.dig("composer", "include_dev") == true
       end
     end
   end

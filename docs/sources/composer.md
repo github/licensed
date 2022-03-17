@@ -12,3 +12,12 @@ The default composer application file location is `<repository root>/composer.ph
 composer:
   application_path: "/path/to/composer"
 ```
+
+### Dev dependencies
+
+By default licensed ignores all dev dependencies. To consider dev dependencies as well, use the `composer.include_dev` configuration setting.
+
+```yml
+composer:
+  include_dev: true
+```
