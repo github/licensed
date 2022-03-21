@@ -19,7 +19,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies 
       with:
         path: vendor/gems
@@ -50,7 +50,7 @@ jobs:
         yes | gem uninstall bundler --all
         gem install bundler -v "${{ matrix.bundler }}"
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -84,7 +84,7 @@ jobs:
         cabal-version: ${{ matrix.cabal }}
     - run: bundle lock
     - name: cache cabal dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cabal/packages
@@ -92,7 +92,7 @@ jobs:
         key: ${{ runner.os }}-cabal-${{ matrix.ghc }}-${{ hashFiles('**/app.cabal') }}
         restore-keys: |
           ${{ runner.os }}-cabal-
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -121,14 +121,14 @@ jobs:
         toolchain: stable
     - run: bundle lock
     - name: cache cargo dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cargo/registry
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
           ${{ runner.os }}-cargo-
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -159,7 +159,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -187,7 +187,7 @@ jobs:
     - name: Set up Bundler
       run: gem install bundler
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -215,7 +215,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -246,7 +246,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache go dependencies
       with:
         path: |
@@ -255,7 +255,7 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -293,7 +293,7 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: adopt
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gradle dependencies
       with:
         path: |
@@ -302,7 +302,7 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -326,7 +326,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -356,7 +356,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -387,7 +387,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -418,7 +418,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -450,14 +450,14 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache pip dependencies
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -488,7 +488,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -521,14 +521,14 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache spm dependencies
       with:
         path: .build
         key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
         restore-keys: |
           ${{ runner.os }}-spm-
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -564,7 +564,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
@@ -594,7 +594,7 @@ jobs:
       with:
         ruby-version: 2.6
     - run: bundle lock
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: cache gem dependencies
       with:
         path: vendor/gems
