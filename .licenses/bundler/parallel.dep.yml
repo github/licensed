@@ -1,6 +1,6 @@
 ---
 name: parallel
-version: 1.22.0
+version: 1.22.1
 type: bundler
 summary: Run any kind of code in parallel processes
 homepage: https://github.com/grosser/parallel
