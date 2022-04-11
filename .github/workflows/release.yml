@@ -167,17 +167,17 @@ jobs:
         ruby-version: 2.6
 
     - name: Download linux package
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{needs.vars.outputs.version}}-linux
 
     - name: Download macOS package
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{needs.vars.outputs.version}}-darwin
 
     - name: Download gem
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{needs.vars.outputs.version}}-gem
 
