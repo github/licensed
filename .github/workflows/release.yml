@@ -102,7 +102,7 @@ jobs:
       env:
         VERSION: ${{needs.vars.outputs.version}}
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: ${{needs.vars.outputs.version}}-linux
         path: pkg/${{needs.vars.outputs.version}}/licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
@@ -128,7 +128,7 @@ jobs:
       env:
         VERSION: ${{needs.vars.outputs.version}}
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: ${{needs.vars.outputs.version}}-darwin
         path: pkg/${{needs.vars.outputs.version}}/licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
@@ -150,7 +150,7 @@ jobs:
     - name: Build gem
       run: gem build licensed.gemspec -o licensed-${{needs.vars.outputs.version}}.gem
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: ${{needs.vars.outputs.version}}-gem
         path: licensed-${{needs.vars.outputs.version}}.gem
