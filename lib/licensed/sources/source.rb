@@ -14,8 +14,13 @@ module Licensed
       class << self
         attr_reader :sources
         def inherited(klass)
-          # add child source classes are defined,
-          # add them to the known sources list
+          # register the inherited class as a source on the Licensed::Sources::Source class
+          Licensed::Sources::Source.register_source(klass)
+        end
+
+        def register_source(klass)
+          # add the source class to the known sources list
+          return unless klass < Licensed::Sources::Source
           (@sources ||= []) << klass
         end
 

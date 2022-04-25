@@ -10,18 +10,17 @@ module Licensed
       PACKAGE_INFO_SEPARATOR = "\n---\n"
 
       def enabled?
-        virtual_env_pip && Licensed::Shell.tool_available?(virtual_env_pip)
+        !pip_command.empty? && Licensed::Shell.tool_available?(pip_command.join(""))
       end
 
       def enumerate_dependencies
         packages.map do |package|
-          location = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
           Dependency.new(
             name: package["Name"],
             version: package["Version"],
-            path: location,
+            path: package_license_location(package),
             metadata: {
-              "type"        => Pip.type,
+              "type"        => self.class.type,
               "summary"     => package["Summary"],
               "homepage"    => package["Home-page"]
             }
@@ -29,7 +28,23 @@ module Licensed
         end
       end
 
+      protected
+
+      # Returns the command to run pip
+      def pip_command
+        return [] unless virtual_env_dir
+        Array(File.join(virtual_env_dir, "bin", "pip"))
+      end
+
       private
+
+      # Returns the location of license files in the package, checking for the inclusion of a new `license_files`
+      # folder per https://peps.python.org/pep-0639/
+      def package_license_location(package)
+        dist_info = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
+        license_files = File.join(dist_info, "license_files")
+        return File.exist?(license_files) ? license_files : dist_info
+      end
 
       # Returns parsed information for all packages used by the project,
       # using `pip list` to determine what packages are used and `pip show`
@@ -64,17 +79,12 @@ module Licensed
 
       # Returns the output from `pip list --format=json`
       def pip_list_command
-        Licensed::Shell.execute(virtual_env_pip, "--disable-pip-version-check", "list", "--format=json")
+        Licensed::Shell.execute(*pip_command, "--disable-pip-version-check", "list", "--format=json")
       end
 
       # Returns the output from `pip show <package> <package> ...`
       def pip_show_command(packages)
-        Licensed::Shell.execute(virtual_env_pip, "--disable-pip-version-check", "show", *packages)
-      end
-
-      def virtual_env_pip
-        return unless virtual_env_dir
-        File.join(virtual_env_dir, "bin", "pip")
+        Licensed::Shell.execute(*pip_command, "--disable-pip-version-check", "show", *packages)
       end
 
       def virtual_env_dir

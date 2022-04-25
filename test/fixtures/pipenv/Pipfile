@@ -9,3 +9,4 @@ verify_ssl = true
 beautifulsoup4 = "==4.7.1"
 dataclasses = {version = "==0.6",markers = "python_version < '3.7.0'"}
 pylint = "==2.3.1"
+datadog = "==0.44.0"

@@ -11,3 +11,4 @@ botocore == 1.12.91
 boto3>=1.0,<=2.0
 lazy-object-proxy==1.4.0
 backports.shutil-get-terminal-size==1.0.0
+datadog==0.44.0
