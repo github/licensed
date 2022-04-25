@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.7.0
+
+### Changed
+
+- Pip and pipenv sources will find dependency licenses under `dist-info/license_files` when available (https://github.com/github/licensed/pull/504)
+
 ## 3.6.0
 
 2022-03-17
@@ -597,4 +603,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.6.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.7.0...HEAD
