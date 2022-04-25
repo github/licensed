@@ -32,7 +32,7 @@ module Licensed
 
       # Returns the command to run pip
       def pip_command
-        return [] unless virtual_env_dir
+        return unless virtual_env_dir
         File.join(virtual_env_dir, "bin", "pip")
       end
 
