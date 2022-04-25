@@ -13,7 +13,7 @@ module Licensed
 
       # Returns the command to run pip
       def pip_command
-        "pipenv run pip"
+        %w(pipenv run pip)
       end
     end
   end

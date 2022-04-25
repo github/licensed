@@ -10,7 +10,7 @@ module Licensed
       PACKAGE_INFO_SEPARATOR = "\n---\n"
 
       def enabled?
-        pip_command && Licensed::Shell.tool_available?(pip_command)
+        !pip_command.empty? && Licensed::Shell.tool_available?(pip_command.join(""))
       end
 
       def enumerate_dependencies
@@ -32,8 +32,8 @@ module Licensed
 
       # Returns the command to run pip
       def pip_command
-        return unless virtual_env_dir
-        File.join(virtual_env_dir, "bin", "pip")
+        return [] unless virtual_env_dir
+        Array(File.join(virtual_env_dir, "bin", "pip"))
       end
 
       private
@@ -79,12 +79,12 @@ module Licensed
 
       # Returns the output from `pip list --format=json`
       def pip_list_command
-        Licensed::Shell.execute(pip_command, "--disable-pip-version-check", "list", "--format=json")
+        Licensed::Shell.execute(*pip_command, "--disable-pip-version-check", "list", "--format=json")
       end
 
       # Returns the output from `pip show <package> <package> ...`
       def pip_show_command(packages)
-        Licensed::Shell.execute(pip_command, "--disable-pip-version-check", "show", *packages)
+        Licensed::Shell.execute(*pip_command, "--disable-pip-version-check", "show", *packages)
       end
 
       def virtual_env_dir
