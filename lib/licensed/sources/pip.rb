@@ -20,7 +20,7 @@ module Licensed
             version: package["Version"],
             path: package_license_location(package),
             metadata: {
-              "type"        => Pip.type,
+              "type"        => self.class.type,
               "summary"     => package["Summary"],
               "homepage"    => package["Home-page"]
             }
