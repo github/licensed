@@ -268,7 +268,7 @@ describe Licensed::Dependency do
       end
     end
 
-    it "handles invlaid encodings in legal notices" do
+    it "handles invalid encodings in legal notices" do
       mkproject do |dependency|
         File.write "AUTHORS", [0x20, 0x42, 0x3f, 0x63, 0x6b].pack("ccccc")
         File.write "NOTICE", "notice"
