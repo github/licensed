@@ -3,7 +3,7 @@ require "licensee"
 
 module Licensed
   class Dependency < Licensee::Projects::FSProject
-    LEGAL_FILES_PATTERN = /\A(AUTHORS|NOTICE|LEGAL)(?:\..*)?\z/i
+    LEGAL_FILES_PATTERN = /#{File::SEPARATOR}(AUTHORS|NOTICE|LEGAL)(?:\..*)?\z/i
 
     attr_reader :name
     attr_reader :version
@@ -83,7 +83,6 @@ module Licensed
     # Returns legal notices found at the dependency path
     def notice_contents
       Dir.glob(dir_path.join("*"))
-         .map(&File.method(:basename))
          .grep(LEGAL_FILES_PATTERN)
          .select { |path| File.file?(path) }
          .sort # sorted by the path
