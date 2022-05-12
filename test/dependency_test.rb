@@ -240,6 +240,7 @@ describe Licensed::Dependency do
         File.write "AUTHORS", "authors"
         File.write "NOTICE", "notice"
         File.write "LEGAL", "legal"
+        File.write "otherLEGAL.c", "new legal"
 
         assert_includes dependency.notice_contents,
                         { "sources" => "AUTHORS", "text" => "authors" }
@@ -247,6 +248,8 @@ describe Licensed::Dependency do
                         { "sources" => "NOTICE", "text" => "notice" }
         assert_includes dependency.notice_contents,
                         { "sources" => "LEGAL", "text" => "legal" }
+
+        refute dependency.notice_contents.any? { |c| c["sources"] == "otherLEGAL.c" }
       end
     end
 
@@ -265,7 +268,7 @@ describe Licensed::Dependency do
       end
     end
 
-    it "handles invlaid encodings in legal notices" do
+    it "handles invalid encodings in legal notices" do
       mkproject do |dependency|
         File.write "AUTHORS", [0x20, 0x42, 0x3f, 0x63, 0x6b].pack("ccccc")
         File.write "NOTICE", "notice"

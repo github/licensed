@@ -3,7 +3,7 @@ require "licensee"
 
 module Licensed
   class Dependency < Licensee::Projects::FSProject
-    LEGAL_FILES_PATTERN = /(AUTHORS|NOTICE|LEGAL)(?:\..*)?\z/i
+    LEGAL_FILES_PATTERN = /#{File::SEPARATOR}(AUTHORS|NOTICE|LEGAL)(?:\..*)?\z/i
 
     attr_reader :name
     attr_reader :version
