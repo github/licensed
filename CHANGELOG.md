@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.7.1
+
+### Fixed
+
+- Dependencies' legal notice file matching has been made more strict to reduce false positives on code files containing the word `legal` (https://github.com/github/licensed/pull/510)
+
 ## 3.7.0
 
 ### Changed
@@ -603,4 +609,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.7.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.7.1...HEAD
