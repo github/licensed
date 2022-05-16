@@ -20,7 +20,7 @@ jobs:
         ruby-version: 2.6
     - run: bundle lock
     - uses: actions/cache@v3
-      name: cache gem dependencies 
+      name: cache gem dependencies
       with:
         path: vendor/gems
         key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
@@ -347,7 +347,7 @@ jobs:
         elixir: [ 1.11.x, 1.12.x ]
     steps:
     - uses: actions/checkout@v3
-    - uses: erlef/setup-elixir@v1.11
+    - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.otp}}
         elixir-version: ${{matrix.elixir}}
