@@ -86,7 +86,7 @@ A configuration file is required for most commands.  See the [configuration file
 
 ### Available dependency sources
 
-Licensed can enumerate dependency for many languages, package managers, and frameworks.  See the [sources documentation](./docs/sources) for the list of currently available sources.  Sources can be explicitly enabled and disabled as a [configuration option](./docs/configuration/dependency_source_enumerators.md.md).
+Licensed can enumerate dependency for many languages, package managers, and frameworks.  See the [sources documentation](./docs/sources) for the list of currently available sources.  Sources can be explicitly enabled and disabled as a [configuration option](./docs/configuration/dependency_source_enumerators.md).
 
 ## Development
 
