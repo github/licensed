@@ -1,6 +1,6 @@
 ---
 name: sawyer
-version: 0.8.2
+version: 0.9.1
 type: bundler
 summary: Secret User Agent of HTTP
 homepage: https://github.com/lostisland/sawyer
