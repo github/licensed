@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.7.2
+
+### Fixed
+
+- Comparing dependency license contents now finds matching contents regardless of the order of the licenses (https://github.com/github/licensed/pull/516)
+- Fixed typo in a link in README.md (https://github.com/github/licensed/pull/514) 
+
+### Changed
+
+- Elixir testing setup is migrated to erlef/setup-beam (https://github.com/github/licensed/pull/512)
+
 ## 3.7.1
 
 ### Fixed
@@ -609,4 +620,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.7.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.7.2...HEAD
