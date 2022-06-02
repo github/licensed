@@ -99,5 +99,25 @@ describe Licensed::DependencyRecord do
 
       assert record.matches?(other)
     end
+
+    it "returns true for the same normalized content in different ordered text-only data" do
+      record = Licensed::DependencyRecord.new(licenses: ["license 1", "license 2"])
+      other = Licensed::DependencyRecord.new(licenses: ["license 2", "license 1"])
+
+      assert record.matches?(other)
+    end
+
+    it "returns true for the same normalized content in different ordered text+source data" do
+      record = Licensed::DependencyRecord.new(licenses: [
+        { "text" => "license 1", "source" => "source 1" },
+        { "text" => "license 2", "source" => "source 2" }
+      ])
+      other = Licensed::DependencyRecord.new(licenses: [
+        { "text" => "license 2", "source" => "source 2" },
+        { "text" => "license 1", "source" => "source 1" }
+      ])
+
+      assert record.matches?(other)
+    end
   end
 end

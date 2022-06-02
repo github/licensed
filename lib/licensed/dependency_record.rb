@@ -27,6 +27,14 @@ module Licensed
           "text" => text
         }
       end
+
+      def key
+        @key ||= begin
+          # rubocop:disable GitHub/InsecureHashAlgorithm
+          Digest::XXHash64.digest(sources.join("") + text)
+          # rubocop:enable GitHub/InsecureHashAlgorithm
+        end
+      end
     end
 
     include Licensee::ContentHelper
@@ -84,7 +92,7 @@ module Licensed
     # `Licensee::CotentHelper`
     def content
       return if licenses.nil? || licenses.empty?
-      licenses.map(&:text).compact.join
+      licenses.sort_by(&:key).map(&:text).compact.join
     end
 
     # Returns whether two records match based on their contents
