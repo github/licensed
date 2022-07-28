@@ -36,11 +36,12 @@ module Licensed
 
       # Returns an array of dependency package import paths
       def packages
-        dependency_packages = if go_version < Gem::Version.new("1.11.0")
-          root_package_deps
-        else
-          go_list_deps
-        end
+        dependency_packages =
+          if go_version < Gem::Version.new("1.11.0")
+            root_package_deps
+          else
+            go_list_deps
+          end
 
         # don't include go std packages
         # don't include packages under the root project that aren't vendored

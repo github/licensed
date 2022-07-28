@@ -243,15 +243,16 @@ module Licensed
 
       # try to expand the source path for glob patterns
       expanded_source_paths = source_path_array.reduce(Set.new) do |matched_paths, pattern|
-        current_matched_paths = if pattern.start_with?("!")
-          # if the pattern is an exclusion, remove all matching files
-          # from the result
-          matched_paths - Dir.glob(pattern[1..-1])
-        else
-          # if the pattern is an inclusion, add all matching files
-          # to the result
-          matched_paths + Dir.glob(pattern)
-        end
+        current_matched_paths =
+          if pattern.start_with?("!")
+            # if the pattern is an exclusion, remove all matching files
+            # from the result
+            matched_paths - Dir.glob(pattern[1..-1])
+          else
+            # if the pattern is an inclusion, add all matching files
+            # to the result
+            matched_paths + Dir.glob(pattern)
+          end
 
         current_matched_paths.select { |p| File.directory?(p) }
       end

@@ -19,7 +19,7 @@ module Licensed
       # app - An application configuration
       # report - A report containing information about the app evaluation
       def begin_report_app(app, report)
-          shell.info "Checking cached dependency records for #{app["name"]}"
+        shell.info "Checking cached dependency records for #{app["name"]}"
       end
 
       # Reports any errors found when checking status, as well as

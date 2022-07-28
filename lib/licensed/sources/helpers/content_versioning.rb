@@ -27,14 +27,14 @@ module Licensed
       def version_strategy
         # default to git for backwards compatible behavior
         @version_strategy ||= begin
-           case config.fetch("version_strategy", nil)
-           when CONTENTS
-             CONTENTS
-           when GIT
-             GIT
-           else
-             Licensed::Git.available? ? GIT : CONTENTS
-           end
+          case config.fetch("version_strategy", nil)
+          when CONTENTS
+            CONTENTS
+          when GIT
+            GIT
+          else
+            Licensed::Git.available? ? GIT : CONTENTS
+          end
         end
       end
 
