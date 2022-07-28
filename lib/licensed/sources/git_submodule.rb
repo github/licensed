@@ -20,12 +20,13 @@ module Licensed
         git_submodules_command.lines.map do |line|
           displaypath, toplevel, version, homepage = line.strip.split
           name = File.basename(displaypath)
-          submodule_path = if toplevel == config.pwd.to_s
-            name
-          else
-            parent = File.basename(toplevel)
-            "#{submodule_paths[parent]}/#{name}"
-          end
+          submodule_path =
+            if toplevel == config.pwd.to_s
+              name
+            else
+              parent = File.basename(toplevel)
+              "#{submodule_paths[parent]}/#{name}"
+            end
           submodule_paths[name] = submodule_path
 
           Licensed::Dependency.new(

@@ -187,20 +187,20 @@ if Licensed::Shell.tool_available?("go")
       end
 
       describe "package version" do
-          it "is the latest git SHA of the package directory when configured" do
-            Dir.chdir fixtures do
-              dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-              assert_equal source.git_version([dep.path]), dep.version
-            end
+        it "is the latest git SHA of the package directory when configured" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+            assert_equal source.git_version([dep.path]), dep.version
           end
+        end
 
-          it "is the hash of all contents in the package directory when configured" do
-            config["version_strategy"] = Licensed::Sources::ContentVersioning::CONTENTS
-            Dir.chdir fixtures do
-              dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
-              assert_equal source.contents_hash(Dir["#{dep.path}/*"]), dep.version
-            end
+        it "is the hash of all contents in the package directory when configured" do
+          config["version_strategy"] = Licensed::Sources::ContentVersioning::CONTENTS
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "github.com/gorilla/context" }
+            assert_equal source.contents_hash(Dir["#{dep.path}/*"]), dep.version
           end
+        end
       end
 
       describe "from a subfolder source_path" do
