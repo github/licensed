@@ -26,8 +26,7 @@ end
 gem "pathed-gem-fixture", path: "pathed-gem-fixture"
 
 # verify https://github.com/github/licensed/issues/71
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
-gem "mini_racer", "0.3.1"
+gem "mini_racer", "0.6.2"
 
 # verify https://github.com/github/licensed/issues/153
 gem "aws-sdk-core", "3.39.0"

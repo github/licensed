@@ -52,7 +52,7 @@ if Licensed::Shell.tool_available?("bundle")
 
       it "finds platform-specific dependencies" do
         Dir.chdir(fixtures) do
-          assert source.dependencies.find { |d| d.name == "libv8" }
+          assert source.dependencies.find { |d| d.name == "libv8-node" }
         end
       end
 
