@@ -57,6 +57,8 @@ test/fixtures/cargo/*
 !test/fixtures/cargo/Cargo.*
 !test/fixtures/cargo/src
 
+test/fixtures/swift/.build
+
 vendor/licenses
 .licenses_test
 *.gem
