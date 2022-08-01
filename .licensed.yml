@@ -7,6 +7,7 @@ allowed:
 
 reviewed:
   bundler:
+    - json
     - pathname-common_prefix
     - racc
     - reverse_markdown
