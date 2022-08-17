@@ -40,6 +40,13 @@ module Licensed
     end
 
     module LazySpecification
+      def materialize_for_installation(*args)
+        spec = super(*args)
+        return spec unless spec.is_a?(LazySpecification)
+
+        Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
+      end
+
       def __materialize__(*args)
         spec = super(*args)
         return spec if spec
