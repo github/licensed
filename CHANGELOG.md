@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Bundler test fixtures are compatible with latest macOS silicon(:tada: @CvX https://github.com/github/licensed/pull/528)
 - Fix segfaults seen using licensed with ruby 3.0.4 (https://github.com/github/licensed/pull/530)
 - Fix compatibility with latest versions of bundler 2.3 (https://github.com/github/licensed/pull/535)
+- Fix compatibility with latest versions of bundler 2.3 (:tada: @CvX https://github.com/github/licensed/pull/522)
 
 ## 3.7.2
 
