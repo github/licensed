@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.7.3
+
+### Fixed
+
+- Swift test fixtures build artifacts are now ignored (:tada: @CvX https://github.com/github/licensed/pull/524)
+- Running cargo test fixture setup no longer deletes test files (:tada: @CvX https://github.com/github/licensed/pull/525)
+- Bundler test fixtures are compatible with latest macOS silicon(:tada: @CvX https://github.com/github/licensed/pull/528)
+- Fix segfaults seen using licensed with ruby 3.0.4 (https://github.com/github/licensed/pull/530)
+- Fix compatibility with latest versions of bundler 2.3 (https://github.com/github/licensed/pull/535)
+
 ## 3.7.2
 
 ### Fixed
@@ -620,4 +630,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.7.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.7.3...HEAD
