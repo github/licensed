@@ -37,6 +37,8 @@ The following data is reported for each dependency when the YAML or JSON report 
 
 ## Status errors and resolutions
 
+**Note** The recommended commands are different in github/github. If you need help resolving a licensed error in github/github, see [the dotcom guide on the hub](https://thehub.github.com/epd/engineering/products-and-services/dotcom/licenses/).
+
 ### cached dependency record not found
 
 *Cause:* A dependency was found while running `licensed status` that does not have a corresponding cached metadata file
