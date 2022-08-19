@@ -6,6 +6,8 @@ Licensed is available as a Ruby gem for Ruby environments, and as a self-contain
 
 Licensed is **not** a complete open source license compliance solution. Please understand the important [disclaimer](#disclaimer) below to make appropriate use of Licensed.
 
+Help is available in the `#licensed-support` Slack channel.
+
 ## Current Status
 
 ![Build status](https://github.com/github/licensed/workflows/Test/badge.svg)
