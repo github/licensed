@@ -1,6 +1,6 @@
-# Allowed licenses
+# Not Allowed licenses
 
-**Key**: allowed
+**Key**: Not allowed
 **Default Value**: none
 
 The list of allowed licenses is used with the [status command](../commands/status.md) to detail which licenses are allowable for use in the current project and do not need further review.  If a dependency uses a license that is not included in the allowed list, and the dependency is not on the ignored or reviewed dependency lists, it will be flagged and the status command will fail.
