@@ -42,8 +42,12 @@ module Licensed
       # folder per https://peps.python.org/pep-0639/
       def package_license_location(package)
         dist_info = File.join(package["Location"], package["Name"].gsub("-", "_") +  "-" + package["Version"] + ".dist-info")
-        license_files = File.join(dist_info, "license_files")
-        return File.exist?(license_files) ? license_files : dist_info
+
+        license_path = ["license_files", "licenses"]
+          .map { |directory| File.join(dist_info, directory) }
+          .find { |path| File.exist?(path) }
+
+        license_path || dist_info
       end
 
       # Returns parsed information for all packages used by the project,

@@ -1,7 +1,7 @@
 # This comment should be ignored
 --index-url https://pypi.org/simple
 scapy
-Jinja2==2.9.6
+Jinja2==3.0
 requests>=2.21.0
 tqdm<=4.30.0
 Pillow>5.4.0
@@ -12,3 +12,4 @@ boto3>=1.0,<=2.0
 lazy-object-proxy==1.4.0
 backports.shutil-get-terminal-size==1.0.0
 datadog==0.44.0
+nbconvert==7.1.0

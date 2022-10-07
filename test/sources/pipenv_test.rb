@@ -66,6 +66,14 @@ if Licensed::Shell.tool_available?("pipenv")
           refute_empty dep.license_files
         end
       end
+
+      it "finds hatch build backend license contents from .dist-info/licenses" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "nbconvert" }
+          assert dep.path.end_with?("licenses")
+          refute_empty dep.license_files
+        end
+      end
     end
   end
 end

@@ -29,7 +29,7 @@ if Licensed::Shell.tool_available?("pip")
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "Jinja2" }
           assert dep
-          assert_equal "2.9.6", dep.version
+          assert_equal "3.0.0", dep.version
           assert_equal "pip", dep.record["type"]
           assert dep.record["homepage"]
           assert dep.record["summary"]
@@ -50,6 +50,14 @@ if Licensed::Shell.tool_available?("pip")
         Dir.chdir fixtures do
           dep = source.dependencies.detect { |d| d.name == "datadog" }
           assert dep.path.end_with?("license_files")
+          refute_empty dep.license_files
+        end
+      end
+
+      it "finds hatch build backend license contents from .dist-info/licenses" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "nbconvert" }
+          assert dep.path.end_with?("licenses")
           refute_empty dep.license_files
         end
       end
