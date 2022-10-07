@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.7.4
+
+### Fixed
+
+- Licenses for Python dependencies built with Hatchling are correctly found (https://github.com/github/licensed/pull/547)
+
 ## 3.7.3
 
 ### Fixed
@@ -631,4 +637,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.7.3...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.7.4...HEAD
