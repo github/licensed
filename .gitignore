@@ -9,6 +9,8 @@
 /tmp/
 
 # test fixtures
+test/fixtures/**/.licenses
+
 test/fixtures/bundler/.bundle/
 test/fixtures/bundler/vendor/
 test/fixtures/bundler/Gemfile.lock
