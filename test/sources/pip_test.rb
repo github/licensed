@@ -61,6 +61,13 @@ if Licensed::Shell.tool_available?("pip")
           refute_empty dep.license_files
         end
       end
+
+      it "does not parse metadata from content" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "scipy" }
+          assert dep.record.licenses.any? { |l| l.text.include?("Name: GCC runtime library") }
+        end
+      end
     end
   end
 end

@@ -74,11 +74,13 @@ module Licensed
       # Returns a hash filled with package info parsed from the email-header formatted output
       # returned by `pip show`
       def parse_package_info(package_info)
-        package_info.lines.each_with_object(Hash.new(0)) { |pkg, a|
+        package_info.lines.each_with_object(Hash.new(0)) do |pkg, a|
+          next if pkg.start_with?(/^\s/)
+
           k, v = pkg.split(":", 2)
           next if k.nil? || k.empty?
           a[k.strip] = v&.strip
-        }
+        end
       end
 
       # Returns the output from `pip list --format=json`
