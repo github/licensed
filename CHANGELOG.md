@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.7.5
+
+### Fixed
+
+- Python dependency metadata will be correctly parsed from the ouput of `pip show` (https://github.com/github/licensed/pull/555)
+
 ## 3.7.4
 
 ### Fixed
@@ -637,4 +643,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.7.4...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.7.5...HEAD
