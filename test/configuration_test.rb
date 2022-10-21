@@ -378,6 +378,45 @@ describe Licensed::AppConfiguration do
         refute config.reviewed?(package)
       end
     end
+
+    describe "with version" do
+      it "sets the dependency reviewed at the specific version" do
+        config.review package
+        assert config.reviewed?(package)
+
+        package["version"] = "1.2.3"
+        assert config.reviewed?(package)
+        refute config.reviewed?(package, match_version: true)
+
+        config.review package
+        refute config.reviewed?(package.merge("version" => "1.0.0"), match_version: true)
+        assert config.reviewed?(package, match_version: true)
+        assert_equal ["#{package["name"]}@#{package["version"]}"], config.reviewed_versions(package)
+      end
+
+      it "reviewing dependencies at version will not match dependencies without version" do
+        package = { "type" => "bundler", "name" => "licensed", "version" => "1.0.0" }
+        config.review(package)
+        refute config.reviewed?(package, match_version: false)
+      end
+
+      it "matches glob patterns for specified versions" do
+        config.review({ "type" => "go", "name" => "github.com/github/**/*", "version" => "1.2.3" })
+        assert_equal ["github.com/github/**/*@1.2.3"], config.reviewed_versions(package)
+
+        refute config.reviewed?(package.merge("version" => "1.0.0"), match_version: true)
+        assert config.reviewed?(package.merge("version" => "1.2.3"), match_version: true)
+      end
+
+      it "does not treat leading @ symbols as version separators when listing versions" do
+        package = { "type" => "npm", "name" => "@github/package" }
+        config.review(package)
+        assert_empty config.reviewed_versions(package)
+
+        config.review(package.merge("version" => "1.2.3"))
+        assert_equal ["@github/package@1.2.3"], config.reviewed_versions(package)
+      end
+    end
   end
 
   describe "allow" do
