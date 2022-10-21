@@ -98,9 +98,9 @@ module Licensed
     end
 
     # Set a dependency as reviewed
-    def review(dependency)
+    def review(dependency, at_version: false)
       id = dependency["name"]
-      id += "@#{dependency["version"]}" if dependency["version"]
+      id += "@#{dependency["version"]}" if at_version && dependency["version"]
       (self["reviewed"][dependency["type"]] ||= []) << id
     end
 

@@ -245,7 +245,7 @@ describe Licensed::Commands::Status do
 
       config.apps.each do |app|
         app.sources.each do |source|
-          app.review "type" => source.class.type, "name" => "dependency"
+          app.review({ "type" => source.class.type, "name" => "dependency" })
         end
       end
 
@@ -443,7 +443,7 @@ describe Licensed::Commands::Status do
           "type" => TestSource.type,
           "name" => TestSource::DEFAULT_DEPENDENCY_NAME,
           "version" => TestSource::DEPENDENCY_VERSION
-        })
+        }, at_version: true)
       end
 
       run_command
@@ -477,7 +477,7 @@ describe Licensed::Commands::Status do
           "type" => TestSource.type,
           "name" => TestSource::DEFAULT_DEPENDENCY_NAME,
           "version" => "0.0.0",
-        })
+        }, at_version: true)
       end
 
       run_command
@@ -537,7 +537,7 @@ describe Licensed::Commands::Status do
           "type" => TestSource.type,
           "name" => TestSource::DEFAULT_DEPENDENCY_NAME,
           "version" => TestSource::DEPENDENCY_VERSION
-        })
+        }, at_version: true)
       end
 
       reporter.report.all_reports.clear

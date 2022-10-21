@@ -388,7 +388,7 @@ describe Licensed::AppConfiguration do
         assert config.reviewed?(package)
         refute config.reviewed?(package, match_version: true)
 
-        config.review package
+        config.review package, at_version: true
         refute config.reviewed?(package.merge("version" => "1.0.0"), match_version: true)
         assert config.reviewed?(package, match_version: true)
         assert_equal ["#{package["name"]}@#{package["version"]}"], config.reviewed_versions(package)
@@ -396,12 +396,12 @@ describe Licensed::AppConfiguration do
 
       it "reviewing dependencies at version will not match dependencies without version" do
         package = { "type" => "bundler", "name" => "licensed", "version" => "1.0.0" }
-        config.review(package)
+        config.review(package, at_version: true)
         refute config.reviewed?(package, match_version: false)
       end
 
       it "matches glob patterns for specified versions" do
-        config.review({ "type" => "go", "name" => "github.com/github/**/*", "version" => "1.2.3" })
+        config.review({ "type" => "go", "name" => "github.com/github/**/*", "version" => "1.2.3" }, at_version: true)
         assert_equal ["github.com/github/**/*@1.2.3"], config.reviewed_versions(package)
 
         refute config.reviewed?(package.merge("version" => "1.0.0"), match_version: true)
@@ -413,7 +413,7 @@ describe Licensed::AppConfiguration do
         config.review(package)
         assert_empty config.reviewed_versions(package)
 
-        config.review(package.merge("version" => "1.2.3"))
+        config.review(package.merge("version" => "1.2.3"), at_version: true)
         assert_equal ["@github/package@1.2.3"], config.reviewed_versions(package)
       end
     end
