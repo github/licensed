@@ -26,8 +26,8 @@ When using `licensed status` in this scenario, licensed will compile all depende
 
 A dependency will fail the status checks if:
 
-1. The cached record's `licenses` data is empty
-2. The cached record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration and the dependency has not been marked `reviewed` or `ignored`
+1. The record's `licenses` data is empty
+2. The record's `license` metadata doesn't match an `allowed` license from the dependency's application configuration and the dependency has not been marked `reviewed` or `ignored`
    - If `license: other` is specified and all of the `licenses` entries match an `allowed` license a failure will not be logged
    - A `reviewed` entry must reference a specific version of the depdency, e.g. `<name>@<version>`.  The version identifier must specify a specific dependency version, ranges are not allowed.
 
