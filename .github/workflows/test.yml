@@ -343,8 +343,8 @@ jobs:
     needs: core
     strategy:
       matrix:
-        otp: [22.x, 23.x, 24.x]
-        elixir: [ 1.11.x, 1.12.x ]
+        otp: [24.x, 25.x]
+        elixir: [ 1.13.x, 1.14.x ]
     steps:
     - uses: actions/checkout@v3
     - uses: erlef/setup-beam@v1
