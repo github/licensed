@@ -343,8 +343,8 @@ jobs:
     needs: core
     strategy:
       matrix:
-        otp: [22.x, 23.x, 24.x]
-        elixir: [ 1.11.x, 1.12.x ]
+        otp: [24.x, 25.x]
+        elixir: [ 1.13.x, 1.14.x ]
     steps:
     - uses: actions/checkout@v3
     - uses: erlef/setup-beam@v1
@@ -505,11 +505,11 @@ jobs:
       run: script/test pipenv
 
   swift:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: core
     strategy:
       matrix:
-        swift: [ "5.4", "5.3" ]
+        swift: [ "5.7", "5.6" ]
     steps:
     - uses: actions/checkout@v3
     - name: Setup Swift
