@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class TestSource < Licensed::Sources::Source
-  def initialize(config, name = "dependency", metadata = {})
+  DEPENDENCY_VERSION = "1.0".freeze
+  DEFAULT_DEPENDENCY_NAME = "dependency".freeze
+
+  def initialize(config, name = DEFAULT_DEPENDENCY_NAME, metadata = {})
     super config
     @name = name
     @metadata = metadata
@@ -18,7 +21,7 @@ class TestSource < Licensed::Sources::Source
   def enumerate_dependencies
     dependency_config = {
       name: @name,
-      version: "1.0",
+      version: DEPENDENCY_VERSION,
       path: Dir.pwd,
       metadata: {
         "type" => TestSource.type,

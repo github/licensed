@@ -26,8 +26,11 @@ module Licensed
       desc: "Individual source(s) to evaluate.  Must also be enabled via configuration."
     method_option :format, aliases: "-f", enum: ["yaml", "json"],
       desc: "Output format"
+    method_option :data_source, aliases: "-d",
+      enum: ["files", "configuration"], default: "files",
+      desc: "Whether to check compliance status from cached records or the configuration file"
     def status
-      run Licensed::Commands::Status.new(config: config), sources: options[:sources], reporter: options[:format]
+      run Licensed::Commands::Status.new(config: config), sources: options[:sources], reporter: options[:format], data_source: options[:data_source]
     end
 
     desc "list", "List dependencies"

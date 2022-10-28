@@ -73,17 +73,18 @@ module Licensed
     end
 
     # Is the given dependency reviewed?
-    def reviewed?(dependency)
-      Array(self["reviewed"][dependency["type"]]).any? do |pattern|
-        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
-      end
+    def reviewed?(dependency, match_version: false)
+      any_list_pattern_matched? self["reviewed"][dependency["type"]], dependency, match_version: match_version
+    end
+
+    # Find all reviewed dependencies that match the provided dependency's name
+    def reviewed_versions(dependency)
+      similar_list_patterns self["reviewed"][dependency["type"]], dependency
     end
 
     # Is the given dependency ignored?
     def ignored?(dependency)
-      Array(self["ignored"][dependency["type"]]).any? do |pattern|
-        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
-      end
+      any_list_pattern_matched? self["ignored"][dependency["type"]], dependency
     end
 
     # Is the license of the dependency allowed?
@@ -97,8 +98,10 @@ module Licensed
     end
 
     # Set a dependency as reviewed
-    def review(dependency)
-      (self["reviewed"][dependency["type"]] ||= []) << dependency["name"]
+    def review(dependency, at_version: false)
+      id = dependency["name"]
+      id += "@#{dependency["version"]}" if at_version && dependency["version"]
+      (self["reviewed"][dependency["type"]] ||= []) << id
     end
 
     # Set a license as explicitly allowed
@@ -107,6 +110,27 @@ module Licensed
     end
 
     private
+
+    def any_list_pattern_matched?(list, dependency, match_version: false)
+      Array(list).any? do |pattern|
+        if match_version
+          at_version = "@#{dependency["version"]}"
+          pattern, pattern_version = pattern.rpartition(at_version).values_at(0, 1)
+          next false if pattern == "" || pattern_version == ""
+        end
+
+        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
+      end
+    end
+
+    def similar_list_patterns(list, dependency)
+      Array(list).select do |pattern|
+        pattern, version = pattern.rpartition("@").values_at(0, 2)
+        next if pattern == "" || version == ""
+
+        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
+      end
+    end
 
     # Returns the cache path for the application based on:
     # 1. An explicitly set cache path for the application, if set
