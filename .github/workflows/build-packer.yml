@@ -54,7 +54,7 @@ jobs:
       - name: "Install dependencies"
         run: |
           brew upgrade
-          brew install squashfs
+          brew install squashfs automake
       - name: "Check dependencies"
         run: |
           sw_vers
