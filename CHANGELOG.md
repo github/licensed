@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.8.0
+
+### Added
+
+- Licensing compliance status checks can now be used without cached files in a repository (https://github.com/github/licensed/pull/560)
+
 ## 3.7.5
 
 ### Fixed
@@ -643,4 +649,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.7.5...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.8.0...HEAD
