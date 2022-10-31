@@ -39,7 +39,7 @@ jobs:
       - name: "Build"
         run: bundle exec rake rubyc
       - name: "Upload"
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: rubyc-linux
           path: rubyc
@@ -71,7 +71,7 @@ jobs:
       - name: "Build"
         run: bundle exec rake rubyc
       - name: "Upload"
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: rubyc-macos
           path: rubyc
