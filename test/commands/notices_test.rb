@@ -40,15 +40,36 @@ describe Licensed::Commands::Notices do
         source.dependencies.each do |dependency|
           report = dependency_report(app, source, dependency.name)
           assert report
-          assert_equal dependency.record["name"], report["cached_record"]["name"]
-          assert_equal dependency.record["version"], report["cached_record"]["version"]
-          assert_equal dependency.record.content, report["cached_record"].content
+          assert_equal dependency.record["name"], report["record"]["name"]
+          assert_equal dependency.record["version"], report["record"]["version"]
+          assert_equal dependency.record.content, report["record"].content
         end
       end
     end
   end
 
-  it "reports a warning on missing cached records" do
+  it "reports computed records found for dependencies" do
+    # delete all cached files for dependencies
+    config.apps.each do |app|
+      FileUtils.rm_rf app.cache_path
+    end
+
+    run_command(computed: true)
+
+    config.apps.each do |app|
+      app.sources.each do |source|
+        source.dependencies.each do |dependency|
+          report = dependency_report(app, source, dependency.name)
+          assert report
+          assert_equal dependency.record["name"], report["record"]["name"]
+          assert_equal dependency.record["version"], report["record"]["version"]
+          assert_equal dependency.record.content, report["record"].content
+        end
+      end
+    end
+  end
+
+  it "reports a warning on missing records" do
     config.apps.each { |app| FileUtils.rm_rf app.cache_path }
     run_command
 
@@ -57,7 +78,7 @@ describe Licensed::Commands::Notices do
         source.dependencies.each do |dependency|
           report = dependency_report(app, source, dependency.name)
           assert report
-          assert_nil report["cached_record"]
+          assert_nil report["record"]
           path = app.cache_path.join(source.class.type, "#{dependency.name}.#{Licensed::DependencyRecord::EXTENSION}")
           assert_equal ["expected cached record not found at #{path}"],
                        report.warnings

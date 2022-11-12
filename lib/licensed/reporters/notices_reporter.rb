@@ -54,11 +54,11 @@ module Licensed
       def notices(report)
         return unless report.target.is_a?(Licensed::Dependency)
 
-        cached_record = report["cached_record"]
-        return unless cached_record
+        record = report["record"]
+        return unless record
 
-        texts = cached_record.licenses.map(&:text)
-        cached_record.notices.each do |notice|
+        texts = record.licenses.map(&:text)
+        record.notices.each do |notice|
           case notice
           when Hash
             texts << notice["text"]
@@ -70,7 +70,7 @@ module Licensed
         end
 
         <<~NOTICE
-          #{cached_record["name"]}@#{cached_record["version"]}
+          #{record["name"]}@#{record["version"]}
 
           #{texts.map(&:strip).reject(&:empty?).compact.join(TEXT_SEPARATOR)}
         NOTICE
