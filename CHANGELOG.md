@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.9.0
+
+### Added
+
+- `NOTICE` files can now be generated without cached files in a repository (https://github.com/github/licensed/pull/572)
+
 ## 3.8.0
 
 ### Added
@@ -649,4 +655,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.8.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.9.0...HEAD
