@@ -39,7 +39,7 @@ describe Licensed::Reporters::NoticesReporter do
     end
 
     it "prints a warning if dependency notice contents can't be parsed" do
-      dependency_report["cached_record"] = Licensed::DependencyRecord.new(
+      dependency_report["record"] = Licensed::DependencyRecord.new(
         licenses: [],
         notices: [1]
       )
@@ -54,7 +54,7 @@ describe Licensed::Reporters::NoticesReporter do
     end
 
     it "writes dependencies' licenses and notices to a NOTICE file" do
-      dependency_report["cached_record"] = Licensed::DependencyRecord.new(
+      dependency_report["record"] = Licensed::DependencyRecord.new(
         licenses: [
           { "sources" => "LICENSE1", "text" => "license1" },
           { "sources" => "LICENSE2", "text" => "license2" }
@@ -77,7 +77,7 @@ describe Licensed::Reporters::NoticesReporter do
 
     it "writes dependencies' licenses and notices to a NOTICE.<app> file in a shared cache" do
       app["shared_cache"] = true
-      dependency_report["cached_record"] = Licensed::DependencyRecord.new(
+      dependency_report["record"] = Licensed::DependencyRecord.new(
         licenses: [
           { "sources" => "LICENSE1", "text" => "license1" },
           { "sources" => "LICENSE2", "text" => "license2" }
