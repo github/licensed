@@ -31,7 +31,7 @@ module Licensed
       def key
         @key ||= begin
           # rubocop:disable GitHub/InsecureHashAlgorithm
-          Digest::XXHash64.digest(sources.join("") + text)
+          sources.join("") + ":" + Digest::XXHash64.digest(text).to_s
           # rubocop:enable GitHub/InsecureHashAlgorithm
         end
       end

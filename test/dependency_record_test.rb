@@ -73,9 +73,14 @@ describe Licensed::DependencyRecord do
       assert_nil record.content
     end
 
-    it "returns joined text of all licenses" do
+    it "returns joined text of all licenses sorted by text content" do
       record = Licensed::DependencyRecord.new(licenses: ["license1", "license2"])
       assert_equal "license1license2", record.content
+    end
+
+    it "returns license texts sorted by text sources when available" do
+      record = Licensed::DependencyRecord.new(licenses: [{ "sources" => ["2"], "text" => "license1" }, { "sources" => ["1"], "text" => "license2" }])
+      assert_equal "license2license1", record.content
     end
   end
 
