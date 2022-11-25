@@ -217,6 +217,8 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.6
+    - name: Set up go dep
+      run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
     - run: bundle lock
     - uses: actions/cache@v3
       name: cache gem dependencies
