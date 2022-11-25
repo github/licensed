@@ -3,7 +3,7 @@ require "test_helper"
 require "tmpdir"
 
 describe Licensed::Sources::Dep do
-  let(:fixtures) { File.expand_path("../../fixtures/go/src/test", __FILE__) }
+  let(:fixtures) { File.expand_path("../../fixtures/dep/src/test", __FILE__) }
   let(:config) { Licensed::AppConfiguration.new({ "dep" => { "allow_ignored" => true }, "source_path" => Dir.pwd }) }
   let(:source) { Licensed::Sources::Dep.new(config) }
 

@@ -1,6 +1,6 @@
 expected_dependency: github.com/gorilla/context
 cache_path: .licenses
-root: ../go/src/modules_test
+root: ../go/src/test
 go:
   GOPATH: ../..
 

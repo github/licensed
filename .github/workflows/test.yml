@@ -225,7 +225,7 @@ jobs:
     - name: Bootstrap
       run: script/bootstrap
     - name: Set up fixtures
-      run: script/source-setup/go
+      run: script/source-setup/dep
     - name: Run tests
       run: script/test dep
 
