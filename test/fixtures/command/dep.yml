@@ -1,6 +1,6 @@
 expected_dependency: github.com/gorilla/context
-source_path: test/fixtures/go/src/test
-cache_path: test/fixtures/go/.licenses
+source_path: test/fixtures/dep/src/test
+cache_path: test/fixtures/dep/.licenses
 dep:
   allow_ignored: true
 sources:
