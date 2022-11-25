@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 3.9.1
+
+### Fixed
+
+- Updating cached dependency records will more accurately apply `review_changed_license` flag (https://github.com/github/licensed/pull/578)
+
 ## 3.9.0
 
 ### Added
@@ -655,4 +661,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.9.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/3.9.1...HEAD
