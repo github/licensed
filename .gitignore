@@ -23,7 +23,10 @@ test/fixtures/npm/package-lock.json
 test/fixtures/go/src/*
 test/fixtures/go/pkg
 !test/fixtures/go/src/test
-!test/fixtures/go/src/modules_test
+
+test/fixtures/dep/src/*
+test/fixtures/dep/pkg
+!test/fixtures/dep/src/test
 
 test/fixtures/cabal/*
 !test/fixtures/cabal/app*

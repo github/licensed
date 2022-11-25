@@ -17,6 +17,17 @@
   revision = "14f550f51af52180c2eefed15e5fd18d63c0a64a"
 
 [[projects]]
+  digest = "1:221e20d1d3ba6ed3756178221798f2566b0460a49e3d30a764f204dc7ea3d285"
+  name = "github.com/hashicorp/golang-lru"
+  packages = [
+    ".",
+    "simplelru",
+  ]
+  pruneopts = "U"
+  revision = "bdf35e3f00df1ad41cb7498159e7a96f3f9af829"
+  version = "v0.6.0"
+
+[[projects]]
   branch = "release-branch.go1.7"
   digest = "1:040cf2b3003eda56429a11ab661cae8414d2df7d22a52eb36b54440de54c045d"
   name = "golang.org/x/net"
@@ -30,6 +41,7 @@
   input-imports = [
     "github.com/davecgh/go-spew/spew",
     "github.com/gorilla/context",
+    "github.com/hashicorp/golang-lru",
     "golang.org/x/net/http2/hpack",
   ]
   solver-name = "gps-cdcl"

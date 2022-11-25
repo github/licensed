@@ -5,6 +5,8 @@ import (
 	ctx "github.com/gorilla/context"
 	lru "github.com/hashicorp/golang-lru"
 	"golang.org/x/net/http2/hpack"
+	"test/internal/fakevendor/github.com/owner/repo"
+	"test/pkg/world"
 )
 
 func main() {
