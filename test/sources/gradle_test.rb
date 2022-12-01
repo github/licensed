@@ -4,54 +4,159 @@ require "tmpdir"
 require "fileutils"
 
 describe Licensed::Sources::Gradle do
-  let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
-  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
-  let(:source) { Licensed::Sources::Gradle.new(config) }
+  describe "Single project" do
+    let(:fixtures) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
+    let(:source) { Licensed::Sources::Gradle.new(config) }
 
-  describe "enabled?" do
-    it "is true if build.gradle exists and gradle is available" do
-      Dir.chdir(fixtures) do
-        assert source.enabled?
+    describe "enabled?" do
+      it "is true if build.gradle exists and gradle is available" do
+        Dir.chdir(fixtures) do
+          assert source.enabled?
+        end
+      end
+
+      it "is false if build.gradle does not exist" do
+        Dir.chdir(Dir.tmpdir) do
+          refute source.enabled?
+        end
       end
     end
 
-    it "is false if build.gradle does not exist" do
-      Dir.chdir(Dir.tmpdir) do
-        refute source.enabled?
+    describe "dependencies" do
+      it "includes declared dependencies" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
+          assert dep
+          assert_equal "gradle", dep.record["type"]
+          assert_equal "4.1.33.Final", dep.version
+        end
+      end
+
+      it "does not include test dependencies" do
+        Dir.chdir fixtures do
+          refute source.dependencies.detect { |d| d.name == "org.junit.jupiter:junit-jupiter" }
+        end
+      end
+
+      it "cleans up grade licenses csv content" do
+        Dir.chdir fixtures do
+          dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
+          # load the dependency record which creates temp license-*.gradle files
+          dep.record
+
+          refute Dir.glob(Pathname.pwd.join("license-*.gradle").to_path).any?
+        end
       end
     end
   end
 
-  describe "dependencies" do
-    it "includes declared dependencies" do
-      Dir.chdir fixtures do
-        dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
-        assert dep
-        assert_equal "gradle", dep.record["type"]
-        assert_equal "4.1.33.Final", dep.version
+  describe "Multi project" do
+    let(:fixtures) { File.expand_path("../../fixtures/gradle/multi_project", __FILE__) }
+    let(:config) { Licensed::Configuration.new({
+      "apps" => [{ "source_path" => "#{Dir.pwd}/lib" }, { "source_path" => "#{Dir.pwd}/app" }],
+      "gradle" => { "configurations" => "runtimeClasspath" }
+    })
+    }
+    let(:appConfig) { config.apps.last }
+    let(:libConfig) { config.apps.last }
+    let(:source) { Licensed::Sources::Gradle.new(appConfig) }
+
+    describe "app subproject" do
+      let(:appConfig) { config.apps.last }
+      let(:source) { Licensed::Sources::Gradle.new(appConfig) }
+
+      describe "enabled?" do
+        it "is true if build.gradle exists and gradle is available" do
+          Dir.chdir(fixtures) do
+            assert source.enabled?
+          end
+        end
+
+        it "is false if build.gradle does not exist" do
+          Dir.chdir(Dir.tmpdir) do
+            refute source.enabled?
+          end
+        end
+      end
+
+      describe "dependencies" do
+        it "includes declared dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "com.google.guava:guava" }
+            assert dep
+            assert_equal "gradle", dep.record["type"]
+            assert_equal "31.1-jre", dep.version
+          end
+        end
+
+        it "does not include test dependencies" do
+          Dir.chdir fixtures do
+            refute source.dependencies.detect { |d| d.name == "org.junit.jupiter:junit-jupiter-engine" }
+          end
+        end
+
+        it "cleans up grade licenses csv content" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "com.google.guava:guava" }
+            # load the dependency record which creates temp license-*.gradle files
+            dep.record
+
+            refute Dir.glob(Pathname.pwd.join("license-*.gradle").to_path).any?
+          end
+        end
       end
     end
 
-    it "does not include test dependencies" do
-      Dir.chdir fixtures do
-        refute source.dependencies.detect { |d| d.name == "org.junit.jupiter:junit-jupiter" }
+    describe "lib subproject" do
+      let(:appConfig) { config.apps.first }
+      let(:source) { Licensed::Sources::Gradle.new(appConfig) }
+      describe "enabled?" do
+        it "is true if build.gradle exists and gradle is available" do
+          Dir.chdir(fixtures) do
+            assert source.enabled?
+          end
+        end
+
+        it "is false if build.gradle does not exist" do
+          Dir.chdir(Dir.tmpdir) do
+            refute source.enabled?
+          end
+        end
       end
-    end
 
-    it "cleans up grade licenses csv content" do
-      Dir.chdir fixtures do
-        dep = source.dependencies.detect { |d| d.name == "io.netty:netty-all" }
-        # load the dependency record which creates temp license-*.gradle files
-        dep.record
+      describe "dependencies" do
+        it "includes declared dependencies" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "com.google.guava:guava" }
+            assert dep
+            assert_equal "gradle", dep.record["type"]
+            assert_equal "31.1-jre", dep.version
+          end
+        end
 
-        refute Dir.glob(Pathname.pwd.join("license-*.gradle").to_path).any?
+        it "does not include test dependencies" do
+          Dir.chdir fixtures do
+            refute source.dependencies.detect { |d| d.name == "org.junit.jupiter:junit-jupiter-engine" }
+          end
+        end
+
+        it "cleans up grade licenses csv content" do
+          Dir.chdir fixtures do
+            dep = source.dependencies.detect { |d| d.name == "com.google.guava:guava" }
+            # load the dependency record which creates temp license-*.gradle files
+            dep.record
+
+            refute Dir.glob(Pathname.pwd.join("license-*.gradle").to_path).any?
+          end
+        end
       end
     end
   end
 end
 
 describe Licensed::Sources::Gradle::Dependency do
-  let(:fixtures) { File.expand_path("../../fixtures/gradle", __FILE__) }
+  let(:fixtures) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
   let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { Licensed::Sources::Gradle.new(config) }
 

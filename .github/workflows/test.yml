@@ -209,7 +209,11 @@ jobs:
         distribution: adopt
         cache: gradle
     - name: Gradle version
-      run: test/fixtures/gradle/gradlew --quiet --version
+      run: |
+        for d in $(ls test/fixtures/gradle/)
+        do
+          test/fixtures/gradle/${d}/gradlew --quiet --version
+        done
     - name: Run tests
       run: script/test gradle
 
