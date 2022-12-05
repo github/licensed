@@ -32,10 +32,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency "parallel", ">= 0.18.0"
   spec.add_dependency "reverse_markdown", ">= 1", "< 3"
   spec.add_dependency "json", ">= 2.6.2"
+  spec.add_dependency "cocoapods-core", "~> 1.0.0"
 
   spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "minitest", "~> 5.8"
   spec.add_development_dependency "mocha", "~> 2.0"
   spec.add_development_dependency "rubocop-github", "~> 0.6"
   spec.add_development_dependency "byebug", "~> 11.1.3"
+  spec.add_development_dependency "cocoapods", "~> 1.0.0"
 end

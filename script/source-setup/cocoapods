@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+if [ -z "$(which pods)" ]; then
+  echo "A local pod installation is required for cocoapods development." >&2
+  exit 127
+fi
+
+# setup test fixtures
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+cd $BASE_PATH/test/fixtures/cocoapods
+
+if [ "$1" == "-f" ]; then
+  pod install --clean-install
+fi
+
+pod install

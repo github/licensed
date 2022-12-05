@@ -612,3 +612,24 @@ jobs:
       run: script/source-setup/yarn/berry
     - name: Run tests
       run: script/test yarn/berry
+
+  cocoapods:
+    runs-on: ubuntu-latest
+    needs: core
+    strategy:
+      matrix:
+        cocoapods: [ '1.11.3' ]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.6
+    - name: Set up Cocoapods
+      run: gem install cocoapods -v ${{ matrix.cocoapods }}
+    - name: Bootstrap
+      run: script/bootstrap
+    - name: Set up fixtures
+      run: script/source-setup/cocoapods
+    - name: Run tests
+      run: script/test cocoapods 
