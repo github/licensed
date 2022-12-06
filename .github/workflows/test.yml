@@ -195,25 +195,26 @@ jobs:
         # are resolved, update this matrix list with '16'.
         # possibly fixed by https://github.com/jk1/Gradle-License-Report/pull/166
         java: [ '11' ]
+        gradle: ['current', '5.2']
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        bundler-cache: true
-
+        ruby-version: 2.6
+    - run: bundle lock
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
         java-version: ${{ matrix.java }}
         distribution: adopt
         cache: gradle
-    - name: Gradle version
-      run: |
-        for d in $(ls test/fixtures/gradle/)
-        do
-          test/fixtures/gradle/${d}/gradlew --quiet --version
-        done
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: ${{ matrix.gradle }}
+    - name: Bootstrap
+      run: script/bootstrap
     - name: Run tests
       run: script/test gradle
 

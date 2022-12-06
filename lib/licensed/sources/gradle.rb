@@ -93,7 +93,7 @@ module Licensed
       # Returns a hash of dependency identifiers to their license content URL
       def load_csv
         begin
-          gradle_licenses_dir = File.join(config.pwd, GRADLE_LICENSES_PATH)
+          gradle_licenses_dir = File.join(config.root, GRADLE_LICENSES_PATH)
           CSV.foreach(File.join(gradle_licenses_dir, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
             name, _, version = row["artifact"].rpartition(":")
             key = csv_key(name: name, version: version)

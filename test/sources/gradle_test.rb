@@ -6,7 +6,7 @@ require "fileutils"
 describe Licensed::Sources::Gradle do
   describe "Single project" do
     let(:fixtures) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
-    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd, "root" => fixtures }) }
     let(:source) { Licensed::Sources::Gradle.new(config) }
 
     describe "enabled?" do
@@ -55,7 +55,8 @@ describe Licensed::Sources::Gradle do
     let(:fixtures) { File.expand_path("../../fixtures/gradle/multi_project", __FILE__) }
     let(:config) { Licensed::Configuration.new({
       "apps" => [{ "source_path" => "#{Dir.pwd}/lib" }, { "source_path" => "#{Dir.pwd}/app" }],
-      "gradle" => { "configurations" => "runtimeClasspath" }
+      "gradle" => { "configurations" => "runtimeClasspath" },
+      "root" => fixtures
     })
     }
     let(:appConfig) { config.apps.last }
@@ -157,7 +158,7 @@ end
 
 describe Licensed::Sources::Gradle::Dependency do
   let(:fixtures) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
-  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
+  let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd, "root" => fixtures }) }
   let(:source) { Licensed::Sources::Gradle.new(config) }
 
   it "returns the dependency license" do
