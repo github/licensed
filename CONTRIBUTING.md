@@ -59,8 +59,6 @@ The following steps will happen automatically from a GitHub Actions workflow
 after creating the release. In case that fails, the following steps can be performed manually
 
 11. Push the gem from (7) to rubygems.org -- `gem push licensed-x.xx.xx.gem`
-12. Build packages for new tag: `VERSION=x.xx.xx bundle exec rake package`
-13. Upload packages from (12) to release from (10)
 
 ## Resources
 
