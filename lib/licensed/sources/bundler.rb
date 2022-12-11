@@ -39,13 +39,8 @@ module Licensed
       end
 
       DEFAULT_WITHOUT_GROUPS = %i{development test}
-      RUBY_PACKER_ERROR = "The bundler source cannot be used from the executable built with ruby-packer.  Please install licensed using `gem install` or using bundler."
 
       def enabled?
-        # running a ruby-packer-built licensed exe when ruby isn't available
-        # could lead to errors if the host ruby doesn't exist
-        return false if ruby_packer? && !Licensed::Shell.tool_available?("ruby")
-
         # if Bundler isn't loaded, this enumerator won't work!
         return false unless defined?(::Bundler)
 
@@ -55,8 +50,6 @@ module Licensed
       end
 
       def enumerate_dependencies
-        raise Licensed::Sources::Source::Error.new(RUBY_PACKER_ERROR) if ruby_packer?
-
         with_application_environment do
           definition.specs.map do |spec|
             next if spec.name == config["name"]
@@ -125,11 +118,6 @@ module Licensed
 
         # reload the bundler environment after enumeration
         ::Bundler.load
-      end
-
-      # Returns whether the current licensed execution is running ruby-packer
-      def ruby_packer?
-        @ruby_packer ||= RbConfig::TOPDIR =~ /__enclose_io_memfs__/
       end
     end
   end
