@@ -1,9 +1,9 @@
 ---
 name: racc
-version: 1.6.0
+version: 1.6.1
 type: bundler
 summary: Racc is a LALR(1) parser generator
-homepage: https://i.loveruby.net/en/projects/racc/
+homepage: https://github.com/ruby/racc
 license: other
 licenses:
 - sources: COPYING
