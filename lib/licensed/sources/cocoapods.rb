@@ -14,41 +14,35 @@ module Licensed
       end
 
       def enumerate_dependencies
-        pods.map { |pod|
-          metadata = dependency_metadata(pod)
+        pods.map do |pod|
+          name = pod.name
           path = dependency_path(pod.root_name)
+          version = lockfile.version(name).version
 
           Dependency.new(
             path: path,
-            name: metadata["name"],
-            version: metadata["version"],
-            metadata: {
-              "type"      => Cocoapods.type,
-              "homepage"  => metadata["homepage"],
-              "summary"   => metadata["summary"],
-              "platforms" => metadata["platform"]
-            }
+            name: name,
+            version: version,
+            metadata: { "type" => Cocoapods.type }
           )
-        }
+        end
       end
 
       private
 
       def pods
-        if targets.nil?
-          lockfile.dependencies
+        return lockfile.dependencies if targets.nil?
+
+        targets_to_validate = podfile.target_definition_list.filter { |t| targets.include?(t.label) }
+        if targets_to_validate.any?
+          targets_to_validate.map(&:dependencies).flatten
         else
-          targets_to_validate = podfile.target_definition_list.filter { |t| targets.include?(t.label) }
-          if targets_to_validate.any?
-            targets_to_validate.map(&:dependencies).flatten
-          else
-            raise Licensed::Sources::Source::Error, "Unable to find any target in the Podfile matching the ones provided in the config."
-          end
+          raise Licensed::Sources::Source::Error, "Unable to find any target in the Podfile matching the ones provided in the config."
         end
       end
 
       def targets
-        config.dig("cocoapods", "targets")&.map { |t| "Pods-#{t}" }
+        @targets ||= config.dig("cocoapods", "targets")&.map { |t| "Pods-#{t}" }
       end
 
       def lockfile

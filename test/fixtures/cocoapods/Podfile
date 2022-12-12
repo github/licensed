@@ -15,5 +15,4 @@ target 'ios' do
     
     pod "lottie-ios", "3.3.0"
   end
-
 end

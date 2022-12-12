@@ -1,6 +1,0 @@
-${PODS_ROOT}/Target Support Files/Pods-ios/Pods-ios-frameworks.sh
-${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
-${BUILT_PRODUCTS_DIR}/Chatto/Chatto.framework
-${BUILT_PRODUCTS_DIR}/MDFInternationalization/MDFInternationalization.framework
-${BUILT_PRODUCTS_DIR}/MDFTextAccessibility/MDFTextAccessibility.framework
-${BUILT_PRODUCTS_DIR}/MaterialComponents/MaterialComponents.framework
