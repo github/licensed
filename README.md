@@ -59,6 +59,12 @@ And then execute:
 $> bundle
 ```
 
+### With a Homebrew (on macOS)
+
+```bash
+brew install licensed
+```
+
 ### As an executable
 
 Download a package from GitHub and extract the executable.  Executable packages are available for each release starting with version 1.2.0.
