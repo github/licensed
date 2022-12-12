@@ -45,14 +45,6 @@ if Licensed::Shell.tool_available?("pod")
           dep = source.dependencies.detect { |d| d.name == "Chatto" }
         end
       end
-
-      it "it adds metadata when available" do
-        Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "Alamofire" }
-          assert dep.record["homepage"] != nil
-          assert dep.record["summary"] != nil
-        end
-      end
     end
 
     describe "targets" do
