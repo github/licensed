@@ -61,6 +61,12 @@ And then execute:
 $> bundle
 ```
 
+### With a Homebrew (on macOS)
+
+```bash
+brew install licensed
+```
+
 ## Usage
 
 See [getting started](./docs/getting_started.md) for guidance using Licensed as part of your developer workflow.
