@@ -123,7 +123,8 @@ module Licensed
             Tempfile.create(["init", ".gradle"], @root_path) do |f|
               f.write(init_script(@configurations))
               f.close
-              Licensed::Shell.execute(executable, "-q", "--no-configuration-cache", "--init-script", f.path, *args)
+              args << "--no-configuration-cache" if gradle_version >= "6.6"
+              Licensed::Shell.execute(executable, "-q", "--init-script", f.path, *args)
             end
           end
         end
@@ -133,6 +134,10 @@ module Licensed
         end
 
         private
+
+        def gradle_version
+          @gradle_version ||= Licensed::Shell.execute(executable, "--version").scan(/Gradle [\d+]\.[\d+]/).last.split(" ").last
+        end
 
         def executable
           return @executable if defined?(@executable)
