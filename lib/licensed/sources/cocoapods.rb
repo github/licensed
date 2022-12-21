@@ -53,14 +53,6 @@ module Licensed
         @podfile ||= Pod::Podfile.from_file(config.pwd.join("Podfile"))
       end
 
-      def dependency_metadata(pod)
-        metadata = JSON.parse(Licensed::Shell.execute("pod", "spec", "cat", "--regex", "^#{pod.root_name}$"))
-        # The version returned by `pod spec cat` is the most recent version that exists which may not be the one installed.
-        metadata["version"] = lockfile.version(pod.name).version
-        metadata["name"] = pod.name
-        metadata
-      end
-
       def dependency_path(name)
         config.pwd.join("Pods/#{name}")
       end
