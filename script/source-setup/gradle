@@ -1,7 +1,0 @@
-#!/bin/bash
-set -e
-
-if [ -z "$(which gradle)" ]; then
-  echo "A local gradle installation is required for gradle development." >&2
-  exit 127
-fi

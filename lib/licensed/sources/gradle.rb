@@ -20,6 +20,11 @@ module Licensed
           end
         end
 
+        def initialize(name:, version:, path:, url:, metadata: {})
+          @url = url
+          super(name: name, version: version, path: path, metadata: metadata)
+        end
+
         # Returns whether the dependency content exists
         def exist?
           # shouldn't force network connections just to check if content exists
@@ -29,11 +34,10 @@ module Licensed
 
         # Returns a Licensee::ProjectFiles::LicenseFile for the dependency
         def project_files
-          url = @metadata["url"]
-          return [] if url.nil?
+          return [] if @url.nil?
 
-          license_data = self.class.retrieve_license(url)
-          Array(Licensee::ProjectFiles::LicenseFile.new(license_data, { uri: url }))
+          license_data = self.class.retrieve_license(@url)
+          Array(Licensee::ProjectFiles::LicenseFile.new(license_data, { uri: @url }))
         end
       end
 
@@ -42,7 +46,6 @@ module Licensed
       end
 
       def enumerate_dependencies
-        gradle_runner.run(format_command("generateLicenseReport"))
         csv = load_csv
         JSON.parse(gradle_runner.run(format_command("printDependencies"))).map do |package|
           name = "#{package['group']}:#{package['name']}"
@@ -50,9 +53,9 @@ module Licensed
             name: name,
             version: package["version"],
             path: config.pwd,
+            url: package_url(name: name, version: package["version"]),
             metadata: {
               "type" => Gradle.type,
-              "url" => csv[csv_key(name: name, version: package["version"])]
             }
           )
         end
@@ -89,10 +92,20 @@ module Licensed
         "#{name}-#{version}"
       end
 
-      # Loads a license report CSV data as a hash of :name-:version => :url pairs
-      # Returns a hash of dependency identifiers to their license content URL
+      def package_url(name:, version:)
+        # load and memoize the license report CSV
+        @urls ||= load_csv
+
+        # uniquely identify a name and version in the obtained CSV content
+        @urls["#{name}-#{version}"]
+      end
+
       def load_csv
         begin
+        # create the CSV file including dependency license urls using the gradle plugin
+          gradle_runner.run("generateLicenseReport")
+
+          # parse the CSV report for dependency license urls
           gradle_licenses_dir = File.join(config.root, GRADLE_LICENSES_PATH)
           CSV.foreach(File.join(gradle_licenses_dir, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
             name, _, version = row["artifact"].rpartition(":")
@@ -115,7 +128,6 @@ module Licensed
         def initialize(root_path, configurations)
           @root_path = root_path
           @configurations = configurations
-          @executable = executable
         end
 
         def run(*args)
@@ -123,6 +135,8 @@ module Licensed
             Tempfile.create(["init", ".gradle"], @root_path) do |f|
               f.write(init_script(@configurations))
               f.close
+              # The configuration cache is an incubating feature that can be activated manually.
+              # The gradle plugin for licenses does not support it so we prevent it to run for gradle version supporting it.
               args << "--no-configuration-cache" if gradle_version >= "6.6"
               Licensed::Shell.execute(executable, "-q", "--init-script", f.path, *args)
             end
