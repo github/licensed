@@ -322,18 +322,11 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
         architecture: x64
+        cache: pip
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-
-    - uses: actions/cache@v3
-      name: cache pip dependencies
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
 
     - name: Install virtualenv
       run: pip install virtualenv
@@ -352,6 +345,7 @@ jobs:
       with:
         python-version: '3.x'
         architecture: x64
+        cache: pipenv
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
