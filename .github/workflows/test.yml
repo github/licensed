@@ -49,8 +49,7 @@ jobs:
     needs: core
     strategy:
       matrix:
-        ghc: [ '8.6', '8.8', '8.10', '9.0' ]
-        cabal: [ '3.0', '3.2', '3.4' ]
+        ghc: [ '9.0', '9.2', '9.4' ]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
@@ -61,7 +60,6 @@ jobs:
       uses: haskell/actions/setup@v2
       with:
         ghc-version: ${{ matrix.ghc }}
-        cabal-version: ${{ matrix.cabal }}
     - name: cache cabal dependencies
       uses: actions/cache@v3
       with:
