@@ -5,7 +5,7 @@ type: bundler
 summary: Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell,
   F#, C#, Java, and classic concurrency patterns.
 homepage: http://www.concurrent-ruby.com
-license: other
+license: mit
 licenses:
 - sources: LICENSE.txt
   text: |

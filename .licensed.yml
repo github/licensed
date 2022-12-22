@@ -7,8 +7,17 @@ allowed:
 
 reviewed:
   bundler:
+    # bsd-3 and mit
+    - ffi
+  
+    # ruby license
     - json
+    - httpclient
     - pathname-common_prefix
+
+    # bsd-2 or ruby
     - racc
-    - reverse_markdown
     - ruby2_keywords
+
+    # dwtfyw
+    - reverse_markdown
