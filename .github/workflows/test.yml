@@ -17,17 +17,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/bower
     - name: Run tests
@@ -38,27 +28,17 @@ jobs:
     needs: core
     strategy:
       matrix:
-        bundler: [ '~> 1.17.0', '~> 2.0.0', '~> 2.1.0', '~> 2.2.0', '~> 2.3.0' ]
+        bundler: [ '~> 2.1.0', '~> 2.2.0', '~> 2.3.0' ]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
+        bundler-cache: true
     - name: Set up Bundler
       run: |
         yes | gem uninstall bundler --all
         gem install bundler -v "${{ matrix.bundler }}"
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/bundler
     - name: Run tests
@@ -76,13 +56,12 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
+        bundler-cache: true
     - name: Setup Haskell
       uses: haskell/actions/setup@v2
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
-    - run: bundle lock
     - name: cache cabal dependencies
       uses: actions/cache@v3
       with:
@@ -92,15 +71,6 @@ jobs:
         key: ${{ runner.os }}-cabal-${{ matrix.ghc }}-${{ hashFiles('**/app.cabal') }}
         restore-keys: |
           ${{ runner.os }}-cabal-
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/cabal
     - name: Run tests
@@ -111,15 +81,14 @@ jobs:
     needs: core
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Ruby
+    - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
+        bundler-cache: true
     - name: Setup Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - run: bundle lock
     - name: cache cargo dependencies
       uses: actions/cache@v3
       with:
@@ -128,15 +97,6 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
           ${{ runner.os }}-cargo-
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/cargo
     - name: Run tests
@@ -157,17 +117,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/composer
     - name: Run tests
@@ -177,25 +127,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: [ 2.6, 2.7, 3.0 ]
+        ruby: [ 2.7, 3.0, 3.1 ]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}
-    - name: Set up Bundler
-      run: gem install bundler
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-${{ matrix.ruby }}-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Build and lint
       run: bundle exec rake rubocop build
     - name: Core functionality tests
@@ -216,19 +155,10 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
+        bundler-cache: true
+
     - name: Set up go dep
       run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/dep
     - name: Run tests
@@ -249,8 +179,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
+        bundler-cache: true
+
     - uses: actions/cache@v3
       name: cache go dependencies
       with:
@@ -260,15 +190,6 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/go
     - name: Run tests
@@ -291,8 +212,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
+        bundler-cache: true
+
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
@@ -307,15 +228,6 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Gradle version
       run: test/fixtures/gradle/gradlew --quiet --version
     - name: Run tests
@@ -329,17 +241,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Run tests
       run: script/test manifest
 
@@ -359,17 +261,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/mix
     - name: Run tests
@@ -390,17 +282,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/npm
     - name: Run tests
@@ -421,17 +303,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/nuget
     - name: Run tests
@@ -453,8 +325,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
+        bundler-cache: true
+
     - uses: actions/cache@v3
       name: cache pip dependencies
       with:
@@ -462,15 +334,7 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+
     - name: Install virtualenv
       run: pip install virtualenv
     - name: Set up fixtures
@@ -491,17 +355,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
+
     - name: Install pipenv
       run: pip install pipenv
     - name: Set up fixtures
@@ -524,8 +379,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
+        bundler-cache: true
     - uses: actions/cache@v3
       name: cache spm dependencies
       with:
@@ -533,15 +387,6 @@ jobs:
         key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
         restore-keys: |
           ${{ runner.os }}-spm-
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/swift
     - name: Run tests
@@ -567,17 +412,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/yarn/v1
     - name: Run tests
@@ -597,17 +432,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
-    - uses: actions/cache@v3
-      name: cache gem dependencies
-      with:
-        path: vendor/gems
-        key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-2.6-
-    - name: Bootstrap
-      run: script/bootstrap
+        bundler-cache: true
     - name: Set up fixtures
       run: script/source-setup/yarn/berry
     - name: Run tests
@@ -624,11 +449,9 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
+        bundler-cache: true
     - name: Set up Cocoapods
       run: gem install cocoapods -v ${{ matrix.cocoapods }}
-    - name: Bootstrap
-      run: script/bootstrap
     - name: Set up fixtures
       run: script/source-setup/cocoapods
     - name: Run tests

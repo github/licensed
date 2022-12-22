@@ -5,4 +5,7 @@ inherit_gem:
 AllCops:
   Exclude:
     - test/fixtures/**/*
-    - vendor/gems/**/*
+    - vendor/**/*
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
