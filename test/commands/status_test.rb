@@ -11,7 +11,7 @@ describe Licensed::Commands::Status do
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
-  let(:command) { Licensed::Commands::Status.new(config: config) }
+  let(:command) { Licensed::Commands::Status.new(config:) }
 
   def dependency_errors(app, source, dependency_name = "dependency")
     app_report = reporter.report.reports.find { |r| r.name == app["name"] }

@@ -15,7 +15,7 @@ module Licensed
     method_option :format, aliases: "-f", enum: ["yaml", "json"],
       desc: "Output format"
     def cache
-      run Licensed::Commands::Cache.new(config: config),
+      run Licensed::Commands::Cache.new(config:),
           force: options[:force], sources: options[:sources], reporter: options[:format]
     end
 
@@ -30,7 +30,7 @@ module Licensed
       enum: ["files", "configuration"], default: "files",
       desc: "Whether to check compliance status from cached records or the configuration file"
     def status
-      run Licensed::Commands::Status.new(config: config), sources: options[:sources], reporter: options[:format], data_source: options[:data_source]
+      run Licensed::Commands::Status.new(config:), sources: options[:sources], reporter: options[:format], data_source: options[:data_source]
     end
 
     desc "list", "List dependencies"
@@ -43,7 +43,7 @@ module Licensed
     method_option :licenses, aliases: "-l", type: :boolean,
       desc: "Include detected licenses in output"
     def list
-      run Licensed::Commands::List.new(config: config), sources: options[:sources], reporter: options[:format], licenses: options[:licenses]
+      run Licensed::Commands::List.new(config:), sources: options[:sources], reporter: options[:format], licenses: options[:licenses]
     end
 
     desc "notices", "Generate a NOTICE file with dependency data"
@@ -54,7 +54,7 @@ module Licensed
     method_option :computed, aliases: "-l", type: :boolean,
       desc: "Whether to generate a NOTICE file using computed data or cached records"
     def notices
-      run Licensed::Commands::Notices.new(config: config), sources: options[:sources], computed: options[:computed]
+      run Licensed::Commands::Notices.new(config:), sources: options[:sources], computed: options[:computed]
     end
 
     map "-v" => :version
@@ -70,7 +70,7 @@ module Licensed
     method_option :config, aliases: "-c", type: :string,
       desc: "Path to licensed configuration file"
     def env
-      run Licensed::Commands::Environment.new(config: config), reporter: options[:format]
+      run Licensed::Commands::Environment.new(config:), reporter: options[:format]
     end
 
     desc "migrate", "Migrate from a previous version of licensed"

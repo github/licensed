@@ -9,7 +9,7 @@ describe Licensed::Commands::List do
   let(:apps) { [] }
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "sources" => { "test" => true }, "test" => source_config) }
-  let(:command) { Licensed::Commands::List.new(config: config) }
+  let(:command) { Licensed::Commands::List.new(config:) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   each_source do |source_class|

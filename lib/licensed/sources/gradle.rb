@@ -31,10 +31,10 @@ module Licensed
           def load_csv(path, executable, configurations)
             @csv ||= begin
               gradle_licenses_dir = File.join(path, GRADLE_LICENSES_PATH)
-              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", path: path, executable: executable, configurations: configurations)
+              Licensed::Sources::Gradle.gradle_command("generateLicenseReport", path:, executable:, configurations:)
               CSV.foreach(File.join(gradle_licenses_dir, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
                 name, _, version = row["artifact"].rpartition(":")
-                key = csv_key(name: name, version: version)
+                key = csv_key(name:, version:)
                 hsh[key] = row["moduleLicenseUrl"]
               end
             ensure
@@ -56,7 +56,7 @@ module Licensed
         def initialize(name:, version:, path:, executable:, configurations:, metadata: {})
           @configurations = configurations
           @executable = executable
-          super(name: name, version: version, path: path, metadata: metadata)
+          super(name:, version:, path:, metadata:)
         end
 
         # Returns whether the dependency content exists
@@ -84,14 +84,14 @@ module Licensed
       end
 
       def enumerate_dependencies
-        JSON.parse(self.class.gradle_command("printDependencies", path: config.pwd, executable: gradle_executable, configurations: configurations)).map do |package|
+        JSON.parse(self.class.gradle_command("printDependencies", path: config.pwd, executable: gradle_executable, configurations:)).map do |package|
           name = "#{package["group"]}:#{package["name"]}"
           Dependency.new(
-            name: name,
+            name:,
             version: package["version"],
             path: config.pwd,
             executable: gradle_executable,
-            configurations: configurations,
+            configurations:,
             metadata: {
               "type"     => Gradle.type
             }

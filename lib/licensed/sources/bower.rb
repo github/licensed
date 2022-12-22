@@ -17,7 +17,7 @@ module Licensed
           Dependency.new(
             name: package["name"],
             version: package["version"] || package["_release"],
-            path: path,
+            path:,
             metadata: {
               "type"     => Bower.type,
               "summary"  => package["description"],

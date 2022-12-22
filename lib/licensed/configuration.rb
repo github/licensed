@@ -74,7 +74,7 @@ module Licensed
 
     # Is the given dependency reviewed?
     def reviewed?(dependency, match_version: false)
-      any_list_pattern_matched? self["reviewed"][dependency["type"]], dependency, match_version: match_version
+      any_list_pattern_matched? self["reviewed"][dependency["type"]], dependency, match_version:
     end
 
     # Find all reviewed dependencies that match the provided dependency's name

@@ -40,7 +40,7 @@ module Licensed
         Dependency.new(
           name: pkg[:name],
           version: pkg[:version],
-          path: path,
+          path:,
           metadata: pkg[:metadata].merge("type" => self.class.type),
           errors: errors + Array(pkg[:error])
         )

@@ -18,7 +18,7 @@ describe Licensed::Commands::Environment do
     ]
   }
   let(:config) { Licensed::Configuration.new("apps" => apps, "sources" => { "test" => true }) }
-  let(:command) { Licensed::Commands::Environment.new(config: config) }
+  let(:command) { Licensed::Commands::Environment.new(config:) }
 
   describe "#run" do
     let(:reporter) { TestReporter.new }

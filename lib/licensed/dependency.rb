@@ -37,7 +37,7 @@ module Licensed
         raise ArgumentError, "dependency path #{path} must be absolute"
       end
 
-      super(path, search_root: search_root, detect_readme: true, detect_packages: true)
+      super(path, search_root:, detect_readme: true, detect_packages: true)
     end
 
     # Returns whether the dependency exists locally

@@ -162,7 +162,7 @@ if Licensed::Shell.tool_available?("dotnet")
       dep = Licensed::Sources::NuGet::NuGetDependency.new(
         name: "test",
         version: "1.0",
-        path: path,
+        path:,
         metadata: {
           "name" => "test"
         }

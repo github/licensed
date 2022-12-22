@@ -10,7 +10,7 @@ describe Licensed::Commands::Cache do
   let(:source_config) { {} }
   let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
   let(:reporter) { TestReporter.new }
-  let(:command) { Licensed::Commands::Cache.new(config: config) }
+  let(:command) { Licensed::Commands::Cache.new(config:) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
 
   after do

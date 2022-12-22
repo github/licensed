@@ -12,7 +12,7 @@ class TestShell < Licensed::UI::Shell
     return unless level?("debug")
     @messages << {
       message: msg,
-      newline: newline,
+      newline:,
       style: :debug
     }
   end
@@ -21,7 +21,7 @@ class TestShell < Licensed::UI::Shell
     return unless level?("info")
     @messages << {
       message: msg,
-      newline: newline,
+      newline:,
       style: :info
     }
   end
@@ -30,7 +30,7 @@ class TestShell < Licensed::UI::Shell
     return unless level?("confirm")
     @messages << {
       message: msg,
-      newline: newline,
+      newline:,
       style: :confirm
     }
   end
@@ -39,7 +39,7 @@ class TestShell < Licensed::UI::Shell
     return unless level?("warn")
     @messages << {
       message: msg,
-      newline: newline,
+      newline:,
       style: :warn
     }
   end
@@ -48,7 +48,7 @@ class TestShell < Licensed::UI::Shell
     return unless level?("error")
     @messages << {
       message: msg,
-      newline: newline,
+      newline:,
       style: :error
     }
   end

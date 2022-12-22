@@ -17,7 +17,7 @@ module Licensed
             name: package_name,
             version: contents_version(*sources),
             path: configured_license_path(package_name) || sources_license_path(sources),
-            sources: sources,
+            sources:,
             metadata: {
               "type"     => Manifest.type,
               "name"     => package_name
@@ -180,7 +180,7 @@ module Licensed
 
         def initialize(name:, version:, path:, sources:, metadata: {})
           @sources = sources
-          super(name: name, version: version, path: path, metadata: metadata)
+          super(name:, version:, path:, metadata:)
         end
 
         def project_files

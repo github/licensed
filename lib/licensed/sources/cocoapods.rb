@@ -20,9 +20,9 @@ module Licensed
           version = lockfile.version(name).version
 
           Dependency.new(
-            path: path,
-            name: name,
-            version: version,
+            path:,
+            name:,
+            version:,
             metadata: { "type" => Cocoapods.type }
           )
         end

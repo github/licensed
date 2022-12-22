@@ -202,8 +202,8 @@ module Licensed
 
           NuGetDependency.new(
             name: id,
-            version: version,
-            path: path,
+            version:,
+            path:,
             errors: Array(error),
             metadata: {
               "type" => NuGet.type,
