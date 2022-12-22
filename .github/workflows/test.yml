@@ -345,7 +345,6 @@ jobs:
       with:
         python-version: '3.x'
         architecture: x64
-        cache: pipenv
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
