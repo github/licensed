@@ -72,32 +72,6 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList["test/**/*_test.rb"].exclude("test/fixtures/**/*_test.rb")
 end
 
-packages_search = File.expand_path("script/packages/*", __dir__)
-platforms = Dir[packages_search].map { |f| File.basename(f, ".*") }
-                                .reject { |f| f == "build" }
-
-namespace :package do
-  platforms.each do |platform|
-    desc "Package licensed for #{platform}"
-    task platform.to_sym do
-      puts "Packaging licensed for #{platform}"
-
-      if Bundler.with_original_env { system("script/packages/#{platform}") }
-        # green
-        puts "\033[32mCompleted packaging for #{platform}.\e[0m"
-      else
-        # red
-        puts "\033[31mEncountered an error packaging for #{platform}.\e[0m"
-      end
-
-      puts
-    end
-  end
-end
-
-desc "Package licensed for all platforms"
-task package: platforms.map { |platform| "package:#{platform}" }
-
 # add rubocop task
 # -S adds styleguide urls to offense messages
 RuboCop::RakeTask.new do |t|

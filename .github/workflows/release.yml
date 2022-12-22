@@ -3,211 +3,39 @@ name: Build and publish release assets
 on:
   release:
     types: [created]
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Commit-like version of github/licensed to build package at'
-        required: true
-      release_tag:
-        description: 'Release tag to upload built packages to'
-        required: false
 
 jobs:
-  vars:
-    name: "Gather values for remainder of steps"
+  build:
+    name: Build + Publish
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.result }}
-      upload_url: ${{ steps.get_url.outputs.result }}
-      ref: ${{ steps.get_ref.outputs.result }}
-    steps:
-      - id: get_version
-        name: Get package version
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          result-encoding: string
-          script: |
-            let version = "${{ github.event.release.tag_name }}"
-            if (!version) {
-              version = "${{ github.event.inputs.version }}"
-            }
+    permissions:
+      contents: read
+      packages: write
 
-            if (!version) {
-              throw new Error("unable to find package build version")
-            }
-
-            return version
-
-      - id: get_url
-        name: Get release upload url
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          result-encoding: string
-          script: |
-            let uploadUrl = "${{ github.event.release.upload_url}}"
-            const tag = "${{ github.event.inputs.release_tag }}"
-            if (!uploadUrl && tag) {
-              const { data: release } = await github.rest.repos.getReleaseByTag({
-                ...context.repo,
-                tag
-              })
-
-              if (!release.upload_url) {
-                throw new Error("unable to find a release upload url")
-              }
-
-              uploadUrl = release.upload_url
-            }
-
-            return uploadUrl
-
-      - id: get_ref
-        name: Get checkout ref for custom build scripts
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          result-encoding: string
-          script: |
-            let ref = "${{ github.event.release.tag_name }}"
-            if (!ref) {
-              ref = "${{ github.event.ref }}".replace(/refs\/[^\/]+\//, '')
-            }
-
-            if (!ref) {
-              throw new Error("unable to find a ref for action")
-            }
-
-            return ref
-
-  package_linux:
-    needs: vars
-    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v3
-      with:
-        # checkout at the ref for the action, separate from the target build version
-        # this allows running build scripts independent of the target version
-        ref: ${{needs.vars.outputs.ref}}
-        fetch-depth: 0
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
 
-    - name: Set up Ruby 2.6
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.6
-
-    - name: Build package
-      run: script/packages/linux
-      env:
-        VERSION: ${{needs.vars.outputs.version}}
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: ${{needs.vars.outputs.version}}-linux
-        path: pkg/${{needs.vars.outputs.version}}/licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
-
-  package_mac:
-    needs: vars
-    runs-on: macOS-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        # checkout at the ref for the action, separate from the target build version
-        # this allows running build scripts independent of the target version
-        ref: ${{needs.vars.outputs.ref}}
-        fetch-depth: 0
-
-    - name: Set up Ruby 2.6
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.6
-
-    - name: Build package
-      run: script/packages/mac
-      env:
-        VERSION: ${{needs.vars.outputs.version}}
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: ${{needs.vars.outputs.version}}-darwin
-        path: pkg/${{needs.vars.outputs.version}}/licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
-
-  build_gem:
-    needs: vars
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        # building a gem doesn't use a different ref from the version input
-        ref: ${{needs.vars.outputs.version}}
-
-    - name: Set up Ruby 2.6
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.6
-
-    - name: Build gem
-      run: gem build licensed.gemspec -o licensed-${{needs.vars.outputs.version}}.gem
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: ${{needs.vars.outputs.version}}-gem
-        path: licensed-${{needs.vars.outputs.version}}.gem
-
-  upload_packages:
-    if: ${{ needs.vars.outputs.upload_url != '' }}
-    runs-on: ubuntu-latest
-    needs: [vars, package_linux, package_mac, build_gem]
-
-    steps:
-    - name: Set up Ruby 2.6
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.6
-
-    - name: Download linux package
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{needs.vars.outputs.version}}-linux
-
-    - name: Download macOS package
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{needs.vars.outputs.version}}-darwin
-
-    - name: Download gem
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{needs.vars.outputs.version}}-gem
-
-    - name: Publish linux package
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.vars.outputs.upload_url }}
-        asset_path: ./licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
-        asset_name: licensed-${{needs.vars.outputs.version}}-linux-x64.tar.gz
-        asset_content_type: application/gzip
-
-    - name: Publish mac package
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.vars.outputs.upload_url }}
-        asset_path: ./licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
-        asset_name: licensed-${{needs.vars.outputs.version}}-darwin-x64.tar.gz
-        asset_content_type: application/gzip
-
-    - name: Publish gem to RubyGems
+    - name: Publish to GPR
       run: |
         mkdir -p $HOME/.gem
         touch $HOME/.gem/credentials
         chmod 0600 $HOME/.gem/credentials
-        printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
-        gem push $GEM
+        printf -- "---\n:github: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+        gem build *.gemspec
+        gem push --KEY github --host https://rubygems.pkg.github.com/${OWNER} *.gem
       env:
-        RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_AUTH_TOKEN}}
-        GEM: licensed-${{needs.vars.outputs.version}}.gem
+        GEM_HOST_API_KEY: "Bearer ${{secrets.GITHUB_TOKEN}}"
+        OWNER: ${{ github.repository_owner }}
+
+    - name: Publish to RubyGems
+      run: |
+        mkdir -p $HOME/.gem
+        touch $HOME/.gem/credentials
+        chmod 0600 $HOME/.gem/credentials
+        printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+        gem build *.gemspec
+        gem push *.gem
+      env:
+        GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_AUTH_TOKEN}}"
