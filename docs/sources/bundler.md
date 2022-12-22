@@ -2,8 +2,6 @@
 
 The bundler source will detect dependencies `Gemfile` and `Gemfile.lock` files are found at an apps `source_path`.  The source uses the `Bundler` API to enumerate dependencies from `Gemfile` and `Gemfile.lock`.
 
-**Note** The bundler source cannot be used when running the [packaged licensed executable](../packaging.md)
-
 ### Excluding gem groups
 
 The bundler source determines which gem groups to include or exclude with the following logic, in order of precedence.
