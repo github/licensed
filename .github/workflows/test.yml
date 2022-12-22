@@ -260,7 +260,8 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node_version }}
-        cache: node
+        cache: npm
+        cache-dependency-path: test/fixtures/npm/package-lock.json
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
