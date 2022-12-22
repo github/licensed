@@ -27,16 +27,7 @@ jobs:
       # set up tooling
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
-      - uses: actions/cache@v3
-        name: cache gem dependencies
-        with:
-          path: vendor/gems
-          key: ${{ runner.os }}-gem-2.6-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gem-2.6-
-      - name: Bootstrap
-        run: script/bootstrap
+          bundler-cache: true
 
       # run licensed
       - uses: jonabc/licensed-ci@v1
