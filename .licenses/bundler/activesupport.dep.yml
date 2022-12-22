@@ -1,16 +1,15 @@
 ---
-name: public_suffix
-version: 4.0.7
+name: activesupport
+version: 6.1.7
 type: bundler
-summary: Domain name parser based on the Public Suffix List.
-homepage: https://simonecarletti.com/code/publicsuffix-ruby
+summary: A toolkit of support libraries and Ruby core extensions extracted from the
+  Rails framework.
+homepage: https://rubyonrails.org
 license: mit
 licenses:
-- sources: LICENSE.txt
+- sources: MIT-LICENSE
   text: |
-    Copyright (c) 2009-2022 Simone Carletti <weppos@weppos.net>
-
-    MIT License
+    Copyright (c) 2005-2022 David Heinemeier Hansson
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -30,9 +29,9 @@ licenses:
     LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-- sources: README.md
+- sources: README.rdoc
   text: |-
-    Copyright (c) 2009-2022 Simone Carletti. This is Free Software distributed under the MIT license.
+    Active Support is released under the MIT license:
 
-    The [Public Suffix List source](https://publicsuffix.org/list/) is subject to the terms of the Mozilla Public License, v. 2.0.
+    * https://opensource.org/licenses/MIT
 notices: []
