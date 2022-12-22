@@ -366,7 +366,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup Swift
-      uses: fwal/setup-swift@v1
+      uses: swift-actions/setup-swift@v1
       with:
         swift-version: ${{ matrix.swift }}
     - name: Set up Ruby
