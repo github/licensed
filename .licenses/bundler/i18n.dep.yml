@@ -1,16 +1,14 @@
 ---
-name: public_suffix
-version: 4.0.7
+name: i18n
+version: 1.12.0
 type: bundler
-summary: Domain name parser based on the Public Suffix List.
-homepage: https://simonecarletti.com/code/publicsuffix-ruby
+summary: New wave Internationalization support for Ruby
+homepage: https://github.com/ruby-i18n/i18n
 license: mit
 licenses:
-- sources: LICENSE.txt
-  text: |
-    Copyright (c) 2009-2022 Simone Carletti <weppos@weppos.net>
-
-    MIT License
+- sources: MIT-LICENSE
+  text: |-
+    Copyright (c) 2008 The Ruby I18n team
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -31,8 +29,5 @@ licenses:
     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 - sources: README.md
-  text: |-
-    Copyright (c) 2009-2022 Simone Carletti. This is Free Software distributed under the MIT license.
-
-    The [Public Suffix List source](https://publicsuffix.org/list/) is subject to the terms of the Mozilla Public License, v. 2.0.
+  text: MIT License. See the included MIT-LICENSE file.
 notices: []
