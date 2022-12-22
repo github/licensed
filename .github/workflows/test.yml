@@ -175,6 +175,7 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
         cache: true
+        cache-dependency-path: test/fixtures/go/src/test/go.sum
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
