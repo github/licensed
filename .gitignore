@@ -64,6 +64,9 @@ test/fixtures/cargo/*
 
 test/fixtures/swift/.build
 
+test/fixtures/cocoapods/Podfile.lock
+test/fixtures/cocoapods/Pods
+
 vendor/licenses
 .licenses_test
 *.gem
