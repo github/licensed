@@ -6,3 +6,6 @@ AllCops:
   Exclude:
     - test/fixtures/**/*
     - vendor/**/*
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
