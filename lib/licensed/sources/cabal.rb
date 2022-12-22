@@ -17,8 +17,8 @@ module Licensed
           Dependency.new(
             name: package["name"],
             version: package["version"],
-            path:,
-            search_root:,
+            path: path,
+            search_root: search_root,
             errors: Array(package["error"]),
             metadata: {
               "type"     => Cabal.type,

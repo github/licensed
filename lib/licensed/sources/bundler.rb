@@ -15,7 +15,7 @@ module Licensed
 
         def initialize(name:, version:, path:, loaded_from:, errors: [], metadata: {})
           @loaded_from = loaded_from
-          super name:, version:, path:, errors:, metadata:
+          super name: name, version: version, path: path, errors: errors, metadata: metadata
         end
 
         # Load a package manager file from the base Licensee::Projects::FsProject

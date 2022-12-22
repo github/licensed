@@ -8,7 +8,7 @@ describe Licensed::Commands::Notices do
   let(:cache_path) { Dir.mktmpdir }
   let(:reporter) { TestReporter.new }
   let(:config) { Licensed::Configuration.new("cache_path" => cache_path, "sources" => { "test" => true }) }
-  let(:command) { Licensed::Commands::Notices.new(config:) }
+  let(:command) { Licensed::Commands::Notices.new(config: config) }
 
   before do
     generator_config = Marshal.load(Marshal.dump(config))

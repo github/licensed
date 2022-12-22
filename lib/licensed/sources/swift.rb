@@ -19,9 +19,9 @@ module Licensed
           error = "Unable to determine project path from #{url}" unless path
 
           Dependency.new(
-            name:,
-            path:,
-            version:,
+            name: name,
+            path: path,
+            version: version,
             errors: Array(error),
             metadata: {
               "type"      => Swift.type,

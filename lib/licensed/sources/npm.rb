@@ -33,7 +33,7 @@ module Licensed
 
           errors = package["problems"] unless package["path"]
           Dependency.new(
-            name:,
+            name: name,
             version: package["version"] || package["required"],
             path: package["path"],
             errors: Array(errors),

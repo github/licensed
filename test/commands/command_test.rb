@@ -172,7 +172,7 @@ describe Licensed::Commands::Command do
 
     it "uses a passed in reporter if given" do
       reporter = Licensed::Reporters::StatusReporter.new
-      assert_equal reporter, command.create_reporter(reporter:)
+      assert_equal reporter, command.create_reporter(reporter: reporter)
     end
 
     it "uses the commands default_reporter by default" do

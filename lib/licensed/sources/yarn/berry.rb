@@ -13,7 +13,7 @@ module Licensed
       def enumerate_dependencies
         packages.map do |name, package|
           Dependency.new(
-            name:,
+            name: name,
             version: package["version"],
             path: package["path"],
             metadata: {

@@ -31,7 +31,7 @@ module Licensed
 
           Licensed::Dependency.new(
             name: submodule_path,
-            version:,
+            version: version,
             path: config.pwd.join(displaypath),
             metadata: {
               "type" => self.class.type,

@@ -44,14 +44,14 @@ module Licensed
         spec = super(*args)
         return spec unless spec.is_a?(LazySpecification)
 
-        Licensed::Bundler::MissingSpecification.new(name:, version:, platform:, source:)
+        Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
       end
 
       def __materialize__(*args)
         spec = super(*args)
         return spec if spec
 
-        Licensed::Bundler::MissingSpecification.new(name:, version:, platform:, source:)
+        Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
       end
     end
   end
