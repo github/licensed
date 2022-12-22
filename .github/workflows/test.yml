@@ -382,6 +382,7 @@ jobs:
       with:
         node-version: 12
         cache: yarn
+        cache-dependency-path: test/fixtures/yarn/v1/yarn.lock
     - name: Install Yarn
       run: npm install -g yarn@${YARN_VERSION}
       env:
@@ -405,6 +406,7 @@ jobs:
       with:
         node-version: 12
         cache: yarn
+        cache-dependency-path: test/fixtures/yarn/berry/yarn.lock
     - name: Install Yarn
       run: npm install -g yarn
     - name: Set up Ruby
