@@ -13,7 +13,7 @@ BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd $BASE_PATH/test/fixtures/cabal
 
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" -and -not -path "*app*" -print0 | xargs -0 rm -rf
+  git clean -ffX .
 fi
 
 (cabal new-update && cabal new-build) || (cabal update && cabal install)

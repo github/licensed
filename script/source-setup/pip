@@ -19,7 +19,7 @@ BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 # clean up any previous fixture venv that might have been created.
 if [ "$1" == "-f" ]; then
     echo "removing old fixture setup..."
-    rm -rf  $BASE_PATH/test/fixtures/pip/venv
+    git clean -ffX .
 fi
 
 # set up a virtualenv and install the packages in the test requirements

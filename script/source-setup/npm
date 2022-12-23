@@ -10,13 +10,8 @@ fi
 BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd $BASE_PATH/test/fixtures/npm
 
-FORCE=""
 if [ "$1" == "-f" ]; then
-  FORCE=1
-fi
-
-if [ -n "$FORCE" ]; then
-  find . -not -regex "\.*" -and -not -name "package\.json*" -print0 | xargs -0 rm -rf
+  git clean -ffX .
 fi
 
 NPM_MAJOR_VERSION="$(npm -v | cut -d'.' -f1)"

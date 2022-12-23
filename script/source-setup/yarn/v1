@@ -11,7 +11,7 @@ BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 cd $BASE_PATH/test/fixtures/yarn/v1
 
 if [ "$1" == "-f" ]; then
-  git clean -fX .
+  git clean -ffX .
 fi
 
 yarn install
