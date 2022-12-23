@@ -1,0 +1,4 @@
+expected_dependency: monolog/monolog
+root: .
+sources:
+  composer: true

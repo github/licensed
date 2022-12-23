@@ -1,5 +1,0 @@
-expected_dependency: Chatto
-source_path: test/fixtures/cocoapods
-cache_path: test/fixtures/cocoapods/.licenses
-sources:
-  cocoapods: true

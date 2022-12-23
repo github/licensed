@@ -1,0 +1,4 @@
+expected_dependency: DeckOfPlayingCards
+root: .
+sources:
+  swift: true

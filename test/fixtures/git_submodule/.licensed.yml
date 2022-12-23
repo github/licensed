@@ -1,0 +1,5 @@
+expected_dependency: submodule
+root: .
+source_path: project
+sources:
+  git_submodule: true

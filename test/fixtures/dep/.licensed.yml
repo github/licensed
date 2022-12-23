@@ -1,6 +1,5 @@
 expected_dependency: github.com/gorilla/context
-source_path: test/fixtures/dep/src/test
-cache_path: test/fixtures/dep/.licenses
+root: src/test
 dep:
   allow_ignored: true
 sources:

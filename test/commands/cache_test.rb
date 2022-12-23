@@ -22,7 +22,7 @@ describe Licensed::Commands::Cache do
   each_source do |source_class|
     describe "with #{source_class.full_type}" do
       let(:source_type) { source_class.full_type }
-      let(:config_file) { File.join(fixtures, "command/#{source_type}.yml") }
+      let(:config_file) { File.join(fixtures, "#{source_type}/.licensed.yml") }
       let(:config) { Licensed::Configuration.load_from(config_file) }
 
       it "extracts license info" do

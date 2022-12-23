@@ -1,5 +1,0 @@
-expected_dependency: submodule
-source_path: test/fixtures/git_submodule/project
-cache_path: test/fixtures/git_submodule/.licenses
-sources:
-  git_submodule: true

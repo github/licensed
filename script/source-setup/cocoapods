@@ -10,8 +10,9 @@ fi
 BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd $BASE_PATH/test/fixtures/cocoapods
 
+OPTIONS=()
 if [ "$1" == "-f" ]; then
-  pod install --clean-install
+  OPTIONS+="--clean-install"
 fi
 
-pod install
+pod install ${OPTIONS[@]}

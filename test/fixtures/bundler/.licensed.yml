@@ -1,0 +1,4 @@
+expected_dependency: semantic
+root: .
+sources:
+  bundler: true

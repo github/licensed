@@ -1,6 +1,5 @@
 expected_dependency: time-0.3.2
 expected_dependency_name: time
-source_path: test/fixtures/cargo
-cache_path: test/fixtures/cargo/.licenses
+root: .
 sources:
   cargo: true

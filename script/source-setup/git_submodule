@@ -5,14 +5,14 @@ set -e
 BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd $BASE_PATH/test/fixtures/git_submodule
 
+if [ "$1" == "-f" ]; then
+  git clean -ffX .
+fi
+
 FIXTURES="$(pwd)/nested $(pwd)/submodule $(pwd)/project"
 SUBMODULE=""
 echo "setting up git_submodule test fixtures"
 for fixture in $FIXTURES; do
-  if [ "$1" == "-f" ]; then
-    rm -rf $fixture
-  fi
-
   mkdir -p $fixture
   pushd $fixture >/dev/null
 

@@ -1,7 +1,0 @@
-expected_dependency: manifest_test
-source_path: test/fixtures/manifest
-cache_path: test/fixtures/manifest/.licenses
-manifest:
-  path: test/fixtures/manifest/manifest.yml
-sources:
-  manifest: true

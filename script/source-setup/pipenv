@@ -18,4 +18,4 @@ if [ "$1" == "-f" ]; then
 fi
 
 # set up a virtualenv and install the packages in the test requirements
-pipenv update
+pipenv install

@@ -1,11 +1,10 @@
 expected_dependency: fused-effects
-source_path: test/fixtures/cabal
-cache_path: test/fixtures/cabal/.licenses
+root: .
 cabal:
   ghc_package_db:
     - global
     - user
-    - test/fixtures/cabal/dist-newstyle/packagedb/ghc-<ghc_version>
+    - dist-newstyle/packagedb/ghc-<ghc_version>
     - ~/.cabal/store/ghc-<ghc_version>/package.db
 sources:
   cabal: true

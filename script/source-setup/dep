@@ -18,12 +18,7 @@ export GO111MODULE=off
 cd "$BASE_PATH/test/fixtures/dep"
 
 if [ "$1" == "-f" ]; then
-  find . -not -regex "\.*" \
-    -and -not -path "*/src/test*" \
-    -and -not -path "*/pkg/mod*" \
-    -and -not -path "*/pkg" \
-    -and -not -path "*/src" \
-    -print0 | xargs -0 rm -rf
+  git clean -ffX .
 fi
 
 cd src/test

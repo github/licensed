@@ -1,0 +1,4 @@
+expected_dependency: phoenix
+root: .
+sources:
+  mix: true

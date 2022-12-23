@@ -1,0 +1,6 @@
+expected_dependency: Jinja2
+root: .
+python:
+  virtual_env_dir: venv
+sources:
+  pip: true
