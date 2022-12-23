@@ -34,11 +34,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        bundler: ${{ matrix.bundler }}
         bundler-cache: true
-    - name: Set up Bundler
-      run: |
-        yes | gem uninstall bundler --all
-        gem install bundler -v "${{ matrix.bundler }}"
     - name: Set up fixtures
       run: script/source-setup/bundler
     - name: Run tests
