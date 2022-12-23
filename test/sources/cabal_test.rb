@@ -29,7 +29,7 @@ if Licensed::Shell.tool_available?("ghc")
       it "finds indirect dependencies" do
         config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "bytestring" }
+          dep = source.dependencies.detect { |d| d.name == "unliftio-core" }
           assert dep
           assert_equal "cabal", dep.record["type"]
           assert dep.record["homepage"]
@@ -51,7 +51,7 @@ if Licensed::Shell.tool_available?("ghc")
       it "finds dependencies for executables" do
         config["cabal"] = { "ghc_package_db" => ["global", "user", local_db, cabal_db] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "semilattices" }
+          dep = source.dependencies.detect { |d| d.name == "nats" }
           assert dep
           assert_equal "cabal", dep.record["type"]
           assert dep.version
@@ -80,7 +80,7 @@ if Licensed::Shell.tool_available?("ghc")
         # look in locations that don't contain the package
         config["cabal"] = { "ghc_package_db" => [local_db, cabal_db, "user"] }
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "bytestring" }
+          dep = source.dependencies.detect { |d| d.name == "transformers" }
           assert dep
           assert_includes dep.errors, "package not found"
         end
