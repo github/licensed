@@ -1,0 +1,9 @@
+---
+name: ruby2_keywords
+version: 0.0.5
+type: bundler
+summary: Shim library for Module#ruby2_keywords
+homepage: https://github.com/ruby/ruby2_keywords
+license: other
+licenses: []
+notices: []
