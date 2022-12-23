@@ -18,8 +18,6 @@ echo "cleaning"
   git clean -ffX .
 fi
 
-sleep 5
-
 bundle config set path 'vendor/gems'
 bundle config set without ignore
 bundle install
