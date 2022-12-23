@@ -355,7 +355,6 @@ module Licensed
     def default_options
       # manually set a cache path without additional name
       {
-        "source_path" => Dir.pwd,
         "cache_path" => AppConfiguration::DEFAULT_CACHE_PATH
       }
     end

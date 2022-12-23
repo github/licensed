@@ -1,0 +1,11 @@
+expected_dependency: github.com/gorilla/context
+root: .
+go:
+  GOPATH: ../..
+
+apps:
+  - source_path: .
+  - source_path: cmd/command
+
+sources:
+  go: true

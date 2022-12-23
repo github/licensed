@@ -1,0 +1,6 @@
+expected_dependency: manifest_test
+root: .
+manifest:
+  path: manifest.yml
+sources:
+  manifest: true

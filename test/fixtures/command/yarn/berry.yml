@@ -1,5 +1,0 @@
-expected_dependency: autoprefixer
-source_path: test/fixtures/yarn/berry
-cache_path: test/fixtures/yarn/berry/.licenses
-sources:
-  yarn: true

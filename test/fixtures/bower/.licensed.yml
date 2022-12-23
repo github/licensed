@@ -1,0 +1,4 @@
+expected_dependency: jquery
+root: .
+sources:
+  bower: true

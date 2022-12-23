@@ -1,0 +1,5 @@
+expected_dependency: time-0.3.2
+expected_dependency_name: time
+root: .
+sources:
+  cargo: true

@@ -1,0 +1,4 @@
+expected_dependency: io.netty:netty-all
+root: .
+sources:
+  gradle: true

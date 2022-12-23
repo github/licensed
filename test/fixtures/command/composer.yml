@@ -1,5 +1,0 @@
-expected_dependency: monolog/monolog
-source_path: test/fixtures/composer
-cache_path: test/fixtures/composer/.licenses
-sources:
-  composer: true

@@ -1,5 +1,0 @@
-expected_dependency: phoenix
-source_path: test/fixtures/mix
-cache_path: test/fixtures/mix/.licenses
-sources:
-  mix: true

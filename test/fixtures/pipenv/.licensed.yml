@@ -1,0 +1,4 @@
+expected_dependency: pylint
+root: .
+sources:
+  pipenv: true
