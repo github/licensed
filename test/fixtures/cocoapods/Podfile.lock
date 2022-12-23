@@ -1,0 +1,102 @@
+PODS:
+  - Alamofire (5.4.3)
+  - Chatto (4.1.0)
+  - lottie-ios (3.3.0)
+  - MaterialComponents/AnimationTiming (124.2.0)
+  - MaterialComponents/Availability (124.2.0)
+  - MaterialComponents/Buttons (124.2.0):
+    - MaterialComponents/Elevation
+    - MaterialComponents/Ink
+    - MaterialComponents/private/Math
+    - MaterialComponents/Ripple
+    - MaterialComponents/Shadow
+    - MaterialComponents/ShadowElevations
+    - MaterialComponents/ShadowLayer
+    - MaterialComponents/ShapeLibrary
+    - MaterialComponents/Shapes
+    - MaterialComponents/Typography
+    - MDFInternationalization
+    - MDFTextAccessibility
+  - MaterialComponents/Cards (124.2.0):
+    - MaterialComponents/Elevation
+    - MaterialComponents/Ink
+    - MaterialComponents/private/Icons/ic_check_circle
+    - MaterialComponents/private/Math
+    - MaterialComponents/Ripple
+    - MaterialComponents/ShadowLayer
+    - MaterialComponents/Shapes
+  - MaterialComponents/Elevation (124.2.0):
+    - MaterialComponents/Availability
+    - MaterialComponents/private/Color
+    - MaterialComponents/private/Math
+  - MaterialComponents/Ink (124.2.0):
+    - MaterialComponents/Availability
+    - MaterialComponents/private/Color
+    - MaterialComponents/private/Math
+  - MaterialComponents/private/Application (124.2.0)
+  - MaterialComponents/private/Color (124.2.0):
+    - MaterialComponents/Availability
+  - MaterialComponents/private/Icons/Base (124.2.0)
+  - MaterialComponents/private/Icons/ic_check_circle (124.2.0):
+    - MaterialComponents/private/Icons/Base
+  - MaterialComponents/private/Math (124.2.0)
+  - MaterialComponents/Ripple (124.2.0):
+    - MaterialComponents/AnimationTiming
+    - MaterialComponents/Availability
+    - MaterialComponents/private/Color
+    - MaterialComponents/private/Math
+  - MaterialComponents/Shadow (124.2.0):
+    - MaterialComponents/Availability
+  - MaterialComponents/ShadowElevations (124.2.0)
+  - MaterialComponents/ShadowLayer (124.2.0):
+    - MaterialComponents/ShadowElevations
+  - MaterialComponents/ShapeLibrary (124.2.0):
+    - MaterialComponents/private/Math
+    - MaterialComponents/Shapes
+  - MaterialComponents/Shapes (124.2.0):
+    - MaterialComponents/private/Color
+    - MaterialComponents/private/Math
+    - MaterialComponents/ShadowLayer
+  - MaterialComponents/Typography (124.2.0):
+    - MaterialComponents/private/Application
+    - MaterialComponents/private/Math
+    - MDFTextAccessibility
+  - MDFInternationalization (3.0.0)
+  - MDFTextAccessibility (2.0.1)
+
+DEPENDENCIES:
+  - Alamofire (= 5.4.3)
+  - Chatto (from `https://github.com/badoo/Chatto`, tag `4.1.0`)
+  - lottie-ios (= 3.3.0)
+  - MaterialComponents/Buttons (= 124.2.0)
+  - MaterialComponents/Cards (= 124.2.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - lottie-ios
+    - MaterialComponents
+    - MDFInternationalization
+    - MDFTextAccessibility
+
+EXTERNAL SOURCES:
+  Chatto:
+    :git: https://github.com/badoo/Chatto
+    :tag: 4.1.0
+
+CHECKOUT OPTIONS:
+  Chatto:
+    :git: https://github.com/badoo/Chatto
+    :tag: 4.1.0
+
+SPEC CHECKSUMS:
+  Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
+  Chatto: dae34c377e0eca8bdcfe7a05a4d79d55eaccec3e
+  lottie-ios: 6ac74dcc09904798f59b18cb3075c089d76be9ae
+  MaterialComponents: 1a9b2d9d45b1601ae544de85089adc4c464306d4
+  MDFInternationalization: d697c55307816222a55685c4ccb1044ffb030c12
+  MDFTextAccessibility: f4bb4cc2194286651b59a215fdeaa0e05dc90ba5
+
+PODFILE CHECKSUM: bdfd89e228c2312fe7d97a12be23107d74b78421
+
+COCOAPODS: 1.11.3
