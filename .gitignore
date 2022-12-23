@@ -35,8 +35,6 @@ test/fixtures/git_submodule/*
 
 test/fixtures/pip/venv
 
-test/fixtures/pipenv/Pipfile.lock
-
 !test/fixtures/migrations/**/*
 
 test/fixtures/composer/**/*
