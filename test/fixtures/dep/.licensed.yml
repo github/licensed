@@ -1,5 +1,5 @@
 expected_dependency: github.com/gorilla/context
-root: .
+root: src/test
 dep:
   allow_ignored: true
 sources:
