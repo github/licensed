@@ -18,7 +18,12 @@ module Licensed
 
           all_dependencies = requested_dependencies.concat(specs.flat_map(&:dependencies))
           if all_dependencies.any? { |d| d.name == "bundler" } && !specs["bundler"].any?
-            bundler = sources.metadata_source.specs.search(Gem::Dependency.new("bundler", ::Bundler::VERSION)).last
+            if ::Bundler::VERSION >= "2.4.1"
+              query = ["bundler", ::Bundler::VERSION]
+            else
+              query = Gem::Dependency.new("bundler", ::Bundler::VERSION)
+            end
+            bundler = sources.metadata_source.specs.search(query).last
             specs["bundler"] = bundler
           end
 
