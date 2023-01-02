@@ -8,7 +8,7 @@ if Licensed::Shell.tool_available?("npm")
     let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
     let(:fixtures) { File.expand_path("../../fixtures/npm", __FILE__) }
     let(:source) { Licensed::Sources::NPM.new(config) }
-    let(:version) { Gem::Version.new(Licensed::Shell.execute("npm", "-v")) }
+    let(:npm_version) { Gem::Version.new(Licensed::Shell.execute("npm", "-v")) }
 
     describe "enabled?" do
       it "is true if package.json exists" do
@@ -36,9 +36,6 @@ if Licensed::Shell.tool_available?("npm")
           assert dep
           assert_equal "npm", dep.record["type"]
           assert_equal "5.2.0", dep.version
-          if source.npm_version < Gem::Version.new("7.0.0")
-            assert dep.record["homepage"]
-          end
           assert dep.record["summary"]
         end
       end
@@ -57,9 +54,6 @@ if Licensed::Shell.tool_available?("npm")
           dep = source.dependencies.detect { |d| d.name == "@github/query-selector" }
           assert dep
           assert_equal "1.0.3", dep.version
-          if source.npm_version < Gem::Version.new("7.0.0")
-            assert dep.record["homepage"]
-          end
           assert dep.record["summary"]
         end
       end
@@ -141,7 +135,7 @@ if Licensed::Shell.tool_available?("npm")
 
         it "finds dependencies" do
           # workspaces will only work as expected with npm > 8.5.0
-          skip if source.npm_version < Gem::Version.new("8.5.0")
+          skip if npm_version < Gem::Version.new("8.5.0")
 
           Dir.chdir fixtures do
             dep = source.dependencies.detect { |d| d.name == "callbackify" }
@@ -153,7 +147,7 @@ if Licensed::Shell.tool_available?("npm")
 
         it "does not include the current workspace project" do
           # workspaces will only work as expected with npm > 8.5.0
-          skip if source.npm_version < Gem::Version.new("8.5.0")
+          skip if npm_version < Gem::Version.new("8.5.0")
 
           Dir.chdir fixtures do
             refute source.dependencies.detect { |d| d.name == "licensed-fixtures-a" }
@@ -163,43 +157,9 @@ if Licensed::Shell.tool_available?("npm")
     end
 
     describe "missing dependencies (glob is missing package)" do
-      it "includes missing dependencies when yarn.lock is missing" do
-        # this test is incompatible with npm >=7
-        skip if source.npm_version >= Gem::Version.new("7.0.0")
-
-        Dir.mktmpdir do |dir|
-          FileUtils.cp_r(fixtures, dir)
-          dir = File.join(dir, "npm")
-          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
-
-          Dir.chdir dir do
-            assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-            assert source.dependencies.detect { |dep| dep.name == "glob" }
-          end
-        end
-      end
-
-      it "excludes missing dependencies when yarn.lock is present" do
-        # this test is incompatible with npm >=7
-        skip if source.npm_version >= Gem::Version.new("7.0.0")
-
-        Dir.mktmpdir do |dir|
-          FileUtils.cp_r(fixtures, dir)
-          dir = File.join(dir, "npm")
-          FileUtils.rm_rf(File.join(dir, "node_modules/glob"))
-          File.write(File.join(dir, "yarn.lock"), "")
-
-          Dir.chdir dir do
-            assert source.dependencies.detect { |dep| dep.name == "autoprefixer" }
-            refute source.dependencies.detect { |dep| dep.name == "glob" }
-          end
-        end
-      end
-
       it "raises Licensed::Sources::Source::Error on missing dependencies" do
-        # this test is incompatible with npm <7, >=7.12.0 (possibly earlier versions as well, I haven't been able to verify)
-        skip if source.npm_version < Gem::Version.new("7.0.0")
-        skip if source.npm_version >= Gem::Version.new("7.12.0")
+        # this test is incompatible with npm >=7.12.0 (possibly earlier versions as well, I haven't been able to verify)
+        skip if npm_version >= Gem::Version.new("7.12.0")
 
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
@@ -218,7 +178,7 @@ if Licensed::Shell.tool_available?("npm")
 
       it "sets errors on missing dependencies" do
         # this test is incompatible with npm <7.12.0, (possibly earlier versions as well, I haven't been able to verify)
-        skip if source.npm_version < Gem::Version.new("7.12.0")
+        skip if npm_version < Gem::Version.new("7.12.0")
 
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
@@ -235,7 +195,7 @@ if Licensed::Shell.tool_available?("npm")
 
       it "does not set errors on packages with reported problems that have a path" do
         # this test is incompatible with npm <7.12.0, (possibly earlier versions as well, I haven't been able to verify)
-        skip if source.npm_version < Gem::Version.new("7.12.0")
+        skip if npm_version < Gem::Version.new("7.12.0")
 
         Dir.mktmpdir do |dir|
           FileUtils.cp_r(fixtures, dir)
