@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.6.0"
 
-  spec.add_dependency "licensee", "9.15.3"
+  spec.add_dependency "licensee", "9.16.0"
   spec.add_dependency "thor", "1.2.1"
   spec.add_dependency "pathname-common_prefix", "0.0.1"
   spec.add_dependency "tomlrb", "2.0.3"
