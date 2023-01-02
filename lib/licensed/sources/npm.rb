@@ -109,10 +109,21 @@ module Licensed
       # Returns an array of arguments that should be used for all `npm list`
       # calls, regardless of how the output is formatted
       def package_metadata_args
-        args = %w(--all)
+        args = []
         args << "--production" unless include_non_production?
 
+        # on npm 7+, the --all argument is necessary to evaluate the project's
+        # full dependency tree
+        args << "--all" if npm_version >= Gem::Version.new("7.0.0")
+
         return args
+      end
+
+      # Returns the currently installed version of npm as a Gem::Version object
+      def npm_version
+        @npm_version ||= begin
+          Gem::Version.new(Licensed::Shell.execute("npm", "-v").strip)
+        end
       end
 
       # Returns true if a yarn.lock file exists in the current directory
