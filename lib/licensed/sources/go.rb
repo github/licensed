@@ -36,25 +36,11 @@ module Licensed
 
       # Returns an array of dependency package import paths
       def packages
-        dependency_packages =
-          if go_version < Gem::Version.new("1.11.0")
-            root_package_deps
-          else
-            go_list_deps
-          end
-
         # don't include go std packages
         # don't include packages under the root project that aren't vendored
-        dependency_packages
+        go_list_deps
           .reject { |pkg| go_std_package?(pkg) }
           .reject { |pkg| local_package?(pkg) }
-      end
-
-      # Returns non-ignored packages found from the root packages "Deps" property
-      def root_package_deps
-        # check for ignored packages to avoid raising errors calling `go list`
-        # when ignored package is not found
-        Parallel.map(Array(root_package["Deps"])) { |name| package_info(name) }
       end
 
       # Returns the list of dependencies as returned by "go list -json -deps"
@@ -188,23 +174,11 @@ module Licensed
         package["ImportPath"]
       end
 
-      # Returns a hash of information about the package with a given import path
-      #
-      # import_path - Go package import path
-      def package_info(import_path)
-        JSON.parse(package_info_command(import_path))
-      end
-
       # Returns package information as a JSON string
       #
       # args - additional arguments to `go list`, e.g. Go package import path
       def package_info_command(*args)
         Licensed::Shell.execute("go", "list", "-e", "-json", *Array(args)).strip
-      end
-
-      # Returns the info for the package under test
-      def root_package
-        @root_package ||= package_info(".")
       end
 
       # Returns whether go source is found
@@ -227,15 +201,6 @@ module Licensed
           return File.expand_path(path, config.root) unless path.to_s.empty?
           return ENV["GOPATH"] if ENV["GOPATH"]
           Licensed::Shell.execute("go", "env", "GOPATH")
-        end
-      end
-
-      # Returns the current version of go available, as a Gem::Version
-      def go_version
-        @go_version ||= begin
-          full_version = Licensed::Shell.execute("go", "version").strip
-          version_string = full_version.gsub(%r{.*go(\d+\.\d+(\.\d+)?).*}, "\\1")
-          Gem::Version.new(version_string)
         end
       end
 
