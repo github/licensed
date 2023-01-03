@@ -46,7 +46,6 @@ module Licensed
       end
 
       def enumerate_dependencies
-        csv = load_csv
         JSON.parse(gradle_runner.run(format_command("printDependencies"))).map do |package|
           name = "#{package['group']}:#{package['name']}"
           Dependency.new(
@@ -64,7 +63,7 @@ module Licensed
       private
 
       def gradle_runner
-        @gradle_runner ||= Runner.new(config.pwd, configurations)
+        @gradle_runner ||= Runner.new(config.root, configurations)
       end
 
       # Returns the configurations to include in license generation.
@@ -81,7 +80,7 @@ module Licensed
 
       # Prefixes the gradle command with the project name for multi-build projects.
       def format_command(command)
-        if config.source_path != config.pwd
+        if config.source_path != config.root
           project = File.basename(config.source_path)
         end
         project.nil? ? command : "#{project}:#{command}"
@@ -102,11 +101,11 @@ module Licensed
 
       def load_csv
         begin
-        # create the CSV file including dependency license urls using the gradle plugin
+          # create the CSV file including dependency license urls using the gradle plugin
+          gradle_licenses_dir = File.join(config.root, GRADLE_LICENSES_PATH)
           gradle_runner.run("generateLicenseReport")
 
           # parse the CSV report for dependency license urls
-          gradle_licenses_dir = File.join(config.root, GRADLE_LICENSES_PATH)
           CSV.foreach(File.join(gradle_licenses_dir, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
             name, _, version = row["artifact"].rpartition(":")
             key = csv_key(name: name, version: version)
