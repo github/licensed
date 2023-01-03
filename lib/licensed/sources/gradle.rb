@@ -46,7 +46,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        JSON.parse(gradle_runner.run(format_command("printDependencies"))).map do |package|
+        JSON.parse(gradle_runner.run("printDependencies")).map do |package|
           name = "#{package['group']}:#{package['name']}"
           Dependency.new(
             name: name,
@@ -63,7 +63,7 @@ module Licensed
       private
 
       def gradle_runner
-        @gradle_runner ||= Runner.new(config.root, configurations)
+        @gradle_runner ||= Runner.new(config.pwd, configurations)
       end
 
       # Returns the configurations to include in license generation.
@@ -76,14 +76,6 @@ module Licensed
             DEFAULT_CONFIGURATIONS
           end
         end
-      end
-
-      # Prefixes the gradle command with the project name for multi-build projects.
-      def format_command(command)
-        if config.source_path != config.root
-          project = File.basename(config.source_path)
-        end
-        project.nil? ? command : "#{project}:#{command}"
       end
 
       # Returns a key to uniquely identify a name and version in the obtained CSV content
@@ -129,11 +121,12 @@ module Licensed
           @configurations = configurations
         end
 
-        def run(*args)
+        def run(command)
           Dir.chdir(@root_path) do
             Tempfile.create(["init", ".gradle"], @root_path) do |f|
               f.write(init_script(@configurations))
               f.close
+              args = [format_command(command)]
               # The configuration cache is an incubating feature that can be activated manually.
               # The gradle plugin for licenses does not support it so we prevent it to run for gradle version supporting it.
               args << "--no-configuration-cache" if gradle_version >= "6.6"
@@ -203,6 +196,12 @@ module Licensed
                 }
               }
             EOF
+        end
+
+        # Prefixes the gradle command with the project name for multi-build projects.
+        def format_command(command)
+          path = Licensed::Shell.execute(executable, "properties", "--property", "path", "-Dorg.gradle.logging.level=quiet")&.split(" ").last
+          path == ":" ? command : "#{path}:#{command}"
         end
       end
     end
