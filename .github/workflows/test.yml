@@ -28,7 +28,7 @@ jobs:
     needs: core
     strategy:
       matrix:
-        bundler: [ '2.1', '2.2', '2.3' ]
+        bundler: [ '2.1', '2.2', '2.3', '2.4' ]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
@@ -435,4 +435,4 @@ jobs:
     - name: Set up fixtures
       run: script/source-setup/cocoapods
     - name: Run tests
-      run: script/test cocoapods 
+      run: script/test cocoapods
