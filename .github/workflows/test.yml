@@ -201,8 +201,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
-    - run: bundle lock
+        bundler-cache: true
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
