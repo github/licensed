@@ -202,7 +202,7 @@ module Licensed
         # Prefixes the gradle command with the project name for multi-build projects.
         def format_command(command, source_path)
           Dir.chdir(source_path) do
-            path = Licensed::Shell.execute(executable, "properties", "--property", "path", "-Dorg.gradle.logging.level=quiet")&.split(" ").last
+            path = Licensed::Shell.execute(executable, "properties", "-Dorg.gradle.logging.level=quiet").scan(/path:.*/).last.split(" ").last
             path == ":" ? command : "#{path}:#{command}"
           end
         end
