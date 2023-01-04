@@ -166,7 +166,7 @@ module Licensed
                       }
                     }
                     dependencies {
-                      classpath "com.github.jk1:gradle-license-report:2.1"
+                      classpath "com.github.jk1:gradle-license-report:#{gradle_version >= "7.0" ? "2.0" : "1.17"}"
                     }
                   }
 
