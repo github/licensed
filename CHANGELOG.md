@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - BREAKING: Licensed no longer ships executables with releases (https://github.com/github/licensed/pull/586)
-- BREAKING: Licensed no longer includes support for Go <= 1.11
+- BREAKING: Licensed no longer includes support for Go <= 1.11 (https://github.com/github/licensed/pull/602)
 
 ## 3.9.1
 
