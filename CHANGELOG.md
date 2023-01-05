@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.0.0
+
+### Added
+
+- Licensed supports Cocoapods as a dependency source (:tada: @LouisBoudreau https://github.com/github/licensed/pull/584)
+- Licensed supports Gradle multi-project builds (:tada: @LouisBoudreau https://github.com/github/licensed/pull/583)
+
+### Fixed
+
+- Licensed no longer crashes when run with Bundler >= 2.4.0 (:tada: @JoshReedSchramm https://github.com/github/licensed/pull/597)
+
+### Changed
+
+- BREAKING: Licensed no longer ships executables with releases (https://github.com/github/licensed/pull/586)
+- BREAKING: Licensed no longer includes support for Go <= 1.11
+
 ## 3.9.1
 
 ### Fixed
@@ -661,4 +677,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/3.9.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.0.0...HEAD
