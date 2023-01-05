@@ -14,3 +14,11 @@ gradle:
     - runtime
     - runtimeClassPath
 ```
+### Multi-build projects
+
+To run `licensed` for specific projects in a [multi-build project](https://docs.gradle.org/current/userguide/multi_project_builds.html) you must specify the [apps](../configuration/application_source.md) configuration key.
+
+```yml
+apps:
+  - source_path: ./path/to/subproject
+```
