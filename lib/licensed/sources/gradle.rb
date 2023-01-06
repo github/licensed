@@ -129,8 +129,8 @@ module Licensed
       class Runner
         def initialize(root_path, configurations, executable)
           @root_path = root_path
-          @init_script = create_init_script(root_path, configurations)
           @executable = executable
+          @init_script = create_init_script(root_path, configurations)
         end
 
         def run(command, source_path)
