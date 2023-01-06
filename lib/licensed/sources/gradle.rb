@@ -42,7 +42,7 @@ module Licensed
       end
 
       def enabled?
-        gradle_runner.enabled? && File.exist?(config.pwd.join("build.gradle"))
+        !executable.to_s.empty? && File.exist?(config.pwd.join("build.gradle"))
       end
 
       def enumerate_dependencies
@@ -62,8 +62,19 @@ module Licensed
 
       private
 
+      def executable
+        return @executable if defined?(@executable)
+
+        @executable = begin
+          gradlew = File.join(config.pwd, "gradlew")
+          return gradlew if File.executable?(gradlew)
+
+          "gradle" if Licensed::Shell.tool_available?("gradle")
+        end
+      end
+
       def gradle_runner
-        @gradle_runner ||= Runner.new(config.pwd, configurations)
+        @gradle_runner ||= Runner.new(config.pwd, configurations, executable)
       end
 
       # Returns the configurations to include in license generation.
@@ -116,9 +127,10 @@ module Licensed
       # The Gradle::Runner class is a wrapper which provides
       # an interface to run gradle commands with the init script initialized
       class Runner
-        def initialize(root_path, configurations)
+        def initialize(root_path, configurations, executable)
           @root_path = root_path
           @init_script = create_init_script(root_path, configurations)
+          @executable = executable
         end
 
         def run(command, source_path)
@@ -126,28 +138,13 @@ module Licensed
           # The configuration cache is an incubating feature that can be activated manually.
           # The gradle plugin for licenses does not support it so we prevent it to run for gradle version supporting it.
           args << "--no-configuration-cache" if gradle_version >= "6.6"
-          Licensed::Shell.execute(executable, "-q", "--init-script", @init_script.path, *args)
-        end
-
-        def enabled?
-          !executable.to_s.empty?
+          Licensed::Shell.execute(@executable, "-q", "--init-script", @init_script.path, *args)
         end
 
         private
 
         def gradle_version
-          @gradle_version ||= Licensed::Shell.execute(executable, "--version").scan(/Gradle [\d+]\.[\d+]/).last.split(" ").last
-        end
-
-        def executable
-          return @executable if defined?(@executable)
-
-          @executable = begin
-            gradlew = File.join(@root_path, "gradlew")
-            return gradlew if File.executable?(gradlew)
-
-            "gradle" if Licensed::Shell.tool_available?("gradle")
-          end
+          @gradle_version ||= Licensed::Shell.execute(@executable, "--version").scan(/Gradle [\d+]\.[\d+]/).last.split(" ").last
         end
 
         def create_init_script(path, configurations)
@@ -202,7 +199,7 @@ module Licensed
         # Prefixes the gradle command with the project name for multi-build projects.
         def format_command(command, source_path)
           Dir.chdir(source_path) do
-            path = Licensed::Shell.execute(executable, "properties", "-Dorg.gradle.logging.level=quiet").scan(/path:.*/).last.split(" ").last
+            path = Licensed::Shell.execute(@executable, "properties", "-Dorg.gradle.logging.level=quiet").scan(/path:.*/).last.split(" ").last
             path == ":" ? command : "#{path}:#{command}"
           end
         end
