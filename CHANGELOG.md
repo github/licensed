@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.0.1
+
+### Fixed
+
+- Running gradle tests will no longer fail when gradle is not available (https://github.com/github/licensed/pull/606)
+
 ## 4.0.0
 
 ### Added
@@ -677,4 +683,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.0.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.0.1...HEAD
