@@ -66,7 +66,7 @@ module Licensed
         return @executable if defined?(@executable)
 
         @executable = begin
-          gradlew = File.join(config.pwd, "gradlew")
+          gradlew = File.join(config.root, "gradlew")
           return gradlew if File.executable?(gradlew)
 
           "gradle" if Licensed::Shell.tool_available?("gradle")
