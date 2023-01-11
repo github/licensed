@@ -14,6 +14,7 @@ gradle:
     - runtime
     - runtimeClassPath
 ```
+
 ### Multi-build projects
 
 To run `licensed` for specific projects in a [multi-build project](https://docs.gradle.org/current/userguide/multi_project_builds.html) you must specify the [apps](../configuration/application_source.md) configuration key.
@@ -23,11 +24,11 @@ apps:
   - source_path: ./path/to/subproject
 ```
 
-### Gradlew 
+### Gradlew
 
 The `gradle.gradlew` property is used to determine where the `gradlew` executable is. The default location the [configuration root](../configuration/configuration_root.md).
 
 ```yml
 gradle:
-  - gradlew: path/from/root/to/gradle/gradlew
+  gradlew: path/from/root/to/gradle/gradlew
 ```

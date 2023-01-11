@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.0.2
+
+### Fixed
+
+- The path to a gradlew executable can be configured when enumerating gradle dependencies (:tada: @LouisBoudreau https://github.com/github/licensed/pull/610)
+
 ## 4.0.1
 
 ### Fixed
@@ -683,4 +689,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.0.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.0.2...HEAD
