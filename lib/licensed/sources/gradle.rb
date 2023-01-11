@@ -66,7 +66,6 @@ module Licensed
         return @executable if defined?(@executable)
 
         @executable = begin
-          gradlew = File.join(config.pwd, "gradlew")
           return gradlew if File.executable?(gradlew)
 
           "gradle" if Licensed::Shell.tool_available?("gradle")
@@ -86,6 +85,14 @@ module Licensed
           else
             DEFAULT_CONFIGURATIONS
           end
+        end
+      end
+
+      # Returns the path to the Gradle wrapper.
+      def gradlew
+        @gradlew ||= begin
+          gradlew = config.dig("gradle", "gradlew")
+          config.root.join(gradlew || "gradlew").to_s
         end
       end
 
