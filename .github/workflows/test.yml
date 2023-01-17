@@ -107,7 +107,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup php
-      uses: nanasess/setup-php@v3.3.2
+      uses: nanasess/setup-php@v3.3.3
       with:
         php-version: ${{ matrix.php }}
     - name: Set up Ruby
