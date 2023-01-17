@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.0.3
+
+### Changed
+
+- Cocoapods dependency enumeration has been disabled (https://github.com/github/licensed/pull/616)
+
+### Fixed
+
+- Fixed method signature change in Bundler API with Bundler >= 2.4.4 (:tada: @CvX https://github.com/github/licensed/pull/614)
+- Fixed installation dependency compatibility with Rails >= 7.0 (https://github.com/github/licensed/pull/616)
+
 ## 4.0.2
 
 ### Fixed
@@ -689,4 +700,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.0.2...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.0.3...HEAD
