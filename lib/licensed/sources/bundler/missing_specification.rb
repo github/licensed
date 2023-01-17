@@ -47,8 +47,8 @@ module Licensed
         Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
       end
 
-      def __materialize__(*args)
-        spec = super(*args)
+      def __materialize__(*args, **kwargs)
+        spec = super(*args, **kwargs)
         return spec if spec
 
         Licensed::Bundler::MissingSpecification.new(name: name, version: version, platform: platform, source: source)
