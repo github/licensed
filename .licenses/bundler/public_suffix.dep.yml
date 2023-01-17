@@ -1,6 +1,6 @@
 ---
 name: public_suffix
-version: 4.0.7
+version: 5.0.1
 type: bundler
 summary: Domain name parser based on the Public Suffix List.
 homepage: https://simonecarletti.com/code/publicsuffix-ruby
