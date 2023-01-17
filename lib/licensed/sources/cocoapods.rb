@@ -2,15 +2,20 @@
 require "json"
 require "pathname"
 require "uri"
-require "cocoapods-core"
+
+# **NOTE** Cocoapods is disabled until cocoapods-core supports recent rails versions
+# https://github.com/CocoaPods/Core/pull/733
+# require "cocoapods-core"
 
 module Licensed
   module Sources
     class Cocoapods < Source
       def enabled?
-        return unless Licensed::Shell.tool_available?("pod")
+        false
 
-        config.pwd.join("Podfile").exist? && config.pwd.join("Podfile.lock").exist?
+        # return unless Licensed::Shell.tool_available?("pod")
+
+        # config.pwd.join("Podfile").exist? && config.pwd.join("Podfile.lock").exist?
       end
 
       def enumerate_dependencies
@@ -46,11 +51,13 @@ module Licensed
       end
 
       def lockfile
-        @lockfile ||= Pod::Lockfile.from_file(config.pwd.join("Podfile.lock"))
+        @lockfile = nil
+        # @lockfile ||= Pod::Lockfile.from_file(config.pwd.join("Podfile.lock"))
       end
 
       def podfile
-        @podfile ||= Pod::Podfile.from_file(config.pwd.join("Podfile"))
+        @podfile = nil
+        # @podfile ||= Pod::Podfile.from_file(config.pwd.join("Podfile"))
       end
 
       def dependency_path(name)

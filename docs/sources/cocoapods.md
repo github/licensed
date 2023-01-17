@@ -1,10 +1,12 @@
 # CocoaPods
 
+**NOTE!**: Enumerating Cocoapods dependencies is disabled until the cocoapods-core gem is compatible with Rails 7+.  See https://github.com/CocoaPods/Core/pull/733
+
 The cocoapods source will detect dependencies when `Podfile` and `Podfile.lock` are found at an app's `source_path`.
 
 It uses the `pod` CLI commands to enumerate dependencies and gather metadata on each package.
 
-### Evaluating dependencies from a specific target
+## Evaluating dependencies from a specific target
 
 The `cocoapods.targets` property is used to specify which targets to analyze dependencies from. By default, dependencies from all targets will be analyzed.
 

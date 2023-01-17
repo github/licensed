@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "parallel", "1.22.1"
   spec.add_dependency "reverse_markdown", "2.1.1"
   spec.add_dependency "json", "2.6.3"
-  spec.add_dependency "cocoapods-core", "1.11.3"
+  # spec.add_dependency "cocoapods-core", "1.11.3"
 
   spec.add_development_dependency "rake", "13.0.6"
   spec.add_development_dependency "minitest", "5.17.0"
