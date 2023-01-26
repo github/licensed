@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.0.4
+
+### Changed
+
+- Dependency version requirements are more relaxed (https://github.com/github/licensed/pull/619)
+
 ## 4.0.3
 
 ### Changed
@@ -700,4 +706,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.0.3...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.0.4...HEAD
