@@ -18,5 +18,20 @@ describe Licensed::Sources::Source do
       config.ignore("type" => "test", "name" => "dependency")
       assert_empty source.dependencies
     end
+
+    it "adds configured dependency amendments to dependencies" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          config["amendments"] = {
+            TestSource.type => {
+              TestSource::DEFAULT_DEPENDENCY_NAME => "amendment.txt"
+            }
+          }
+          File.write "amendment.txt", "amendment"
+          dep = source.dependencies.first
+          assert_equal [Pathname.pwd.join("amendment.txt")], dep.amendments
+        end
+      end
+    end
   end
 end

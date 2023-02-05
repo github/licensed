@@ -604,4 +604,56 @@ describe Licensed::AppConfiguration do
                    config.cache_path
     end
   end
+
+  describe "amendments_for_dependency" do
+    it "returns an empty array if amendments aren't configured for a dependency" do
+      assert_empty config.amendments_for_dependency("type" => "test", "name" => "test")
+    end
+
+    it "returns an array of absolute paths to amendment files for a string configuration" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          options["amendments"] = { "test" => { "test" => "amendment.txt" } }
+          File.write "amendment.txt", "amendment"
+
+          path = File.join(Dir.pwd, "amendment.txt")
+          assert_equal [path], config.amendments_for_dependency("type" => "test", "name" => "test")
+        end
+      end
+    end
+
+    it "returns an array of absolute paths to amendment files for an array configuration" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          options["amendments"] = { "test" => { "test" => ["amendment.txt"] } }
+          File.write "amendment.txt", "amendment"
+
+          path = File.join(Dir.pwd, "amendment.txt")
+          assert_equal [path], config.amendments_for_dependency("type" => "test", "name" => "test")
+        end
+      end
+    end
+
+    it "strips any amendment paths for files that don't exist" do
+      options["amendments"] = { "test" => { "test" => "amendment.txt" } }
+      assert_empty config.amendments_for_dependency("type" => "test", "name" => "test")
+    end
+
+    it "expands glob patterns" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          Dir.mkdir "amendments"
+
+          options["amendments"] = { "test" => { "test" => "amendments/*" } }
+          paths = 2.times.map do |index|
+            path = "amendments/amendment-#{index}.txt"
+            File.write path, "amendment-#{index}"
+            File.join(Dir.pwd, path)
+          end
+
+          assert_equal paths, config.amendments_for_dependency("type" => "test", "name" => "test")
+        end
+      end
+    end
+  end
 end

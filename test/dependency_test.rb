@@ -319,4 +319,23 @@ describe Licensed::Dependency do
       refute dep.exist?
     end
   end
+
+  describe "project_files" do
+    it "returns found only project files when the dependency does not contain amendments" do
+      mkproject do |dependency|
+        File.write "LICENSE", Licensee::License.find("mit").text
+        assert_includes dependency.license_contents,
+                        { "sources" => "LICENSE", "text" => Licensee::License.find("mit").text }
+      end
+    end
+
+    it "returns custom license amendment files when the dependency contains amendments" do
+      mkproject do |dependency|
+        File.write "amendment.txt", "license amendment"
+        dependency.amendments << "amendment.txt"
+        assert_includes dependency.license_contents,
+                        { "sources" => "License amendment loaded from amendment.txt", "text" => "license amendment" }
+      end
+    end
+  end
 end
