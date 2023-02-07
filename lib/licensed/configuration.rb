@@ -109,9 +109,9 @@ module Licensed
       self["allowed"] << license
     end
 
-    # Returns an array of amendment content file paths
-    def amendments_for_dependency(dependency)
-      amendment_paths = Array(self.dig("amendments", dependency["type"], dependency["name"]))
+    # Returns an array of paths to files containing additional license terms.
+    def additional_terms_for_dependency(dependency)
+      amendment_paths = Array(self.dig("additional_terms", dependency["type"], dependency["name"]))
       amendment_paths.flat_map { |path| Dir.glob(self.root.join(path)) }
     end
 

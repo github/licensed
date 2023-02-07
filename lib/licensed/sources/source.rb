@@ -71,7 +71,7 @@ module Licensed
       def dependencies
         cached_dependencies
           .reject { |d| ignored?(d) }
-          .each { |d| add_amendments_from_configuration(d) }
+          .each { |d| add_additional_terms_from_configuration(d) }
       end
 
       # Enumerate all source dependencies.  Must be implemented by each source class.
@@ -91,9 +91,9 @@ module Licensed
         @dependencies ||= enumerate_dependencies.compact
       end
 
-      # Add any amendments for this dependency that have been added to the configuration
-      def add_amendments_from_configuration(dependency)
-        dependency.amendments.concat config.amendments_for_dependency("type" => self.class.type, "name" => dependency.name)
+      # Add any additional_terms for this dependency that have been added to the configuration
+      def add_additional_terms_from_configuration(dependency)
+        dependency.additional_terms.concat config.additional_terms_for_dependency("type" => self.class.type, "name" => dependency.name)
       end
     end
   end

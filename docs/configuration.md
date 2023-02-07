@@ -67,9 +67,9 @@ reviewed:
   - classlist # public domain
   - octicons
 
-# Specify license amendments that have been obtained from a dependency's owner
-# which alter the terms of the dependency's license 
-amendments:
+# Specify additional license terms that have been obtained from a dependency's owner
+# which apply to the dependency's license 
+additional_terms:
   bundler:
     bcrypt-ruby:
       - .licenses/amendments/bundler/bcrypt-ruby/amendment.txt

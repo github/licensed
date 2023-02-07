@@ -9,7 +9,7 @@ module Licensed
     attr_reader :version
     attr_reader :errors
     attr_reader :path
-    attr_reader :amendments
+    attr_reader :additional_terms
 
     # Create a new project dependency
     #
@@ -29,7 +29,7 @@ module Licensed
       @errors = errors
       path = path.to_s
       @path = path
-      @amendments = []
+      @additional_terms = []
 
       # enforcing absolute paths makes life much easier when determining
       # an absolute file path in #notices
@@ -84,9 +84,9 @@ module Licensed
 
 
     # Override the behavior of Licensee::Projects::FSProject#project_files to include
-    # configured license amendments
+    # additional license terms
     def project_files
-      super + amendment_license_files
+      super + additional_license_terms_files
     end
 
     # Returns legal notices found at the dependency path
@@ -169,16 +169,16 @@ module Licensed
     end
 
     # Returns an array of Licensee::ProjectFiles::LicenseFile created from
-    # this dependency's added amendments
-    def amendment_license_files
-      @amendment_license_files ||= begin
-        files = amendments.map do |path|
+    # this dependency's additional license terms
+    def additional_license_terms_files
+      @additional_license_terms_files ||= begin
+        files = additional_terms.map do |path|
           next unless File.file?(path)
 
           metadata = { dir: File.dirname(path), name: File.basename(path) }
           Licensee::ProjectFiles::LicenseFile.new(
             load_file(metadata),
-            { source: "License amendment loaded from #{metadata[:name]}" }
+            { source: "License terms loaded from #{metadata[:name]}" }
           )
         end
         files.compact

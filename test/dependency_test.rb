@@ -321,7 +321,7 @@ describe Licensed::Dependency do
   end
 
   describe "project_files" do
-    it "returns found only project files when the dependency does not contain amendments" do
+    it "returns found only project files when the dependency does not contain additional terms" do
       mkproject do |dependency|
         File.write "LICENSE", Licensee::License.find("mit").text
         assert_includes dependency.license_contents,
@@ -329,12 +329,12 @@ describe Licensed::Dependency do
       end
     end
 
-    it "returns custom license amendment files when the dependency contains amendments" do
+    it "returns custom license amendment files when the dependency contains additional terms" do
       mkproject do |dependency|
         File.write "amendment.txt", "license amendment"
-        dependency.amendments << "amendment.txt"
+        dependency.additional_terms << "amendment.txt"
         assert_includes dependency.license_contents,
-                        { "sources" => "License amendment loaded from amendment.txt", "text" => "license amendment" }
+                        { "sources" => "License terms loaded from amendment.txt", "text" => "license amendment" }
       end
     end
   end
