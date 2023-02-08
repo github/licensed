@@ -1,0 +1,4 @@
+expected_dependency: autoprefixer
+root: .
+sources:
+  pnpm: true
