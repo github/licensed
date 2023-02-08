@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.1.0
+
+### Added
+
+- Custom license terms can be added to dependencies via new configuration options (https://github.com/github/licensed/pull/624)
+- Licensed is now integrated with pnpm to enumerate dependencies (https://github.com/github/licensed/pull/626)
+
 ## 4.0.4
 
 ### Changed
@@ -706,4 +713,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.0.4...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.1.0...HEAD
