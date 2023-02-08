@@ -67,6 +67,13 @@ reviewed:
   - classlist # public domain
   - octicons
 
+# Specify additional license terms that have been obtained from a dependency's owner
+# which apply to the dependency's license 
+additional_terms:
+  bundler:
+    bcrypt-ruby:
+      - .licenses/amendments/bundler/bcrypt-ruby/amendment.txt
+
 # A single configuration file can be used to enumerate dependencies for multiple
 # projects.  Each configuration is referred to as an "application" and must include
 # a source path, at a minimum

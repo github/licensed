@@ -9,3 +9,4 @@
 1. [Allowed licenses](./allowed_licenses.md)
 1. [Ignoring dependencies](./ignoring_dependencies.md)
 1. [Reviewing dependencies](./reviewing_dependencies.md)
+1. [Additional license terms](./additional_terms.md)

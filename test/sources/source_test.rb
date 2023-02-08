@@ -18,5 +18,20 @@ describe Licensed::Sources::Source do
       config.ignore("type" => "test", "name" => "dependency")
       assert_empty source.dependencies
     end
+
+    it "adds the dependency's configured additional terms to dependencies" do
+      Dir.mktmpdir do |dir|
+        Dir.chdir dir do
+          config["additional_terms"] = {
+            TestSource.type => {
+              TestSource::DEFAULT_DEPENDENCY_NAME => "amendment.txt"
+            }
+          }
+          File.write "amendment.txt", "amendment"
+          dep = source.dependencies.first
+          assert_equal [File.join(Dir.pwd, "amendment.txt")], dep.additional_terms
+        end
+      end
+    end
   end
 end

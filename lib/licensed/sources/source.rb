@@ -69,7 +69,9 @@ module Licensed
       # Returns all dependencies that should be evaluated.
       # Excludes ignored dependencies.
       def dependencies
-        cached_dependencies.reject { |d| ignored?(d) }
+        cached_dependencies
+          .reject { |d| ignored?(d) }
+          .each { |d| add_additional_terms_from_configuration(d) }
       end
 
       # Enumerate all source dependencies.  Must be implemented by each source class.
@@ -87,6 +89,11 @@ module Licensed
       # Returns a cached list of dependencies
       def cached_dependencies
         @dependencies ||= enumerate_dependencies.compact
+      end
+
+      # Add any additional_terms for this dependency that have been added to the configuration
+      def add_additional_terms_from_configuration(dependency)
+        dependency.additional_terms.concat config.additional_terms_for_dependency("type" => self.class.type, "name" => dependency.name)
       end
     end
   end
