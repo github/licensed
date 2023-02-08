@@ -1,0 +1,10 @@
+{
+  "name": "licensed-fixtures-a",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "callbackify": "1.1.0"
+  }
+}

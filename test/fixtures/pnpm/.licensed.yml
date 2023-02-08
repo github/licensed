@@ -1,0 +1,5 @@
+expected_dependency: autoprefixer@5.2.0
+expected_dependency_name: autoprefixer
+root: .
+sources:
+  pnpm: true
