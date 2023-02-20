@@ -131,10 +131,13 @@ module Licensed
           # treat the entire pattern as the dependency name with no version.
           name = pattern
           requirement = nil
-        elsif Gem::Requirement::PATTERN.match?(requirement)
+        elsif !requirement.to_s.empty?
           # check if the version requirement is a valid Gem::Requirement
           # for range matching
-          requirement = Gem::Requirement.new(requirement)
+          requirements = requirement.split(",").map(&:strip)
+          if requirements.all? { |r| Gem::Requirement::PATTERN.match?(r) }
+            requirement = Gem::Requirement.new(requirements)
+          end
         end
 
         # the pattern's name must match the dependency's name

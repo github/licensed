@@ -396,11 +396,11 @@ describe Licensed::AppConfiguration do
 
       it "matches a dependency ignored at *" do
         config.ignore package.merge("version" => "*"), at_version: true
-        assert config.ignored?(package.merge("version" => "1.0.1"))
+        assert config.ignored?(package)
       end
 
       it "matches a dependency ignored at a requirement pattern" do
-        config.ignore package.merge("version" => ">= 1.0.0"), at_version: true
+        config.ignore package.merge("version" => ">= 1.0.0, < 2.0.0"), at_version: true
         assert config.ignored?(package)
       end
 
@@ -501,7 +501,7 @@ describe Licensed::AppConfiguration do
       end
 
       it "matches a dependency reviewed at a requirement pattern" do
-        config.review package.merge("version" => ">= 1.0.0"), at_version: true
+        config.review package.merge("version" => ">= 1.0.0, < 2.0.0"), at_version: true
         assert config.reviewed?(package, require_version: true)
       end
 
