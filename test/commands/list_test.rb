@@ -44,7 +44,7 @@ describe Licensed::Commands::List do
     count = dependencies.size
 
     config.apps.each do |app|
-      app.ignore("type" => "test", "name" => "dependency")
+      app.ignore({ "type" => "test", "name" => "dependency" })
     end
 
     run_command
