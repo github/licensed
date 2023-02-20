@@ -10,6 +10,8 @@ module Licensed
 
     DEFAULT_CACHE_PATH = ".licenses".freeze
 
+    ANY_VERSION_REQUIREMENT = "*".freeze
+
     # Returns the root for a configuration in following order of precedence:
     # 1. explicitly configured "root" property
     # 2. a found git repository root
@@ -73,8 +75,8 @@ module Licensed
     end
 
     # Is the given dependency reviewed?
-    def reviewed?(dependency, match_version: false)
-      any_list_pattern_matched? self["reviewed"][dependency["type"]], dependency, match_version: match_version
+    def reviewed?(dependency, require_version: false)
+      any_list_pattern_matched? self["reviewed"][dependency["type"]], dependency, require_version: require_version
     end
 
     # Find all reviewed dependencies that match the provided dependency's name
@@ -83,8 +85,8 @@ module Licensed
     end
 
     # Is the given dependency ignored?
-    def ignored?(dependency)
-      any_list_pattern_matched? self["ignored"][dependency["type"]], dependency
+    def ignored?(dependency, require_version: false)
+      any_list_pattern_matched? self["ignored"][dependency["type"]], dependency, require_version: require_version
     end
 
     # Is the license of the dependency allowed?
@@ -93,8 +95,10 @@ module Licensed
     end
 
     # Ignore a dependency
-    def ignore(dependency)
-      (self["ignored"][dependency["type"]] ||= []) << dependency["name"]
+    def ignore(dependency, at_version: false)
+      id = dependency["name"]
+      id += "@#{dependency["version"]}" if at_version && dependency["version"]
+      (self["ignored"][dependency["type"]] ||= []) << id
     end
 
     # Set a dependency as reviewed
@@ -117,15 +121,38 @@ module Licensed
 
     private
 
-    def any_list_pattern_matched?(list, dependency, match_version: false)
+    def any_list_pattern_matched?(list, dependency, require_version: false)
       Array(list).any? do |pattern|
-        if match_version
-          at_version = "@#{dependency["version"]}"
-          pattern, pattern_version = pattern.rpartition(at_version).values_at(0, 1)
-          next false if pattern == "" || pattern_version == ""
+        # parse a name and version requirement value from the pattern
+        name, requirement = pattern.rpartition("@").values_at(0, 2).map(&:strip)
+
+        if name == ""
+          # if name == "", then the pattern doesn't contain a valid version value.
+          # treat the entire pattern as the dependency name with no version.
+          name = pattern
+          requirement = nil
+        elsif Gem::Requirement::PATTERN.match?(requirement)
+          # check if the version requirement is a valid Gem::Requirement
+          # for range matching
+          requirement = Gem::Requirement.new(requirement)
         end
 
-        File.fnmatch?(pattern, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
+        # the pattern's name must match the dependency's name
+        next false unless File.fnmatch?(name, dependency["name"], File::FNM_PATHNAME | File::FNM_CASEFOLD)
+
+        # if there is no version requirement configured or if the dependency doesn't have a version
+        # specified, return a value based on whether a version match is required
+        next !require_version if requirement.nil? || dependency["version"].to_s.empty?
+
+        case requirement
+        when String
+          # string match the requirement against "*" or the dependency's version
+          [ANY_VERSION_REQUIREMENT, dependency["version"]].any? { |r| requirement == r }
+        when Gem::Requirement
+          # if the version was parsed as a gem requirement, check whether the version requirement
+          # matches the dependency's version
+          Gem::Version.correct?(dependency["version"]) && requirement.satisfied_by?(Gem::Version.new(dependency["version"]))
+        end
       end
     end
 

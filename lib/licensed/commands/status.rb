@@ -72,7 +72,7 @@ module Licensed
       # record's license(s) and the app's configuration
       def license_needs_review?(app, record)
         # review is not needed if the record is set as reviewed
-        return false if app.reviewed?(record, match_version: data_source == "configuration")
+        return false if app.reviewed?(record, require_version: data_source == "configuration")
 
         # review is not needed if the top level license is allowed
         return false if app.allowed?(record["license"])
@@ -99,7 +99,7 @@ module Licensed
         error = "dependency needs review"
 
         # look for an unversioned reviewed list match
-        if app.reviewed?(record, match_version: false)
+        if app.reviewed?(record, require_version: false)
           error += ", unversioned 'reviewed' match found: #{record["name"]}"
         end
 

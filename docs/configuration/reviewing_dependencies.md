@@ -16,3 +16,16 @@ reviewed:
   bundler:
     - gem-using-unallowed-license
 ```
+
+## Reviewing dependencies at specific versions
+
+Review a dependency at specific versions by appending `@<version>` to the end of the dependency's name in an `reviewed` list.  If a dependency is configured to be reviewed at a specific version, licensed will not recognize non-matching versions of the dependency as being manually reviewed and accepted.
+
+The version value can be one of:
+
+1. `"*"` - match any version value
+1. any version string, or version range string, that can be parsed by `Gem::Requirement`
+   - a semantic version - `dependency@1.2.3`
+   - a gem requirement range - `dependency@~> 1.0.0` or `dependency@< 3.0`
+   - see the [Rubygems version guides](https://guides.rubygems.org/patterns/#pessimistic-version-constraint) for more details about specifying gem version requirements
+1. a value that can't be parsed by `Gem::Requirement`, which will only match dependencies with the same version string

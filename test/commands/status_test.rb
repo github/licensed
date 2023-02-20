@@ -82,7 +82,7 @@ describe Licensed::Commands::Status do
       config.apps.each do |app|
         app.sources.each do |source|
           assert dependency_errors(app, source).any?
-          app.ignore "type" => source.class.type, "name" => "dependency"
+          app.ignore({ "type" => source.class.type, "name" => "dependency" })
         end
       end
 
@@ -100,7 +100,7 @@ describe Licensed::Commands::Status do
       config.apps.each do |app|
         app.sources.each do |source|
           assert dependency_errors(app, source).any?
-          app.ignore "type" => source.class.type, "name" => "dependency"
+          app.ignore({ "type" => source.class.type, "name" => "dependency" })
         end
       end
 
@@ -189,7 +189,7 @@ describe Licensed::Commands::Status do
     it "does not warn if cached license data missing for ignored gem" do
       config.apps.each do |app|
         FileUtils.rm app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}")
-        app.ignore "type" => "test", "name" => "dependency"
+        app.ignore({ "type" => "test", "name" => "dependency" })
       end
 
       run_command
@@ -214,7 +214,7 @@ describe Licensed::Commands::Status do
       count = reporter.report.all_reports.size
 
       config.apps.each do |app|
-        app.ignore "type" => "test", "name" => "dependency"
+        app.ignore({ "type" => "test", "name" => "dependency" })
       end
 
       run_command
@@ -423,7 +423,7 @@ describe Licensed::Commands::Status do
       config.apps.each do |app|
         app.sources.each do |source|
           assert dependency_errors(app, source).any?
-          app.ignore "type" => source.class.type, "name" => "dependency"
+          app.ignore({ "type" => source.class.type, "name" => "dependency" })
         end
       end
 
@@ -503,7 +503,7 @@ describe Licensed::Commands::Status do
       count = reporter.report.all_reports.size
 
       config.apps.each do |app|
-        app.ignore "type" => "test", "name" => "dependency"
+        app.ignore({ "type" => "test", "name" => "dependency" })
       end
 
       run_command
