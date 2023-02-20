@@ -4,6 +4,12 @@ require "json"
 module Licensed
   module Sources
     class PNPM < Source
+      # The PNPM source requires matching reviewed or ignored dependencies
+      # on both name and version
+      def self.require_matched_dependency_version
+        true
+      end
+
       # Returns true when pnpm is installed and a pnpm-lock.yaml file is found,
       # otherwise false
       def enabled?

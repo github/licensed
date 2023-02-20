@@ -7,6 +7,10 @@ describe Licensed::Sources::Source do
   let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd }) }
   let(:source) { TestSource.new(config) }
 
+  it "does not include dependency versions in the name identifier by default" do
+    refute Licensed::Sources::Source.require_matched_dependency_version
+  end
+
   describe "dependencies" do
     it "returns dependencies from the source" do
       dep = source.dependencies.first

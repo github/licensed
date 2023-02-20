@@ -130,7 +130,7 @@ module Licensed
         if dependency.record.matches?(cached_record)
           # use the cached license value if the license text wasn't updated
           dependency.record["license"] = cached_record["license"]
-        elsif app.reviewed?(dependency.record)
+        elsif app.reviewed?(dependency.record, require_version: self.class.require_matched_dependency_version)
           # if the license text changed and the dependency is set as reviewed
           # force a re-review of the dependency
           dependency.record["review_changed_license"] = true

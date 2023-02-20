@@ -51,6 +51,12 @@ module Licensed
                    .downcase
                    .split("::")
         end
+
+        # Returns true if the source requires matching reviewed and ignored dependencies'
+        # versions as well as their name
+        def require_matched_dependency_version
+          false
+        end
       end
 
       # all sources have a configuration
@@ -81,7 +87,7 @@ module Licensed
 
       # Returns whether a dependency is ignored in the configuration.
       def ignored?(dependency)
-        config.ignored?({ "type" => self.class.type, "name" => dependency.name })
+        config.ignored?(dependency.metadata, require_version: self.class.require_matched_dependency_version)
       end
 
       private
