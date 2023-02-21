@@ -46,7 +46,7 @@ module Licensed
       end
 
       def enumerate_dependencies
-        JSON.parse(gradle_runner.run("printDependencies", config.source_path)).map do |package|
+        JSON.parse(gradle_runner.run("printDependencies")).map do |package|
           name = "#{package['group']}:#{package['name']}"
           Dependency.new(
             name: name,
@@ -73,7 +73,7 @@ module Licensed
       end
 
       def gradle_runner
-        @gradle_runner ||= Runner.new(config.pwd, configurations, executable)
+        @gradle_runner ||= Runner.new(configurations, executable)
       end
 
       # Returns the configurations to include in license generation.
@@ -113,7 +113,7 @@ module Licensed
         begin
           # create the CSV file including dependency license urls using the gradle plugin
           gradle_licenses_dir = File.join(config.root, GRADLE_LICENSES_PATH)
-          gradle_runner.run("generateLicenseReport", config.source_path)
+          gradle_runner.run("generateLicenseReport")
 
           # parse the CSV report for dependency license urls
           CSV.foreach(File.join(gradle_licenses_dir, GRADLE_LICENSES_CSV_NAME), headers: true).each_with_object({}) do |row, hsh|
@@ -134,14 +134,13 @@ module Licensed
       # The Gradle::Runner class is a wrapper which provides
       # an interface to run gradle commands with the init script initialized
       class Runner
-        def initialize(root_path, configurations, executable)
-          @root_path = root_path
+        def initialize(configurations, executable)
           @executable = executable
-          @init_script = create_init_script(root_path, configurations)
+          @init_script = create_init_script(configurations)
         end
 
-        def run(command, source_path)
-          args = [format_command(command, source_path)]
+        def run(command)
+          args = [command]
           # The configuration cache is an incubating feature that can be activated manually.
           # The gradle plugin for licenses does not support it so we prevent it to run for gradle version supporting it.
           args << "--no-configuration-cache" if gradle_version >= "6.6"
@@ -150,65 +149,51 @@ module Licensed
 
         private
 
-        def gradle_version
-          @gradle_version ||= Licensed::Shell.execute(@executable, "--version").scan(/Gradle [\d+]\.[\d+]/).last.split(" ").last
-        end
+        def create_init_script(configurations)
+          f = Tempfile.new(["init", ".gradle"])
+          f.write(
+            <<~EOF
+                import com.github.jk1.license.render.CsvReportRenderer
+                import com.github.jk1.license.filter.LicenseBundleNormalizer
+                final configs = #{configurations.inspect}
 
-        def create_init_script(path, configurations)
-          Dir.chdir(path) do
-            f = Tempfile.new(["init", ".gradle"], @root_path)
-            f.write(
-              <<~EOF
-                  import com.github.jk1.license.render.CsvReportRenderer
-                  import com.github.jk1.license.filter.LicenseBundleNormalizer
-                  final configs = #{configurations.inspect}
-
-                  initscript {
-                    repositories {
-                      maven {
-                        url "https://plugins.gradle.org/m2/"
-                      }
-                    }
-                    dependencies {
-                      classpath "com.github.jk1:gradle-license-report:#{gradle_version >= "7.0" ? "2.0" : "1.17"}"
+                initscript {
+                  repositories {
+                    maven {
+                      url "https://plugins.gradle.org/m2/"
                     }
                   }
+                  dependencies {
+                    classpath "com.github.jk1:gradle-license-report:#{gradle_version >= "7.0" ? "2.0" : "1.17"}"
+                  }
+                }
 
-                  allprojects {
-                    apply plugin: com.github.jk1.license.LicenseReportPlugin
-                    licenseReport {
-                        outputDir = "$rootDir/.gradle-licenses"
-                        configurations = configs
-                        renderers = [new CsvReportRenderer()]
-                        filters = [new LicenseBundleNormalizer()]
-                    }
+                allprojects {
+                  apply plugin: com.github.jk1.license.LicenseReportPlugin
+                  licenseReport {
+                      outputDir = "$rootDir/.gradle-licenses"
+                      configurations = configs
+                      renderers = [new CsvReportRenderer()]
+                      filters = [new LicenseBundleNormalizer()]
+                  }
 
-                    task printDependencies {
-                      doLast {
-                          def dependencies = []
-                          configs.each {
-                              configurations[it].resolvedConfiguration.resolvedArtifacts.each { artifact ->
-                                  def id = artifact.moduleVersion.id
-                                  dependencies << "{ \\"group\\": \\"${id.group}\\", \\"name\\": \\"${id.name}\\", \\"version\\": \\"${id.version}\\" }"
-                              }
-                          }
-                          println "[${dependencies.join(", ")}]"
-                      }
+                  task printDependencies {
+                    doLast {
+                        def dependencies = []
+                        configs.each {
+                            configurations[it].resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                                def id = artifact.moduleVersion.id
+                                dependencies << "{ \\"group\\": \\"${id.group}\\", \\"name\\": \\"${id.name}\\", \\"version\\": \\"${id.version}\\" }"
+                            }
+                        }
+                        println "[${dependencies.join(", ")}]"
                     }
                   }
-                EOF
-              )
-            f.close
-            f
-          end
-        end
-
-        # Prefixes the gradle command with the project name for multi-build projects.
-        def format_command(command, source_path)
-          Dir.chdir(source_path) do
-            path = Licensed::Shell.execute(@executable, "properties", "-Dorg.gradle.logging.level=quiet").scan(/path:.*/).last.split(" ").last
-            path == ":" ? command : "#{path}:#{command}"
-          end
+                }
+              EOF
+            )
+          f.close
+          f
         end
       end
     end
