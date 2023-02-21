@@ -180,7 +180,7 @@ module Licensed
 
                   apply plugin: com.github.jk1.license.LicenseReportPlugin
                   licenseReport {
-                      outputDir = "$rootDir/.gradle-licenses"
+                      outputDir = "$rootDir/#{GRADLE_LICENSES_PATH}"
                       configurations = configs
                       renderers = [new CsvReportRenderer()]
                       filters = [new LicenseBundleNormalizer()]
