@@ -151,7 +151,7 @@ module Licensed
 
         def create_init_script(configurations)
           # we need to create extensions in the event that the user hasn't configured custom configurations
-          # to avoid hitting errors where core Gradle configurations are set with canBeResolved=false 
+          # to avoid hitting errors where core Gradle configurations are set with canBeResolved=false
           configuration_map = configurations.map { |c| [c, "licensed#{c}"] }.to_h
           configuration_dsl = configuration_map.map { |orig, custom| "#{custom}.extendsFrom(#{orig})" }
 
