@@ -143,7 +143,7 @@ module Licensed
           args = [command]
           # The configuration cache is an incubating feature that can be activated manually.
           # The gradle plugin for licenses does not support it so we prevent it to run for gradle version supporting it.
-          args << "--no-configuration-cache" if gradle_version >= "6.6"
+          args << "--no-configuration-cache" if gradle_version >= Gem::Version.new("6.6")
           Licensed::Shell.execute(@executable, "-q", "--init-script", @init_script.path, *args)
         end
 
@@ -164,7 +164,7 @@ module Licensed
                     }
                   }
                   dependencies {
-                    classpath "com.github.jk1:gradle-license-report:#{gradle_version >= "7.0" ? "2.0" : "1.17"}"
+                    classpath "com.github.jk1:gradle-license-report:#{gradle_version >= Gem::Version.new("7.0") ? "2.0" : "1.17"}"
                   }
                 }
 
@@ -194,6 +194,14 @@ module Licensed
             )
           f.close
           f
+        end
+
+        # Returns the version of gradle used during execution
+        def gradle_version
+          @gradle_version ||= begin
+            version = Licensed::Shell.execute(@executable, "--version").scan(/Gradle [\d+]\.[\d+]/).last.split(" ").last
+            Gem::Version.new(version)
+          end
         end
       end
     end
