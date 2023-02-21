@@ -193,7 +193,7 @@ jobs:
         # are resolved, update this matrix list with '16'.
         # possibly fixed by https://github.com/jk1/Gradle-License-Report/pull/166
         java: [ '11' ]
-        gradle: ['current', '6.4']
+        gradle: ['current', '7.6', '6.9.3']
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
