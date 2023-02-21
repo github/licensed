@@ -5,10 +5,13 @@ require "fileutils"
 
 if Licensed::Shell.tool_available?("gradle")
   describe Licensed::Sources::Gradle do
+    let(:opts) { { "source_path" => fixtures, "root" => root } }
+    let(:config) { Licensed::AppConfiguration.new(opts) }
+    let(:source) { Licensed::Sources::Gradle.new(config) }
+
     describe "Single project" do
-      let(:fixtures) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
-      let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd, "root" => fixtures }) }
-      let(:source) { Licensed::Sources::Gradle.new(config) }
+      let(:root) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
+      let(:fixtures) { root }
 
       describe "enabled?" do
         it "is true if build.gradle exists and gradle is available" do
@@ -53,20 +56,10 @@ if Licensed::Shell.tool_available?("gradle")
     end
 
     describe "Multi project" do
-      let(:fixtures) { File.expand_path("../../fixtures/gradle/multi_project", __FILE__) }
-      let(:config) { Licensed::Configuration.new({
-        "apps" => [{ "source_path" => "#{Dir.pwd}/lib" }, { "source_path" => "#{Dir.pwd}/app" }],
-        "gradle" => { "configurations" => "runtimeClasspath" },
-        "root" => fixtures
-      })
-      }
-      let(:appConfig) { config.apps.last }
-      let(:libConfig) { config.apps.last }
-      let(:source) { Licensed::Sources::Gradle.new(appConfig) }
+      let(:root) { File.expand_path("../../fixtures/gradle/multi_project", __FILE__) }
 
       describe "app subproject" do
-        let(:appConfig) { config.apps.last }
-        let(:source) { Licensed::Sources::Gradle.new(appConfig) }
+        let(:fixtures) { File.join(root, "app") }
 
         describe "enabled?" do
           it "is true if build.gradle exists and gradle is available" do
@@ -111,8 +104,8 @@ if Licensed::Shell.tool_available?("gradle")
       end
 
       describe "lib subproject" do
-        let(:appConfig) { config.apps.first }
-        let(:source) { Licensed::Sources::Gradle.new(appConfig) }
+        let(:fixtures) { File.join(root, "lib") }
+
         describe "enabled?" do
           it "is true if build.gradle exists and gradle is available" do
             Dir.chdir(fixtures) do
@@ -159,7 +152,7 @@ if Licensed::Shell.tool_available?("gradle")
 
   describe Licensed::Sources::Gradle::Dependency do
     let(:fixtures) { File.expand_path("../../fixtures/gradle/single_project", __FILE__) }
-    let(:config) { Licensed::AppConfiguration.new({ "source_path" => Dir.pwd, "root" => fixtures }) }
+    let(:config) { Licensed::AppConfiguration.new({ "source_path" => fixtures, "root" => fixtures }) }
     let(:source) { Licensed::Sources::Gradle.new(config) }
 
     it "returns the dependency license" do
