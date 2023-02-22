@@ -5,10 +5,10 @@ require "tmpdir"
 describe Licensed::Dependency do
   let(:error) { nil }
 
-  def mkproject(&block)
+  def mkproject(metadata: {}, &block)
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        yield Licensed::Dependency.new(name: "test", version: "1.0", path: dir, errors: [error])
+        yield Licensed::Dependency.new(name: "test", version: "1.0", path: dir, errors: [error], metadata: metadata)
       end
     end
   end
@@ -335,6 +335,23 @@ describe Licensed::Dependency do
         dependency.additional_terms << "amendment.txt"
         assert_includes dependency.license_contents,
                         { "sources" => "License terms loaded from amendment.txt", "text" => "license amendment" }
+      end
+    end
+  end
+
+  describe "metadata" do
+    it "returns a hash of license metadata including the name and version" do
+      mkproject(metadata: { "type" => "test-type" }) do |dependency|
+        assert_equal(
+          { "type" => "test-type", "name" => dependency.name, "version" => dependency.version },
+          dependency.metadata
+        )
+      end
+    end
+
+    it "overrides the dependency name and version with values set in metadata input" do
+      mkproject(metadata: { "name" => "custom", "version" => "custom" }) do |dependency|
+        assert_equal({ "name" => "custom", "version" => "custom" }, dependency.metadata)
       end
     end
   end

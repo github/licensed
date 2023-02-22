@@ -99,6 +99,17 @@ module Licensed
          .select { |notice| notice["text"].length > 0 } # files with content only
     end
 
+    # Returns a hash of basic metadata about the dependency - name, version, type, etc
+    def metadata
+      {
+        # can be overriden by values in @metadata
+        "name" => name,
+        "version" => version
+      }.merge(
+        @metadata
+      )
+    end
+
     private
 
     def read_file_with_encoding_check(file_path)
@@ -135,14 +146,8 @@ module Licensed
     # Returns the metadata that represents this dependency.  This metadata
     # is written to YAML in the dependencys cached text file
     def license_metadata
-      {
-        # can be overriden by values in @metadata
-        "name" => name,
-        "version" => version
-      }.merge(
-        @metadata
-      ).merge({
-        # overrides all other values
+      metadata.merge({
+        # overrides all metadata values
         "license" => license_key
       })
     end

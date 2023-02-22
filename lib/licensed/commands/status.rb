@@ -60,7 +60,7 @@ module Licensed
           report.errors << "missing license text" if record.licenses.empty?
           if record["review_changed_license"]
             report.errors << "license text has changed and needs re-review. if the new text is ok, remove the `review_changed_license` flag from the cached record"
-          elsif license_needs_review?(app, record)
+          elsif license_needs_review?(app, source, record)
             report.errors << needs_review_error_message(app, record)
           end
         end
@@ -70,9 +70,10 @@ module Licensed
 
       # Returns true if a cached record needs further review based on the
       # record's license(s) and the app's configuration
-      def license_needs_review?(app, record)
+      def license_needs_review?(app, source, record)
         # review is not needed if the record is set as reviewed
-        return false if app.reviewed?(record, match_version: data_source == "configuration")
+        require_version = data_source == "configuration" || source.class.require_matched_dependency_version
+        return false if app.reviewed?(record, require_version: require_version)
 
         # review is not needed if the top level license is allowed
         return false if app.allowed?(record["license"])
@@ -99,7 +100,7 @@ module Licensed
         error = "dependency needs review"
 
         # look for an unversioned reviewed list match
-        if app.reviewed?(record, match_version: false)
+        if app.reviewed?(record, require_version: false)
           error += ", unversioned 'reviewed' match found: #{record["name"]}"
         end
 

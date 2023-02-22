@@ -9,6 +9,10 @@ if Licensed::Shell.tool_available?("pnpm")
     let(:fixtures) { File.expand_path("../../fixtures/pnpm", __FILE__) }
     let(:source) { Licensed::Sources::PNPM.new(config) }
 
+    it "includes dependency versions in the name identifier" do
+      assert Licensed::Sources::PNPM.require_matched_dependency_version
+    end
+
     describe "enabled?" do
       it "is true if pnpm-lock.yaml exists" do
         Dir.mktmpdir do |dir|
@@ -80,7 +84,7 @@ if Licensed::Shell.tool_available?("pnpm")
 
       it "does not include ignored dependencies" do
         Dir.chdir fixtures do
-          config.ignore({ "type" => Licensed::Sources::PNPM.type, "name" => "autoprefixer@5.2.0" })
+          config.ignore({ "type" => Licensed::Sources::PNPM.type, "name" => "autoprefixer", "version" => "5.2.0" }, at_version: true)
           refute source.dependencies.detect { |dep| dep.name == "autoprefixer@5.2.0" }
         end
       end

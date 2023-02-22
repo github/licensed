@@ -83,7 +83,7 @@ module Licensed
         report["version"] = dependency.version
 
         if save_dependency_record?(dependency, cached_record)
-          update_dependency_from_cached_record(app, dependency, cached_record)
+          update_dependency_from_cached_record(app, source, dependency, cached_record)
 
           dependency.record.save(filename)
           report["cached"] = true
@@ -123,14 +123,14 @@ module Licensed
       # Update dependency metadata from the cached record, to support:
       # 1. continuity between cache runs to cut down on churn
       # 2. notifying users when changed content needs to be reviewed
-      def update_dependency_from_cached_record(app, dependency, cached_record)
+      def update_dependency_from_cached_record(app, source, dependency, cached_record)
         return if cached_record.nil?
         return if options[:force]
 
         if dependency.record.matches?(cached_record)
           # use the cached license value if the license text wasn't updated
           dependency.record["license"] = cached_record["license"]
-        elsif app.reviewed?(dependency.record)
+        elsif app.reviewed?(dependency.record, require_version: source.class.require_matched_dependency_version)
           # if the license text changed and the dependency is set as reviewed
           # force a re-review of the dependency
           dependency.record["review_changed_license"] = true

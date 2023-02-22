@@ -273,149 +273,301 @@ describe Licensed::AppConfiguration do
   end
 
   describe "ignore" do
-    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package" } }
+    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package", "version" => "1.0.0"  } }
 
     it "marks the dependency as ignored" do
+      assert_nil config.dig("ignored", package["type"])
+      config.ignore package
+      assert_equal [package["name"]], config.dig("ignored", package["type"])
+    end
+
+    it "marks the dependency ignored at the specific version" do
+      assert_nil config.dig("ignored", package["type"])
+      config.ignore package, at_version: true
+      assert_equal ["#{package["name"]}@#{package["version"]}"], config.dig("ignored", package["type"])
+    end
+  end
+
+  describe "ignored?" do
+    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package", "version" => "1.0.0"  } }
+
+    it "matches exact name matches" do
       refute config.ignored?(package)
       config.ignore package
       assert config.ignored?(package)
     end
 
-    describe "with glob patterns" do
-      it "does not match trailing ** to multiple path segments" do
-        refute config.ignored?(package)
-        config.ignore package.merge("name" => "github.com/github/**")
-        refute config.ignored?(package)
+    it "does not match trailing ** to multiple path segments" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "github.com/github/**")
+      refute config.ignored?(package)
+    end
+
+    it "matches internal ** to multiple path segments" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "github.com/**/package")
+      assert config.ignored?(package)
+    end
+
+    it "matches trailing * to single path segment" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "github.com/github/licensed/*")
+      assert config.ignored?(package)
+    end
+
+    it "maches internal * to single path segment" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "github.com/*/licensed/package")
+      assert config.ignored?(package)
+    end
+
+    it "matches multiple globstars in a pattern" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "**/licensed/*")
+      assert config.ignored?(package)
+    end
+
+    it "does not match * to multiple path segments" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "github.com/github/*")
+      refute config.ignored?(package)
+    end
+
+    it "is case insensitive" do
+      refute config.ignored?(package)
+      config.ignore package.merge("name" => "GITHUB.com/github/**")
+      refute config.ignored?(package)
+    end
+
+    describe "with required_version" do
+      it "matches a dependency ignored at the same version" do
+        config.ignore package, at_version: true
+        assert config.ignored?(package, require_version: true)
       end
 
-      it "matches internal ** to multiple path segments" do
-        refute config.ignored?(package)
-        config.ignore package.merge("name" => "github.com/**/package")
+      it "does not match a dependency not ignored at a version" do
+        config.ignore package
+        refute config.ignored?(package, require_version: true)
+      end
+
+      it "does not match a dependency ignored at a different version" do
+        config.ignore package.merge("version" => "1.0.1"), at_version: true
+        refute config.ignored?(package, require_version: true)
+      end
+
+      it "matches a dependency ignored at *" do
+        config.ignore package.merge("version" => "*"), at_version: true
+        assert config.ignored?(package, require_version: true)
+      end
+
+      it "matches a dependency ignored at a requirement pattern" do
+        config.ignore package.merge("version" => ">= 1.0.0"), at_version: true
+        assert config.ignored?(package, require_version: true)
+      end
+
+      it "does not match a dependency without a version" do
+        config.ignore package, at_version: true
+        package.delete("version")
+        refute config.ignored?(package, require_version: true)
+      end
+
+      it "matches a dependency ignored at a matching non-gem requirement value" do
+        package["version"] = "abcdef"
+        config.ignore package, at_version: true
+        assert config.ignored?(package, require_version: true)
+      end
+    end
+
+    describe "without required_version" do
+      it "matches a dependency ignored at the same version" do
+        config.ignore package, at_version: true
         assert config.ignored?(package)
       end
 
-      it "matches trailing * to single path segment" do
-        refute config.ignored?(package)
-        config.ignore package.merge("name" => "github.com/github/licensed/*")
+      it "matches a dependency not ignored at a version" do
+        config.ignore package
         assert config.ignored?(package)
       end
 
-      it "maches internal * to single path segment" do
+      it "does not match a dependency ignored at a different version" do
+        config.ignore package.merge("version" => "1.0.1"), at_version: true
         refute config.ignored?(package)
-        config.ignore package.merge("name" => "github.com/*/licensed/package")
+      end
+
+      it "matches a dependency ignored at *" do
+        config.ignore package.merge("version" => "*"), at_version: true
         assert config.ignored?(package)
       end
 
-      it "matches multiple globstars in a pattern" do
-        refute config.ignored?(package)
-        config.ignore package.merge("name" => "**/licensed/*")
+      it "matches a dependency ignored at a requirement pattern" do
+        config.ignore package.merge("version" => ">= 1.0.0, < 2.0.0"), at_version: true
         assert config.ignored?(package)
       end
 
-      it "does not match * to multiple path segments" do
-        refute config.ignored?(package)
-        config.ignore package.merge("name" => "github.com/github/*")
-        refute config.ignored?(package)
-      end
-
-      it "is case insensitive" do
-        refute config.ignored?(package)
-        config.ignore package.merge("name" => "GITHUB.com/github/**")
-        refute config.ignored?(package)
+      it "matches a dependency without a version" do
+        config.ignore package, at_version: true
+        package.delete("version")
+        assert config.ignored?(package)
       end
     end
   end
 
   describe "review" do
-    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package" } }
+    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package", "version" => "1.0.0" } }
 
     it "marks the dependency as reviewed" do
+      assert_nil config.dig("reviewed", package["type"])
+      config.review package
+      assert_equal [package["name"]], config.dig("reviewed", package["type"])
+    end
+
+    it "marks the dependency reviewed at the specific version" do
+      assert_nil config.dig("reviewed", package["type"])
+      config.review package, at_version: true
+      assert_equal ["#{package["name"]}@#{package["version"]}"], config.dig("reviewed", package["type"])
+    end
+  end
+
+  describe "reviewed?" do
+    let(:package) { { "type" => "go", "name" => "github.com/github/licensed/package", "version" => "1.0.0" } }
+
+    it "matches exact name matches" do
       refute config.reviewed?(package)
       config.review package
       assert config.reviewed?(package)
     end
 
-    describe "with glob patterns" do
-      it "does not match trailing ** to multiple path segments" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "github.com/github/**")
-        refute config.reviewed?(package)
+    it "does not match trailing ** to multiple path segments" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "github.com/github/**")
+      refute config.reviewed?(package)
+    end
+
+    it "matches internal ** to multiple path segments" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "github.com/**/package")
+      assert config.reviewed?(package)
+    end
+
+    it "matches trailing * to single path segment" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "github.com/github/licensed/*")
+      assert config.reviewed?(package)
+    end
+
+    it "maches internal * to single path segment" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "github.com/*/licensed/package")
+      assert config.reviewed?(package)
+    end
+
+    it "matches multiple globstars in a pattern" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "**/licensed/*")
+      assert config.reviewed?(package)
+    end
+
+    it "does not match * to multiple path segments" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "github.com/github/*")
+      refute config.reviewed?(package)
+    end
+
+    it "is case insensitive" do
+      refute config.reviewed?(package)
+      config.review package.merge("name" => "GITHUB.com/github/**")
+      refute config.reviewed?(package)
+    end
+
+    describe "with required_version" do
+      it "matches a dependency reviewed at the same version" do
+        config.review package, at_version: true
+        assert config.reviewed?(package, require_version: true)
       end
 
-      it "matches internal ** to multiple path segments" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "github.com/**/package")
-        assert config.reviewed?(package)
+      it "does not match a dependency not reviewed at a version" do
+        config.review package
+        refute config.reviewed?(package, require_version: true)
       end
 
-      it "matches trailing * to single path segment" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "github.com/github/licensed/*")
-        assert config.reviewed?(package)
+      it "does not match a dependency reviewed at a different version" do
+        config.review package.merge("version" => "1.0.1"), at_version: true
+        refute config.reviewed?(package, require_version: true)
       end
 
-      it "maches internal * to single path segment" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "github.com/*/licensed/package")
-        assert config.reviewed?(package)
+      it "matches a dependency reviewed at *" do
+        config.review package.merge("version" => "*"), at_version: true
+        assert config.reviewed?(package, require_version: true)
       end
 
-      it "matches multiple globstars in a pattern" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "**/licensed/*")
-        assert config.reviewed?(package)
+      it "matches a dependency reviewed at a requirement pattern" do
+        config.review package.merge("version" => ">= 1.0.0, < 2.0.0"), at_version: true
+        assert config.reviewed?(package, require_version: true)
       end
 
-      it "does not match * to multiple path segments" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "github.com/github/*")
-        refute config.reviewed?(package)
+      it "does not match a dependency without a version" do
+        config.review package, at_version: true
+        package.delete("version")
+        refute config.reviewed?(package, require_version: true)
       end
 
-      it "is case insensitive" do
-        refute config.reviewed?(package)
-        config.review package.merge("name" => "GITHUB.com/github/**")
-        refute config.reviewed?(package)
+      it "matches a dependency reviewed at a matching non-gem requirement value" do
+        package["version"] = "abcdef"
+        config.review package, at_version: true
+        assert config.reviewed?(package, require_version: true)
       end
     end
 
-    describe "with version" do
-      it "sets the dependency reviewed at the specific version" do
+    describe "without required_version" do
+      it "matches a dependency reviewed at the same version" do
+        config.review package, at_version: true
+        assert config.reviewed?(package)
+      end
+
+      it "matches a dependency not reviewed at a version" do
         config.review package
         assert config.reviewed?(package)
+      end
 
-        package["version"] = "1.2.3"
+      it "does not match a dependency reviewed at a different version" do
+        config.review package.merge("version" => "1.0.1"), at_version: true
+        refute config.reviewed?(package)
+      end
+
+      it "matches a dependency reviewed at *" do
+        config.review package.merge("version" => "*"), at_version: true
+        assert config.reviewed?(package.merge("version" => "1.0.1"))
+      end
+
+      it "matches a dependency reviewed at a requirement pattern" do
+        config.review package.merge("version" => ">= 1.0.0"), at_version: true
         assert config.reviewed?(package)
-        refute config.reviewed?(package, match_version: true)
+      end
 
+      it "matches a dependency without a version" do
         config.review package, at_version: true
-        refute config.reviewed?(package.merge("version" => "1.0.0"), match_version: true)
-        assert config.reviewed?(package, match_version: true)
-        assert_equal ["#{package["name"]}@#{package["version"]}"], config.reviewed_versions(package)
+        package.delete("version")
+        assert config.reviewed?(package)
       end
+    end
+  end
 
-      it "reviewing dependencies at version will not match dependencies without version" do
-        package = { "type" => "bundler", "name" => "licensed", "version" => "1.0.0" }
-        config.review(package, at_version: true)
-        refute config.reviewed?(package, match_version: false)
-      end
+  describe "reviewed_versions" do
+    it "returns an array of all matching reviewed dependency names at versions" do
+      packages = [
+        { "type" => "npm", "name" => "@github/package", "version" => "1.0.0" },
+        { "type" => "npm", "name" => "@github/package", "version" => "1.0.1" }
+      ]
 
-      it "matches glob patterns for specified versions" do
-        config.review({ "type" => "go", "name" => "github.com/github/**/*", "version" => "1.2.3" }, at_version: true)
-        assert_equal ["github.com/github/**/*@1.2.3"], config.reviewed_versions(package)
+      packages.each { |p| config.review(p, at_version: true) }
+      assert_equal packages.map { |p| "#{p["name"]}@#{p["version"]}" },
+        config.reviewed_versions({ "type" => "npm", "name" => "@github/package" })
+    end
 
-        refute config.reviewed?(package.merge("version" => "1.0.0"), match_version: true)
-        assert config.reviewed?(package.merge("version" => "1.2.3"), match_version: true)
-      end
-
-      it "does not treat leading @ symbols as version separators when listing versions" do
-        package = { "type" => "npm", "name" => "@github/package" }
-        config.review(package)
-        assert_empty config.reviewed_versions(package)
-
-        config.review(package.merge("version" => "1.2.3"), at_version: true)
-        assert_equal ["@github/package@1.2.3"], config.reviewed_versions(package)
-      end
+    it "does not return reviewed dependencies without version" do
+      package = { "type" => "npm", "name" => "@github/package", "version" => "1.0.0" }
+      config.review(package)
+      assert_empty config.reviewed_versions(package)
     end
   end
 

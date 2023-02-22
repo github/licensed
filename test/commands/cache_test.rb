@@ -61,7 +61,7 @@ describe Licensed::Commands::Cache do
     config.apps.each do |app|
       FileUtils.mkdir_p app.cache_path.join("test")
       File.write app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}"), ""
-      app.ignore "type" => "test", "name" => "dependency"
+      app.ignore({ "type" => "test", "name" => "dependency" })
     end
 
     run_command
@@ -206,7 +206,7 @@ describe Licensed::Commands::Cache do
     config.apps.each do |app|
       FileUtils.mkdir_p app.cache_path.join("test")
       File.write app.cache_path.join("test/dependency.#{Licensed::DependencyRecord::EXTENSION}"), ""
-      app.ignore "type" => "test", "name" => "dependency"
+      app.ignore({ "type" => "test", "name" => "dependency" })
     end
 
     run_command
