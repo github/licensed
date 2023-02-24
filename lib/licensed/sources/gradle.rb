@@ -9,7 +9,7 @@ require "fileutils"
 module Licensed
   module Sources
     class Gradle < Source
-      DEFAULT_CONFIGURATIONS   = ["runtimeOnly", "runtimeClasspath"].freeze
+      DEFAULT_CONFIGURATIONS   = ["runtime", "runtimeClasspath"].freeze
       GRADLE_LICENSES_PATH     = ".gradle-licenses".freeze
       GRADLE_LICENSES_CSV_NAME = "licenses.csv".freeze
       class Dependency < Licensed::Dependency
@@ -150,17 +150,12 @@ module Licensed
         private
 
         def create_init_script(configurations)
-          # we need to create extensions in the event that the user hasn't configured custom configurations
-          # to avoid hitting errors where core Gradle configurations are set with canBeResolved=false
-          configuration_map = configurations.map { |c| [c, "licensed#{c}"] }.to_h
-          configuration_dsl = configuration_map.map { |orig, custom| "#{custom}.extendsFrom(#{orig})" }
-
           f = Tempfile.new(["init", ".gradle"])
           f.write(
             <<~EOF
                 import com.github.jk1.license.render.CsvReportRenderer
                 import com.github.jk1.license.filter.LicenseBundleNormalizer
-                final configs = #{configuration_map.values.inspect}
+                final configs = #{configurations.inspect}
 
                 initscript {
                   repositories {
@@ -174,10 +169,6 @@ module Licensed
                 }
 
                 allprojects {
-                  configurations {
-                    #{configuration_dsl.join("\n") }
-                  }
-
                   apply plugin: com.github.jk1.license.LicenseReportPlugin
                   licenseReport {
                       outputDir = "$rootDir/#{GRADLE_LICENSES_PATH}"
