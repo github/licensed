@@ -9,7 +9,7 @@ require "fileutils"
 module Licensed
   module Sources
     class Gradle < Source
-      DEFAULT_CONFIGURATIONS   = ["runtime", "runtimeClasspath"].freeze
+      DEFAULT_CONFIGURATIONS   = ["runtimeClasspath"].freeze
       GRADLE_LICENSES_PATH     = ".gradle-licenses".freeze
       GRADLE_LICENSES_CSV_NAME = "licenses.csv".freeze
       class Dependency < Licensed::Dependency
