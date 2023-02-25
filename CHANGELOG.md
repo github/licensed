@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.2.0
+
+### Added
+
+- Reviewed and ignored configuration lists support matching on versions and version ranges (https://github.com/github/licensed/pull/629)
+
+### Fixed
+
+- Licensed should more reliably source dependencies from Gradle >= 8.0 (https://github.com/github/licensed/pull/630)
+
 ## 4.1.0
 
 ### Added
@@ -713,4 +723,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.1.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.2.0...HEAD
