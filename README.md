@@ -47,7 +47,7 @@ sudo apt-get install cmake pkg-config
 brew install cmake pkg-config
 ```
 
-### With a Gemfile
+### With Gemfile
 
 Add this line to your application's Gemfile:
 
@@ -61,7 +61,7 @@ And then execute:
 $> bundle
 ```
 
-### With a Homebrew (on macOS)
+### With Homebrew (on macOS)
 
 ```bash
 brew install licensed
