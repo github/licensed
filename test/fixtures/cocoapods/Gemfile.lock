@@ -1,9 +1,3 @@
-GIT
-  remote: https://github.com/jonabc/cocoapods-dependencies-list
-  revision: 437d6e1060c2c5510241d04ae480f184146593b0
-  specs:
-    cocoapods-dependencies-list (0.0.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -50,6 +44,7 @@ GEM
       public_suffix (~> 4.0)
       typhoeus (~> 1.0)
     cocoapods-deintegrate (1.0.5)
+    cocoapods-dependencies-list (1.0.0)
     cocoapods-downloader (1.6.3)
     cocoapods-plugins (1.0.0)
       nap
@@ -96,7 +91,7 @@ PLATFORMS
 
 DEPENDENCIES
   cocoapods
-  cocoapods-dependencies-list!
+  cocoapods-dependencies-list (~> 1.0)
 
 BUNDLED WITH
    2.3.26

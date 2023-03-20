@@ -37,7 +37,7 @@ module Licensed
       end
 
       def cocoapods_dependencies_json
-        args = ["dependencies", "--include-path=true"]
+        args = ["dependencies", "--include-path"]
         args << "--targets=#{targets.join(",")}" if targets.any?
 
         output = Licensed::Shell.execute(*pod_command, *args, allow_failure: true)

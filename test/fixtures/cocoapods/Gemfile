@@ -5,5 +5,5 @@ source "https://rubygems.org"
 gem "cocoapods"
 
 group "plugins" do
-  gem "cocoapods-dependencies-list", git: "https://github.com/jonabc/cocoapods-dependencies-list"
+  gem "cocoapods-dependencies-list", "~> 1.0"
 end

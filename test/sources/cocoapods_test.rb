@@ -77,7 +77,7 @@ if Licensed::Shell.tool_available?("pod")
 
       it "supports pods from git" do
         Dir.chdir(fixtures) do
-          dep = source.dependencies.detect { |d| d.name == "Chatto" }
+          assert source.dependencies.detect { |d| d.name == "Chatto" }
         end
       end
 
