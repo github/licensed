@@ -40,6 +40,8 @@ GEM
       thor (>= 0.19, < 2.0)
     mini_portile2 (2.8.1)
     minitest (5.18.0)
+    minitest-hooks (1.5.0)
+      minitest (> 5.3)
     mocha (2.0.2)
       ruby2_keywords (>= 0.0.5)
     nokogiri (1.14.2)
@@ -104,6 +106,7 @@ DEPENDENCIES
   byebug (~> 11.1)
   licensed!
   minitest (~> 5.17)
+  minitest-hooks (~> 1.5)
   mocha (~> 2.0)
   rake (~> 13.0)
   rubocop-github (~> 0.20)

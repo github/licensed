@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "bundler/setup"
 require "minitest/autorun"
+require "minitest/hooks/default"
 require "mocha/minitest"
 require "byebug"
 require "licensed"
