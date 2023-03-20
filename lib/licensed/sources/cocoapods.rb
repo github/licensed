@@ -3,32 +3,29 @@ require "json"
 require "pathname"
 require "uri"
 
-# **NOTE** Cocoapods is disabled until cocoapods-core supports recent rails versions
-# https://github.com/CocoaPods/Core/pull/733
-# require "cocoapods-core"
-
 module Licensed
   module Sources
     class Cocoapods < Source
+      DEFAULT_POD_COMMAND = "pod".freeze
+      MISSING_PLUGIN_MESSAGE = "Error running `pods dependencies`. Please ensure the cocoapods-dependencies-list gem is installed, it is required for licensed to enumerate dependencies.".freeze
+
       def enabled?
-        false
+        return unless Licensed::Shell.tool_available?("pod")
 
-        # return unless Licensed::Shell.tool_available?("pod")
-
-        # config.pwd.join("Podfile").exist? && config.pwd.join("Podfile.lock").exist?
+        config.pwd.join("Podfile").exist? && config.pwd.join("Podfile.lock").exist?
       end
 
       def enumerate_dependencies
         pods.map do |pod|
-          name = pod.name
-          path = dependency_path(pod.root_name)
-          version = lockfile.version(name).version
-
           Dependency.new(
-            path: path,
-            name: name,
-            version: version,
-            metadata: { "type" => Cocoapods.type }
+            name: pod["name"],
+            version: pod["version"],
+            path: pod["path"],
+            metadata: {
+              "type" => Cocoapods.type,
+              "summary"  => pod["summary"],
+              "homepage" => pod["homepage"]
+            }
           )
         end
       end
@@ -36,32 +33,32 @@ module Licensed
       private
 
       def pods
-        return lockfile.dependencies if targets.nil?
+        cocoapods_dependencies_json.values.flatten
+      end
 
-        targets_to_validate = podfile.target_definition_list.filter { |t| targets.include?(t.label) }
-        if targets_to_validate.any?
-          targets_to_validate.map(&:dependencies).flatten
-        else
-          raise Licensed::Sources::Source::Error, "Unable to find any target in the Podfile matching the ones provided in the config."
+      def cocoapods_dependencies_json
+        args = ["dependencies", "--include-path"]
+        args << "--targets=#{targets.join(",")}" if targets.any?
+
+        output = Licensed::Shell.execute(*pod_command, *args, allow_failure: true)
+        if output.include? "Unknown command"
+          raise Licensed::Sources::Source::Error, MISSING_PLUGIN_MESSAGE
         end
+
+        JSON.parse(output)
+      rescue JSON::ParserError => e
+        message = "Licensed was unable to parse the output from 'pod dependencies'. JSON Error: #{e.message}"
+        raise Licensed::Sources::Source::Error, message
       end
 
       def targets
-        @targets ||= config.dig("cocoapods", "targets")&.map { |t| "Pods-#{t}" }
+        return [] unless [String, Array].any? { |type| source_config["targets"].is_a?(type) }
+        Array(source_config["targets"]).map { |t| "Pods-#{t}" }
       end
 
-      def lockfile
-        @lockfile = nil
-        # @lockfile ||= Pod::Lockfile.from_file(config.pwd.join("Podfile.lock"))
-      end
-
-      def podfile
-        @podfile = nil
-        # @podfile ||= Pod::Podfile.from_file(config.pwd.join("Podfile"))
-      end
-
-      def dependency_path(name)
-        config.pwd.join("Pods/#{name}")
+      def pod_command
+        return DEFAULT_POD_COMMAND unless source_config["command"].is_a?(String)
+        source_config["command"].split
       end
     end
   end

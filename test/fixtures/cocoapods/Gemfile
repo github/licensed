@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+source "https://rubygems.org"
+
+# Specify your gem's dependencies in licensed.gemspec
+gem "cocoapods"
+
+group "plugins" do
+  gem "cocoapods-dependencies-list", "~> 1.0"
+end

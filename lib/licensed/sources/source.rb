@@ -90,6 +90,11 @@ module Licensed
         config.ignored?(dependency.metadata, require_version: self.class.require_matched_dependency_version)
       end
 
+      # Returns configuration options set for the current source
+      def source_config
+        @source_config ||= config[self.class.type].is_a?(Hash) ? config[self.class.type] : {}
+      end
+
       private
 
       # Returns a cached list of dependencies
