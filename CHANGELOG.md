@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.3.0
+
+### Added
+
+- Cocoapods support has been re-enabled using a cocoapods plugin (https://github.com/github/licensed/pull/644)
+
 ## 4.2.0
 
 ### Added
@@ -723,4 +729,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.2.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.3.0...HEAD
