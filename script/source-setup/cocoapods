@@ -18,4 +18,4 @@ if [ "$1" == "-f" ]; then
   OPTIONS+="--clean-install"
 fi
 
-pod install "${OPTIONS[@]}"
+bundle exec pod install "${OPTIONS[@]}"
