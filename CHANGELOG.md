@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.3.1
+
+### Changed
+
+- Bump nokogiri to resolve vulnerabilities (https://github.com/github/licensed/pull/648)
+
 ## 4.3.0
 
 ### Added
@@ -729,4 +735,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.3.0...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.3.1...HEAD
