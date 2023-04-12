@@ -44,7 +44,7 @@ GEM
       minitest (> 5.3)
     mocha (2.0.2)
       ruby2_keywords (>= 0.0.5)
-    nokogiri (1.14.2)
+    nokogiri (1.14.3)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     octokit (6.1.0)
