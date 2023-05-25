@@ -69,7 +69,7 @@ module Licensed
 
         result = results.all?
 
-        yield(result) if block_given?
+        result = yield(result) if block_given?
 
         result
       ensure
@@ -103,7 +103,7 @@ module Licensed
 
           result = results.all?
 
-          yield(result) if block_given?
+          result = yield(result) if block_given?
 
           result
         end
@@ -142,7 +142,7 @@ module Licensed
 
         result = results.all?
 
-        yield(result) if block_given?
+        result = yield(result) if block_given?
 
         result
       rescue Licensed::Shell::Error => err
@@ -175,7 +175,7 @@ module Licensed
 
         result = evaluate_dependency(app, source, dependency, report)
 
-        yield(result) if block_given?
+        result = yield(result) if block_given?
 
         result
       rescue Licensed::DependencyRecord::Error, Licensed::Shell::Error => err

@@ -23,6 +23,7 @@ module Licensed
       def run_command(report)
         super do |result|
           clear_stale_cached_records if result
+          result
         end
       ensure
         cache_paths.clear
