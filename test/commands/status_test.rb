@@ -825,7 +825,7 @@ describe Licensed::Commands::Status do
     end
 
     it "reports a warning on stale cached records when configured" do
-      command_config["stale_records_action"] = "warning"
+      command_config["stale_records_action"] = "warn"
 
       assert run_command
 
