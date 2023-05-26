@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 4.4.0
+
+### Added
+
+- Licensed status command will alert on stale cached dependency records (https://github.com/github/licensed/pull/657)
+
 ## 4.3.1
 
 ### Changed
@@ -735,4 +741,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release :tada:
 
-[Unreleased]: https://github.com/github/licensed/compare/4.3.1...HEAD
+[Unreleased]: https://github.com/github/licensed/compare/4.4.0...HEAD
