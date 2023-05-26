@@ -30,7 +30,7 @@ jobs:
           bundler-cache: true
 
       # run licensed
-      - uses: jonabc/licensed-ci@v1
+      - uses: github/licensed-ci@v1
         with:
           # override the command to use licensed built from this repo
           command: bundle exec licensed
@@ -49,5 +49,5 @@ jobs:
           # the "branch" workflow creates a new branch for license file updates.
           # e.g. when the action is run on main, changes are pushed to a new "main-licenses" branch
 
-          # see https://github.com/jonabc/licensed-ci for more details
+          # see https://github.com/github/licensed-ci for more details
           workflow: branch
