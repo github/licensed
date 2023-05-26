@@ -274,6 +274,7 @@ module Licensed
     end
 
     def initialize(options = {})
+      @options = options
       apps = options.delete("apps") || []
       apps << default_options.merge(options) if apps.empty?
 
@@ -283,6 +284,10 @@ module Licensed
 
       apps = apps.flat_map { |app| self.class.expand_app_source_path(app) }
       @apps = apps.map { |app| AppConfiguration.new(app, options) }
+    end
+
+    def [](key)
+      @options&.fetch(key, nil)
     end
 
     private
