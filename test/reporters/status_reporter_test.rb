@@ -24,6 +24,18 @@ describe Licensed::Reporters::StatusReporter do
                           style: :error
                       }
     end
+
+    it "reports any warnings specified on the report object" do
+      report.warnings << "command warning"
+      reporter.end_report_command(command, report)
+
+      assert_includes shell.messages,
+                      {
+                          message: "command warning",
+                          newline: true,
+                          style: :warn
+                      }
+    end
   end
 
   describe "#begin_report_app" do

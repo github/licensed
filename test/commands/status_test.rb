@@ -9,7 +9,8 @@ describe Licensed::Commands::Status do
   let(:reporter) { TestReporter.new }
   let(:apps) { [] }
   let(:source_config) { {} }
-  let(:config) { Licensed::Configuration.new("apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config) }
+  let(:command_config) { { "apps" => apps, "cache_path" => cache_path, "sources" => { "test" => true }, "test" => source_config } }
+  let(:config) { Licensed::Configuration.new(command_config) }
   let(:fixtures) { File.expand_path("../../fixtures", __FILE__) }
   let(:command) { Licensed::Commands::Status.new(config: config) }
 
@@ -24,11 +25,15 @@ describe Licensed::Commands::Status do
     dependency_report&.errors || []
   end
 
+  def generate_metadata_files
+    generator_config = Marshal.load(Marshal.dump(config))
+    generator = Licensed::Commands::Cache.new(config: generator_config)
+    generator.run(force: true, reporter: TestReporter.new)
+  end
+
   describe "with cached metadata data source" do
     before do
-      generator_config = Marshal.load(Marshal.dump(config))
-      generator = Licensed::Commands::Cache.new(config: generator_config)
-      generator.run(force: true, reporter: TestReporter.new)
+      generate_metadata_files
     end
 
     after do
@@ -774,6 +779,67 @@ describe Licensed::Commands::Status do
           assert reporter.report.reports.find { |report| report.name == app["name"] }
         end
       end
+    end
+  end
+
+  describe "with stale cached records" do
+    let(:unused_record_file_path) do
+      app = config.apps.first
+      source = app.sources.first
+      File.join(app.cache_path, source.class.type, "unused.#{Licensed::DependencyRecord::EXTENSION}")
+    end
+
+    before do
+      # generate artifacts needed for the status command to normally pass
+      # in order to validate that the command passes or fails depending on
+      # the stale_records_action config setting
+      generate_metadata_files
+      config.apps.each do |app|
+        app.allow "mit"
+      end
+
+      FileUtils.mkdir_p File.dirname(unused_record_file_path)
+      File.write(unused_record_file_path, "")
+    end
+
+    after do
+      config.apps.each do |app|
+        FileUtils.rm_rf app.cache_path
+      end
+    end
+
+    it "reports an error on stale cached records when configured" do
+      command_config["stale_records_action"] = "error"
+
+      refute run_command
+
+      assert reporter.report.errors.include?("Stale dependency record found: #{unused_record_file_path}")
+      refute reporter.report.warnings.include?("Stale dependency record found: #{unused_record_file_path}")
+    end
+
+    it "reports a warning on stale cached records when unconfigured" do
+      assert run_command
+
+      refute reporter.report.errors.include?("Stale dependency record found: #{unused_record_file_path}")
+      assert reporter.report.warnings.include?("Stale dependency record found: #{unused_record_file_path}")
+    end
+
+    it "reports a warning on stale cached records when configured" do
+      command_config["stale_records_action"] = "warning"
+
+      assert run_command
+
+      refute reporter.report.errors.include?("Stale dependency record found: #{unused_record_file_path}")
+      assert reporter.report.warnings.include?("Stale dependency record found: #{unused_record_file_path}")
+    end
+
+    it "ignores stale cached records when configured" do
+      command_config["stale_records_action"] = "ignore"
+
+      assert run_command
+
+      refute reporter.report.errors.include?("Stale dependency record found: #{unused_record_file_path}")
+      refute reporter.report.warnings.include?("Stale dependency record found: #{unused_record_file_path}")
     end
   end
 end

@@ -31,6 +31,21 @@ A dependency will fail the status checks if:
    - If `license: other` is specified and all of the `licenses` entries match an `allowed` license a failure will not be logged
    - A `reviewed` entry must reference a specific version of the depdency, e.g. `<name>@<version>`.  The version identifier must specify a specific dependency version, ranges are not allowed.
 
+## Detect and alert on stale cached metadata files
+
+Licensed can alert on any metadata files that don't correlate to a currently used dependency when `licensed status` is run.  To configure this behavior, set a root-level `stale_records_action` value in your [licensed configuration file](./../configuration.md).
+
+Available values are:
+
+1. `'error'`: Treat stale cached records as errors.  Licensed will output errors for any stale metadata files and will cause `licensed status` to fail.
+1. `'warn'`, `''`, or unset (default): Treat stale cached records as warnings.  Licensed will output warnings for any stale metadata files but will not cause `licensed status` to fail.
+1. `'ignore'`, any other value: Ignore stale cached records.  Licensed will not output any notifications about stale metadata files.
+
+```yaml
+# in the licensed configuration file
+stale_records_action: 'warn'
+```
+
 ## Options
 
 - `--config`/`-c`: the path to the licensed configuration file

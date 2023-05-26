@@ -8,6 +8,11 @@ module Licensed
       # command - The command being run
       # report - A report object containing information about the command run
       def end_report_command(command, report)
+        if report.warnings.any?
+          shell.newline
+          report.warnings.each { |e| shell.warn e }
+        end
+
         if report.errors.any?
           shell.newline
           report.errors.each { |e| shell.error e }
