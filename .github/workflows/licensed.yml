@@ -30,6 +30,7 @@ jobs:
           bundler-cache: true
 
       # run licensed
+      # TEST if github licensed works # TODO: remove this line
       - uses: jonabc/licensed-ci@v1
         with:
           # override the command to use licensed built from this repo
