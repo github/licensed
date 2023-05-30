@@ -30,7 +30,7 @@ jobs:
           bundler-cache: true
 
       # run licensed
-      - uses: jonabc/licensed-ci@v1
+      - uses: github/licensed-ci@v1
         with:
           # override the command to use licensed built from this repo
           command: bundle exec licensed
