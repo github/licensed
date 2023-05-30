@@ -296,7 +296,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v3.1.0
+      uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: ${{ matrix.dotnet }}
     - name: Set up Ruby
