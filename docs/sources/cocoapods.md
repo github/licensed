@@ -2,7 +2,7 @@
 
 The cocoapods source will detect dependencies when `Podfile` and `Podfile.lock` are found at an app's `source_path`.  The cocoapods source uses the [cocoapods-dependencies-list](https://github.com/jonabc/cocoapods-dependencies-list) plugin to enumerate dependencies and gather metadata on each package.
 
-**NOTE:  Licensed does not install the [cocoapods-dependencies-list](https://github.com/jonanc/cocoapods-dependencies-list) plugin.  Users must install the gem alongside the cocoapods gem to enumerate cocoapods dependencies.**
+**NOTE:  Licensed does not install the [cocoapods-dependencies-list](https://github.com/jonabc/cocoapods-dependencies-list) plugin.  Users must install the gem alongside the cocoapods gem to enumerate cocoapods dependencies.**
 
 ## Evaluating dependencies from a specific target
 
