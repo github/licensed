@@ -8,7 +8,7 @@ Licensed is **not** a complete open source license compliance solution. Please u
 
 ![Build status](https://github.com/github/licensed/workflows/Test/badge.svg)
 
-Licensed is in active development and currently used at GitHub.  See the [open issues](https://github.com/github/licensed/issues) for a list of potential work.
+Licensed is currently in **low maintenance mode**. At this point, we're only looking to maintain this repository for security fixes.
 
 ## Licensed v4 - **Removed support for non-Ruby environments**
 
