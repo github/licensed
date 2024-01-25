@@ -41,7 +41,7 @@ jobs:
           #
           # see https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
           # for additional details on GITHUB_TOKEN not re-triggering this action
-          github_token: ${{ secrets.LICENSED_CI_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           
           # the "push" workflow updates license metadata files on the branch being examined.
           # e.g. when the action is run on main, changes are pushed to main
