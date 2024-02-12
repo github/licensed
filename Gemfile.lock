@@ -39,7 +39,7 @@ GEM
       rugged (>= 0.24, < 2.0)
       thor (>= 0.19, < 2.0)
     mini_portile2 (2.8.1)
-    minitest (5.18.0)
+    minitest (5.22.2)
     minitest-hooks (1.5.0)
       minitest (> 5.3)
     mocha (2.0.2)
