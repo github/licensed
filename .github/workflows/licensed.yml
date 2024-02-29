@@ -22,7 +22,7 @@ jobs:
 
     steps:
       # checkout the repo
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # set up tooling
       - uses: ruby/setup-ruby@v1
