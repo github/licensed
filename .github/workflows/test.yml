@@ -337,12 +337,15 @@ jobs:
   pipenv:
     runs-on: ubuntu-latest
     needs: core
+    strategy:
+      matrix:
+        python: [ '3.8', '3.10', '3.x' ]
     steps:
     - uses: actions/checkout@v4
     - name: Setup python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: ${{ matrix.python }}
         architecture: x64
         cache: pipenv
     - name: Set up Ruby
