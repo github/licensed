@@ -368,7 +368,7 @@ jobs:
         pnpm_version: [ 7 ]
     steps:
     - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v2
+    - uses: pnpm/action-setup@v3
       name: Install pnpm
       id: pnpm-install
       with:
