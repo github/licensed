@@ -63,7 +63,7 @@ GEM
     parallel (1.23.0)
     parser (3.2.0.0)
       ast (~> 2.4.1)
-    pathname-common_prefix (0.0.1)
+    pathname-common_prefix (0.0.2)
     public_suffix (5.0.1)
     racc (1.6.2)
     rack (3.0.9.1)
