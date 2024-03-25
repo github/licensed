@@ -1,9 +1,9 @@
 ---
 name: json
-version: 2.6.3
+version: 2.7.1
 type: bundler
 summary: JSON Implementation for Ruby
-homepage: http://flori.github.com/json
+homepage: https://flori.github.io/json
 license: other
 licenses:
 - sources: LICENSE
