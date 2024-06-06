@@ -59,7 +59,7 @@ jobs:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
     - name: cache cabal dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cabal/packages
@@ -86,7 +86,7 @@ jobs:
       with:
         toolchain: stable
     - name: cache cargo dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -381,7 +381,7 @@ jobs:
       run: |
         echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       name: Setup pnpm cache
       with:
         path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -415,7 +415,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       name: cache spm dependencies
       with:
         path: .build
