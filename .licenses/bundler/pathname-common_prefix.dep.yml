@@ -5,7 +5,6 @@ type: bundler
 summary: Calculate prefix commont to some pathnames
 homepage: https://gitlab.com/KitaitiMakoto/pathname-common_prefix
 license: other
-review_changed_license: true
 licenses:
 - sources: README.markdown
   text: |-
