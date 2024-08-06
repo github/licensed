@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## 4.4.0
 
+### Changed
+
+- Bumped a number of dependencies for security fixes
+
+## 4.4.0
+
 ### Added
 
 - Licensed status command will alert on stale cached dependency records (https://github.com/github/licensed/pull/657)
@@ -132,7 +138,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Comparing dependency license contents now finds matching contents regardless of the order of the licenses (https://github.com/github/licensed/pull/516)
-- Fixed typo in a link in README.md (https://github.com/github/licensed/pull/514) 
+- Fixed typo in a link in README.md (https://github.com/github/licensed/pull/514)
 
 ### Changed
 
