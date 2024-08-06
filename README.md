@@ -21,7 +21,7 @@ Licensed v3 includes a breaking change if both of the following are true:
 1. a project uses bundler to manage ruby dependencies
 2. a project uses the self-contained executable build of licensed
 
-All other usages of licensed should not encounter any major changes migrating from the latest 2.x build to 3.0.  
+All other usages of licensed should not encounter any major changes migrating from the latest 2.x build to 3.0.
 
 See [CHANGELOG.md](./CHANGELOG.md) for more details on what's changed.
 See the [v3 migration documentation](./docs/migrations/v3.md) for more info on migrating to v3.
@@ -94,7 +94,7 @@ To get started after checking out the repo, run
 
 You can also run `script/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then create a release on GitHub.
 
 ### Adding a new source
 
