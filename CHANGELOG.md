@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Ensure homepage string is not too long in cabal.rb to avoid DOS attack
 
+## 4.5.0
+
+### Changed
+
+- Bumped a number of dependencies for security fixes
+
 ## 4.4.0
 
 ### Added
