@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Ensure homepage string is not too long in cabal.rb to avoid DOS attack
+
 ## 4.4.0
 
 ### Added
@@ -132,7 +136,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Comparing dependency license contents now finds matching contents regardless of the order of the licenses (https://github.com/github/licensed/pull/516)
-- Fixed typo in a link in README.md (https://github.com/github/licensed/pull/514) 
+- Fixed typo in a link in README.md (https://github.com/github/licensed/pull/514)
 
 ### Changed
 
