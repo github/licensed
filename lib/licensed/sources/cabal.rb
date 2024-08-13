@@ -71,6 +71,12 @@ module Licensed
       # Returns a homepage url that enforces https and removes url fragments
       def safe_homepage(homepage)
         return unless homepage
+        # Ensure there's no denial of service issue with a long homepage
+        # 1000 characters is likely enough for any real project homepage
+        # See https://github.com/github/licensed/security/code-scanning/1
+        if homepage.length > 1000
+          raise ArgumentError, "Input too long"
+        end
         # use https and remove url fragment
         homepage.gsub(/http:/, "https:")
                 .gsub(/#[^?]*\z/, "")
