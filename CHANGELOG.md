@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Breaking change
+
+- Only supports Ruby 3.0+ due to nokogiri upgrade
+
 ### Changed
 
 - Ensure homepage string is not too long in cabal.rb to avoid DOS attack
