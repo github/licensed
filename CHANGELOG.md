@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - Ensure homepage string is not too long in cabal.rb to avoid DOS attack
+- Update dependencies
 
 ## 4.5.0
 
