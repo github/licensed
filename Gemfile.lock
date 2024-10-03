@@ -54,7 +54,7 @@ GEM
     mocha (2.4.5)
       ruby2_keywords (>= 0.0.5)
     mutex_m (0.2.0)
-    nokogiri (1.15.6)
+    nokogiri (1.16.5)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     octokit (6.1.0)
