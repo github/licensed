@@ -1,0 +1,9 @@
+---
+name: logger
+version: 1.6.1
+type: bundler
+summary: Provides a simple logging utility for outputting messages.
+homepage: https://github.com/ruby/logger
+license: other
+licenses: []
+notices: []
