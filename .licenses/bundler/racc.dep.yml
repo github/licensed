@@ -5,7 +5,6 @@ type: bundler
 summary: Racc is an LALR(1) parser generator
 homepage: https://github.com/ruby/racc
 license: other
-review_changed_license: true
 licenses:
 - sources: COPYING
   text: |
