@@ -1,9 +1,9 @@
 ---
-name: racc
-version: 1.8.1
+name: logger
+version: 1.6.1
 type: bundler
-summary: Racc is an LALR(1) parser generator
-homepage: https://github.com/ruby/racc
+summary: Provides a simple logging utility for outputting messages.
+homepage: https://github.com/ruby/logger
 license: other
 licenses:
 - sources: COPYING
@@ -64,10 +64,4 @@ licenses:
        IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
        PURPOSE.
-- sources: README.rdoc
-  text: |-
-    Racc is distributed under the same terms of ruby.
-      (see the file COPYING). Note that you do NOT need to follow
-      ruby license for your own parser (racc outputs).
-      You can distribute those files under any licenses you want.
 notices: []
