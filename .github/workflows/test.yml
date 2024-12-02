@@ -122,7 +122,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup php
-      uses: nanasess/setup-php@v4.0.2
+      uses: nanasess/setup-php@v4.1.0
       with:
         php-version: ${{ matrix.php }}
     - name: Set up Ruby
