@@ -6,7 +6,7 @@ PATH
       licensee (~> 9.16)
       parallel (~> 1.22)
       pathname-common_prefix (~> 0.0.1)
-      reverse_markdown (~> 2.1)
+      reverse_markdown (>= 2.1, < 4.0)
       ruby-xxHash (~> 0.4.0)
       thor (~> 1.2)
       tomlrb (~> 2.0)
@@ -75,7 +75,7 @@ GEM
     rainbow (3.1.1)
     rake (13.2.1)
     regexp_parser (2.6.2)
-    reverse_markdown (2.1.1)
+    reverse_markdown (3.0.0)
       nokogiri
     rexml (3.3.9)
     rubocop (1.45.1)
