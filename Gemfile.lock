@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    licensed (5.0.0)
+    licensed (5.0.1)
       json (~> 2.6)
       licensee (~> 9.16)
       parallel (~> 1.22)
