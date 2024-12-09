@@ -51,7 +51,7 @@ GEM
       thor (>= 0.19, < 2.0)
     logger (1.6.1)
     mini_portile2 (2.8.8)
-    minitest (5.25.1)
+    minitest (5.25.4)
     minitest-hooks (1.5.2)
       minitest (> 5.3)
     mocha (2.6.1)
