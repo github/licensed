@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # set up tooling
-      - uses: ruby/setup-ruby@a2bbe5b1b236842c1cb7dd11e8e3b51e0a616acc
+      - uses: ruby/setup-ruby@401c19e14f474b54450cd3905bb8b86e2c8509cf
         with:
           bundler-cache: true
 
