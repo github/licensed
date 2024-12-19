@@ -1,6 +1,6 @@
 ---
 name: json
-version: 2.8.2
+version: 2.9.1
 type: bundler
 summary: JSON Implementation for Ruby
 homepage: https://ruby.github.io/json
