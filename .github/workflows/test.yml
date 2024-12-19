@@ -57,7 +57,7 @@ jobs:
       with:
         bundler-cache: true
     - name: Setup Haskell
-      uses: haskell/actions/setup@v2
+      uses: haskell/actions/setup@dd344bc1cec854a369df8814ce17ef337d6e6170
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
@@ -85,7 +85,7 @@ jobs:
       with:
         bundler-cache: true
     - name: Setup Rust toolchain
-      uses: actions-rs/toolchain@v1
+      uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
       with:
         toolchain: stable
     - name: cache cargo dependencies
@@ -125,7 +125,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup php
-      uses: nanasess/setup-php@v4.1.0
+      uses: nanasess/setup-php@50c1c73e8ab7258f64ab525b05fcac481c0762db
       with:
         php-version: ${{ matrix.php }}
     - name: Set up Ruby
@@ -225,7 +225,7 @@ jobs:
         distribution: adopt
         cache: gradle
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v3.5.0
+      uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1
       with:
         gradle-version: ${{ matrix.gradle }}
     - name: Bootstrap
@@ -254,7 +254,7 @@ jobs:
         elixir: [ 1.13.x, 1.14.x ]
     steps:
     - uses: actions/checkout@v4
-    - uses: erlef/setup-beam@v1
+    - uses: erlef/setup-beam@5304e04ea2b355f03681464e683d92e3b2f18451
       with:
         otp-version: ${{matrix.otp}}
         elixir-version: ${{matrix.elixir}}
@@ -371,7 +371,7 @@ jobs:
         pnpm_version: [ 7 ]
     steps:
     - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
+    - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2
       name: Install pnpm
       id: pnpm-install
       with:
@@ -411,7 +411,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup Swift
-      uses: swift-actions/setup-swift@v2
+      uses: swift-actions/setup-swift@3aed395c5397f62deb91d8fe7af1418a9ae4d16f
       with:
         swift-version: ${{ matrix.swift }}
     - name: Set up Ruby
