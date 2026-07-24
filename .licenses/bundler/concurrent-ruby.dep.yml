@@ -1,6 +1,6 @@
 ---
 name: concurrent-ruby
-version: 1.3.7
+version: 1.3.8
 type: bundler
 summary: Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell,
   F#, C#, Java, and classic concurrency patterns.
